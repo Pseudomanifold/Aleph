@@ -1,0 +1,8 @@
+PROJECT( Aleph )
+
+SET( CMAKE_CXX_STANDARD 11 )
+SET( CMAKE_CXX_STANDARD_REQUIRED ON )
+
+ADD_EXECUTABLE( aleph_test
+  aleph_test.cc
+)
