@@ -26,7 +26,7 @@ public:
     return _data.size();
   }
 
-  std::pair<Index, bool> getMaximumIndex( Index column )
+  std::pair<Index, bool> getMaximumIndex( Index column ) const
   {
     if( _data.at( column ).empty() )
       return std::make_pair( Index(0), false );

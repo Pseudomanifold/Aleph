@@ -21,7 +21,7 @@ public:
     return _representation.getNumColumns();
   }
 
-  Index getMaximumIndex( Index column ) const
+  std::pair<Index, bool> getMaximumIndex( Index column ) const
   {
     return _representation.getMaximumIndex( column );
   };

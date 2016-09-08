@@ -3,6 +3,7 @@
 
 #include "BoundaryMatrix.hh"
 
+#include <tuple>
 #include <vector>
 
 namespace aleph
@@ -23,12 +24,12 @@ public:
     for( Index j = 0; j < numColumns; j++ )
     {
       Index i;
-      bool valid;
+      bool valid = false;
 
       std::tie( i, valid ) = M.getMaximumIndex( j );
       while( valid && lut[i].second )
       {
-        M.addColumns( j, lut[i] );
+        M.addColumns( lut[i].first, j );
         std::tie( i, valid ) = M.getMaximumIndex( j );
       }
 
