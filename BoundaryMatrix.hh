@@ -43,6 +43,11 @@ public:
     return _representation.getColumn( column );
   }
 
+  Index getDimension( Index column ) const
+  {
+    return _representation.getDimension( column );
+  }
+
 private:
   Representation _representation;
 };

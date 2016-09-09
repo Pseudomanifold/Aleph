@@ -19,6 +19,7 @@ public:
   void setNumColumns( Index numColumns )
   {
     _data.resize( numColumns );
+    _dimensions.resize( numColumns );
   }
 
   Index getNumColumns() const
@@ -53,6 +54,13 @@ public:
                                                  InputIterator begin, InputIterator end )
   {
     _data.at( column ).assign( begin, end );
+
+    // Upon initialization, the column must by necessity have the dimension
+    // that is indicated by the amount of indices in its boundary. The case
+    // of 0-simplices needs special handling.
+    _dimensions.at( column )
+        = begin == end ? 0
+                       : static_cast<Index>( std::distance( begin, end ) - 1 );
   }
 
   std::vector<Index> getColumn( Index column ) const
@@ -60,8 +68,14 @@ public:
     return _data.at( column );
   }
 
+  Index getDimension( Index column ) const
+  {
+    return _dimensions.at( column );
+  }
+
 private:
   std::vector< std::vector<Index> > _data;
+  std::vector<Index> _dimensions;
 };
 
 }

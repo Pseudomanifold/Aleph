@@ -8,6 +8,7 @@
 #include <iterator>
 #include <ostream>
 #include <sstream>
+#include <stdexcept>
 #include <string>
 
 namespace aleph
@@ -69,10 +70,16 @@ template <class Representation> BoundaryMatrix<Representation> load( const std::
                       return static_cast<Index>( std::stoul( token ) );
                     } );
 
+    if( indices.empty() )
+      throw std::runtime_error( "Amount of indices in boundary must not be empty" );
+
     // TODO: This ignores the dimension of the column
     // TODO: This assumes that the column indices are ordered
     M.setColumn( curColumn,
                  indices.begin() + 1, indices.end() );
+
+    if( M.getDimension( curColumn ) != indices.front() )
+      throw std::runtime_error( "Inconsistency between actual number of indices and specified number of indices in boundary" );
 
     ++curColumn;
   }
