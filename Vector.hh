@@ -68,6 +68,11 @@ public:
     return _data.at( column );
   }
 
+  void clearColumn( Index column )
+  {
+    _data.at( column ).clear();
+  }
+
   Index getDimension( Index column ) const
   {
     return _dimensions.at( column );
