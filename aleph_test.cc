@@ -18,7 +18,8 @@ int main()
 {
   auto M = load<BM>( "Triangle.txt" );
 
-  std::cout << M << std::endl;
+  std::cout << "* Boundary matrix\n" << M << "\n"
+            << "* Maximum dimension: " << M.getDimension() << "\n";
 
   computePersistencePairs<SR>( M );
 }

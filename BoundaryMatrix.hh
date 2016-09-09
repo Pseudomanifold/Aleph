@@ -48,6 +48,11 @@ public:
     return _representation.getDimension( column );
   }
 
+  Index getDimension() const
+  {
+    return _representation.getDimension();
+  }
+
 private:
   Representation _representation;
 };

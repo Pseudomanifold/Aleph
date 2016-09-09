@@ -73,6 +73,14 @@ public:
     return _dimensions.at( column );
   }
 
+  Index getDimension() const
+  {
+    if( _dimensions.empty() )
+      return Index(0);
+    else
+      return *std::max_element( _dimensions.begin(), _dimensions.end() );
+  }
+
 private:
   std::vector< std::vector<Index> > _data;
   std::vector<Index> _dimensions;
