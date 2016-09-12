@@ -15,7 +15,7 @@ template <
   using Index = typename BoundaryMatrix<Representation>::Index;
 
   BoundaryMatrix<Representation> M;
-  M.setNumColumns( K.size() );
+  M.setNumColumns( static_cast<Index>( K.size() ) );
 
   Index j = Index(0);
 

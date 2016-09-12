@@ -589,7 +589,7 @@ public:
         if( itPos != this->end() )
         {
           weight = std::max( weight,
-                             itPos->getData() );
+                             itPos->data() );
         }
 
         // The if-branch above ignores missing boundaries. This is useful when a
@@ -739,7 +739,7 @@ private:
         // its faces (assuming that the data type is comparable).
 
         _simplices.push_back( Simplex( *itFace,
-                                       simplex.getData() ) );
+                                       simplex.data() ) );
       }
     }
   }
