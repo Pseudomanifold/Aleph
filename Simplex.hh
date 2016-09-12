@@ -1,16 +1,16 @@
 #ifndef ALEPH_SIMPLEX_HH__
 #define ALEPH_SIMPLEX_HH__
 
+#include <boost/functional/hash.hpp>
+
+#include <boost/iterator/iterator_adaptor.hpp>
+#include <boost/iterator/filter_iterator.hpp>
+
 #include <algorithm>
 #include <initializer_list>
 #include <iosfwd>
 #include <stdexcept>
 #include <vector>
-
-#include <boost/functional/hash.hpp>
-
-#include <boost/iterator/iterator_adaptor.hpp>
-#include <boost/iterator/filter_iterator.hpp>
 
 namespace aleph
 {

@@ -1,9 +1,6 @@
 #ifndef ALEPH_SIMPLICIAL_COMPLEX_HH__
 #define ALEPH_SIMPLICIAL_COMPLEX_HH__
 
-namespace aleph
-{
-
 #include <boost/multi_index_container.hpp>
 
 #include <boost/multi_index/indexed_by.hpp>
@@ -19,6 +16,9 @@ namespace aleph
 #include <set>
 #include <type_traits>
 #include <vector>
+
+namespace aleph
+{
 
 template <class Simplex> class SimplicialComplex
 {
@@ -40,7 +40,8 @@ public:
        >
   >;
 
-  using const_iterator                 = typename simplex_container_t::template index<index_t>::type::const_iterator const_iterator;
+
+  using const_iterator                 = typename simplex_container_t::template index<index_t>::type::const_iterator;
   using iterator                       = typename simplex_container_t::template index<index_t>::type::iterator;
 
   using lexicographical_iterator       = typename simplex_container_t::template index<lexicographical_t>::type::const_iterator;
@@ -54,6 +55,7 @@ public:
   // This simplifies writing algorithms that do not have any internal knowledge
   // about objects stored in this container.
   using value_type = Simplex;
+
 
   // constructors ------------------------------------------------------
 
@@ -624,7 +626,7 @@ public:
     {
       foundInvalidSimplex = false;
 
-      for( iterator itSimplex = this->begin();
+      for( auto itSimplex = this->begin();
            itSimplex != this->end(); )
       {
         if( this->checkValidity( *itSimplex ) == false )
