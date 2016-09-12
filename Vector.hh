@@ -24,7 +24,7 @@ public:
 
   Index getNumColumns() const
   {
-    return _data.size();
+    return static_cast<Index>( _data.size() );
   }
 
   std::pair<Index, bool> getMaximumIndex( Index column ) const
