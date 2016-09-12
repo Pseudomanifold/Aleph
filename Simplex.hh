@@ -45,7 +45,7 @@ public:
 
   /** Creates an empty simplex */
   Simplex()
-    : _data( Data() )
+    : _data( DataType() )
   {
   }
 
@@ -91,7 +91,7 @@ public:
 
   template <class InputIterator>
   Simplex( InputIterator begin, InputIterator end,
-           DataType data = Data() )
+           DataType data = DataType() )
     : _vertices( begin, end )
     , _data( data )
   {
@@ -107,9 +107,9 @@ public:
     @param data     Data to assign to simplex
   */
 
-  template <class VertexType>
-  Simplex( const std::initializer_list<VertexType>& vertices,
-           DataType data = Data() )
+  template <class Vertex>
+  Simplex( const std::initializer_list<Vertex>& vertices,
+           DataType data = DataType() )
     : Simplex( vertices.begin(), vertices.end(), data )
   {
   }
@@ -359,7 +359,7 @@ std::ostream& operator<<( std::ostream& o, const Simplex<DataType, VertexType>& 
 template <class DataType>
 std::ostream& operator<<( std::ostream& o, const Simplex<DataType>& s )
 {
-  return ::operator<< <DataType, typename Simplex<DataType>::vertex_type>( o, s );
+  return operator<< <DataType, typename Simplex<DataType>::vertex_type>( o, s );
 }
 
 // ---------------------------------------------------------------------
@@ -373,7 +373,7 @@ std::size_t hash_value( const Simplex<DataType, VertexType>& s )
 
 template <class DataType> std::size_t hash_value( const Simplex<DataType>& s )
 {
-  return ::hash_value<DataType, typename Simplex<DataType>::vertex_type>( s );
+  return hash_value<DataType, typename Simplex<DataType>::vertex_type>( s );
 }
 
 // ---------------------------------------------------------------------
