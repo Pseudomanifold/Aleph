@@ -5,6 +5,10 @@
 #include "Twist.hh"
 #include "PersistencePairs.hh"
 
+#include "Conversions.hh"
+#include "Simplex.hh"
+#include "SimplicialComplex.hh"
+
 #include <iostream>
 
 using namespace aleph;
@@ -16,6 +20,9 @@ using BM = BoundaryMatrix<V>;
 using SR = StandardReduction;
 using TR = TwistReduction;
 
+using S  = Simplex<float, unsigned>;
+using SC = SimplicialComplex<S>;
+
 int main()
 {
   auto M = load<BM>( "Triangle.txt" );
@@ -25,4 +32,16 @@ int main()
 
   computePersistencePairs<SR>( M );
   computePersistencePairs<TR>( M );
+
+  {
+    S simplex( {0,1,2} );
+    SC K( { {0}, {1}, {2}, {0,1}, {0,2}, {1,2}, {0,1,2} } );
+
+    std::cout << K;
+
+    auto M = makeBoundaryMatrix<BM>( K );
+
+    computePersistencePairs<SR>( M );
+    computePersistencePairs<TR>( M );
+  }
 }
