@@ -64,6 +64,7 @@ template <class Representation> BoundaryMatrix<Representation> dualizeTrivial( c
                  dualMatrix.at(j).begin(), dualMatrix.at(j).end() );
   }
 
+  N.setDualized( !M.isDualized() );
   return N;
 }
 

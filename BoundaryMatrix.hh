@@ -58,6 +58,16 @@ public:
     return _representation.getDimension();
   }
 
+  void setDualized( bool value = true )
+  {
+    _representation.setDualized( value );
+  }
+
+  bool isDualized() const
+  {
+    return _representation.isDualized();
+  }
+
 private:
   Representation _representation;
 };

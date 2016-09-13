@@ -36,8 +36,8 @@ int main()
   computePersistencePairs<SR>( M );
   computePersistencePairs<TR>( M );
 
-  computePersistencePairs<SR>( dualizeTrivial( M ), true );
-  computePersistencePairs<TR>( dualizeTrivial( M ), true );
+  computePersistencePairs<SR>( dualizeTrivial( M ) );
+  computePersistencePairs<TR>( dualizeTrivial( M ) );
 
   std::cout << "* Boundary matrix [doubly-dualized]\n"
             << dualizeTrivial( dualizeTrivial( M ) ) << "\n";

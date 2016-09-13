@@ -1,7 +1,6 @@
 #ifndef ALEPH_PERSISTENCE_PAIRS_HH__
 #define ALEPH_PERSISTENCE_PAIRS_HH__
 
-#include "Dualization.hh"
 #include "BoundaryMatrix.hh"
 #include "PersistencePairing.hh"
 
@@ -15,14 +14,12 @@ namespace aleph
 template <
   class ReductionAlgorithm,
   class Representation
-> PersistencePairing<typename Representation::Index> computePersistencePairs( const BoundaryMatrix<Representation>& M, bool dualize = false )
+> PersistencePairing<typename Representation::Index> computePersistencePairs( const BoundaryMatrix<Representation>& M )
 {
   using Index              = typename Representation::Index;
   using PersistencePairing = PersistencePairing<Index>;
 
   BoundaryMatrix<Representation> B = M;
-  if( dualize )
-    dualizeTrivial( B );
 
   ReductionAlgorithm reductionAlgorithm;
   reductionAlgorithm( B );
@@ -43,7 +40,7 @@ template <
       auto v = j;
       auto w = u;
 
-      if( dualize )
+      if( B.isDualized() )
       {
         u  = numColumns - 1 - v;
         v  = numColumns - 1 - w; // Yes, this is correct!
