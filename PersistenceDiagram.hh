@@ -1,6 +1,7 @@
 #ifndef ALEPH_PERSISTENCE_DIAGRAM_HH__
 #define ALEPH_PERSISTENCE_DIAGRAM_HH__
 
+#include <iosfwd>
 #include <limits>
 #include <utility>
 #include <vector>
@@ -115,6 +116,14 @@ private:
   /** Container of persistence pairs */
   ContainerType _points;
 };
+
+template <class DataType> std::ostream& operator<<( std::ostream& o, const PersistenceDiagram<DataType>& D )
+{
+  for( auto&& p : D )
+    o << p.x() << "\t" << p.y() << "\n";
+
+  return o;
+}
 
 }
 

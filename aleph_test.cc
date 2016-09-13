@@ -48,5 +48,11 @@ int main()
 
     auto&& diagrams1 = makePersistenceDiagrams( pairing1, K );
     auto&& diagrams2 = makePersistenceDiagrams( pairing2, K );
+
+    for( auto&& D : diagrams1 )
+      std::cout << D << "\n";
+
+    for( auto&& D : diagrams2 )
+      std::cout << D << "\n";
   }
 }
