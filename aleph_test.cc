@@ -6,6 +6,7 @@
 #include "PersistencePairs.hh"
 
 #include "Conversions.hh"
+#include "Dualization.hh"
 #include "PersistenceDiagram.hh"
 #include "PersistenceDiagramConversion.hh"
 #include "Simplex.hh"
@@ -34,6 +35,11 @@ int main()
 
   computePersistencePairs<SR>( M );
   computePersistencePairs<TR>( M );
+
+  computePersistencePairs<SR>( dualizeTrivial( M ) );
+
+  std::cout << "* Boundary matrix [doubly-dualized]\n"
+            << dualizeTrivial( dualizeTrivial( M ) ) << "\n";
 
   {
     S simplex( {0,1,2} );
