@@ -16,8 +16,8 @@ namespace aleph
 {
 
 template <
-  class DataType,
-  class VertexType = unsigned short
+  class D,
+  class V = unsigned short
 >
 class Simplex
 {
@@ -27,6 +27,9 @@ public:
   //
   // Note that these aliases follow the STL conventions in order to make it
   // easier to use the class with STL algorithms.
+
+  using DataType                      = D;
+  using VertexType                    = V;
 
   using data_type                     = DataType;
   using vertex_type                   = VertexType;
@@ -299,8 +302,8 @@ public:
 
   // Convenience functions ---------------------------------------------
 
-  template <class D>          friend std::size_t hash_value( const Simplex<D>& s );
-  template <class D, class V> friend std::size_t hash_value( const Simplex<D,V>& s );
+  template <class DataType>                   friend std::size_t hash_value( const Simplex<DataType>& s );
+  template <class DataType, class VertexType> friend std::size_t hash_value( const Simplex<DataType, VertexType>& s );
 
 private:
 

@@ -6,6 +6,8 @@
 #include "PersistencePairs.hh"
 
 #include "Conversions.hh"
+#include "PersistenceDiagram.hh"
+#include "PersistenceDiagramConversion.hh"
 #include "Simplex.hh"
 #include "SimplicialComplex.hh"
 
@@ -41,7 +43,10 @@ int main()
 
     auto M = makeBoundaryMatrix<BM>( K );
 
-    computePersistencePairs<SR>( M );
-    computePersistencePairs<TR>( M );
+    auto&& pairing1 = computePersistencePairs<SR>( M );
+    auto&& pairing2 = computePersistencePairs<TR>( M );
+
+    makePersistenceDiagrams( pairing1, K );
+    makePersistenceDiagrams( pairing2, K );
   }
 }

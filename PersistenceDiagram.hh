@@ -20,7 +20,7 @@ public:
       : _x( x )
       , _y( std::numeric_limits<DataType>::max() )
     {
-      if( std::numeric_limits<DataType>::has_infinity() )
+      if( std::numeric_limits<DataType>::has_infinity )
         _y = std::numeric_limits<DataType>::infinity();
     }
 
