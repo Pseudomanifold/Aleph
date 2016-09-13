@@ -97,8 +97,13 @@ template <class Representation> std::ostream& operator<< ( std::ostream& o, cons
   {
     auto column = M.getColumn( j );
 
-    for( auto&& c : column )
-      o << c << " ";
+    if( !column.empty() )
+    {
+      for( auto&& c : column )
+        o << c << " ";
+    }
+    else
+      o << "-";
 
     o << "\n";
   }
