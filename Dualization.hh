@@ -8,7 +8,7 @@
 namespace aleph
 {
 
-template <class Representation> BoundaryMatrix<Representation> dualizeTrivial( const BoundaryMatrix<Representation>& M )
+template <class Representation> BoundaryMatrix<Representation> dualize( const BoundaryMatrix<Representation>& M )
 {
   using Index = typename BoundaryMatrix<Representation>::Index;
 

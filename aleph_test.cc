@@ -36,11 +36,11 @@ int main()
   computePersistencePairs<SR>( M );
   computePersistencePairs<TR>( M );
 
-  computePersistencePairs<SR>( dualizeTrivial( M ) );
-  computePersistencePairs<TR>( dualizeTrivial( M ) );
+  computePersistencePairs<SR>( dualize( M ) );
+  computePersistencePairs<TR>( dualize( M ) );
 
   std::cout << "* Boundary matrix [doubly-dualized]\n"
-            << dualizeTrivial( dualizeTrivial( M ) ) << "\n";
+            << dualize( dualize( M ) ) << "\n";
 
   {
     S simplex( {0,1,2} );
@@ -52,8 +52,8 @@ int main()
 
     auto&& pairing1 = computePersistencePairs<SR>( M );
     auto&& pairing2 = computePersistencePairs<TR>( M );
-    auto&& pairing3 = computePersistencePairs<SR>( dualizeTrivial( M ) );
-    auto&& pairing4 = computePersistencePairs<TR>( dualizeTrivial( M ) );
+    auto&& pairing3 = computePersistencePairs<SR>( dualize( M ) );
+    auto&& pairing4 = computePersistencePairs<TR>( dualize( M ) );
 
     auto&& diagrams1 = makePersistenceDiagrams( pairing1, K );
     auto&& diagrams2 = makePersistenceDiagrams( pairing2, K );
