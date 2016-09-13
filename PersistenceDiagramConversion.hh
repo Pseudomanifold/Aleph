@@ -46,7 +46,12 @@ std::vector< PersistenceDiagram<typename Simplex::DataType> > makePersistenceDia
   result.reserve( persistenceDiagrams.size() );
 
   for( auto&& pair : persistenceDiagrams )
-    result.push_back( pair.second );
+  {
+    auto&& diagram = pair.second;
+    diagram.setDimension( pair.first );
+
+    result.push_back( diagram );
+  }
 
   return result;
 }

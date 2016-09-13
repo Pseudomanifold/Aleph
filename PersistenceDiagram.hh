@@ -83,12 +83,19 @@ public:
     return _points.erase( begin, end );
   }
 
-  // Queries -----------------------------------------------------------
+  // Attributes --------------------------------------------------------
+
+  void setDimension( std::size_t dimension )
+  {
+    _dimension = dimension;
+  }
 
   std::size_t dimension() const
   {
     return _dimension;
   }
+
+  // Queries -----------------------------------------------------------
 
   std::size_t size() const
   {
