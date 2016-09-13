@@ -2,6 +2,7 @@
 #define ALEPH_PERSISTENCE_PAIRS_HH__
 
 #include "BoundaryMatrix.hh"
+#include "PersistencePairing.hh"
 
 #include <iostream>
 #include <tuple>
@@ -11,12 +12,15 @@ namespace aleph
 
 template <class ReductionAlgorithm, class Representation> void computePersistencePairs( const BoundaryMatrix<Representation>& M )
 {
-  using Index = typename Representation::Index;
+  using Index              = typename Representation::Index;
+  using PersistencePairing = PersistencePairing<Index>;
 
   BoundaryMatrix<Representation> B = M;
 
   ReductionAlgorithm reductionAlgorithm;
   reductionAlgorithm( B );
+
+  PersistencePairing pairing;
 
   auto numColumns = B.getNumColumns();
 
@@ -27,7 +31,11 @@ template <class ReductionAlgorithm, class Representation> void computePersistenc
 
     std::tie( i, valid ) = B.getMaximumIndex( j );
     if( valid )
+    {
       std::cout << "Pair: " << i << "--" << j << std::endl;
+
+      pairing.add( i, j );
+    }
   }
 }
 
