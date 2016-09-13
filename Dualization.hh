@@ -2,10 +2,8 @@
 #define ALEPH_DUALIZATION_HH__
 
 #include "BoundaryMatrix.hh"
-#include "IO.hh" // FIXME: Remove after debugging
 
 #include <algorithm>
-#include <iostream> // FIXME: Remove after debugging
 
 namespace aleph
 {
@@ -28,7 +26,7 @@ template <class Representation> BoundaryMatrix<Representation> dualizeTrivial( c
     auto&& column = M.getColumn(j);
 
     for( auto&& i : column )
-      ++dualColumnSizes.at( numColumns - 1 - i ); // FIXME: Change operator later after debugging
+      ++dualColumnSizes[ numColumns - 1 - i ];
   }
 
   for( Index j = 0; j < numColumns; j++ )
@@ -43,11 +41,12 @@ template <class Representation> BoundaryMatrix<Representation> dualizeTrivial( c
     auto&& column = M.getColumn( j );
 
     for( auto&& i : column )
-      dualMatrix.at( numColumns - 1 - i ).push_back( numColumns - 1 - j ); // FIXME: Change operator later after debugging
+      dualMatrix[ numColumns - 1 - i ].push_back( numColumns - 1 - j );
   }
 
   auto&& d = M.getDimension();
 
+  // FIXME: Do I need this?
   for( Index j = 0; j < numColumns; j++ )
     dualDimensions.at( numColumns - 1 - j ) = d - M.getDimension( j ); // FIXME: Change operator later after debugging
 
@@ -64,8 +63,6 @@ template <class Representation> BoundaryMatrix<Representation> dualizeTrivial( c
     N.setColumn( j,
                  dualMatrix.at(j).begin(), dualMatrix.at(j).end() );
   }
-
-  std::cout << N << std::endl;
 
   return N;
 }
