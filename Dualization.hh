@@ -5,6 +5,7 @@
 #include "IO.hh" // FIXME: Remove after debugging
 
 #include <algorithm>
+#include <iostream> // FIXME: Remove after debugging
 
 namespace aleph
 {

@@ -1,9 +1,11 @@
 #ifndef ALEPH_PERSISTENCE_PAIRS_HH__
 #define ALEPH_PERSISTENCE_PAIRS_HH__
 
+#include "Dualization.hh"
 #include "BoundaryMatrix.hh"
 #include "PersistencePairing.hh"
 
+#include <algorithm>
 #include <iostream>
 #include <tuple>
 
@@ -13,12 +15,14 @@ namespace aleph
 template <
   class ReductionAlgorithm,
   class Representation
-> PersistencePairing<typename Representation::Index> computePersistencePairs( const BoundaryMatrix<Representation>& M )
+> PersistencePairing<typename Representation::Index> computePersistencePairs( const BoundaryMatrix<Representation>& M, bool dualize = false )
 {
   using Index              = typename Representation::Index;
   using PersistencePairing = PersistencePairing<Index>;
 
   BoundaryMatrix<Representation> B = M;
+  if( dualize )
+    dualizeTrivial( B );
 
   ReductionAlgorithm reductionAlgorithm;
   reductionAlgorithm( B );
@@ -35,12 +39,23 @@ template <
     std::tie( i, valid ) = B.getMaximumIndex( j );
     if( valid )
     {
-      std::cout << "Pair: " << i << "--" << j << std::endl;
+      auto u = i;
+      auto v = j;
+      auto w = u;
 
-      pairing.add( i, j );
+      if( dualize )
+      {
+        u  = numColumns - 1 - v;
+        v  = numColumns - 1 - w; // Yes, this is correct!
+      }
+
+      std::cout << "Pair: " << u << "--" << v << std::endl;
+
+      pairing.add( u, v );
     }
   }
 
+  std::sort( pairing.begin(), pairing.end() );
   return pairing;
 }
 
