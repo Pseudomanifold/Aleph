@@ -9,6 +9,7 @@
 #include "Dualization.hh"
 #include "PersistenceDiagram.hh"
 #include "PersistenceDiagramConversion.hh"
+#include "PersistenceDiagramNorms.hh"
 #include "Simplex.hh"
 #include "SimplicialComplex.hh"
 
@@ -79,5 +80,14 @@ int main()
       std::cout << D << "\n";
 
     std::cout<< std::string( 80, '-' ) << "\n";
+
+    for( auto&& D : diagrams1 )
+    {
+      std::cout << "1-norm:                     " << pNorm( D, 1 ) << "\n"
+                << "2-norm:                     " << pNorm( D )    << "\n"
+                << "Total degree-1 persistence: " << totalPersistence( D, 1 ) << "\n"
+                << "Total degree-2 persistence: " << totalPersistence( D, 2 ) << "\n"
+                << "Infinity norm:              " << infinityNorm( D ) << "\n";
+    }
   }
 }
