@@ -52,14 +52,32 @@ int main()
 
     auto&& pairing1 = computePersistencePairs<SR>( M );
     auto&& pairing2 = computePersistencePairs<TR>( M );
+    auto&& pairing3 = computePersistencePairs<SR>( dualizeTrivial( M ) );
+    auto&& pairing4 = computePersistencePairs<TR>( dualizeTrivial( M ) );
 
     auto&& diagrams1 = makePersistenceDiagrams( pairing1, K );
     auto&& diagrams2 = makePersistenceDiagrams( pairing2, K );
+    auto&& diagrams3 = makePersistenceDiagrams( pairing3, K );
+    auto&& diagrams4 = makePersistenceDiagrams( pairing4, K );
 
+    std::cout<< std::string( 80, '-' ) << "\n";
     for( auto&& D : diagrams1 )
       std::cout << D << "\n";
+    std::cout<< std::string( 80, '-' ) << "\n";
 
     for( auto&& D : diagrams2 )
       std::cout << D << "\n";
+
+    std::cout<< std::string( 80, '-' ) << "\n";
+
+    for( auto&& D : diagrams3 )
+      std::cout << D << "\n";
+
+    std::cout<< std::string( 80, '-' ) << "\n";
+
+    for( auto&& D : diagrams4 )
+      std::cout << D << "\n";
+
+    std::cout<< std::string( 80, '-' ) << "\n";
   }
 }
