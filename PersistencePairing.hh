@@ -12,6 +12,26 @@ template <class Index> class PersistencePairing
 {
 public:
 
+  // Typedefs & aliases ------------------------------------------------
+
+  using ValueType     = std::pair<Index, Index>;
+  using ContainerType = std::vector<ValueType>;
+
+  using ConstIterator = typename ContainerType::const_iterator;
+  using Iterator      = typename ContainerType::iterator;
+
+  using value_type    = ValueType;
+
+  // Iterators ---------------------------------------------------------
+
+  ConstIterator begin() const { return _pairs.begin(); }
+  Iterator      begin()       { return _pairs.begin(); }
+
+  ConstIterator end() const   { return _pairs.end(); }
+  Iterator      end()         { return _pairs.end(); }
+
+  // Container modification --------------------------------------------
+
   void add( Index birth )
   {
     _pairs.push_back( std::make_pair( birth, std::numeric_limits<Index>::max() ) );
@@ -21,6 +41,8 @@ public:
   {
     _pairs.push_back( std::make_pair( birth, destruction ) );
   }
+
+  // Queries -----------------------------------------------------------
 
   std::size_t size() const
   {
@@ -33,7 +55,7 @@ public:
   }
 
 private:
-  std::vector< std::pair<Index, Index> > _pairs;
+  ContainerType _pairs;
 };
 
 }
