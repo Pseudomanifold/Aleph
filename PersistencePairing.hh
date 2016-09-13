@@ -42,6 +42,16 @@ public:
     _pairs.push_back( std::make_pair( birth, destruction ) );
   }
 
+  Iterator erase( Iterator position )
+  {
+    return _pairs.erase( position );
+  }
+
+  Iterator erase( Iterator begin, Iterator end )
+  {
+    return _pairs.erase( begin, end );
+  }
+
   // Queries -----------------------------------------------------------
 
   std::size_t size() const
