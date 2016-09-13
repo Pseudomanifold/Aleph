@@ -52,6 +52,18 @@ public:
     return _pairs.erase( begin, end );
   }
 
+  // Comparison operators ----------------------------------------------
+
+  bool operator==( const PersistencePairing<Index>& other ) const
+  {
+    return _pairs == other._pairs;
+  }
+
+  bool operator!=( const PersistencePairing<Index>& other ) const
+  {
+    return !( this->operator==( other ) );
+  }
+
   // Queries -----------------------------------------------------------
 
   std::size_t size() const

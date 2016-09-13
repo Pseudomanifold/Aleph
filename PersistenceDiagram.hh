@@ -96,6 +96,18 @@ public:
     return _dimension;
   }
 
+  // Comparison operators ----------------------------------------------
+
+  bool operator==( const PersistenceDiagram<DataType>& other ) const
+  {
+    return _points == other._points;
+  }
+
+  bool operator!=( const PersistenceDiagram<DataType>& other ) const
+  {
+    return !( this->operator==( other ) );
+  }
+
   // Queries -----------------------------------------------------------
 
   std::size_t size() const
