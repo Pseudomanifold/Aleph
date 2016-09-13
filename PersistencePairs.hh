@@ -10,7 +10,10 @@
 namespace aleph
 {
 
-template <class ReductionAlgorithm, class Representation> void computePersistencePairs( const BoundaryMatrix<Representation>& M )
+template <
+  class ReductionAlgorithm,
+  class Representation
+> PersistencePairing<typename Representation::Index> computePersistencePairs( const BoundaryMatrix<Representation>& M )
 {
   using Index              = typename Representation::Index;
   using PersistencePairing = PersistencePairing<Index>;
@@ -37,6 +40,8 @@ template <class ReductionAlgorithm, class Representation> void computePersistenc
       pairing.add( i, j );
     }
   }
+
+  return pairing;
 }
 
 }
