@@ -13,10 +13,14 @@
 #include "Simplex.hh"
 #include "SimplicialComplex.hh"
 
+#include "filtrations/LowerStar.hh"
+#include "filtrations/UpperStar.hh"
+
 #include <iostream>
 
 using namespace aleph;
 using namespace representations;
+using namespace filtrations;
 
 using I  = unsigned;
 using V  = Vector<I>;
@@ -48,6 +52,23 @@ int main()
     SC K( { {0}, {1}, {2}, {0,1}, {0,2}, {1,2}, {0,1,2} } );
 
     std::cout << K;
+
+    {
+      auto L1 = K;
+      auto L2 = K;
+
+      std::vector<float> functionValues
+        = { 0.0, 0.0, 1.0, 1.0, 2.0, 3.0, 3.0 };
+
+      LowerStar<S> ls( functionValues.begin(), functionValues.end() );
+      UpperStar<S> us( functionValues.begin(), functionValues.end() );
+
+      L1.sort( std::ref( ls ) );
+      L2.sort( std::ref( us ) );
+
+      std::cout << "Lower-star filtration:\n" << L1 << "\n"
+                << "Upper-star filtration:\n" << L2 << "\n";
+    }
 
     auto M = makeBoundaryMatrix<BM>( K );
 

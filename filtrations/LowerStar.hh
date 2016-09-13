@@ -1,5 +1,5 @@
-#ifndef ALEPH_LOWER_STAR_FILTRATION_HH__
-#define ALEPH_LOWER_STAR_FILTRATION_HH__
+#ifndef ALEPH_LOWER_STAR_HH__
+#define ALEPH_LOWER_STAR_HH__
 
 #include <limits>
 #include <vector>
