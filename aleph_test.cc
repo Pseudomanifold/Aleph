@@ -16,11 +16,14 @@
 #include "filtrations/LowerStar.hh"
 #include "filtrations/UpperStar.hh"
 
+#include "utilities/String.hh"
+
 #include <iostream>
 
 using namespace aleph;
 using namespace representations;
 using namespace filtrations;
+using namespace utilities;
 
 using I  = unsigned;
 using V  = Vector<I>;
@@ -111,4 +114,14 @@ int main()
                 << "Infinity norm:              " << infinityNorm( D ) << "\n";
     }
   }
+
+  std::string s = " \r\tTest ";
+  std::string t = " foo bar   baz\n ";
+
+  std::cout << "#" << trim(s) << "#" << std::endl;
+
+  for( auto&& s : split( t ) )
+    std::cout << "*" << s << "*";
+
+  std::cout << std::endl;
 }
