@@ -23,8 +23,14 @@ ENABLE_IF_SUPPORTED( CMAKE_CXX_FLAGS "-Wself-init" )
 ENABLE_IF_SUPPORTED( CMAKE_CXX_FLAGS "-Wunsafe-loop-optimization" )
 ENABLE_IF_SUPPORTED( CMAKE_CXX_FLAGS "-pedantic" )
 
+INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR} )
+
 ADD_EXECUTABLE( aleph_test
   aleph_test.cc
+)
+
+ADD_EXECUTABLE( aleph_ply
+  aleph_ply.cc
 )
 
 #
