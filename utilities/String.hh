@@ -2,8 +2,8 @@
 #define ALEPH_STRING_HH__
 
 #include <algorithm>
-#include <list>
 #include <regex>
+#include <vector>
 
 #include <cctype>
 
@@ -42,8 +42,8 @@ template <class T> T trim( T sequence )
   return ltrim( rtrim( sequence ) );
 }
 
-template <class T> std::list<T> split( const T& sequence,
-                                       const T& regex = "[[:space:]]+" )
+template <class T> std::vector<T> split( const T& sequence,
+                                         const T& regex = "[[:space:]]+" )
 {
   std::regex re( regex );
   std::sregex_token_iterator begin( sequence.begin(), sequence.end(), re, -1 );
