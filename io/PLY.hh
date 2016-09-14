@@ -25,7 +25,7 @@ namespace io
 template <
   class DataType,
   class VertexType
-> SimplicialComplex< Simplex<DataType, VertexType> > loadPLY( const std::string& filename )
+> SimplicialComplex< Simplex<DataType, VertexType> > loadPLY( const std::string& filename, const std::string& property = std::string() )
 {
   std::ifstream in( filename );
 
@@ -180,7 +180,20 @@ template <
     auto z      = std::stod( tokens.at( iz ) );
 
     coordinates.push_back( {x,y,z} );
-    simplices.push_back( { VertexType( vertexIndex ) } );
+
+    // No property for reading weights specified; just add a simplex
+    // with the default weight.
+    if( property.empty() )
+      simplices.push_back( { VertexType( vertexIndex ) } );
+    else
+    {
+      // FIXME: Check for existence first
+      // FIXME: Conversion is stupid
+      auto iw    = propertyMap.at( property );
+      DataType w = static_cast<DataType>( std::stod( tokens.at( iw ) ) );
+
+      simplices.push_back( Simplex( VertexType( vertexIndex ), w ) );
+    }
   }
 
   // Read faces --------------------------------------------------------
@@ -247,7 +260,10 @@ template <
 
   in.close();
 
-  return SimplicialComplex( simplices.begin(), simplices.end() );
+  SimplicialComplex K( simplices.begin(), simplices.end() );
+  K.recalculateWeights();
+
+  return K;
 }
 
 }
