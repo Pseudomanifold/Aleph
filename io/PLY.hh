@@ -4,6 +4,7 @@
 #include "Simplex.hh"
 #include "SimplicialComplex.hh"
 
+#include "filtrations/Data.hh"
 #include "utilities/String.hh"
 
 #include <cassert>
@@ -262,8 +263,8 @@ template <
 
   SimplicialComplex K( simplices.begin(), simplices.end() );
   K.recalculateWeights();
+  K.sort( filtrations::Data<Simplex>() );
 
-  // TODO: What about sorting order?
   return K;
 }
 
