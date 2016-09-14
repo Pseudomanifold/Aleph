@@ -4,6 +4,8 @@
 #include "BoundaryMatrix.hh"
 #include "SimplicialComplex.hh"
 
+#include <algorithm>
+
 namespace aleph
 {
 
@@ -35,6 +37,10 @@ template <
 
       column.push_back( static_cast<Index>( index ) );
     }
+
+    // TODO: Is this something that should be done by the boundary
+    // matrix automatically?
+    std::sort( column.begin(), column.end() );
 
     M.setColumn( j, column.begin(), column.end() );
 
