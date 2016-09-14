@@ -5,13 +5,13 @@
 #include "Twist.hh"
 #include "PersistencePairs.hh"
 
-#include "Conversions.hh"
 #include "Dualization.hh"
 #include "PersistenceDiagram.hh"
-#include "PersistenceDiagramConversion.hh"
+#include "PersistenceDiagramCalculation.hh"
 #include "PersistenceDiagramNorms.hh"
 #include "Simplex.hh"
 #include "SimplicialComplex.hh"
+#include "SimplicialComplexConversions.hh"
 
 #include "filtrations/LowerStar.hh"
 #include "filtrations/UpperStar.hh"

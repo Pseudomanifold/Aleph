@@ -1,5 +1,7 @@
 #include "io/PLY.hh"
 
+#include "PersistentHomologyCalculation.hh"
+
 #include <iostream>
 
 using DataType   = double;
@@ -19,7 +21,16 @@ int main( int argc, char** argv )
   if( argc >= 3 )
     property = argv[2];
 
-  auto K = aleph::io::loadPLY<DataType, VertexType>( filename, property );
+  auto K
+    = aleph::io::loadPLY<DataType, VertexType>( filename, property );
 
   std::cout << "* Loaded simplicial complex with " << K.size() << " simplices\n";
+
+  auto diagrams
+    = aleph::calculatePersistenceDiagrams( K );
+
+  std::cout << "* Calculated " << diagrams.size() << " persistence diagrams\n";
+
+  for( auto&& D : diagrams )
+    std::cout << D << "\n";
 }

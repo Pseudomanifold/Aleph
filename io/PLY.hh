@@ -263,6 +263,7 @@ template <
   SimplicialComplex K( simplices.begin(), simplices.end() );
   K.recalculateWeights();
 
+  // TODO: What about sorting order?
   return K;
 }
 
