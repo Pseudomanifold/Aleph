@@ -63,8 +63,8 @@ int main()
       LowerStar<S> ls( functionValues.begin(), functionValues.end() );
       UpperStar<S> us( functionValues.begin(), functionValues.end() );
 
-      L1.sort( std::ref( ls ) );
-      L2.sort( std::ref( us ) );
+      L1.sort( ls );
+      L2.sort( us );
 
       std::cout << "Lower-star filtration:\n" << L1 << "\n"
                 << "Upper-star filtration:\n" << L2 << "\n";

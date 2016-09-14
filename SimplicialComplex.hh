@@ -9,6 +9,7 @@
 #include <boost/multi_index/random_access_index.hpp>
 
 #include <algorithm>
+#include <functional>
 #include <initializer_list>
 #include <iterator>
 #include <iosfwd>
@@ -494,9 +495,9 @@ public:
     @see Simplex<T>::DataDimensionComparison
   */
 
-  template <class Comparison> void sort( Comparison comparison )
+  template <class Comparison> void sort( Comparison&& comparison )
   {
-    _simplices.sort( comparison );
+    _simplices.sort( std::ref( comparison ) );
   }
 
   // -------------------------------------------------------------------
