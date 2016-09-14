@@ -9,6 +9,7 @@
 #include <cassert>
 
 #include <fstream>
+#include <map>
 #include <set>
 #include <stdexcept>
 #include <string>
@@ -82,6 +83,16 @@ template <
       throw std::runtime_error( "Format error: Expecting \"ascii 1.0\"" );
   }
 
+  // Maps properties of a PLY file to an index. The index specifies at
+  // which position in a single vertex specification line the selected
+  // property appears.
+  //
+  // The parser expects certain properties, viz. "x", "y", and "z" to be
+  // present in all files. Else, an error is raised.
+  std::map<std::string, unsigned> propertyMap;
+
+  unsigned propertyIndex = 0;
+
   // Parse the rest of the header, taking care to skip any comment lines.
   do
   {
@@ -117,7 +128,26 @@ template <
         numFaces = numElements;
     }
     else if( line.substr( 0, 8) == "property" )
-      continue;
+    {
+      std::string property = line.substr( 8 );
+      property = utilities::trim( property );
+
+      std::istringstream converter( property );
+
+      std::string dataType;
+      std::string name;
+
+      converter >> dataType
+                >> name;
+
+      if( !converter )
+        throw std::runtime_error( "Property conversion error: Expecting data type and name of property" );
+
+      name                = utilities::trim( name );
+      propertyMap[ name ] = propertyIndex;
+
+      ++propertyIndex;
+    }
 
     if( line == "end_header" )
     {
@@ -137,16 +167,19 @@ template <
     std::vector<double> vertexCoordinates( 3 );
 
     std::getline( in, line );
-    std::istringstream converter( line );
 
-    converter >> vertexCoordinates[0]
-              >> vertexCoordinates[1]
-              >> vertexCoordinates[2];
+    line        = utilities::trim( line );
+    auto tokens = utilities::split( line );
 
-    if( !converter )
-      throw std::runtime_error( "Unable to parse coordinates" );
+    auto ix     = propertyMap.at( "x" );
+    auto iy     = propertyMap.at( "y" );
+    auto iz     = propertyMap.at( "z" );
 
-    coordinates.push_back( vertexCoordinates );
+    auto x      = std::stod( tokens.at( ix ) );
+    auto y      = std::stod( tokens.at( iy ) );
+    auto z      = std::stod( tokens.at( iz ) );
+
+    coordinates.push_back( {x,y,z} );
     simplices.push_back( { VertexType( vertexIndex ) } );
   }
 
