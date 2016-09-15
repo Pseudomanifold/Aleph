@@ -1,6 +1,8 @@
 #include "io/PLY.hh"
+#include "utilities/Timer.hh"
 
 #include "PersistentHomologyCalculation.hh"
+#include "PersistenceDiagramNorms.hh"
 
 #include <iostream>
 
@@ -24,13 +26,23 @@ int main( int argc, char** argv )
   auto K
     = aleph::io::loadPLY<DataType, VertexType>( filename, property );
 
-  std::cout << "* Loaded simplicial complex with " << K.size() << " simplices\n";
+  std::cerr << "* Loaded simplicial complex with " << K.size() << " simplices\n";
+
+  aleph::utilities::Timer timer;
 
   auto diagrams
     = aleph::calculatePersistenceDiagrams( K );
 
-  std::cout << "* Calculated " << diagrams.size() << " persistence diagrams\n";
+  std::cerr << "* Calculated " << diagrams.size() << " persistence diagrams in " << timer.elapsed_s() << "s\n";
 
   for( auto&& D : diagrams )
     std::cout << D << "\n";
+
+  for( auto&& D : diagrams )
+  {
+    std::cerr << "* Total degree-1 persistence: " << aleph::totalPersistence( D, 1.0 ) << "\n"
+              << "* Total degree-2 persistence: " << aleph::totalPersistence( D, 2.0 ) << "\n"
+              << "* 1-norm:                     " << aleph::pNorm( D, 1.0 ) << "\n"
+              << "* 2-norm:                     " << aleph::pNorm( D, 2.0 ) << "\n";
+  }
 }
