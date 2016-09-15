@@ -55,6 +55,10 @@ public:
   {
     _data.at( column ).assign( begin, end );
 
+    // Ensures proper sorting order. Else, the reduction algorithm will
+    // not be able to reduce the matrix.
+    std::sort( _data.at( column ).begin(), _data.at( column ).end() );
+
     // Upon initialization, the column must by necessity have the dimension
     // that is indicated by the amount of indices in its boundary. The case
     // of 0-simplices needs special handling.
