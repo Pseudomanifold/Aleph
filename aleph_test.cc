@@ -18,20 +18,22 @@
 
 #include "utilities/String.hh"
 
+#include "representations/Set.hh"
 #include "representations/Vector.hh"
 
 #include <iostream>
 
 using namespace aleph;
+using namespace algorithms;
 using namespace representations;
 using namespace filtrations;
 using namespace utilities;
 
 using I  = unsigned;
-using V  = Vector<I>;
+using V  = Set<I>;
 using BM = BoundaryMatrix<V>;
-using SR = StandardReduction;
-using TR = TwistReduction;
+using SR = Standard;
+using TR = Twist;
 
 using S  = Simplex<float, unsigned>;
 using SC = SimplicialComplex<S>;
