@@ -1,8 +1,5 @@
 #include "BoundaryMatrix.hh"
-#include "Vector.hh"
 #include "IO.hh"
-#include "Standard.hh"
-#include "Twist.hh"
 #include "PersistencePairs.hh"
 
 #include "Dualization.hh"
@@ -13,10 +10,15 @@
 #include "SimplicialComplex.hh"
 #include "SimplicialComplexConversions.hh"
 
+#include "algorithms/Standard.hh"
+#include "algorithms/Twist.hh"
+
 #include "filtrations/LowerStar.hh"
 #include "filtrations/UpperStar.hh"
 
 #include "utilities/String.hh"
+
+#include "representations/Vector.hh"
 
 #include <iostream>
 

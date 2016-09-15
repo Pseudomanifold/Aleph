@@ -1,8 +1,8 @@
 #ifndef ALEPH_DEFAULTS_HH__
 #define ALEPH_DEFAULTS_HH__
 
-#include "Twist.hh"
-#include "Vector.hh"
+#include "algorithms/Twist.hh"
+#include "representations/Vector.hh"
 
 namespace aleph
 {
