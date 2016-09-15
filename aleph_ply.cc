@@ -1,4 +1,5 @@
 #include "io/PLY.hh"
+#include "distances/NearestNeighbour.hh"
 #include "utilities/Timer.hh"
 
 #include "PersistentHomologyCalculation.hh"
@@ -45,4 +46,9 @@ int main( int argc, char** argv )
               << "* 1-norm:                     " << aleph::pNorm( D, 1.0 ) << "\n"
               << "* 2-norm:                     " << aleph::pNorm( D, 2.0 ) << "\n";
   }
+
+  // FIXME: Remove after debugging
+  for( auto&& D1 : diagrams )
+    for( auto&& D2 : diagrams )
+      std::cerr << aleph::distances::nearestNeighbourDistance( D1, D2 ) << "\n";
 }
