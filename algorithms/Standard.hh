@@ -9,7 +9,10 @@
 namespace aleph
 {
 
-class StandardReduction
+namespace algorithms
+{
+
+class Standard
 {
 public:
   template <class Representation> void operator()( BoundaryMatrix<Representation>& M )
@@ -38,6 +41,8 @@ public:
     }
   }
 };
+
+}
 
 }
 

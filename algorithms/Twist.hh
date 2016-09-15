@@ -9,7 +9,10 @@
 namespace aleph
 {
 
-class TwistReduction
+namespace algorithms
+{
+
+class Twist
 {
 public:
   template <class Representation> void operator()( BoundaryMatrix<Representation>& M )
@@ -48,6 +51,8 @@ public:
     }
   }
 };
+
+}
 
 }
 
