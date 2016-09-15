@@ -60,16 +60,25 @@ public:
 
   void setDualized( bool value = true )
   {
-    _representation.setDualized( value );
+    _isDualized = value;
   }
 
   bool isDualized() const
   {
-    return _representation.isDualized();
+    return _isDualized;
   }
 
 private:
   Representation _representation;
+
+  /**
+    Flag indicating whether the matrix is dualized or not. By default
+    no matrix is dualized. This flag is used by some of the reduction
+    algorithms to determine how to calculate indices.
+  */
+
+  bool _isDualized = false;
+
 };
 
 }

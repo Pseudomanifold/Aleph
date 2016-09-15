@@ -1,5 +1,5 @@
-#ifndef ALEPH_VECTOR_HH__
-#define ALEPH_VECTOR_HH__
+#ifndef ALEPH_REPRESENTATIONS_VECTOR_HH__
+#define ALEPH_REPRESENTATIONS_VECTOR_HH__
 
 #include <algorithm>
 #include <utility>
@@ -90,27 +90,9 @@ public:
       return *std::max_element( _dimensions.begin(), _dimensions.end() );
   }
 
-  void setDualized( bool value )
-  {
-    _isDualized = value;
-  }
-
-  bool isDualized() const
-  {
-    return _isDualized;
-  }
-
 private:
   std::vector< std::vector<Index> > _data;
   std::vector<Index> _dimensions;
-
-  /**
-    Flag indicating whether the matrix is dualized or not. By default
-    no matrix is dualized. This flag is used by some of the reduction
-    to determine how to calculate indices.
-  */
-
-  bool _isDualized = false;
 };
 
 }
