@@ -1,5 +1,8 @@
 #include "io/PLY.hh"
+
+#include "distances/Hausdorff.hh"
 #include "distances/NearestNeighbour.hh"
+
 #include "utilities/Timer.hh"
 
 #include "PersistentHomologyCalculation.hh"
@@ -51,4 +54,11 @@ int main( int argc, char** argv )
   for( auto&& D1 : diagrams )
     for( auto&& D2 : diagrams )
       std::cerr << aleph::distances::nearestNeighbourDistance( D1, D2 ) << "\n";
+
+  std::cerr << std::string( 80, '-' ) << "\n";
+
+  for( auto&& D1 : diagrams )
+    for( auto&& D2 : diagrams )
+      std::cerr << aleph::distances::hausdorffDistance( D1, D2 ) << "\n";
+
 }
