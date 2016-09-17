@@ -1,7 +1,10 @@
 #include "io/Function.hh"
 #include "representations/Vector.hh"
 
+#include "Defaults.hh"
+
 #include "BoundaryMatrix.hh"
+#include "PersistencePairingCalculation.hh"
 
 #include <iostream>
 #include <string>
@@ -28,4 +31,11 @@ int main( int argc, char** argv )
   aleph::io::loadFunction( filename,
                            boundaryMatrix,
                            functionValues );
+
+  auto pairing =
+    aleph::calculatePersistencePairing<aleph::defaults::ReductionAlgorithm>(
+        boundaryMatrix );
+
+  for( auto&& pair : pairing )
+    std::cerr << pair.first << "--" << pair.second << "\n";
 }
