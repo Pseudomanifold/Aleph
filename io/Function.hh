@@ -62,36 +62,20 @@ template <
                return weight(i) < weight(j);
              } );
 
-  std::vector<Index> vertexIndices( functionValues.size() );
+  for( Index j = 0; j < static_cast<Index>( indices.size() ); j++ )
+  {
+    auto&& index = indices.at(j);
 
-  std::iota( vertexIndices.begin(), vertexIndices.end(),
-             Index(0) );
+    if( index < functionValues.size() )
+      boundaryMatrix.clearColumn( j );
+    else
+    {
+      std::vector<Index> vertexIndices = { index, index + 1 };
 
-  std::sort( vertexIndices.begin(), vertexIndices.end(),
-             [&functionValues] ( Index i, Index j )
-             {
-              return functionValues.at(i) < functionValues.at(j);
-             } );
-
-  std::vector<Index> edgeIndices( functionValues.size() - 1 );
-
-  std::iota( edgeIndices.begin(),
-             edgeIndices.end(),
-             static_cast<Index>( functionValues.size() ) );
-
-  std::sort( edgeIndices.begin(), edgeIndices.end(),
-             [&functionValues] ( Index i, Index j )
-             {
-              auto k = i - functionValues.size();
-              auto l = j - functionValues.size();
-
-              return functionValues.at(k) < functionValues.at(l);
-             } );
-
-  boundaryMatrix.setNumColumns( 2 * functionValues.size() - 1 );
-
-  for( Index j = 0; j < static_cast<Index>( functionValues.size() ); j++ )
-    boundaryMatrix.clearColumn( j );
+      boundaryMatrix.setColumn(j,
+                               vertexIndices.begin(), vertexIndices.end() );
+    }
+  }
 }
 
 }
