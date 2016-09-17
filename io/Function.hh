@@ -40,6 +40,28 @@ template <
   if( functionValues.empty() )
     throw std::runtime_error( "Unable to load any function values" );
 
+  std::vector<Index> indices( 2*functionValues.size() - 1 );
+  std::iota( indices.begin(), indices.end(), Index(0) );
+
+  std::stable_sort( indices.begin(), indices.end(),
+             [&functionValues] ( Index i, Index j )
+             {
+               auto weight = [&] ( Index i )
+               {
+                 if( i < functionValues.size() )
+                   return functionValues.at(i);
+                 else
+                 {
+                   auto l = functionValues.at( i - functionValues.size()     );
+                   auto r = functionValues.at( i - functionValues.size() + 1 );
+
+                   return std::max( l, r );
+                 }
+               };
+
+               return weight(i) < weight(j);
+             } );
+
   std::vector<Index> vertexIndices( functionValues.size() );
 
   std::iota( vertexIndices.begin(), vertexIndices.end(),
