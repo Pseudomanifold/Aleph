@@ -12,6 +12,8 @@
 #include "PersistenceDiagramCalculation.hh"
 #include "PersistencePairingCalculation.hh"
 
+#include <vector>
+
 namespace aleph
 {
 
@@ -25,6 +27,17 @@ template <
   auto pairing        = calculatePersistencePairing<ReductionAlgorithm>( boundaryMatrix );
 
   return makePersistenceDiagrams( pairing, K );
+}
+
+template <
+  class ReductionAlgorithm = defaults::ReductionAlgorithm,
+  class Representation     = defaults::Representation,
+  class DataType
+> PersistenceDiagram<DataType> calculatePersistenceDiagram( const BoundaryMatrix<Representation>& boundaryMatrix,
+                                                            const std::vector<double>& functionValues )
+{
+  auto pairing = calculatePersistencePairing<ReductionAlgorithm>( boundaryMatrix );
+  return makePersistenceDiagram( pairing, functionValues );
 }
 
 }

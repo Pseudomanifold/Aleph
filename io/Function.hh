@@ -63,6 +63,8 @@ template <
                return weight(i) < weight(j);
              } );
 
+  boundaryMatrix.setNumColumns( static_cast<Index>( indices.size() ) );
+
   for( Index j = 0; j < static_cast<Index>( indices.size() ); j++ )
   {
     auto&& index = indices.at(j);

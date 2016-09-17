@@ -56,6 +56,29 @@ std::vector< PersistenceDiagram<typename Simplex::DataType> > makePersistenceDia
   return result;
 }
 
+template <
+  class Index,
+  class DataType
+>
+PersistenceDiagram<DataType> makePersistenceDiagram( const PersistencePairing<Index>& pairing,
+                                                     const std::vector<DataType>& functionValues )
+{
+  using PersistenceDiagram = PersistenceDiagram<DataType>;
+
+  PersistenceDiagram D;
+  D.setDimension( 0 );
+
+  for( auto&& pair : pairing )
+  {
+    auto&& i = pair.first;
+    auto&& j = pair.second;
+
+    D.add( functionValues.at(i), functionValues.at(j) );
+  }
+
+  return D;
+}
+
 }
 
 #endif
