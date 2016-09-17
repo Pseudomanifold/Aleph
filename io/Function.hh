@@ -17,13 +17,14 @@ namespace io
 {
 
 template <
-  class Index,
-  class DataType
+  class DataType,
+  class Representation
 > void loadFunction( const std::string& filename,
-                     BoundaryMatrix<Index>& boundaryMatrix,
+                     BoundaryMatrix<Representation>& boundaryMatrix,
                      std::vector<DataType>& functionValues )
 {
-  using BoundaryMatrix = BoundaryMatrix<Index>;
+  using BoundaryMatrix = BoundaryMatrix<Representation>;
+  using Index          = typename BoundaryMatrix::Index;
 
   std::ifstream in( filename );
 

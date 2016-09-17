@@ -33,6 +33,11 @@ ADD_EXECUTABLE( aleph_ply
   aleph_ply.cc
 )
 
+ADD_EXECUTABLE( aleph_function
+  aleph_function.cc
+)
+
+
 #
 # Place compile commands in the source directory
 #
