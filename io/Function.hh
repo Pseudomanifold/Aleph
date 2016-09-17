@@ -73,7 +73,9 @@ template <
       boundaryMatrix.clearColumn( j );
     else
     {
-      std::vector<Index> vertexIndices = { index, index + 1 };
+      Index k = static_cast<Index>( index - functionValues.size() );
+
+      std::vector<Index> vertexIndices = { k, k+1 };
 
       boundaryMatrix.setColumn(j,
                                vertexIndices.begin(), vertexIndices.end() );
