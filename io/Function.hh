@@ -8,6 +8,7 @@
 #include <iterator>
 #include <numeric>
 #include <string>
+#include <unordered_map>
 #include <vector>
 
 namespace aleph
@@ -65,17 +66,26 @@ template <
 
   boundaryMatrix.setNumColumns( static_cast<Index>( indices.size() ) );
 
+  // Maps a vertex in the original function to its place in the current
+  // filtration order. The map is filled while creating the matrix below,
+  // which is possible because faces need to precede cofcaces.
+  std::unordered_map<Index, Index> vertexIndexMap;
+
   for( Index j = 0; j < static_cast<Index>( indices.size() ); j++ )
   {
     auto&& index = indices.at(j);
 
     if( index < functionValues.size() )
+    {
       boundaryMatrix.clearColumn( j );
+
+      vertexIndexMap[index] = j;
+    }
     else
     {
       Index k = static_cast<Index>( index - functionValues.size() );
 
-      std::vector<Index> vertexIndices = { k, k+1 };
+      std::vector<Index> vertexIndices = { vertexIndexMap.at(k), vertexIndexMap.at(k+1) };
 
       boundaryMatrix.setColumn(j,
                                vertexIndices.begin(), vertexIndices.end() );
