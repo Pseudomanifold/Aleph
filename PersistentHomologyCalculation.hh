@@ -34,7 +34,7 @@ template <
   class Representation     = defaults::Representation,
   class DataType
 > PersistenceDiagram<DataType> calculatePersistenceDiagram( const BoundaryMatrix<Representation>& boundaryMatrix,
-                                                            const std::vector<double>& functionValues )
+                                                            const std::vector<DataType>& functionValues )
 {
   auto pairing = calculatePersistencePairing<ReductionAlgorithm>( boundaryMatrix );
   return makePersistenceDiagram( pairing, functionValues );

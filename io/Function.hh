@@ -81,6 +81,31 @@ template <
                                vertexIndices.begin(), vertexIndices.end() );
     }
   }
+
+  // Extend function values with edge weights. Since the i-th edge will use
+  // vertices i and i+1, this can be done in one sweep.
+  {
+    std::size_t n = functionValues.size();
+    for( std::size_t i = 0; i < n - 1; i++ )
+    {
+      auto w1 = functionValues.at(i  );
+      auto w2 = functionValues.at(i+1);
+      functionValues.push_back( std::max( w1, w2 ) );
+    }
+  }
+
+  // Sort the function values to reflect the order of vertex indices. Else, we
+  // will be unable to add the proper weights to the corresponding pairing.
+
+  {
+    std::vector<DataType> newFunctionValues;
+    newFunctionValues.reserve( functionValues.size() );
+
+    for( auto&& index : indices )
+      newFunctionValues.push_back( functionValues.at( index ) );
+
+    functionValues.swap( newFunctionValues );
+  }
 }
 
 }

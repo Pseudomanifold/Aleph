@@ -5,6 +5,7 @@
 #include "IO.hh"
 
 #include "BoundaryMatrix.hh"
+#include "PersistentHomologyCalculation.hh"
 #include "PersistencePairingCalculation.hh"
 
 #include <iostream>
@@ -35,10 +36,10 @@ int main( int argc, char** argv )
 
   std::cerr << boundaryMatrix << "\n";
 
-  auto pairing =
-    aleph::calculatePersistencePairing<aleph::defaults::ReductionAlgorithm>(
-        boundaryMatrix );
+  auto diagram
+    = aleph::calculatePersistenceDiagram<aleph::defaults::ReductionAlgorithm>(
+        boundaryMatrix,
+        functionValues );
 
-  for( auto&& pair : pairing )
-    std::cerr << pair.first << "--" << pair.second << "\n";
+  std::cerr << diagram << "\n";
 }
