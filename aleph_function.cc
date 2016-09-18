@@ -34,8 +34,6 @@ int main( int argc, char** argv )
                            boundaryMatrix,
                            functionValues );
 
-  std::cerr << boundaryMatrix << "\n";
-
   auto diagram
     = aleph::calculatePersistenceDiagram<aleph::defaults::ReductionAlgorithm>(
         boundaryMatrix,
