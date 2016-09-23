@@ -24,11 +24,8 @@ public:
   {
     auto n = matrix.n();
 
-    // Copy input matrix
-    this->matrix = m;
-
-    _rowMask = std::vector<bool>( size, false );
-    _colMask = std::vector<bool>( size, false );
+    _rowMask = std::vector<bool>( n, false );
+    _colMask = std::vector<bool>( n, false );
 
     subtractRowMinimum( matrix );
 
@@ -90,7 +87,7 @@ private:
     }
   }
 
-  bool findUncoveredZeroInMatrix( const Matrix<T>& matrix, std::size_t& row, std::size_t& column ) const
+  bool findUncoveredZeroInMatrix( const Matrix<T>& matrix, std::size_t& row, std::size_t& col ) const
   {
     auto n = matrix.n();
 
@@ -226,9 +223,8 @@ private:
     std::size_t r = 0;
     std::size_t c = col;
 
-    size_t row, col = savecol;
-
     bool havePair = false;
+
     do
     {
       havePair = false;
