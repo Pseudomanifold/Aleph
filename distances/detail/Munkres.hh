@@ -140,7 +140,8 @@ private:
               goto skipCurrentRow;
           }
 
-          _stars( row, col ) = true;
+          _stars( row, col )  = true;
+          _primes( row, col ) = false;
         }
         skipCurrentColumn:
           ;
@@ -185,7 +186,10 @@ private:
   unsigned short step3( Matrix<T>& matrix, std::size_t& row, std::size_t& col )
   {
     if( findUncoveredZeroInMatrix( matrix, row, col ) )
+    {
       _primes( row, col ) = true;
+      _stars( row, col )  = false;
+    }
     else
       return 5;
 
