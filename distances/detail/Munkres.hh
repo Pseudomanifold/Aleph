@@ -20,14 +20,18 @@ template <class T> class Munkres
 {
 public:
 
-  void solve( Matrix<T>& matrix )
+  Munkres( Matrix<T>& matrix )
+    : _matrix( matrix )
+    , _stars( matrix.n() )
+    , _primes( matrix.n() )
+    , _rowMask( std::vector<bool>( _matrix.n(), false ) )
+    , _colMask( std::vector<bool>( _matrix.n(), false ) )
   {
-    auto n = matrix.n();
+  }
 
-    _rowMask = std::vector<bool>( n, false );
-    _colMask = std::vector<bool>( n, false );
-
-    subtractRowMinimum( matrix );
+  void operator()()
+  {
+    subtractRowMinimum( _matrix );
 
     unsigned short step = 1;
 
@@ -38,31 +42,33 @@ public:
 
       switch ( step ) {
         case 1:
-          step = step1( matrix );
+          step = step1( _matrix );
           break;
         case 2:
-          step = step2( matrix );
+          step = step2( _matrix );
           break;
         case 3:
-          step = step3( matrix, row, col );
+          step = step3( _matrix, row, col );
           break;
         case 4:
-          step = step4( matrix );
+          step = step4( _matrix );
           break;
         case 5:
-          step = step5( matrix );
+          step = step5( _matrix );
           break;
       }
     }
+
+    auto n = _matrix.n();
 
     for( std::size_t row = 0; row < n; row++ )
     {
       for( std::size_t col = 0; col < n; col++ )
       {
         if( _stars( row, col ) )
-          matrix( row, col ) = T( 0 );
+          _matrix( row, col ) = T( 0 );
         else
-          matrix( row, col ) = std::numeric_limits<T>::max();
+          _matrix( row, col ) = std::numeric_limits<T>::max();
       }
     }
   }
@@ -333,13 +339,14 @@ private:
     return 3;
   }
 
+  Matrix<T>& _matrix;
+
   Matrix<bool> _stars;
   Matrix<bool> _primes;
 
   std::vector<bool> _rowMask;
   std::vector<bool> _colMask;
 };
-
 
 }
 
