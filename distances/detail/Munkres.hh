@@ -35,27 +35,35 @@ public:
 
     unsigned short step = 1;
 
-    while( step )
+    while( step != 0 )
     {
       std::size_t row = 0;
       std::size_t col = 0;
 
-      switch ( step ) {
-        case 1:
-          step = step1( _matrix );
-          break;
-        case 2:
-          step = step2( _matrix );
-          break;
-        case 3:
-          step = step3( _matrix, row, col );
-          break;
-        case 4:
-          step = step4( _matrix, row, col );
-          break;
-        case 5:
-          step = step5( _matrix );
-          break;
+      std::cout << "Step " << step << "\n"
+                << std::string(80, '-') << "\n"
+                << "Matrix" << "\n"
+                << std::string(80, '-') << "\n"
+                << _matrix << "\n"
+                << std::string(80, '-') << "\n";
+
+      switch( step )
+      {
+      case 1:
+        step = step1();
+        break;
+      case 2:
+        step = step2();
+        break;
+      case 3:
+        step = step3( _matrix, row, col );
+        break;
+      case 4:
+        step = step4( _matrix, row, col );
+        break;
+      case 5:
+        step = step5( _matrix );
+        break;
       }
     }
 
@@ -93,9 +101,9 @@ private:
     }
   }
 
-  bool findUncoveredZeroInMatrix( const Matrix<T>& matrix, std::size_t& row, std::size_t& col ) const
+  bool findUncoveredZeroInMatrix( std::size_t& row, std::size_t& col ) const
   {
-    auto n = matrix.n();
+    auto n = _matrix.n();
 
     for( row = 0; row < n; row++ )
     {
@@ -105,7 +113,7 @@ private:
         {
           if( !_colMask[col] )
           {
-            if( matrix( row, col ) == T( 0 ) )
+            if( _matrix( row, col ) == T( 0 ) )
               return true;
           }
         }
@@ -117,15 +125,15 @@ private:
 
   // Find zeroes in the current matrix. If there is no starred zero in
   // the row or column, star the current value.
-  unsigned short step1( Matrix<T>& matrix )
+  unsigned short step1()
   {
-    auto n = matrix.n();
+    auto n = _matrix.n();
 
     for( std::size_t row = 0; row < n; row++ )
     {
       for( std::size_t col = 0; col < n; col++ )
       {
-        if( matrix( row, col ) == T( 0 ) )
+        if( _matrix( row, col ) == T( 0 ) )
         {
           // Check whether another zero in the same _column_ is already
           // starred.
@@ -160,9 +168,9 @@ private:
   // Cover each column that contains a starred zero. If enough columns
   // have been covered, the starred zeroes give us the complete set of
   // assignments.
-  unsigned short step2( Matrix<T>& matrix )
+  unsigned short step2()
   {
-    auto n                     = matrix.n();
+    auto n                     = _matrix.n();
     std::size_t coveredColumns = 0;
 
     for( std::size_t row = 0; row < n; row++ )
@@ -188,7 +196,7 @@ private:
   // this row and uncover the column that contains the starred zero.
   unsigned short step3( Matrix<T>& matrix, std::size_t& row, std::size_t& col )
   {
-    if( findUncoveredZeroInMatrix( matrix, row, col ) )
+    if( findUncoveredZeroInMatrix( row, col ) )
     {
       _primes( row, col ) = true;
       _stars( row, col )  = false;

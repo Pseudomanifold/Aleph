@@ -1,3 +1,5 @@
+#include <iostream>
+
 #include "distances/detail/Matrix.hh"
 #include "distances/detail/Munkres.hh"
 
@@ -10,6 +12,14 @@ int main()
   m(0,0) = 1; m(0,1) = 2; m(0,2) = 3;
   m(1,0) = 2; m(1,1) = 4; m(1,2) = 6;
   m(2,0) = 3; m(2,1) = 6; m(2,2) = 9;
+
+  auto separator = std::string( 80, '-' );
+
+  std::cerr << separator << "\n"
+            << "Original costs\n"
+            << separator << "\n"
+            << m
+            << separator << "\n";
 
   Munkres<unsigned short> solver( m );
   solver();

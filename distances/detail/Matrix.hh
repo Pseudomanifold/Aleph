@@ -2,6 +2,7 @@
 #define ALEPH_DISTANCES_DETAIL_MATRIX_HH__
 
 #include <algorithm>
+#include <iosfwd>
 
 #include <cassert>
 #include <cstddef>
@@ -65,6 +66,26 @@ private:
   std::size_t _n = 0;
   T** _data      = nullptr;
 };
+
+template <class T> std::ostream& operator<<( std::ostream& o, const Matrix<T>& m )
+{
+  auto n = m.n();
+
+  for( decltype(n) row = 0; row < n; row++ )
+  {
+    for( decltype(n) col = 0; col < n; col++ )
+    {
+      if( col > 0 )
+        o << " ";
+
+      o << m(row,col);
+    }
+
+    o << "\n";
+  }
+
+  return o;
+}
 
 }
 
