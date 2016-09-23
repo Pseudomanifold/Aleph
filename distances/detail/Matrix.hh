@@ -15,7 +15,7 @@ namespace distances
 namespace detail
 {
 
-template <class T> Matrix
+template <class T> class Matrix
 {
 public:
 
@@ -47,12 +47,12 @@ public:
     return _n;
   }
 
-  T& operator( std::size_t row, std::size_t column )
+  T& operator()( std::size_t row, std::size_t column )
   {
-    return const_cast<T&>( static_cast<const Matrix&>( *this ).operator( row, column ) );
+    return const_cast<T&>( static_cast<const Matrix&>( *this ).operator()( row, column ) );
   }
 
-  const T& operator( std::size_t row, std::size_t column ) const
+  const T& operator()( std::size_t row, std::size_t column ) const
   {
     assert( row    < _n );
     assert( column < _n );
