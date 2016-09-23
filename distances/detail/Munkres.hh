@@ -51,7 +51,7 @@ public:
           step = step3( _matrix, row, col );
           break;
         case 4:
-          step = step4( _matrix );
+          step = step4( _matrix, row, col );
           break;
         case 5:
           step = step5( _matrix );

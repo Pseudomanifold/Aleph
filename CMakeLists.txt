@@ -25,6 +25,8 @@ ENABLE_IF_SUPPORTED( CMAKE_CXX_FLAGS "-pedantic" )
 
 INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR} )
 
+ADD_SUBDIRECTORY( tests )
+
 ADD_EXECUTABLE( aleph_test
   aleph_test.cc
 )
@@ -36,7 +38,6 @@ ADD_EXECUTABLE( aleph_ply
 ADD_EXECUTABLE( aleph_function
   aleph_function.cc
 )
-
 
 #
 # Place compile commands in the source directory
