@@ -35,11 +35,11 @@ public:
 
     unsigned short step = 1;
 
+    std::size_t row = 0;
+    std::size_t col = 0;
+
     while( step != 0 )
     {
-      std::size_t row = 0;
-      std::size_t col = 0;
-
       std::cout << "Step " << step << "\n"
                 << std::string(80, '-') << "\n";
 
