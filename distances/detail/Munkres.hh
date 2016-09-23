@@ -41,10 +41,6 @@ public:
       std::size_t col = 0;
 
       std::cout << "Step " << step << "\n"
-                << std::string(80, '-') << "\n"
-                << "Matrix" << "\n"
-                << std::string(80, '-') << "\n"
-                << _matrix << "\n"
                 << std::string(80, '-') << "\n";
 
       switch( step )
@@ -65,6 +61,11 @@ public:
         step = step5( _matrix );
         break;
       }
+
+      std::cout << "Matrix" << "\n"
+                << std::string(80, '-') << "\n"
+                << _matrix << "\n"
+                << std::string(80, '-') << "\n";
     }
 
     auto n = _matrix.n();
@@ -153,6 +154,8 @@ private:
 
           _stars( row, col )  = true;
           _primes( row, col ) = false;
+
+          std::cout << "0* at (" << row << "," << col << ")\n";
         }
         skipCurrentColumn:
           ;
@@ -185,6 +188,8 @@ private:
       }
     }
 
+    std::cout << "I have " << coveredColumns << " covered columns\n";
+
     if( coveredColumns >= n )
       return 0;
 
@@ -200,6 +205,8 @@ private:
     {
       _primes( row, col ) = true;
       _stars( row, col )  = false;
+
+      std::cout << "0' at (" << row << "," << col << ")\n";
     }
     else
       return 5;
@@ -211,7 +218,7 @@ private:
       if( _stars( row, c ) )
       {
         _rowMask[row] = true;
-        _colMask[col] = false;
+        _colMask[c]   = false;
 
         return 3;
       }
@@ -285,13 +292,21 @@ private:
 
     for( auto&& pair : sequence )
     {
+      std::cout << "- (" << pair.first << "," << pair.second << ")\n";
+
       // Un-star
       if( _stars(pair.first, pair.second) )
-        _stars(pair.first, pair.second) = false;
+      {
+        _stars(pair.first, pair.second)  = false;
+        _primes(pair.first, pair.second) = false;
+      }
 
       // Star each primed zero
       if( _primes(pair.first, pair.second) )
-        _stars(pair.first, pair.second) = true;
+      {
+        _stars(pair.first, pair.second)  = true;
+        _primes(pair.first, pair.second) = false;
+      }
     }
 
     // Erase all primes & uncover all columns and rows -----------------
@@ -299,7 +314,13 @@ private:
     for( std::size_t row = 0; row < n; row++ )
     {
       for( std::size_t col = 0; col < n; col++ )
-        _primes(row, col) = false;
+      {
+        if( _primes( row, col ) )
+        {
+          _primes(row, col) = false;
+          _stars(row, col)  = false;
+        }
+      }
 
       _rowMask[row] = false;
       _colMask[row] = false;
