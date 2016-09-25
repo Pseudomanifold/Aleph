@@ -3,6 +3,7 @@
 
 #include <algorithm>
 #include <iosfwd>
+#include <utility>
 
 #include <cassert>
 #include <cstddef>
@@ -40,8 +41,31 @@ public:
     delete[] _data;
   }
 
-  Matrix( const Matrix& other )           = delete;
-  Matrix operator=( const Matrix& other ) = delete;
+  Matrix( const Matrix& other )
+    : _n( other._n )
+    , _data( new T*[_n] )
+  {
+    for( std::size_t row = 0; row < _n; row ++ )
+    {
+      _data[row] = new T[_n];
+
+      std::copy( other._data[row], other._data[row] + _n, _data[row] );
+    }
+  }
+
+  Matrix& operator=( Matrix other )
+  {
+    swap( *this, other );
+    return *this;
+  }
+
+  friend void swap( Matrix& m1, Matrix& m2 ) noexcept
+  {
+    using std::swap;
+
+    swap( m1._n,    m2._n );
+    swap( m1._data, m2._data );
+  }
 
   std::size_t n() const
   {

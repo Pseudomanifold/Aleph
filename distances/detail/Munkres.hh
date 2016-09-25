@@ -20,7 +20,7 @@ template <class T> class Munkres
 {
 public:
 
-  Munkres( Matrix<T>& matrix )
+  Munkres( const Matrix<T>& matrix )
     : _matrix( matrix )
     , _stars( matrix.n() )
     , _primes( matrix.n() )
@@ -29,7 +29,7 @@ public:
   {
   }
 
-  void operator()()
+  Matrix<T> operator()()
   {
     subtractRowMinimum( _matrix );
 
@@ -80,6 +80,8 @@ public:
           _matrix( row, col ) = std::numeric_limits<T>::max();
       }
     }
+
+    return _matrix;
   }
 
 private:
@@ -368,7 +370,7 @@ private:
     return 3;
   }
 
-  Matrix<T>& _matrix;
+  Matrix<T> _matrix;
 
   Matrix<bool> _stars;
   Matrix<bool> _primes;
