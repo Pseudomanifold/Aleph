@@ -53,6 +53,12 @@ public:
     }
   }
 
+  Matrix( Matrix&& other )
+    : Matrix( 0 )
+  {
+    swap( *this, other );
+  }
+
   Matrix& operator=( Matrix other )
   {
     swap( *this, other );
