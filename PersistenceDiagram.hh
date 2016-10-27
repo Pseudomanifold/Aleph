@@ -39,6 +39,11 @@ public:
       return _y - _x;
     }
 
+    bool operator==( const Point& other ) const
+    {
+      return _x == other._x && _y == other._y;
+    }
+
   private:
     DataType _x;
     DataType _y;
