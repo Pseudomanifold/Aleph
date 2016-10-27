@@ -71,6 +71,8 @@ template <
 
   for( auto&& p1 : D1 )
   {
+    row = IndexType();
+
     for( auto&& p2 : D1 )
     {
       DataType d = DataType();
@@ -97,6 +99,8 @@ template <
 
   for( auto&& p1 : D2 )
   {
+    col = IndexType();
+
     for( auto&& p2 : D2 )
     {
       DataType d = DataType();
@@ -118,7 +122,7 @@ template <
 
   // Assignment problem solving ----------------------------------------
 
-  Munkres<DataType> solver( costs );
+  detail::Munkres<DataType> solver( costs );
 
   auto M              = solver();
   DataType totalCosts = DataType();
