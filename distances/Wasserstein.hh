@@ -5,6 +5,7 @@
 #include "PersistenceDiagram.hh"
 
 #include "detail/Munkres.hh"
+#include "detail/Orthogonal.hh"
 
 #include <algorithm>
 #include <limits>
@@ -78,9 +79,7 @@ template <
       DataType d = DataType();
 
       if( p1 == p2 )
-      {
-        // TODO: Orthogonal distance
-      }
+        d = std::pow( detail::orthogonalDistance<Distance>( p1 ), power );
       else
         d = std::numeric_limits<DataType>::max();
 
@@ -106,9 +105,7 @@ template <
       DataType d = DataType();
 
       if( p1 == p2 )
-      {
-        // TODO: Orthogonal distance
-      }
+        d = std::pow( detail::orthogonalDistance<Distance>( p1 ), power );
       else
         d = std::numeric_limits<DataType>::max();
 

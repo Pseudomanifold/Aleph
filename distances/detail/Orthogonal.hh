@@ -10,10 +10,8 @@ namespace distances
 namespace detail
 {
 
-template <class Distance, class Point> auto orthogonalDistance( const Point& p ) -> decltype( Distance::operator()( p,p ) )
+template <class Distance, class Point> auto orthogonalDistance( const Point& p ) -> decltype( Distance().operator()( p,p ) )
 {
-  using DataType = decltype( Distance::operator()( p,p ) );
-
   auto&& x = p.x();
   auto&& y = p.y();
 
