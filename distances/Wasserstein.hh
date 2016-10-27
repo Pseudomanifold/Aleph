@@ -7,6 +7,7 @@
 #include "detail/Munkres.hh"
 
 #include <algorithm>
+#include <limits>
 #include <stdexcept>
 
 #include <cmath>
@@ -62,6 +63,76 @@ template <
 
     ++row;
   }
+
+  // Orthogonal projection of the first diagram ------------------------
+
+  row = IndexType();
+  col = D2.size();
+
+  for( auto&& p1 : D1 )
+  {
+    for( auto&& p2 : D1 )
+    {
+      DataType d = DataType();
+
+      if( p1 == p2 )
+      {
+        // TODO: Orthogonal distance
+      }
+      else
+        d = std::numeric_limits<DataType>::max();
+
+      costs( row, col ) = d;
+
+      ++row;
+    }
+
+    ++col;
+  }
+
+  // Orthogonal projection of the second diagram -----------------------
+
+  row = D1.size();
+  col = IndexType();
+
+  for( auto&& p1 : D2 )
+  {
+    for( auto&& p2 : D2 )
+    {
+      DataType d = DataType();
+
+      if( p1 == p2 )
+      {
+        // TODO: Orthogonal distance
+      }
+      else
+        d = std::numeric_limits<DataType>::max();
+
+      costs( row, col ) = d;
+
+      ++col;
+    }
+
+    ++row;
+  }
+
+  // Assignment problem solving ----------------------------------------
+
+  Munkres<DataType> solver( costs );
+
+  auto M              = solver();
+  DataType totalCosts = DataType();
+
+  for( row = IndexType(); row < M.n(); row++ )
+  {
+    for( col = IndexType(); col < M.n(); col++ )
+    {
+      if( M( row, col ) == IndexType() )
+        totalCosts += costs( row, col );
+    }
+  }
+
+  return std::pow( totalCosts, 1 / power );
 }
 
 }
