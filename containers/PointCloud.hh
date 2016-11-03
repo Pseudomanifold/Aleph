@@ -12,6 +12,10 @@ template <class T> class PointCloud
 {
 public:
 
+  // Exporting the type of elements stored in the point cloud. This is
+  // used by other algorithms to prevent casting.
+  using ElementType = T;
+
   PointCloud()
     : _n( 0 )
     , _d( 0 )
