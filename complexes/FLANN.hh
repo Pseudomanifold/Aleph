@@ -5,6 +5,9 @@
 
 #include <flann/flann.hpp>
 
+#include <algorithm>
+#include <vector>
+
 namespace aleph
 {
 
@@ -14,7 +17,10 @@ namespace complexes
 template <class Container> class FLANN : public NearestNeighbours< FLANN<Container> >
 {
 public:
+  using IndexType       = std::size_t;
   using ElementType     = typename Container::ElementType;
+
+  // TODO: Make configurable...
   using DistanceFunctor = flann::L2<ElementType>;
 
   FLANN( const Container& container )
@@ -34,6 +40,40 @@ public:
   ~FLANN()
   {
     delete _index;
+  }
+
+  void radiusSearch( ElementType radius,
+                     std::vector< std::vector<IndexType> >& indices,
+                     std::vector< std::vector<ElementType> >& distances )
+  {
+
+    flann::SearchParams searchParameters = flann::SearchParams();
+    searchParameters.checks = flann::FLANN_CHECKS_UNLIMITED;
+
+    std::vector< std::vector<int> > internalIndices;
+
+    _index->radiusSearch( _matrix,
+                          internalIndices,
+                          distances,
+                          radius,
+                          searchParameters );
+
+    // Perform transformation of indices -------------------------------
+
+    indices.clear();
+    indices.resize( _matrix.rows );
+
+    for( std::size_t i = 0; i < internalIndices.size(); i++ )
+    {
+      indices[i] = std::vector<IndexType>( internalIndices[i].size() );
+
+      std::transform( internalIndices[i].begin(), internalIndices[i].end(),
+                      indices[i].begin(),
+                      [] ( int j )
+                      {
+                        return static_cast<IndexType>( j );
+                      } );
+    }
   }
 
 private:
