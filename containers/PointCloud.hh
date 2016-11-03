@@ -2,8 +2,14 @@
 #define ALEPH_CONTAINERS_POINT_CLOUD_HH__
 
 #include <algorithm>
+#include <fstream>
+#include <iterator>
+#include <stdexcept>
+#include <string>
 
 #include <cstddef>
+
+#include <utilities/String.hh>
 
 namespace aleph
 {
@@ -89,12 +95,84 @@ public:
     return _points;
   }
 
+  /**
+    Sets $i$th point of point cloud. Throws if the number of dimensions
+    does not match the number of dimensions in the point cloud.
+  */
+
+  template <class InputIterator> void set( std::size_t i,
+                                           InputIterator begin, InputIterator end )
+  {
+    auto distance = std::distance( begin, end );
+
+    if( static_cast<std::size_t>( distance ) != this->dimension() )
+      throw std::runtime_error( "Incorrect number of dimensions" );
+
+    std::copy( begin, end, _points[ this->dimension() * i ]);
+  }
+
 private:
   std::size_t _n; ///< Number of points
   std::size_t _d; ///< Dimension
 
   T* _points;
 };
+
+/**
+  Loads a new point cloud from a file. The file is supposed to be in
+  ASCII format. Each row must specify one item of the data set.  The
+  different attributes of each item are assumed to be separated by a
+  comma or white-space characters.
+*/
+template<class T> PointCloud<T> load( const std::string& filename )
+{
+  std::ifstream in( filename );
+
+  if( !in )
+    return PointCloud<T>();
+
+  auto lines = std::count( std::istreambuf_iterator<char>( in ),
+                           std::istreambuf_iterator<char>(),
+                           '\n' );
+
+  if( lines <= 0 )
+    return PointCloud<T>();
+
+  std::size_t i = 0;
+  std::size_t d = 0;
+  std::size_t n = static_cast<std::size_t>( lines );
+
+  std::string line;
+
+  PointCloud<T> pointCloud;
+
+  while( std::getline( in, line ) )
+  {
+    auto tokens = utilities::split( line, std::string( "[:;,[:space:]]+" ) );
+
+    if( d == 0 )
+    {
+      d          = tokens.size();
+      pointCloud = PointCloud<T>( n, d );
+    }
+
+    std::vector<T> coordinates;
+    coordinates.reserve( d );
+
+    for( auto&& token : tokens )
+    {
+      T coordinate = utilities::convert<T>( token );
+      coordinates.push_back( coordinate );
+    }
+
+    pointCloud.set( i,
+                    coordinates.begin(), coordinates.end() );
+
+    ++i;
+  }
+
+  return pointCloud;
+}
 
 }
 

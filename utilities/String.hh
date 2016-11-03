@@ -3,6 +3,7 @@
 
 #include <algorithm>
 #include <regex>
+#include <sstream>
 #include <vector>
 
 #include <cctype>
@@ -52,6 +53,15 @@ template <class T> std::vector<T> split( const T& sequence,
   return { begin, end };
 }
 
+template <class T1, class T2> T2 convert( const T1& sequence )
+{
+  T2 result = T2();
+
+  std::istringstream converter( sequence );
+  sequence >> result;
+
+  return result;
+}
 
 }
 
