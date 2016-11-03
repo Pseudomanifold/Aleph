@@ -103,12 +103,32 @@ public:
   template <class InputIterator> void set( std::size_t i,
                                            InputIterator begin, InputIterator end )
   {
+    if( i >= this->size() )
+      throw std::runtime_error( "Invalid index" );
+
     auto distance = std::distance( begin, end );
 
     if( static_cast<std::size_t>( distance ) != this->dimension() )
       throw std::runtime_error( "Incorrect number of dimensions" );
 
     std::copy( begin, end, _points[ this->dimension() * i ]);
+  }
+
+  /**
+    Gets the $i$th point of the point cloud. It will be stored via an
+    output iterator. Incorrect indices will result in an exception.
+  */
+
+  template <class OutputIterator> void get( std::size_t i,
+                                            OutputIterator result ) const
+  {
+    if( i >= this->size() )
+      throw std::runtime_error( "Invalid index" );
+
+    auto offset = i * this->dimension();
+
+    std::copy( _points + offset, _points + offset + this->dimension(),
+               result );
   }
 
 private:
