@@ -7,16 +7,9 @@ namespace aleph
 namespace complexes
 {
 
-template <class Wrapper, class Container> class NearestNeighbours
+template <class Wrapper> class NearestNeighbours
 {
 public:
-  NearestNeighbours( const Container& container )
-    : _wrapper( container )
-  {
-  }
-
-private:
-  Wrapper _wrapper;
 };
 
 }
