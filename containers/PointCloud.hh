@@ -67,6 +67,28 @@ public:
     swap( pc1._d,      pc2._d );
   }
 
+  // Attributes --------------------------------------------------------
+
+  std::size_t size() const noexcept
+  {
+    return _n;
+  }
+
+  std::size_t dimension() const noexcept
+  {
+    return _d;
+  }
+
+  // Point access ------------------------------------------------------
+
+  // This is slightly evil. The function is not really "bit-wise"
+  // constant because it still permits modifying the pointer that
+  // is being returned.
+  T* data() const noexcept
+  {
+    return _points;
+  }
+
 private:
   std::size_t _n; ///< Number of points
   std::size_t _d; ///< Dimension
