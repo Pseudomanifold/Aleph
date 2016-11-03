@@ -58,7 +58,7 @@ template <class T1, class T2> T2 convert( const T1& sequence )
   T2 result = T2();
 
   std::istringstream converter( sequence );
-  sequence >> result;
+  converter >> result;
 
   return result;
 }

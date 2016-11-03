@@ -120,7 +120,7 @@ public:
     if( static_cast<std::size_t>( distance ) != this->dimension() )
       throw std::runtime_error( "Incorrect number of dimensions" );
 
-    std::copy( begin, end, _points[ this->dimension() * i ]);
+    std::copy( begin, end, _points + this->dimension() * i );
   }
 
   /**
@@ -190,7 +190,7 @@ template<class T> PointCloud<T> load( const std::string& filename )
 
     for( auto&& token : tokens )
     {
-      T coordinate = utilities::convert<T>( token );
+      T coordinate = utilities::convert<decltype(token), T>( token );
       coordinates.push_back( coordinate );
     }
 
