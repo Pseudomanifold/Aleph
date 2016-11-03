@@ -14,7 +14,7 @@ namespace aleph
 namespace complexes
 {
 
-template <class Container> class FLANN : public NearestNeighbours< FLANN<Container> >
+template <class Container> class FLANN : public NearestNeighbours< FLANN<Container>, std::size_t, typename Container::ElementType >
 {
 public:
   using IndexType       = std::size_t;
