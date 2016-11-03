@@ -73,6 +73,15 @@ public:
     swap( pc1._d,      pc2._d );
   }
 
+  // Equality comparison -----------------------------------------------
+
+  bool operator==( const PointCloud<T>& other ) const noexcept
+  {
+    return    _n == other._n
+           && _d == other._d
+           && std::equal( _points, _points + _n * _d, other._points );
+  }
+
   // Attributes --------------------------------------------------------
 
   std::size_t size() const noexcept
