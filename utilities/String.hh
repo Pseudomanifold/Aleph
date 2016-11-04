@@ -53,9 +53,15 @@ template <class T> std::vector<T> split( const T& sequence,
   return { begin, end };
 }
 
-template <class T1, class T2> T2 convert( const T1& sequence )
+/**
+  Attempts to convert a sequence type $S$ to a non-sequence type $T$ by
+  using $std::stringstream$. This makes converting strings to different
+  types such as numbers easier.
+*/
+
+template <class T, class S> T convert( const S& sequence )
 {
-  T2 result = T2();
+  T result = T();
 
   std::istringstream converter( sequence );
   converter >> result;

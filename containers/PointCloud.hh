@@ -194,7 +194,7 @@ template<class T> PointCloud<T> load( const std::string& filename )
 
     for( auto&& token : tokens )
     {
-      T coordinate = utilities::convert<decltype(token), T>( token );
+      T coordinate = utilities::convert<T>( token );
       coordinates.push_back( coordinate );
     }
 
