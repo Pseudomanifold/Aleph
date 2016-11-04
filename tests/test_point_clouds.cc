@@ -92,6 +92,15 @@ template <class T> void testAccess()
     );
   }
 
+  {
+    std::vector<T> p;
+
+    ALEPH_EXPECT_EXCEPTION(
+      pc.set( 151, {1,2,3} ),
+      std::runtime_error
+    );
+  }
+
   ALEPH_TEST_END;
 }
 
