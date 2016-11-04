@@ -49,6 +49,7 @@ public:
   }
 
   PointCloud( PointCloud&& other )
+    : PointCloud()
   {
     swap( *this, other );
   }
