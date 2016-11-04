@@ -17,7 +17,6 @@ int main()
 
   assert( container.size() == 150 );
   assert( container.dimension() == 4 );
-  assert( container.size() == 2);
 
   FLANN<Container> flannWrapper( container );
 }
