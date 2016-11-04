@@ -165,6 +165,9 @@ template<class T> PointCloud<T> load( const std::string& filename )
                            std::istreambuf_iterator<char>(),
                            '\n' );
 
+  in.clear();
+  in.seekg( 0 );
+
   if( lines <= 0 )
     return PointCloud<T>();
 
