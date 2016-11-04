@@ -27,6 +27,10 @@ CONFIGURE_FILE( ${CMAKE_SOURCE_DIR}/config/Base.hh.in ${CMAKE_SOURCE_DIR}/config
 
 INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR} )
 
+# Enable testing globally. Individual tests may be found in the `tests`
+# subdirectory of the repository.
+ENABLE_TESTING()
+
 ADD_SUBDIRECTORY( tests )
 
 ADD_EXECUTABLE( aleph_test
