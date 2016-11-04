@@ -21,6 +21,26 @@ namespace aleph
   }                                                                 \
 }
 
+#define ALEPH_EXPECT_EXCEPTION( expression, exception )             \
+{                                                                   \
+  try                                                               \
+  {                                                                 \
+    ( expression );                                                 \
+  }                                                                 \
+  catch( exception& e )                                             \
+  {                                                                 \
+  }                                                                 \
+  catch( ... )                                                      \
+  {                                                                 \
+    throw std::runtime_error(   std::string( __FILE__ )             \
+                              + std::string( ":" )                  \
+                              + std::to_string( __LINE__ )          \
+                              + std::string( " in " )               \
+                              + std::string( __PRETTY_FUNCTION__ )  \
+    );                                                              \
+  }                                                                 \
+}
+
 #define ALEPH_TEST_BEGIN( name )\
 {\
   std::cerr << "-- Running test \"" << name << "\"...";\

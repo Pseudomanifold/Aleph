@@ -67,6 +67,31 @@ template <class T> void testAccess()
     ALEPH_ASSERT_THROW( p == q );
   }
 
+  {
+    std::vector<T> p1 = { T(1), T(2), T(3), T(4) };
+    std::vector<T> p2;
+    std::vector<T> q1 = { T(5), T(6), T(7), T(8) };
+    std::vector<T> q2;
+
+    pc.set( 148, {1,2,3,4} );
+    pc.set( 149, {5,6,7,8} );
+
+    pc.get( 148, std::back_inserter( p2 ) );
+    pc.get( 149, std::back_inserter( q2 ) );
+
+    ALEPH_ASSERT_THROW( p1 == p2 );
+    ALEPH_ASSERT_THROW( q1 == q2 );
+  }
+
+  {
+    std::vector<T> p;
+
+    ALEPH_EXPECT_EXCEPTION(
+      pc.get( 151, std::back_inserter( p ) ),
+      std::runtime_error
+    );
+  }
+
   ALEPH_TEST_END;
 }
 
