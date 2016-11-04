@@ -106,9 +106,13 @@ template <class T> void testAccess()
 
 int main()
 {
-  testFormats<float> ();
-  testFormats<double>();
+  std::cerr << "-- float\n";
 
+  testFormats<float> ();
   testAccess<float>  ();
+
+  std::cerr << "-- double\n";
+
+  testFormats<double>();
   testAccess<double> ();
 }
