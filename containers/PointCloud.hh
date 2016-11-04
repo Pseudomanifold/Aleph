@@ -3,6 +3,7 @@
 
 #include <algorithm>
 #include <fstream>
+#include <initializer_list>
 #include <iterator>
 #include <stdexcept>
 #include <string>
@@ -65,7 +66,7 @@ public:
     delete[] _points;
   }
 
-  friend void swap( PointCloud& pc1, PointCloud& pc2 )
+  friend void swap( PointCloud& pc1, PointCloud& pc2 ) noexcept
   {
     using std::swap;
 
@@ -95,6 +96,11 @@ public:
     return _d;
   }
 
+  bool empty() const noexcept
+  {
+    return _n == 0;
+  }
+
   // Point access ------------------------------------------------------
 
   // This is slightly evil. The function is not really "bit-wise"
@@ -122,6 +128,12 @@ public:
       throw std::runtime_error( "Incorrect number of dimensions" );
 
     std::copy( begin, end, _points + this->dimension() * i );
+  }
+
+  /** @overload set() */
+  void set( std::size_t i, const std::initializer_list<T>& il )
+  {
+    this->set( i, il.begin(), il.end() );
   }
 
   /**
