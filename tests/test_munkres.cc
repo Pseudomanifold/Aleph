@@ -1,4 +1,5 @@
 #include <iostream>
+#include <set>
 #include <string>
 
 #include "distances/detail/Matrix.hh"
@@ -48,11 +49,36 @@ template <class T> void fourByFour()
   ALEPH_ASSERT_THROW( cost  > T()   );
   ALEPH_ASSERT_THROW( cost == T(140) );
 
-  // TODO: Check...
-  // 2,0
-  // 1,1
-  // 0,2
-  // 3,3
+  std::set< std::pair<std::size_t, std::size_t> > matching;
+
+  solver.matching(
+    std::inserter( matching, matching.begin() )
+  );
+
+  // Existing matches --------------------------------------------------
+
+  ALEPH_ASSERT_THROW( matching.find( std::make_pair( std::size_t(0), std::size_t(2) ) ) != matching.end() );
+  ALEPH_ASSERT_THROW( matching.find( std::make_pair( std::size_t(1), std::size_t(1) ) ) != matching.end() );
+  ALEPH_ASSERT_THROW( matching.find( std::make_pair( std::size_t(2), std::size_t(0) ) ) != matching.end() );
+  ALEPH_ASSERT_THROW( matching.find( std::make_pair( std::size_t(3), std::size_t(3) ) ) != matching.end() );
+
+  // ...non-existing matches -------------------------------------------
+
+  ALEPH_ASSERT_THROW( matching.find( std::make_pair( std::size_t(0), std::size_t(0) ) ) == matching.end() );
+  ALEPH_ASSERT_THROW( matching.find( std::make_pair( std::size_t(0), std::size_t(1) ) ) == matching.end() );
+  ALEPH_ASSERT_THROW( matching.find( std::make_pair( std::size_t(0), std::size_t(3) ) ) == matching.end() );
+
+  ALEPH_ASSERT_THROW( matching.find( std::make_pair( std::size_t(1), std::size_t(0) ) ) == matching.end() );
+  ALEPH_ASSERT_THROW( matching.find( std::make_pair( std::size_t(1), std::size_t(2) ) ) == matching.end() );
+  ALEPH_ASSERT_THROW( matching.find( std::make_pair( std::size_t(1), std::size_t(3) ) ) == matching.end() );
+
+  ALEPH_ASSERT_THROW( matching.find( std::make_pair( std::size_t(2), std::size_t(1) ) ) == matching.end() );
+  ALEPH_ASSERT_THROW( matching.find( std::make_pair( std::size_t(2), std::size_t(2) ) ) == matching.end() );
+  ALEPH_ASSERT_THROW( matching.find( std::make_pair( std::size_t(2), std::size_t(3) ) ) == matching.end() );
+
+  ALEPH_ASSERT_THROW( matching.find( std::make_pair( std::size_t(3), std::size_t(0) ) ) == matching.end() );
+  ALEPH_ASSERT_THROW( matching.find( std::make_pair( std::size_t(3), std::size_t(1) ) ) == matching.end() );
+  ALEPH_ASSERT_THROW( matching.find( std::make_pair( std::size_t(3), std::size_t(2) ) ) == matching.end() );
 
   ALEPH_TEST_END();
 }
