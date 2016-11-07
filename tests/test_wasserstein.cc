@@ -1,8 +1,8 @@
-#include <iostream>
-
 #include "PersistenceDiagram.hh"
 
 #include "distances/Wasserstein.hh"
+
+#include "tests/Base.hh"
 
 using namespace aleph;
 using namespace aleph::distances;
@@ -23,6 +23,9 @@ int main()
 
     assert( d11 >= DataType() );
     assert( d11 == DataType() );
+
+    ALEPH_ASSERT_THROW( d11 >= DataType() );
+    ALEPH_ASSERT_THROW( d11 == DataType() );
   }
 
   Diagram D2;
@@ -35,14 +38,10 @@ int main()
     auto d12 = wassersteinDistance( D1, D2 );
     auto d21 = wassersteinDistance( D2, D1 );
 
-    assert( d12 > DataType() );
-    assert( d21 > DataType() );
+    ALEPH_ASSERT_THROW( d12 > DataType() );
+    ALEPH_ASSERT_THROW( d21 > DataType() );
 
-    assert( d12 == d21 );
-
-    std::cerr << "d12 = " << d12 << std::endl;
-    std::cerr << "d21 = " << d21 << std::endl;
-
-    assert( std::abs( d12 -  DataType( 3.05 ) ) < 1e-8 );
+    ALEPH_ASSERT_THROW( d12 == d21 );
+    ALEPH_ASSERT_THROW( std::abs( d12 -  DataType( 3.05 ) ) < 1e-8 );
   }
 }
