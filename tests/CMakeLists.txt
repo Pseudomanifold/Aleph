@@ -23,3 +23,4 @@ ADD_EXECUTABLE( test_wasserstein        test_wasserstein.cc )
 
 ADD_TEST( munkres      test_munkres )
 ADD_TEST( point_clouds test_point_clouds )
+ADD_TEST( wasserstein  test_wasserstein )
