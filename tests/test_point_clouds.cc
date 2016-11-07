@@ -35,7 +35,7 @@ template <class T> void testFormats()
     for( auto&& pc2 : pointClouds )
       ALEPH_ASSERT_THROW( pc1 == pc2 );
 
-  ALEPH_TEST_END;
+  ALEPH_TEST_END();
 }
 
 template <class T> void testAccess()
@@ -101,7 +101,7 @@ template <class T> void testAccess()
     );
   }
 
-  ALEPH_TEST_END;
+  ALEPH_TEST_END();
 }
 
 int main()

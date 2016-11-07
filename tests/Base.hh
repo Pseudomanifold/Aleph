@@ -46,7 +46,7 @@ namespace aleph
   std::cerr << "-- Running test \"" << name << "\"...";\
 }
 
-#define ALEPH_TEST_END \
+#define ALEPH_TEST_END() \
 {\
   std::cerr << "finished\n";\
 }
