@@ -2,7 +2,7 @@
 #define ALEPH_DISTANCES_DETAIL_MATRIX_HH__
 
 #include <algorithm>
-#include <iosfwd>
+#include <ostream>
 #include <utility>
 
 #include <cassert>
