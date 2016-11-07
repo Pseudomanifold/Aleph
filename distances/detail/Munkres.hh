@@ -79,9 +79,6 @@ public:
 
     while( step != 0 )
     {
-      std::cout << "Step " << step << "\n"
-                << std::string(80, '-') << "\n";
-
       switch( step )
       {
       case 1:
@@ -100,12 +97,9 @@ public:
         step = step5( _matrix );
         break;
       }
-
-      std::cout << "Matrix" << "\n"
-                << std::string(80, '-') << "\n"
-                << _matrix << "\n"
-                << std::string(80, '-') << "\n";
     }
+
+    // Prepare reduced matrix ------------------------------------------
 
     auto n = _matrix.n();
 
@@ -127,7 +121,7 @@ private:
 
   // Modifies matrix in-place by subtracting the minimum value in each
   // row. The function assumes that matrix is not empty.
-  void subtractRowMinimum( Matrix<T>& matrix )
+  static void subtractRowMinimum( Matrix<T>& matrix ) noexcept
   {
     auto n = matrix.n();
 
@@ -195,8 +189,6 @@ private:
 
           _stars( row, col )  = true;
           _primes( row, col ) = false;
-
-          std::cout << "0* at (" << row << "," << col << ")\n";
         }
         skipCurrentColumn:
           ;
@@ -229,8 +221,6 @@ private:
       }
     }
 
-    std::cout << "I have " << coveredColumns << " covered columns\n";
-
     if( coveredColumns >= n )
       return 0;
 
@@ -246,8 +236,6 @@ private:
     {
       _primes( row, col ) = true;
       _stars( row, col )  = false;
-
-      std::cout << "0' at (" << row << "," << col << ")\n";
     }
     else
       return 5;
@@ -333,8 +321,6 @@ private:
 
     for( auto&& pair : sequence )
     {
-      std::cout << "- (" << pair.first << "," << pair.second << ")\n";
-
       // Un-star
       if( _stars(pair.first, pair.second) )
       {
@@ -409,6 +395,11 @@ private:
     return 3;
   }
 
+  // Attributes --------------------------------------------------------
+
+  // The matrix is going to be reduced in-place. The class does not
+  // store additional information about its status. Hence, there is
+  // no way of determining whether the algorithm has converged.
   Matrix<T> _matrix;
 
   Matrix<bool> _stars;
