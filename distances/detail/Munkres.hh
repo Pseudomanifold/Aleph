@@ -6,6 +6,7 @@
 #include <algorithm>
 #include <limits>
 #include <numeric>
+#include <utility>
 #include <vector>
 
 namespace aleph
@@ -53,6 +54,27 @@ public:
     }
 
     return std::accumulate( allCosts.begin(), allCosts.end(), T() );
+  }
+
+  /**
+    Stores the matching in an output iterator. The output iterator needs
+    to be able to handle pairs of indices. Note that this function needs
+    an
+  */
+
+  template <class OutputIterator> void matching( OutputIterator result ) const noexcept
+  {
+    using Index = std::size_t;
+    auto n      = _matrix.n();
+
+    for( std::size_t row = 0; row < n; row++ )
+    {
+      for( std::size_t col = 0; col < n; col++ )
+      {
+        if( _matrix( row, col ) == T() )
+          *result++ = std::make_pair( static_cast<Index>( row ), static_cast<Index>( col ) );
+      }
+    }
   }
 
   // Constructor -------------------------------------------------------
