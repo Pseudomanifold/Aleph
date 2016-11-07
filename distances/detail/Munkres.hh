@@ -5,6 +5,7 @@
 
 #include <algorithm>
 #include <limits>
+#include <numeric>
 #include <vector>
 
 namespace aleph
@@ -20,6 +21,42 @@ template <class T> class Munkres
 {
 public:
 
+  /**
+    Given a reduced matrix stored by the class and a matrix of costs,
+    calculates the costs and returns them. Note that this function is
+    unable to know whether the stored matrix has been reduced or not.
+  */
+
+  T cost( const Matrix<T>& costs ) const noexcept
+  {
+    std::vector<T> allCosts;
+
+    auto n = _matrix.n();
+
+    if( n != costs.n() )
+    {
+      if( std::numeric_limits<T>::has_quiet_NaN )
+        return std::numeric_limits<T>::quiet_NaN();
+      else
+        return std::numeric_limits<T>::max();
+    }
+
+    for( std::size_t row = 0; row < n; row++ )
+    {
+      for( std::size_t col = 0; col < n; col++ )
+      {
+        // This value denotes that a match has been made between the
+        // current row and the current column.
+        if( _matrix( row, col ) == T() )
+          allCosts.push_back( costs( row, col ) );
+      }
+    }
+
+    return std::accumulate( allCosts.begin(), allCosts.end(), T() );
+  }
+
+  // Constructor -------------------------------------------------------
+
   Munkres( const Matrix<T>& matrix )
     : _matrix( matrix )
     , _stars( matrix.n() )
@@ -28,6 +65,8 @@ public:
     , _colMask( std::vector<bool>( _matrix.n(), false ) )
   {
   }
+
+  // Solver ------------------------------------------------------------
 
   Matrix<T> operator()()
   {
