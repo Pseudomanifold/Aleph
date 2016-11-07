@@ -21,4 +21,5 @@ ADD_EXECUTABLE( test_nearest_neighbours test_nearest_neighbours.cc )
 ADD_EXECUTABLE( test_point_clouds       test_point_clouds.cc )
 ADD_EXECUTABLE( test_wasserstein        test_wasserstein.cc )
 
+ADD_TEST( munkres      test_munkres )
 ADD_TEST( point_clouds test_point_clouds )
