@@ -33,11 +33,21 @@ template <class T> void test()
   std::vector< std::vector<IndexType> > indices;
   std::vector< std::vector<ElementType> > distances;
 
-  flannWrapper.radiusSearch( static_cast<T>( 0.5 ), indices, distances );
+  // Check that an *empty* radius does not return any indices
 
+  flannWrapper.radiusSearch( static_cast<T>( 0.0 ), indices, distances );
+
+  ALEPH_ASSERT_THROW( indices.size() == pointCloud.size() );
   for( auto&& i : indices )
-    for( auto&& j : i )
-      std::cerr << j << " ";
+    ALEPH_ASSERT_THROW( i.empty() == true );
+
+  // Check that a large radius returns *all* indices
+
+  flannWrapper.radiusSearch( static_cast<T>( 8.0 ), indices, distances );
+
+  ALEPH_ASSERT_THROW( indices.size() == pointCloud.size() );
+  for( auto&& i : indices )
+    ALEPH_ASSERT_THROW( i.size() == pointCloud.size() );
 
   ALEPH_TEST_END();
 }
