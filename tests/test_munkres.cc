@@ -106,5 +106,4 @@ int main()
   fourByFour<unsigned long> ();
   fourByFour<float>         ();
   fourByFour<double>        ();
-
 }
