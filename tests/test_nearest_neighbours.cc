@@ -1,7 +1,11 @@
-#include <complexes/FLANN.hh>
-#include <complexes/NearestNeighbours.hh>
+#include "complexes/FLANN.hh"
+#include "complexes/NearestNeighbours.hh"
 
-#include <containers/PointCloud.hh>
+#include "config/Base.hh"
+
+#include "containers/PointCloud.hh"
+
+#include "tests/Base.hh"
 
 #include <vector>
 
@@ -10,13 +14,24 @@
 using namespace aleph::complexes;
 using namespace aleph;
 
+template <class T> void test()
+{
+  ALEPH_TEST_BEGIN( "Nearest-neighbour calculation with different types" );
+
+  using PointCloud = PointCloud<T>;
+
+  PointCloud pointCloud = load<T>( CMAKE_SOURCE_DIR + std::string( "/tests/input/Iris_colon_separated.txt" ) );
+
+  ALEPH_ASSERT_THROW( pointCloud.size()      == 150 );
+  ALEPH_ASSERT_THROW( pointCloud.dimension() ==   4);
+
+  FLANN<PointCloud> flannWrapper( pointCloud );
+
+  ALEPH_TEST_END();
+}
+
 int main()
 {
-  using Container = PointCloud<double>;
-  Container container = load<double>( "Iris.txt" );
-
-  assert( container.size() == 150 );
-  assert( container.dimension() == 4 );
-
-  FLANN<Container> flannWrapper( container );
+  test<float> ();
+  test<double>();
 }
