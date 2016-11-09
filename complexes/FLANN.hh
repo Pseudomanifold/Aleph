@@ -35,6 +35,8 @@ public:
 
     _index
       = new flann::Index<DistanceFunctor>( _matrix, indexParameters );
+
+    _index->buildIndex();
   }
 
   ~FLANN()

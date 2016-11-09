@@ -27,6 +27,18 @@ template <class T> void test()
 
   FLANN<PointCloud> flannWrapper( pointCloud );
 
+  using IndexType   = typename FLANN<PointCloud>::IndexType;
+  using ElementType = typename FLANN<PointCloud>::ElementType;
+
+  std::vector< std::vector<IndexType> > indices;
+  std::vector< std::vector<ElementType> > distances;
+
+  flannWrapper.radiusSearch( static_cast<T>( 0.5 ), indices, distances );
+
+  for( auto&& i : indices )
+    for( auto&& j : i )
+      std::cerr << j << " ";
+
   ALEPH_TEST_END();
 }
 
