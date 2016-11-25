@@ -40,10 +40,14 @@ public:
     {
       simplices.push_back( Simplex( vertex ) );
 
-      this->addCofaces( simplices.back(),
-                        lowerNeighbours.at( vertex ),
-                        simplices,
-                        dimension );
+      if( lowerNeighbours.find( vertex ) != lowerNeighbours.end() )
+      {
+        addCofaces( simplices.back(),
+                    lowerNeighbours,
+                    lowerNeighbours.at( vertex ),
+                    simplices,
+                    dimension );
+      }
     }
 
     return SimplicialComplex( simplices.begin(), simplices.end() );
@@ -51,19 +55,17 @@ public:
 
 private:
 
-  using VertexContainer    = std::vector<VertexType>;
+  using VertexContainer    = std::unordered_set<VertexType>;
   using LowerNeighboursMap = std::unordered_map<VertexType, VertexContainer>;
 
   static void addCofaces( const Simplex& s,
+                          const LowerNeighboursMap& lowerNeighboursMap,
                           const VertexContainer& neighbours,
                           SimplexContainer& simplices,
                           unsigned dimension )
   {
     if( s.dimension() > dimension )
       return;
-
-    std::unordered_set<VertexType> currentNeighbours( neighbours.begin(),
-                                                      neighbours.end() );
 
     for( auto&& neighbour : neighbours )
     {
@@ -78,7 +80,37 @@ private:
       //  - Add *their* respective cofaces
 
       simplices.push_back( Simplex( vertices.begin(), vertices.end() ) );
+
+      if( lowerNeighboursMap.find( neighbour ) != lowerNeighboursMap.end() )
+      {
+        auto lowerNeighbours  = lowerNeighboursMap.at( neighbour );
+        auto commonNeighbours = intersect( lowerNeighbours, neighbours );
+
+        addCofaces( simplices.back(),
+                    lowerNeighboursMap,
+                    commonNeighbours,
+                    simplices,
+                    dimension );
+      }
     }
+  }
+
+  static std::unordered_set<VertexType> intersect( const std::unordered_set<VertexType>& U,
+                                                   const std::unordered_set<VertexType>& V )
+  {
+    auto uPtr = &U;
+    auto vPtr = &V;
+
+    std::unordered_set<VertexType> result;
+
+    if( uPtr->size() > vPtr->size() )
+      std::swap( uPtr, vPtr );
+
+    for( auto&& u : *uPtr )
+      if( vPtr->find( u ) != vPtr->end() )
+        result.insert( u );
+
+    return result;
   }
 
   static LowerNeighboursMap getLowerNeighbours( const SimplicialComplex& K )
@@ -95,13 +127,12 @@ private:
       auto&& v = *( it->begin() + 1); // second vertex of edge
 
       if( u < v )
-        lowerNeighbours[v].push_back( u );
+        lowerNeighbours[v].insert( u );
       else
-        lowerNeighbours[u].push_back( v );
+        lowerNeighbours[u].insert( v );
     }
 
-    for( auto&& pair : lowerNeighbours )
-      std::sort( pair.second.begin(), pair.second.end() );
+    return lowerNeighbours;
   }
 };
 
