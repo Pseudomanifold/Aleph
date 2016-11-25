@@ -30,7 +30,7 @@ public:
   {
     std::set<VertexType> vertices;
     K.vertices( std::inserter( vertices,
-                               vertices.begin() );
+                               vertices.begin() ) );
 
     auto lowerNeighbours = getLowerNeighbours( K );
 
@@ -54,10 +54,10 @@ private:
   using VertexContainer    = std::vector<VertexType>;
   using LowerNeighboursMap = std::unordered_map<VertexType, VertexContainer>;
 
-  void addCofaces( const Simplex& s,
-                   const VertexContainer& neighbours,
-                   SimplexContainer& simplices,
-                   unsigned dimension )
+  static void addCofaces( const Simplex& s,
+                          const VertexContainer& neighbours,
+                          SimplexContainer& simplices,
+                          unsigned dimension )
   {
     if( s.dimension() > dimension )
       return;
@@ -77,7 +77,7 @@ private:
       //  - Intersect current neighbours with these neighbours
       //  - Add *their* respective cofaces
 
-      simplices.push_back( Simplex( vertices.begin(), vertices.end() );
+      simplices.push_back( Simplex( vertices.begin(), vertices.end() ) );
     }
   }
 
