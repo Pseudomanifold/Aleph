@@ -23,9 +23,13 @@ template <class Data, class Vertex> bool triangle()
   SimplicialComplex K( simplices.begin(), simplices.end() );
   RipsExpander<Simplex> ripsExpander;
 
-  auto vr = ripsExpander( K, 2 );
+  auto vr1 = ripsExpander( K, 2 );
+  auto vr2 = ripsExpander( K, 3 );
 
-  ALEPH_ASSERT_THROW( vr.empty() == false );
+  ALEPH_ASSERT_THROW( vr1.empty() == false );
+  ALEPH_ASSERT_THROW( vr2.empty() == false );
+  ALEPH_ASSERT_THROW( vr1.size()  == vr2.size() );
+  ALEPH_ASSERT_THROW( vr1.size()  == 7 );
 
   ALEPH_TEST_END();
   return true;
