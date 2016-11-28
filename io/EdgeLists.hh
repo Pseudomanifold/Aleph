@@ -7,6 +7,7 @@
 #include <string>
 #include <vector>
 
+#include "Simplex.hh"
 #include "SimplicialComplex.hh"
 
 #include "utilities/String.hh"
@@ -91,6 +92,8 @@ private:
   bool _readWeights              = true;
   bool _trimLines                = true;
 };
+
+}
 
 }
 
