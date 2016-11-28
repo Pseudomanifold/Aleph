@@ -7,7 +7,6 @@
 #include <string>
 #include <vector>
 
-#include "Simplex.hh"
 #include "SimplicialComplex.hh"
 
 #include "utilities/String.hh"
@@ -28,12 +27,12 @@ public:
   void setReadWeights( bool value = true ) noexcept { _readWeights = value; }
   void setTrimLines( bool value = true )   noexcept { _trimLines = value; }
 
-  template <class DataType,
-    class VertexType> SimplicialComplex< Simplex<DataType, VertexType> > operator()( std::ifstream& in )
+  template <class Simplex> void operator()( std::ifstream& in, SimplicialComplex<Simplex>& K )
   {
     using namespace utilities;
 
-    using Simplex           = Simplex<DataType, VertexType>;
+    using DataType          = typename Simplex::DataType;
+    using VertexType        = typename Simplex::VertexType;
     using SimplicialComplex = SimplicialComplex<Simplex>;
 
     std::string line;
@@ -83,7 +82,7 @@ public:
     simplices.insert( simplices.end(), vertices.begin(), vertices.end() );
     simplices.insert( simplices.end(), edges.begin(), edges.end() );
 
-    return SimplicialComplex( simplices.begin(), simplices.end() );
+    K = SimplicialComplex( simplices.begin(), simplices.end() );
   }
 
 private:
