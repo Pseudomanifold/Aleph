@@ -31,6 +31,7 @@ INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR} )
 # subdirectory of the repository.
 ENABLE_TESTING()
 
+ADD_SUBDIRECTORY( examples )
 ADD_SUBDIRECTORY( tests )
 
 ADD_EXECUTABLE( aleph_test
@@ -44,6 +45,7 @@ ADD_EXECUTABLE( aleph_ply
 ADD_EXECUTABLE( aleph_function
   aleph_function.cc
 )
+
 
 #
 # Place compile commands in the source directory
