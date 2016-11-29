@@ -1,3 +1,5 @@
+#include "complexes/RipsExpander.hh"
+
 #include "filtrations/Data.hh"
 
 #include "io/EdgeLists.hh"
@@ -35,6 +37,15 @@ int main( int argc, char** argv )
   std::cerr << "finished\n"
             << "* Extracted simplicial complex with " << K.size() << " simplices\n";
 
+  std::cerr << "* Expanding simplicial complex...";
+
+  // TODO: Make expansion configurable
+  aleph::complexes::RipsExpander<Simplex> ripsExpander;
+  K = ripsExpander( K, 2 );
+
+  std::cerr << "...finished\n"
+            << "* Expanded complex has " << K.size() << " simplices\n";
+
   std::cerr << "* Establishing filtration order...";
 
   K.sort(
@@ -49,4 +60,7 @@ int main( int argc, char** argv )
     = calculatePersistenceDiagrams( K );
 
   std::cerr << "...finished\n";
+
+  for( auto&& D : diagrams )
+    std::cout << D << "\n";
 }

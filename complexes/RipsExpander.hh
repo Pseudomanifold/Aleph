@@ -78,6 +78,7 @@ private:
       //  - Get lower neighbours of current vertex
       //  - Intersect current neighbours with these neighbours
       //  - Add *their* respective cofaces
+      //  - Set weight
 
       simplices.push_back( Simplex( vertices.begin(), vertices.end() ) );
 
