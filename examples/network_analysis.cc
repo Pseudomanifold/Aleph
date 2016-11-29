@@ -40,7 +40,7 @@ int main( int argc, char** argv )
   std::cerr << "* Expanding simplicial complex...";
 
   // TODO: Make expansion configurable
-  aleph::complexes::RipsExpander<Simplex> ripsExpander;
+  aleph::complexes::RipsExpander<SimplicialComplex> ripsExpander;
   K = ripsExpander( K, 2 );
 
   std::cerr << "...finished\n"

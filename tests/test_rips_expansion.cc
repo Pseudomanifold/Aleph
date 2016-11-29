@@ -21,7 +21,7 @@ template <class Data, class Vertex> bool triangle()
     = { {0}, {1}, {2}, {0,1}, {0,2}, {1,2} };
 
   SimplicialComplex K( simplices.begin(), simplices.end() );
-  RipsExpander<Simplex> ripsExpander;
+  RipsExpander<SimplicialComplex> ripsExpander;
 
   auto vr1 = ripsExpander( K, 2 );
   auto vr2 = ripsExpander( K, 3 );

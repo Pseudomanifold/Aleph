@@ -1,10 +1,9 @@
 #ifndef ALEPH_COMPLEXES_RIPS_EXPANDER_HH__
 #define ALEPH_COMPLEXES_RIPS_EXPANDER_HH__
 
-#include "Simplex.hh"
-#include "SimplicialComplex.hh"
-
 #include <algorithm>
+#include <list>
+#include <set>
 #include <unordered_map>
 #include <unordered_set>
 #include <vector>
@@ -15,13 +14,13 @@ namespace aleph
 namespace complexes
 {
 
-template <class Simplex> class RipsExpander
+template <class SimplicialComplex> class RipsExpander
 {
 public:
+  using Simplex           = typename SimplicialComplex::ValueType;
   using DataType          = typename Simplex::DataType;
   using VertexType        = typename Simplex::VertexType;
 
-  using SimplicialComplex = SimplicialComplex<Simplex>;
   using SimplexContainer  = std::list<Simplex>;
 
   // Expansion ---------------------------------------------------------
