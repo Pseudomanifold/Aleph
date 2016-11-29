@@ -42,6 +42,7 @@ int main( int argc, char** argv )
   // TODO: Make expansion configurable
   aleph::complexes::RipsExpander<SimplicialComplex> ripsExpander;
   K = ripsExpander( K, 2 );
+  K = ripsExpander.assignMaximumWeight( K );
 
   std::cerr << "...finished\n"
             << "* Expanded complex has " << K.size() << " simplices\n";

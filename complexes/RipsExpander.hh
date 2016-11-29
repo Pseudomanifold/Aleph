@@ -52,6 +52,39 @@ public:
     return SimplicialComplex( simplices.begin(), simplices.end() );
   }
 
+  // Weight assignment -------------------------------------------------
+
+  SimplicialComplex assignMaximumWeight( const SimplicialComplex& K, unsigned minDimension = 1 )
+  {
+    SimplicialComplex S;
+
+    for( auto s : K )
+    {
+      // Re-calculate the weight of the simplex because its
+      // dimensionality requirement is not satisfied
+      if( s.dimension() > minDimension )
+      {
+        auto w = s.data();
+
+        for( auto itFace = s.begin_boundary(); itFace != s.end_boundary(); ++itFace )
+        {
+          auto itFaceInK = K.find( *itFace );
+          if( itFaceInK != K.end() )
+            w = std::max( w, itFaceInK->data() );
+        }
+
+        s.setData( w );
+      }
+
+      // TODO: Not sure whether this is the best way of solving it;
+      // should I expect a generic simplicial complex to have this
+      // function?
+      S.push_back_without_validation( s );
+    }
+
+    return S;
+  }
+
 private:
 
   using VertexContainer    = std::unordered_set<VertexType>;
