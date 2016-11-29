@@ -63,5 +63,8 @@ int main( int argc, char** argv )
   std::cerr << "...finished\n";
 
   for( auto&& D : diagrams )
+  {
+    D.removeDiagonal();
     std::cout << D << "\n";
+  }
 }

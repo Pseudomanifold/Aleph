@@ -1,6 +1,7 @@
 #ifndef ALEPH_PERSISTENCE_DIAGRAM_HH__
 #define ALEPH_PERSISTENCE_DIAGRAM_HH__
 
+#include <algorithm>
 #include <iosfwd>
 #include <limits>
 #include <utility>
@@ -87,6 +88,18 @@ public:
   Iterator erase( Iterator begin, Iterator end )
   {
     return _points.erase( begin, end );
+  }
+
+  void removeDiagonal() noexcept
+  {
+    _points.erase(
+      std::remove_if( _points.begin(), _points.end(),
+                      [] ( const Point& p )
+                      {
+                        return p.x() == p.y();
+                      } ),
+      _points.end()
+    );
   }
 
   // Attributes --------------------------------------------------------
