@@ -49,6 +49,27 @@ public:
       }
     }
 
+    // Re-assign weights of all simplices that are already present in
+    // the original simplicial complex. This is certainly not a quick
+    // algorithm.
+    //
+    // I am mitigating the performance impact somewhat by considering
+    // only 0-simplices and 1-simplices. This may not be the smartest
+    // idea, though.
+    //
+    // TODO: Performance improvements?
+    // TODO: Higher-dimensional simplices & their weights?
+    for( auto&& simplex : simplices )
+    {
+      if( simplex.dimension() <= 1 )
+      {
+        auto itSimplex = K.find( simplex );
+
+        if( itSimplex != K.end() )
+          simplex.setData( itSimplex->data() );
+      }
+    }
+
     return SimplicialComplex( simplices.begin(), simplices.end() );
   }
 
