@@ -117,7 +117,7 @@ private:
                           SimplexContainer& simplices,
                           unsigned dimension )
   {
-    if( s.dimension() > dimension )
+    if( s.dimension() >= dimension )
       return;
 
     for( auto&& neighbour : neighbours )
