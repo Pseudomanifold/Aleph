@@ -7,8 +7,6 @@
 #include <string>
 #include <vector>
 
-#include "SimplicialComplex.hh"
-
 #include "utilities/String.hh"
 
 namespace aleph
@@ -27,13 +25,13 @@ public:
   void setReadWeights( bool value = true ) noexcept { _readWeights = value; }
   void setTrimLines( bool value = true )   noexcept { _trimLines = value; }
 
-  template <class Simplex> void operator()( std::ifstream& in, SimplicialComplex<Simplex>& K )
+  template <class SimplicialComplex> void operator()( std::ifstream& in, SimplicialComplex& K )
   {
     using namespace utilities;
 
+    using Simplex           = typename SimplicialComplex::ValueType;
     using DataType          = typename Simplex::DataType;
     using VertexType        = typename Simplex::VertexType;
-    using SimplicialComplex = SimplicialComplex<Simplex>;
 
     std::string line;
 

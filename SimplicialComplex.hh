@@ -56,7 +56,7 @@ public:
   // This simplifies writing algorithms that do not have any internal knowledge
   // about objects stored in this container.
   using value_type = Simplex;
-
+  using ValueType  = value_type;
 
   // constructors ------------------------------------------------------
 
