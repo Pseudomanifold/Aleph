@@ -1,4 +1,4 @@
-![Aleph logo](Aleph.svg "The logo of Aleph in all its glory")
+![Aleph logo](Aleph.png "The logo of Aleph in all its glory")
 
 # Aleph &mdash; *A* *L*ibrary for *E*ploring *P*ersistent *H*omology
 
