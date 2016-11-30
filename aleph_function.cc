@@ -5,7 +5,7 @@
 #include "IO.hh"
 
 #include "BoundaryMatrix.hh"
-#include "PersistentHomologyCalculation.hh"
+#include "persistentHomology/Calculation.hh"
 #include "PersistencePairingCalculation.hh"
 
 #include <iostream>

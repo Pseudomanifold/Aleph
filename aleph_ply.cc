@@ -5,7 +5,7 @@
 
 #include "utilities/Timer.hh"
 
-#include "PersistentHomologyCalculation.hh"
+#include "persistentHomology/Calculation.hh"
 
 #include "persistenceDiagrams/PersistenceDiagram.hh"
 #include "persistenceDiagrams/Norms.hh"

@@ -11,7 +11,7 @@
 #include "Simplex.hh"
 #include "SimplicialComplex.hh"
 
-#include "PersistentHomologyCalculation.hh"
+#include "persistentHomology/Calculation.hh"
 
 using DataType          = double;
 using VertexType        = unsigned;

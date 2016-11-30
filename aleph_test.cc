@@ -4,7 +4,7 @@
 
 #include "Dualization.hh"
 #include "persistenceDiagrams/PersistenceDiagram.hh"
-#include "PersistenceDiagramCalculation.hh"
+#include "persistenceDiagrams/Calculation.hh"
 #include "persistenceDiagrams/Norms.hh"
 #include "Simplex.hh"
 #include "SimplicialComplex.hh"

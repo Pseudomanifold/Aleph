@@ -9,7 +9,7 @@
 #include "SimplicialComplex.hh"
 #include "SimplicialComplexConversions.hh"
 
-#include "PersistenceDiagramCalculation.hh"
+#include "persistenceDiagrams/Calculation.hh"
 #include "PersistencePairingCalculation.hh"
 
 #include <vector>
