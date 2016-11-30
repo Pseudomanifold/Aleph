@@ -65,6 +65,11 @@ int main( int argc, char** argv )
   for( auto&& D : diagrams )
   {
     D.removeDiagonal();
-    std::cout << D << "\n";
+
+    std::cout << "# Persistence diagram <" << input << ">\n"
+              << "#\n"
+              << "# Dimension: " << D.dimension() << "\n"
+              << "# Entries  : " << D.size() << "\n"
+              << D << "\n\n";
   }
 }
