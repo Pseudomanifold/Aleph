@@ -1,7 +1,7 @@
 #ifndef ALEPH_FUNCTION_HH__
 #define ALEPH_FUNCTION_HH__
 
-#include "BoundaryMatrix.hh"
+#include "boundaryMatrices/BoundaryMatrix.hh"
 
 #include <algorithm>
 #include <fstream>

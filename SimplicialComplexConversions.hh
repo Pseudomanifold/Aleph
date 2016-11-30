@@ -1,7 +1,7 @@
 #ifndef ALEPH_CONVERSIONS_HH__
 #define ALEPH_CONVERSIONS_HH__
 
-#include "BoundaryMatrix.hh"
+#include "boundaryMatrices/BoundaryMatrix.hh"
 #include "SimplicialComplex.hh"
 
 #include <algorithm>

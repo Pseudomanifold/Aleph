@@ -2,9 +2,10 @@
 #include "representations/Vector.hh"
 
 #include "config/Defaults.hh"
-#include "IO.hh"
 
-#include "BoundaryMatrix.hh"
+#include "boundaryMatrices/BoundaryMatrix.hh"
+#include "boundaryMatrices/IO.hh"
+
 #include "persistentHomology/Calculation.hh"
 
 #include <iostream>

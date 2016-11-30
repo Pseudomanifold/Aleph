@@ -1,7 +1,7 @@
-#include "BoundaryMatrix.hh"
-#include "IO.hh"
+#include "boundaryMatrices/BoundaryMatrix.hh"
+#include "boundaryMatrices/Dualization.hh"
+#include "boundaryMatrices/IO.hh"
 
-#include "Dualization.hh"
 #include "persistenceDiagrams/PersistenceDiagram.hh"
 #include "persistenceDiagrams/Calculation.hh"
 #include "persistenceDiagrams/Norms.hh"

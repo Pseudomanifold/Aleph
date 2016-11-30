@@ -1,7 +1,7 @@
-#ifndef ALEPH_STANDARD_HH__
-#define ALEPH_STANDARD_HH__
+#ifndef ALEPH_ALGORITHMS_STANDARD_HH__
+#define ALEPH_ALGORITHMS_STANDARD_HH__
 
-#include "BoundaryMatrix.hh"
+#include "boundaryMatrices/BoundaryMatrix.hh"
 
 #include <tuple>
 #include <vector>
