@@ -1,11 +1,13 @@
 #include "BoundaryMatrix.hh"
 #include "IO.hh"
-#include "PersistencePairs.hh"
 
 #include "Dualization.hh"
 #include "persistenceDiagrams/PersistenceDiagram.hh"
 #include "persistenceDiagrams/Calculation.hh"
 #include "persistenceDiagrams/Norms.hh"
+
+#include "persistentHomology/Calculation.hh"
+
 #include "Simplex.hh"
 #include "SimplicialComplex.hh"
 #include "SimplicialComplexConversions.hh"
@@ -45,11 +47,11 @@ int main()
   std::cout << "* Boundary matrix\n" << M << "\n"
             << "* Maximum dimension: " << M.getDimension() << "\n";
 
-  computePersistencePairs<SR>( M );
-  computePersistencePairs<TR>( M );
+  calculatePersistencePairing<SR>( M );
+  calculatePersistencePairing<TR>( M );
 
-  computePersistencePairs<SR>( dualize( M ) );
-  computePersistencePairs<TR>( dualize( M ) );
+  calculatePersistencePairing<SR>( dualize( M ) );
+  calculatePersistencePairing<TR>( dualize( M ) );
 
   std::cout << "* Boundary matrix [doubly-dualized]\n"
             << dualize( dualize( M ) ) << "\n";
@@ -79,10 +81,10 @@ int main()
 
     auto M = makeBoundaryMatrix<BM>( K );
 
-    auto&& pairing1 = computePersistencePairs<SR>( M );
-    auto&& pairing2 = computePersistencePairs<TR>( M );
-    auto&& pairing3 = computePersistencePairs<SR>( dualize( M ) );
-    auto&& pairing4 = computePersistencePairs<TR>( dualize( M ) );
+    auto&& pairing1 = calculatePersistencePairing<SR>( M );
+    auto&& pairing2 = calculatePersistencePairing<TR>( M );
+    auto&& pairing3 = calculatePersistencePairing<SR>( dualize( M ) );
+    auto&& pairing4 = calculatePersistencePairing<TR>( dualize( M ) );
 
     auto&& diagrams1 = makePersistenceDiagrams( pairing1, K );
     auto&& diagrams2 = makePersistenceDiagrams( pairing2, K );

@@ -6,7 +6,6 @@
 
 #include "BoundaryMatrix.hh"
 #include "persistentHomology/Calculation.hh"
-#include "PersistencePairingCalculation.hh"
 
 #include <iostream>
 #include <string>

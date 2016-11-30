@@ -4,18 +4,62 @@
 #include "Defaults.hh"
 
 #include "persistenceDiagrams/PersistenceDiagram.hh"
-#include "PersistencePairing.hh"
+#include "persistenceDiagrams/Calculation.hh"
+
+#include "persistentHomology/PersistencePairing.hh"
 
 #include "SimplicialComplex.hh"
 #include "SimplicialComplexConversions.hh"
 
-#include "persistenceDiagrams/Calculation.hh"
-#include "PersistencePairingCalculation.hh"
-
+#include <algorithm>
+#include <tuple>
 #include <vector>
 
 namespace aleph
 {
+
+template <
+  class ReductionAlgorithm,
+  class Representation
+> PersistencePairing<typename Representation::Index> calculatePersistencePairing( const BoundaryMatrix<Representation>& M )
+{
+  using Index              = typename Representation::Index;
+  using PersistencePairing = PersistencePairing<Index>;
+
+  BoundaryMatrix<Representation> B = M;
+
+  ReductionAlgorithm reductionAlgorithm;
+  reductionAlgorithm( B );
+
+  PersistencePairing pairing;
+
+  auto numColumns = B.getNumColumns();
+
+  for( Index j = Index(0); j < numColumns; j++ )
+  {
+    Index i;
+    bool valid;
+
+    std::tie( i, valid ) = B.getMaximumIndex( j );
+    if( valid )
+    {
+      auto u = i;
+      auto v = j;
+      auto w = u;
+
+      if( B.isDualized() )
+      {
+        u  = numColumns - 1 - v;
+        v  = numColumns - 1 - w; // Yes, this is correct!
+      }
+
+      pairing.add( u, v );
+    }
+  }
+
+  std::sort( pairing.begin(), pairing.end() );
+  return pairing;
+}
 
 template <
   class ReductionAlgorithm = defaults::ReductionAlgorithm,

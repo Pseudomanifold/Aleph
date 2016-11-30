@@ -2,7 +2,7 @@
 #define ALEPH_PERSISTENCE_DIAGRAM_CONVERSION_HH__
 
 #include "persistenceDiagrams/PersistenceDiagram.hh"
-#include "PersistencePairing.hh"
+#include "persistentHomology/PersistencePairing.hh"
 #include "SimplicialComplex.hh"
 
 #include <map>
