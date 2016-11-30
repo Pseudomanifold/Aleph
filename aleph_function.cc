@@ -1,7 +1,7 @@
 #include "io/Function.hh"
 #include "representations/Vector.hh"
 
-#include "Defaults.hh"
+#include "config/Defaults.hh"
 #include "IO.hh"
 
 #include "BoundaryMatrix.hh"

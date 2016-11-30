@@ -1,7 +1,7 @@
 #ifndef ALEPH_PERSISTENT_HOMOLOGY_CALCULATION_HH__
 #define ALEPH_PERSISTENT_HOMOLOGY_CALCULATION_HH__
 
-#include "Defaults.hh"
+#include "config/Defaults.hh"
 
 #include "persistenceDiagrams/PersistenceDiagram.hh"
 #include "persistenceDiagrams/Calculation.hh"
