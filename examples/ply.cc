@@ -3,12 +3,12 @@
 #include "distances/Hausdorff.hh"
 #include "distances/NearestNeighbour.hh"
 
-#include "utilities/Timer.hh"
+#include "persistenceDiagrams/PersistenceDiagram.hh"
+#include "persistenceDiagrams/Norms.hh"
 
 #include "persistentHomology/Calculation.hh"
 
-#include "persistenceDiagrams/PersistenceDiagram.hh"
-#include "persistenceDiagrams/Norms.hh"
+#include "utilities/Timer.hh"
 
 #include <iostream>
 
@@ -32,6 +32,10 @@ int main( int argc, char** argv )
   auto K
     = aleph::io::loadPLY<DataType, VertexType>( filename, property );
 
+  // TODO:
+  //   - Expansion (higher-dimensional simplices)
+  //   - Different filtrations (superlevel, sublevel)
+
   std::cerr << "* Loaded simplicial complex with " << K.size() << " simplices\n";
 
   aleph::utilities::Timer timer;
@@ -42,7 +46,10 @@ int main( int argc, char** argv )
   std::cerr << "* Calculated " << diagrams.size() << " persistence diagrams in " << timer.elapsed_s() << "s\n";
 
   for( auto&& D : diagrams )
+  {
+    D.removeDiagonal();
     std::cout << D << "\n";
+  }
 
   for( auto&& D : diagrams )
   {
@@ -51,16 +58,4 @@ int main( int argc, char** argv )
               << "* 1-norm:                     " << aleph::pNorm( D, 1.0 ) << "\n"
               << "* 2-norm:                     " << aleph::pNorm( D, 2.0 ) << "\n";
   }
-
-  // FIXME: Remove after debugging
-  for( auto&& D1 : diagrams )
-    for( auto&& D2 : diagrams )
-      std::cerr << aleph::distances::nearestNeighbourDistance( D1, D2 ) << "\n";
-
-  std::cerr << std::string( 80, '-' ) << "\n";
-
-  for( auto&& D1 : diagrams )
-    for( auto&& D2 : diagrams )
-      std::cerr << aleph::distances::hausdorffDistance( D1, D2 ) << "\n";
-
 }
