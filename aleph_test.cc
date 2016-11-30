@@ -3,9 +3,9 @@
 #include "PersistencePairs.hh"
 
 #include "Dualization.hh"
-#include "PersistenceDiagram.hh"
+#include "persistenceDiagrams/PersistenceDiagram.hh"
 #include "PersistenceDiagramCalculation.hh"
-#include "PersistenceDiagramNorms.hh"
+#include "persistenceDiagrams/Norms.hh"
 #include "Simplex.hh"
 #include "SimplicialComplex.hh"
 #include "SimplicialComplexConversions.hh"

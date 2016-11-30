@@ -1,7 +1,7 @@
 #ifndef ALEPH_DISTANCES_INFINITY_HH__
 #define ALEPH_DISTANCES_INFINITY_HH__
 
-#include "PersistenceDiagram.hh"
+#include "persistenceDiagrams/PersistenceDiagram.hh"
 
 #include <algorithm>
 

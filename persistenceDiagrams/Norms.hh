@@ -1,7 +1,7 @@
-#ifndef ALEPH_PERSISTENCE_DIAGRAM_NORMS_HH__
-#define ALEPH_PERSISTENCE_DIAGRAM_NORMS_HH__
+#ifndef ALEPH_PERSISTENCE_DIAGRAMS_NORMS_HH__
+#define ALEPH_PERSISTENCE_DIAGRAMS_NORMS_HH__
 
-#include "PersistenceDiagram.hh"
+#include "persistenceDiagrams/PersistenceDiagram.hh"
 
 #include <algorithm>
 #include <vector>

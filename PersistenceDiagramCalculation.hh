@@ -1,7 +1,7 @@
 #ifndef ALEPH_PERSISTENCE_DIAGRAM_CONVERSION_HH__
 #define ALEPH_PERSISTENCE_DIAGRAM_CONVERSION_HH__
 
-#include "PersistenceDiagram.hh"
+#include "persistenceDiagrams/PersistenceDiagram.hh"
 #include "PersistencePairing.hh"
 #include "SimplicialComplex.hh"
 

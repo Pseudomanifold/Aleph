@@ -1,8 +1,8 @@
 #ifndef ALEPH_DISTANCES_WASSERSTEIN_HH__
 #define ALEPH_DISTANCES_WASSERSTEIN_HH__
 
-#include "Infinity.hh"
-#include "PersistenceDiagram.hh"
+#include "distances/Infinity.hh"
+#include "persistenceDiagrams/PersistenceDiagram.hh"
 
 #include "detail/Munkres.hh"
 #include "detail/Orthogonal.hh"

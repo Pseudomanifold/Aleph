@@ -1,4 +1,4 @@
-#include "PersistenceDiagram.hh"
+#include "persistenceDiagrams/PersistenceDiagram.hh"
 
 #include "distances/Wasserstein.hh"
 

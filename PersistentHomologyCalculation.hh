@@ -3,7 +3,7 @@
 
 #include "Defaults.hh"
 
-#include "PersistenceDiagram.hh"
+#include "persistenceDiagrams/PersistenceDiagram.hh"
 #include "PersistencePairing.hh"
 
 #include "SimplicialComplex.hh"

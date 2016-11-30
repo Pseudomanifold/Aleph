@@ -1,8 +1,8 @@
 #ifndef ALEPH_DISTANCES_HAUSDORFF_HH__
 #define ALEPH_DISTANCES_HAUSDORFF_HH__
 
-#include "Infinity.hh"
-#include "PersistenceDiagram.hh"
+#include "distances/Infinity.hh"
+#include "persistenceDiagrams/PersistenceDiagram.hh"
 
 #include <limits>
 
