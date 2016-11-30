@@ -38,25 +38,12 @@ ADD_EXECUTABLE( aleph_test
   aleph_test.cc
 )
 
-ADD_EXECUTABLE( aleph_ply
-  aleph_ply.cc
-)
-
 ADD_EXECUTABLE( aleph_function
   aleph_function.cc
 )
 
 
 #
-# Place compile commands in the source directory
-#
-
-IF( EXISTS "${CMAKE_CURRENT_BINARY_DIR}/compile_commands.json" )
-  EXECUTE_PROCESS( COMMAND ${CMAKE_COMMAND} -E copy_if_different
-    ${CMAKE_CURRENT_BINARY_DIR}/compile_commands.json
-    ${CMAKE_CURRENT_SOURCE_DIR}/compile_commands.json
-  )
-ENDIF()#
 # Place compile commands in the source directory
 #
 
