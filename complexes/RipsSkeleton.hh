@@ -4,6 +4,8 @@
 #include "Simplex.hh"
 #include "SimplicialComplex.hh"
 
+#include <vector>
+
 namespace aleph
 {
 
@@ -21,6 +23,15 @@ public:
 
   SimplicialComplex build( const NearestNeighbours& nn, ElementType epsilon ) const
   {
+    auto numVertices = nn.size();
+
+    std::vector<Simplex> simplices;
+    simplices.reserve( numVertices );
+
+    for( decltype(numVertices) i = 0; i < numVertices; i++ )
+      simplices.push_back( Simplex( i ) );
+
+    return SimplicialComplex( simplices.begin(), simplices.end() );
   };
 };
 
