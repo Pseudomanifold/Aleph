@@ -1,5 +1,4 @@
 #include "complexes/FLANN.hh"
-#include "complexes/NearestNeighbours.hh"
 #include "complexes/RipsSkeleton.hh"
 
 #include "config/Base.hh"
@@ -10,9 +9,8 @@
 
 #include "tests/Base.hh"
 
+#include <algorithm>
 #include <vector>
-
-#include <cassert>
 
 using namespace aleph::complexes;
 using namespace aleph;
@@ -29,35 +27,21 @@ template <class T> void test()
   ALEPH_ASSERT_THROW( pointCloud.size()      == 150 );
   ALEPH_ASSERT_THROW( pointCloud.dimension() ==   4);
 
-  FLANN<PointCloud, Distance> flannWrapper( pointCloud );
+  using FLANN = FLANN<PointCloud, Distance>;
 
-  using IndexType   = typename FLANN<PointCloud, Distance>::IndexType;
-  using ElementType = typename FLANN<PointCloud, Distance>::ElementType;
+  FLANN flannWrapper( pointCloud );
+  RipsSkeleton<FLANN> ripsSkeleton;
 
-  std::vector< std::vector<IndexType> > indices;
-  std::vector< std::vector<ElementType> > distances;
+  auto K        = ripsSkeleton.build( flannWrapper, 8.0 );
+  auto numEdges = std::count_if( K.begin(), K.end(),
+                                     [] ( const typename decltype(K)::ValueType& s )
+                                     {
+                                       return s.dimension() == 1;
+                                     } );
 
-  // Check that an *empty* radius does not return any indices
 
-  flannWrapper.radiusSearch( static_cast<T>( 0.0 ), indices, distances );
-
-  ALEPH_ASSERT_THROW( indices.size() == pointCloud.size() );
-  for( auto&& i : indices )
-    ALEPH_ASSERT_THROW( i.empty() == true );
-
-  // Check that a large radius returns *all* indices
-
-  flannWrapper.radiusSearch( static_cast<T>( 8.0 ), indices, distances );
-
-  ALEPH_ASSERT_THROW( indices.size() == pointCloud.size() );
-  for( auto&& i : indices )
-    ALEPH_ASSERT_THROW( i.size() == pointCloud.size() );
-
-  RipsSkeleton<decltype(flannWrapper)> ripsSkeleton;
-
-  auto simplicialComplex = ripsSkeleton.build( flannWrapper, 8.0 );
-
-  ALEPH_ASSERT_THROW( simplicialComplex.empty() == false );
+  ALEPH_ASSERT_THROW( K.empty() == false );
+  ALEPH_ASSERT_THROW( numEdges > 0 );
 
   ALEPH_TEST_END();
 }
