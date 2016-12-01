@@ -39,9 +39,9 @@ template <class T> void test()
                                        return s.dimension() == 1;
                                      } );
 
-
   ALEPH_ASSERT_THROW( K.empty() == false );
   ALEPH_ASSERT_THROW( numEdges > 0 );
+  ALEPH_ASSERT_THROW( numEdges == ( pointCloud.size() * ( pointCloud.size() - 1 ) ) / 2 );
 
   ALEPH_TEST_END();
 }
