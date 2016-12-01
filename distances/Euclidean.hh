@@ -129,8 +129,8 @@ public:
 
 template <class T> struct Traits< Euclidean<T> >
 {
-  using ResultType  = typename T::ResultType;
-  using ElementType = typename T::ElementType;
+  using ResultType  = typename Euclidean<T>::ResultType;
+  using ElementType = typename Euclidean<T>::ElementType;
 
   ResultType from( ElementType x )
   {

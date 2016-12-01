@@ -8,6 +8,8 @@
 #include <algorithm>
 #include <vector>
 
+#include "distances/Traits.hh"
+
 namespace aleph
 {
 
@@ -20,6 +22,7 @@ class FLANN : public NearestNeighbours< FLANN<Container, DistanceFunctor>, std::
 public:
   using IndexType       = std::size_t;
   using ElementType     = typename Container::ElementType;
+  using Traits          = aleph::distances::Traits<DistanceFunctor>;
 
   FLANN( const Container& container )
     : _container( container )
@@ -58,7 +61,7 @@ public:
     _index->radiusSearch( _matrix,
                           internalIndices,
                           distances,
-                          static_cast<float>( radius ),
+                          static_cast<float>( _traits.to( radius ) ),
                           searchParameters );
 
     // Perform transformation of indices -------------------------------
@@ -75,6 +78,17 @@ public:
                       [] ( int j )
                       {
                         return static_cast<IndexType>( j );
+                      } );
+    }
+
+    // Perform transformation of distances -----------------------------
+
+    for( auto&& D : distances )
+    {
+      std::transform( D.begin(), D.end(), D.begin(),
+                      [this] ( ElementType x )
+                      {
+                        return _traits.from( x );
                       } );
     }
   }
@@ -96,6 +110,9 @@ private:
 
   /** Index structure for queries. */
   flann::Index<DistanceFunctor>* _index = nullptr;
+
+  /** Required for optional distance functor conversions */
+  Traits _traits;
 };
 
 }
