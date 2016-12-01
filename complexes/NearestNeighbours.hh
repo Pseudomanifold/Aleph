@@ -20,6 +20,11 @@ public:
                                                  indices,
                                                  distances );
   }
+
+  std::size_t size() const noexcept
+  {
+    return static_cast<const Wrapper&>( *this ).size(); 
+  }
 };
 
 }
