@@ -47,7 +47,7 @@ public:
 
   void radiusSearch( ElementType radius,
                      std::vector< std::vector<IndexType> >& indices,
-                     std::vector< std::vector<ElementType> >& distances )
+                     std::vector< std::vector<ElementType> >& distances ) const
   {
 
     flann::SearchParams searchParameters = flann::SearchParams();

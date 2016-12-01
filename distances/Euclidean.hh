@@ -132,12 +132,12 @@ template <class T> struct Traits< Euclidean<T> >
   using ResultType  = typename Euclidean<T>::ResultType;
   using ElementType = typename Euclidean<T>::ElementType;
 
-  ResultType from( ElementType x )
+  ResultType from( ElementType x ) const noexcept
   {
     return ResultType( std::sqrt( x ) );
   }
 
-  ResultType to( ElementType x )
+  ResultType to( ElementType x ) const noexcept
   {
     return ResultType( x*x );
   }

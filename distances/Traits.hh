@@ -22,12 +22,12 @@ template <class T> struct Traits
   using ResultType  = typename T::ResultType;
   using ElementType = typename T::ElementType;
 
-  ResultType from( ElementType x )
+  ResultType from( ElementType x ) const noexcept
   {
     return ResultType( x );
   }
 
-  ResultType to( ElementType x )
+  ResultType to( ElementType x ) const noexcept
   {
     return ResultType( x );
   }

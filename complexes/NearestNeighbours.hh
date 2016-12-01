@@ -16,9 +16,9 @@ public:
                      std::vector< std::vector<IndexType> >& indices,
                      std::vector< std::vector<ElementType> >& distances )
   {
-    static_cast<Wrapper&>( *this ).radiusSearch( radius,
-                                                 indices,
-                                                 distances );
+    static_cast<const Wrapper&>( *this ).radiusSearch( radius,
+                                                       indices,
+                                                       distances );
   }
 
   std::size_t size() const noexcept
