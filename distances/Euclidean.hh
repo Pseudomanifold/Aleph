@@ -22,7 +22,7 @@ namespace distances
   @see FLANN repository   (https://github.com/mariusmuja/flann)
 */
 
-class Euclidean
+template <class T> class Euclidean
 {
 public:
 
@@ -31,8 +31,8 @@ public:
   typedef bool is_kdtree_distance;
 
   // Required for FLANN usage
-  using ElementType = double;
-  using ResultType  = double;
+  using ElementType = T;
+  using ResultType  = T;
 
   /**
     Given two ranges of double values, which are assumed to represent two
@@ -73,10 +73,10 @@ public:
 
     while( a < lastGroup )
     {
-      diff0 = std::abs( ElementType( a[0] - b[0] ) );
-      diff1 = std::abs( ElementType( a[1] - b[1] ) );
-      diff2 = std::abs( ElementType( a[2] - b[2] ) );
-      diff3 = std::abs( ElementType( a[3] - b[3] ) );
+      diff0 = ElementType( a[0] - b[0] );
+      diff1 = ElementType( a[1] - b[1] );
+      diff2 = ElementType( a[2] - b[2] );
+      diff3 = ElementType( a[3] - b[3] );
 
       result +=   diff0 * diff0
                 + diff1 * diff1
@@ -92,7 +92,7 @@ public:
 
     while( a < last )
     {
-      diff0  = std::abs( ElementType( *a++ - *b++ ) );
+      diff0  = ElementType( *a++ - *b++ );
       result = result + diff0 * diff0;
     }
 

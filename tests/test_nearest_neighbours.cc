@@ -5,6 +5,8 @@
 
 #include "containers/PointCloud.hh"
 
+#include "distances/Euclidean.hh"
+
 #include "tests/Base.hh"
 
 #include <vector>
@@ -19,16 +21,17 @@ template <class T> void test()
   ALEPH_TEST_BEGIN( "Nearest-neighbour calculation with different types" );
 
   using PointCloud = PointCloud<T>;
+  using Distance   = aleph::distances::Euclidean<T>;
 
   PointCloud pointCloud = load<T>( CMAKE_SOURCE_DIR + std::string( "/tests/input/Iris_colon_separated.txt" ) );
 
   ALEPH_ASSERT_THROW( pointCloud.size()      == 150 );
   ALEPH_ASSERT_THROW( pointCloud.dimension() ==   4);
 
-  FLANN<PointCloud> flannWrapper( pointCloud );
+  FLANN<PointCloud, Distance> flannWrapper( pointCloud );
 
-  using IndexType   = typename FLANN<PointCloud>::IndexType;
-  using ElementType = typename FLANN<PointCloud>::ElementType;
+  using IndexType   = typename FLANN<PointCloud, Distance>::IndexType;
+  using ElementType = typename FLANN<PointCloud, Distance>::ElementType;
 
   std::vector< std::vector<IndexType> > indices;
   std::vector< std::vector<ElementType> > distances;

@@ -1,7 +1,7 @@
 #ifndef ALEPH_COMPLEXES_FLANN_HH__
 #define ALEPH_COMPLEXES_FLANN_HH__
 
-#include <complexes/NearestNeighbours.hh>
+#include "complexes/NearestNeighbours.hh"
 
 #include <flann/flann.hpp>
 
@@ -14,14 +14,12 @@ namespace aleph
 namespace complexes
 {
 
-template <class Container> class FLANN : public NearestNeighbours< FLANN<Container>, std::size_t, typename Container::ElementType >
+template <class Container, class DistanceFunctor>
+class FLANN : public NearestNeighbours< FLANN<Container, DistanceFunctor>, std::size_t, typename Container::ElementType >
 {
 public:
   using IndexType       = std::size_t;
   using ElementType     = typename Container::ElementType;
-
-  // TODO: Make configurable...
-  using DistanceFunctor = flann::L2<ElementType>;
 
   FLANN( const Container& container )
     : _container( container )
@@ -52,12 +50,15 @@ public:
     flann::SearchParams searchParameters = flann::SearchParams();
     searchParameters.checks = flann::FLANN_CHECKS_UNLIMITED;
 
+    using ResultType = typename DistanceFunctor::ResultType;
+
     std::vector< std::vector<int> > internalIndices;
+    std::vector< std::vector<ResultType> > internalDistances;
 
     _index->radiusSearch( _matrix,
                           internalIndices,
                           distances,
-                          radius,
+                          static_cast<float>( radius ),
                           searchParameters );
 
     // Perform transformation of indices -------------------------------
