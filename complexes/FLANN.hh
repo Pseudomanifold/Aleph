@@ -93,6 +93,11 @@ public:
     }
   }
 
+  std::size_t size() const noexcept
+  {
+    return _container.size();
+  }
+
   // The wrapper must not be copied. Else, clients  will run afoul of memory
   // management issues.
   FLANN( const FLANN& other )            = delete;
