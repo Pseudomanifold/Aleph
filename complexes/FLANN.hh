@@ -79,6 +79,11 @@ public:
     }
   }
 
+  // The wrapper must not be copied. Else, clients  will run afoul of memory
+  // management issues.
+  FLANN( const FLANN& other )            = delete;
+  FLANN& operator=( const FLANN& other ) = delete;
+
 private:
   const Container& _container;
 
@@ -89,7 +94,7 @@ private:
 
   flann::Matrix<ElementType> _matrix;
 
-  /** Index structure for queries. TODO: Make configurable/generic. */
+  /** Index structure for queries. */
   flann::Index<DistanceFunctor>* _index = nullptr;
 };
 
