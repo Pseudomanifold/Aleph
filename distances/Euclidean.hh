@@ -1,6 +1,8 @@
 #ifndef ALEPH_DISTANCES_EUCLIDEAN_HH__
 #define ALEPH_DISTANCES_EUCLIDEAN_HH__
 
+#include "distances/Traits.hh"
+
 #include <cmath>
 #include <cstddef>
 
@@ -122,6 +124,22 @@ public:
   static std::string name()
   {
     return "Euclidean distance";
+  }
+};
+
+template <class T> struct Traits< Euclidean<T> >
+{
+  using ResultType  = typename T::ResultType;
+  using ElementType = typename T::ElementType;
+
+  ResultType from( ElementType x )
+  {
+    return ResultType( std::sqrt( x ) );
+  }
+
+  ResultType to( ElementType x )
+  {
+    return ResultType( x*x );
   }
 };
 
