@@ -1,8 +1,8 @@
-#ifndef ALEPH_DISTANCES_EUCLIDEAN_HH__
-#define ALEPH_DISTANCES_EUCLIDEAN_HH__
+#ifndef ALEPH_DISTANCES_MANHATTAN_HH__
+#define ALEPH_DISTANCES_MANHATTAN_HH__
 
-#include <cmath>
 #include <cstddef>
+#include <cmath>
 
 #include <iterator>
 #include <string>
@@ -14,21 +14,21 @@ namespace distances
 {
 
 /**
-  Euclidean distance ($L_2$ distance) functor. The functor is templated in
-  order to handle arbitrary ranges. Its interface is somewhat general, but
-  the \c accum_dist function is specifically meant to be used with FLANN.
+  Manhattan distance ($L_1$ distance) functor The functor is templated in order
+  to handle arbitrary ranges. Its interface is general, but the \c accum_dist
+  function is specifically meant to be used with FLANN.
 
   @see FLANN project page (http://www.cs.ubc.ca/research/flann)
   @see FLANN repository   (https://github.com/mariusmuja/flann)
 */
 
-class Euclidean
+class Manhattan
 {
 public:
 
   // Flag telling FLANN that this functor can be used for calculating distances
   // within kd trees.
-  typedef bool is_kdtree_distance;
+  using is_kdtree_distance = bool;
 
   // Required for FLANN usage
   using ElementType = double;
@@ -46,6 +46,8 @@ public:
     stop once the value has been reached. Else, the value of this variable is
     ignored. This variable is provided in order to remain compatible with the
     interface of FLANN.
+
+    @returns Manhattan distance between the two input vectors.
   */
 
   template <typename Iterator1, typename Iterator2>
@@ -54,22 +56,22 @@ public:
                          std::size_t size,
                          ElementType worstDistance = -1.0 ) const
   {
-    // Fix compiler warnings about unused parameters. This is provided to be
-    // compatible with FLANN.
+    // Fixes warnings about unused parameters. This parameter is
+    // provided for compatibility reasons with FLANN only.
     (void) worstDistance;
 
-    ResultType result = 0.0;
+    ElementType result = 0.0;
 
-    ResultType diff0  = 0.0;
-    ResultType diff1  = 0.0;
-    ResultType diff2  = 0.0;
-    ResultType diff3  = 0.0;
+    ElementType diff0  = 0.0;
+    ElementType diff1  = 0.0;
+    ElementType diff2  = 0.0;
+    ElementType diff3  = 0.0;
 
-    Iterator1 last      = a; 
-    Iterator1 lastGroup = last;
+    using DifferenceType1
+      = typename std::iterator_traits<Iterator1>::difference_type;
 
-    std::advance( last,     size );
-    std::advance( lastGroup, -3 );
+    Iterator1 last      = std::next( a, DifferenceType1( size ) );
+    Iterator1 lastGroup = std::prev( last, 3 );
 
     while( a < lastGroup )
     {
@@ -78,10 +80,10 @@ public:
       diff2 = std::abs( ElementType( a[2] - b[2] ) );
       diff3 = std::abs( ElementType( a[3] - b[3] ) );
 
-      result +=   diff0 * diff0
-                + diff1 * diff1
-                + diff2 * diff2
-                + diff3 * diff3;
+      result +=   diff0
+                + diff1
+                + diff2
+                + diff3;
 
       a += 4;
       b += 4;
@@ -93,7 +95,7 @@ public:
     while( a < last )
     {
       diff0  = std::abs( ElementType( *a++ - *b++ ) );
-      result = result + diff0 * diff0;
+      result = result + diff0;
     }
 
     return result;
@@ -101,7 +103,7 @@ public:
 
   /**
     Partial distance calculation, used by FLANN for fast kd-tree calculations.
-    This function exploits that the Euclidean distance can be evaluated
+    This function exploits that the Manhattan distance can be evaluated
     component-wise.
 
     @param a First component
@@ -115,13 +117,13 @@ public:
                          const V& b,
                          int __attribute__((unused)) ) const
   {
-    return (a-b) * (a-b);
+    return std::abs( a - b );
   }
 
   /** @returns Name of functor */
   static std::string name()
   {
-    return "Euclidean distance";
+    return "Manhattan distance";
   }
 };
 
