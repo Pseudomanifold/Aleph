@@ -7,6 +7,8 @@
 #include "RipsExpander.hh"
 #include "RipsSkeleton.hh"
 
+#include "filtrations/Data.hh"
+
 namespace aleph
 {
 
@@ -48,6 +50,8 @@ template <class NearestNeighbours> auto buildVietorisRipsComplex(
 
   auto K = ripsExpander( skeleton, dimension );
   K      = ripsExpander.assignMaximumWeight( K );
+
+  K.sort( filtrations::Data<Simplex>() );
 
   return K;
 }
