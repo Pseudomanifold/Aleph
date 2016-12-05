@@ -1,5 +1,5 @@
-#ifndef ALEPH_FUNCTION_HH__
-#define ALEPH_FUNCTION_HH__
+#ifndef ALEPH_TOPOLOGY_IO_FUNCTION_HH__
+#define ALEPH_TOPOLOGY_IO_FUNCTION_HH__
 
 #include "boundaryMatrices/BoundaryMatrix.hh"
 

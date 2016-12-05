@@ -1,5 +1,5 @@
-#ifndef ALEPH_IO_EDGE_LISTS_HH__
-#define ALEPH_IO_EDGE_LISTS_HH__
+#ifndef ALEPH_TOPOLOGY_IO_EDGE_LISTS_HH__
+#define ALEPH_TOPOLOGY_IO_EDGE_LISTS_HH__
 
 #include <algorithm>
 #include <fstream>

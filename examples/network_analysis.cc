@@ -2,7 +2,7 @@
 
 #include "filtrations/Data.hh"
 
-#include "io/EdgeLists.hh"
+#include "topology/io/EdgeLists.hh"
 
 #include "persistentHomology/Calculation.hh"
 

@@ -1,5 +1,5 @@
-#ifndef ALEPH_PLY_HH__
-#define ALEPH_PLY_HH__
+#ifndef ALEPH_TOPOLOGY_IO_PLY_HH__
+#define ALEPH_TOPOLOGY_IO_PLY_HH__
 
 #include "filtrations/Data.hh"
 #include "utilities/String.hh"

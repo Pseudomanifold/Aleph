@@ -1,4 +1,3 @@
-#include "io/PLY.hh"
 
 #include "distances/Hausdorff.hh"
 #include "distances/NearestNeighbour.hh"
@@ -7,6 +6,8 @@
 #include "persistenceDiagrams/Norms.hh"
 
 #include "persistentHomology/Calculation.hh"
+
+#include "topology/io/PLY.hh"
 
 #include "utilities/Timer.hh"
 
