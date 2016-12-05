@@ -1,11 +1,13 @@
-#include "geometry/FLANN.hh"
-#include "geometry/VietorisRipsComplex.hh"
-
 #include "containers/PointCloud.hh"
 
 #include "distances/Euclidean.hh"
 
+#include "geometry/FLANN.hh"
+#include "geometry/VietorisRipsComplex.hh"
+
 #include "utilities/String.hh"
+
+#include "persistentHomology/Calculation.hh"
 
 #include <iostream>
 #include <string>
@@ -43,4 +45,23 @@ int main( int argc, char** argv )
 
   std::cerr << "finished\n"
             << "* Obtained simplicial complex with " << K.size() << " simplices\n";
+
+  std::cerr << "* Calculating persistence diagrams...";
+
+  auto diagrams
+    = calculatePersistenceDiagrams( K );
+
+  std::cerr << "finished\n"
+            << "* Obtained " << diagrams.size() << " persistence diagrams\n";
+
+  for( auto&& D : diagrams )
+  {
+    D.removeDiagonal();
+
+    std::cout << "# Persistence diagram <" << input << ">\n"
+              << "#\n"
+              << "# Dimension: " << D.dimension() << "\n"
+              << "# Entries  : " << D.size() << "\n"
+              << D << "\n\n";
+  }
 }
