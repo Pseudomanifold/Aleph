@@ -1,17 +1,17 @@
-#include "complexes/RipsExpander.hh"
+#include "geometry/RipsExpander.hh"
 
 #include "filtrations/Data.hh"
 
 #include "io/EdgeLists.hh"
 
-#include <iostream>
-#include <fstream>
-#include <string>
-
 #include "Simplex.hh"
 #include "SimplicialComplex.hh"
 
 #include "persistentHomology/Calculation.hh"
+
+#include <iostream>
+#include <fstream>
+#include <string>
 
 using DataType          = double;
 using VertexType        = unsigned;
@@ -40,7 +40,7 @@ int main( int argc, char** argv )
   std::cerr << "* Expanding simplicial complex...";
 
   // TODO: Make expansion configurable
-  aleph::complexes::RipsExpander<SimplicialComplex> ripsExpander;
+  aleph::geometry::RipsExpander<SimplicialComplex> ripsExpander;
   K = ripsExpander( K, 2 );
   K = ripsExpander.assignMaximumWeight( K );
 

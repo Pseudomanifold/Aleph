@@ -1,19 +1,19 @@
-#ifndef ALEPH_COMPLEXES_FLANN_HH__
-#define ALEPH_COMPLEXES_FLANN_HH__
+#ifndef ALEPH_GEOMETRY_FLANN_HH__
+#define ALEPH_GEOMETRY_FLANN_HH__
 
-#include "complexes/NearestNeighbours.hh"
+#include "distances/Traits.hh"
+
+#include "geometry/NearestNeighbours.hh"
 
 #include <flann/flann.hpp>
 
 #include <algorithm>
 #include <vector>
 
-#include "distances/Traits.hh"
-
 namespace aleph
 {
 
-namespace complexes
+namespace geometry
 {
 
 template <class Container, class DistanceFunctor>

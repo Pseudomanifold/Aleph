@@ -1,5 +1,5 @@
-#include "complexes/FLANN.hh"
-#include "complexes/VietorisRipsComplex.hh"
+#include "geometry/FLANN.hh"
+#include "geometry/VietorisRipsComplex.hh"
 
 #include "containers/PointCloud.hh"
 
@@ -11,10 +11,9 @@
 #include <string>
 
 using namespace aleph;
-using namespace complexes;
+using namespace distances;
 using namespace geometry;
 using namespace utilities;
-using namespace distances;
 
 int main( int argc, char** argv )
 {

@@ -1,5 +1,3 @@
-#include "complexes/FLANN.hh"
-#include "complexes/NearestNeighbours.hh"
 
 #include "config/Base.hh"
 
@@ -7,13 +5,16 @@
 
 #include "distances/Euclidean.hh"
 
+#include "geometry/FLANN.hh"
+#include "geometry/NearestNeighbours.hh"
+
 #include "tests/Base.hh"
 
 #include <vector>
 
 #include <cassert>
 
-using namespace aleph::complexes;
+using namespace aleph::geometry;
 using namespace aleph;
 
 template <class T> void test()

@@ -1,5 +1,5 @@
-#ifndef ALEPH_COMPLEXES_RIPS_SKELETON_HH__
-#define ALEPH_COMPLEXES_RIPS_SKELETON_HH__
+#ifndef ALEPH_GEOMETRY_RIPS_SKELETON_HH__
+#define ALEPH_GEOMETRY_RIPS_SKELETON_HH__
 
 #include "Simplex.hh"
 #include "SimplicialComplex.hh"
@@ -9,7 +9,7 @@
 namespace aleph
 {
 
-namespace complexes
+namespace geometry
 {
 
 template <class NearestNeighbours> class RipsSkeleton

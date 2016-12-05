@@ -1,5 +1,5 @@
-#ifndef ALEPH_COMPLEXES_RIPS_EXPANDER_HH__
-#define ALEPH_COMPLEXES_RIPS_EXPANDER_HH__
+#ifndef ALEPH_GEOMETRY_RIPS_EXPANDER_HH__
+#define ALEPH_GEOMETRY_RIPS_EXPANDER_HH__
 
 #include <algorithm>
 #include <list>
@@ -11,7 +11,7 @@
 namespace aleph
 {
 
-namespace complexes
+namespace geometry
 {
 
 template <class SimplicialComplex> class RipsExpander
@@ -127,11 +127,8 @@ private:
       std::vector<VertexType> vertices( s.begin(), s.end() );
       vertices.push_back( neighbour );
 
-      // TODO:
-      //  - Get lower neighbours of current vertex
-      //  - Intersect current neighbours with these neighbours
-      //  - Add *their* respective cofaces
-      //  - Set weight
+      // TODO: Set weight of new simplex; maybe this can be solved by
+      // specifying an optional callback beforehand?
 
       simplices.push_back( Simplex( vertices.begin(), vertices.end() ) );
 

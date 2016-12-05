@@ -39,12 +39,12 @@ template <class NearestNeighbours> auto buildVietorisRipsComplex(
   using Simplex           = Simplex<ElementType, IndexType>;
   using SimplicialComplex = SimplicialComplex<Simplex>;
 
-  complexes::RipsSkeleton<NearestNeighbours> ripsSkeleton;
+  geometry::RipsSkeleton<NearestNeighbours> ripsSkeleton;
 
   auto skeleton
     = ripsSkeleton.build( nn, epsilon );
 
-  complexes::RipsExpander<SimplicialComplex> ripsExpander;
+  geometry::RipsExpander<SimplicialComplex> ripsExpander;
 
   auto K = ripsExpander( skeleton, dimension );
   K      = ripsExpander.assignMaximumWeight( K );

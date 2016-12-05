@@ -1,12 +1,12 @@
-#ifndef ALEPH_COMPLEXES_NEAREST_NEIGHBOURS_HH__
-#define ALEPH_COMPLEXES_NEAREST_NEIGHBOURS_HH__
+#ifndef ALEPH_GEOMETRY_NEAREST_NEIGHBOURS_HH__
+#define ALEPH_GEOMETRY_NEAREST_NEIGHBOURS_HH__
 
 #include <vector>
 
 namespace aleph
 {
 
-namespace complexes
+namespace geometry
 {
 
 template <class Wrapper, class ElementType, class IndexType> class NearestNeighbours
@@ -23,7 +23,7 @@ public:
 
   std::size_t size() const noexcept
   {
-    return static_cast<const Wrapper&>( *this ).size(); 
+    return static_cast<const Wrapper&>( *this ).size();
   }
 };
 

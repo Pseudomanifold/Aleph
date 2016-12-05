@@ -1,18 +1,18 @@
-#include "complexes/FLANN.hh"
-#include "complexes/RipsSkeleton.hh"
-
 #include "config/Base.hh"
 
 #include "containers/PointCloud.hh"
 
 #include "distances/Euclidean.hh"
 
+#include "geometry/FLANN.hh"
+#include "geometry/RipsSkeleton.hh"
+
 #include "tests/Base.hh"
 
 #include <algorithm>
 #include <vector>
 
-using namespace aleph::complexes;
+using namespace aleph::geometry;
 using namespace aleph;
 
 template <class T> void test()

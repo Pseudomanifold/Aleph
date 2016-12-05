@@ -1,4 +1,4 @@
-#include "complexes/RipsExpander.hh"
+#include "geometry/RipsExpander.hh"
 
 #include "tests/Base.hh"
 
@@ -7,7 +7,7 @@
 
 #include <vector>
 
-using namespace aleph::complexes;
+using namespace aleph::geometry;
 using namespace aleph;
 
 template <class Data, class Vertex> bool triangle()
