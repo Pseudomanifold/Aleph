@@ -4,10 +4,10 @@
 
 #include "io/EdgeLists.hh"
 
-#include "Simplex.hh"
-#include "SimplicialComplex.hh"
-
 #include "persistentHomology/Calculation.hh"
+
+#include "topology/Simplex.hh"
+#include "topology/SimplicialComplex.hh"
 
 #include <iostream>
 #include <fstream>
@@ -16,8 +16,8 @@
 using DataType          = double;
 using VertexType        = unsigned;
 
-using Simplex           = aleph::Simplex<DataType, VertexType>;
-using SimplicialComplex = aleph::SimplicialComplex<Simplex>;
+using Simplex           = aleph::topology::Simplex<DataType, VertexType>;
+using SimplicialComplex = aleph::topology::SimplicialComplex<Simplex>;
 
 int main( int argc, char** argv )
 {
@@ -58,7 +58,7 @@ int main( int argc, char** argv )
   std::cerr << "* Calculating persistent homology...";
 
   auto diagrams
-    = calculatePersistenceDiagrams( K );
+    = aleph::calculatePersistenceDiagrams( K );
 
   std::cerr << "...finished\n";
 

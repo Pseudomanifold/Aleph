@@ -1,5 +1,5 @@
-#ifndef ALEPH_SIMPLEX_HH__
-#define ALEPH_SIMPLEX_HH__
+#ifndef ALEPH_TOPOLOGY_SIMPLEX_HH__
+#define ALEPH_TOPOLOGY_SIMPLEX_HH__
 
 #include <boost/functional/hash.hpp>
 
@@ -13,6 +13,9 @@
 #include <vector>
 
 namespace aleph
+{
+
+namespace topology
 {
 
 template <
@@ -327,46 +330,6 @@ private:
 
 // ---------------------------------------------------------------------
 
-/**
-  Outputs a simplex to an ostream. This is used for debugging purposes.
-
-  @param o Output stream
-  @param s Simplex to be added to o
-
-  @returns Output stream with information about simplex s.
-*/
-
-template <class DataType, class VertexType>
-std::ostream& operator<<( std::ostream& o, const Simplex<DataType, VertexType>& s )
-{
-  auto numVertices = s.size();
-
-  o << "{";
-
-  for( decltype(numVertices) i = 0; i < numVertices; i++ )
-  {
-    if( i != 0 )
-      o << " ";
-
-    o << s[i];
-  }
-
-  if( s.data() != DataType() )
-    o << " (" << s.data() << ")";
-
-  o << "}";
-
-  return o;
-}
-
-template <class DataType>
-std::ostream& operator<<( std::ostream& o, const Simplex<DataType>& s )
-{
-  return operator<< <DataType, typename Simplex<DataType>::vertex_type>( o, s );
-}
-
-// ---------------------------------------------------------------------
-
 template <class DataType, class VertexType>
 std::size_t hash_value( const Simplex<DataType, VertexType>& s )
 {
@@ -458,6 +421,50 @@ private:
 
   const vertex_container_type& _vertices;
 };
+
+// ---------------------------------------------------------------------
+
+/**
+  Outputs a simplex to an ostream. This is used for debugging purposes.
+
+  @param o Output stream
+  @param s Simplex to be added to o
+
+  @returns Output stream with information about simplex s.
+*/
+
+template <class DataType, class VertexType>
+std::ostream& operator<<( std::ostream& o, const topology::Simplex<DataType, VertexType>& s )
+{
+  auto numVertices = s.size();
+
+  o << "{";
+
+  for( decltype(numVertices) i = 0; i < numVertices; i++ )
+  {
+    if( i != 0 )
+      o << " ";
+
+    o << s[i];
+  }
+
+  if( s.data() != DataType() )
+    o << " (" << s.data() << ")";
+
+  o << "}";
+
+  return o;
+}
+
+template <class DataType>
+std::ostream& operator<<( std::ostream& o, const topology::Simplex<DataType>& s )
+{
+  return operator<< <DataType, typename topology::Simplex<DataType>::vertex_type>( o, s );
+}
+
+// ---------------------------------------------------------------------
+
+}
 
 }
 

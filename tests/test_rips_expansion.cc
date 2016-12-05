@@ -2,12 +2,13 @@
 
 #include "tests/Base.hh"
 
-#include "Simplex.hh"
-#include "SimplicialComplex.hh"
+#include "topology/Simplex.hh"
+#include "topology/SimplicialComplex.hh"
 
 #include <vector>
 
 using namespace aleph::geometry;
+using namespace aleph::topology;
 using namespace aleph;
 
 template <class Data, class Vertex> bool triangle()

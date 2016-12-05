@@ -1,18 +1,20 @@
-#ifndef ALEPH_CONVERSIONS_HH__
-#define ALEPH_CONVERSIONS_HH__
+#ifndef ALEPH_TOPOLOGY_CONVERSION_HH__
+#define ALEPH_TOPOLOGY_CONVERSION_HH__
 
 #include "boundaryMatrices/BoundaryMatrix.hh"
-#include "SimplicialComplex.hh"
 
 #include <algorithm>
 
 namespace aleph
 {
 
+namespace topology
+{
+
 template <
   class Representation,
-  class Simplex
-> BoundaryMatrix<Representation> makeBoundaryMatrix( const SimplicialComplex<Simplex>& K )
+  class SimplicialComplex
+> BoundaryMatrix<Representation> makeBoundaryMatrix( const SimplicialComplex& K )
 {
   using Index = typename BoundaryMatrix<Representation>::Index;
 
@@ -44,6 +46,8 @@ template <
   }
 
   return M;
+}
+
 }
 
 }

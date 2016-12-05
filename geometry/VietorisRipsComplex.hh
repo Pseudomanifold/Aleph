@@ -1,13 +1,13 @@
 #ifndef ALEPH_GEOMETRY_VIETORIS_RIPS_COMPLEX_HH__
 #define ALEPH_GEOMETRY_VIETORIS_RIPS_COMPLEX_HH__
 
-#include "Simplex.hh"
-#include "SimplicialComplex.hh"
-
 #include "RipsExpander.hh"
 #include "RipsSkeleton.hh"
 
 #include "filtrations/Data.hh"
+
+#include "topology/Simplex.hh"
+#include "topology/SimplicialComplex.hh"
 
 namespace aleph
 {
@@ -34,12 +34,12 @@ namespace geometry
 template <class NearestNeighbours> auto buildVietorisRipsComplex(
   const NearestNeighbours& nn,
   typename NearestNeighbours::ElementType epsilon,
-  unsigned dimension ) -> SimplicialComplex< Simplex<typename NearestNeighbours::ElementType, typename NearestNeighbours::IndexType> >
+  unsigned dimension ) -> topology::SimplicialComplex< topology::Simplex<typename NearestNeighbours::ElementType, typename NearestNeighbours::IndexType> >
 {
   using ElementType       = typename NearestNeighbours::ElementType;
   using IndexType         = typename NearestNeighbours::IndexType;
-  using Simplex           = Simplex<ElementType, IndexType>;
-  using SimplicialComplex = SimplicialComplex<Simplex>;
+  using Simplex           = topology::Simplex<ElementType, IndexType>;
+  using SimplicialComplex = topology::SimplicialComplex<Simplex>;
 
   geometry::RipsSkeleton<NearestNeighbours> ripsSkeleton;
 

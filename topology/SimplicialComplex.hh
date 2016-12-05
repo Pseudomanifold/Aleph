@@ -1,5 +1,5 @@
-#ifndef ALEPH_SIMPLICIAL_COMPLEX_HH__
-#define ALEPH_SIMPLICIAL_COMPLEX_HH__
+#ifndef ALEPH_TOPOLOGY_SIMPLICIAL_COMPLEX_HH__
+#define ALEPH_TOPOLOGY_SIMPLICIAL_COMPLEX_HH__
 
 #include <boost/multi_index_container.hpp>
 
@@ -19,6 +19,9 @@
 #include <vector>
 
 namespace aleph
+{
+
+namespace topology
 {
 
 template <class Simplex> class SimplicialComplex
@@ -786,7 +789,7 @@ private:
 // ---------------------------------------------------------------------
 
 template <class Simplex> std::ostream& operator<<( std::ostream& o,
-                                                   const SimplicialComplex<Simplex>& S )
+                                                   const topology::SimplicialComplex<Simplex>& S )
 {
   if( S.empty() )
     return o;
@@ -802,6 +805,8 @@ template <class Simplex> std::ostream& operator<<( std::ostream& o,
 }
 
 // ---------------------------------------------------------------------
+
+}
 
 }
 

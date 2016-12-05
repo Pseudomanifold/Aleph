@@ -1,8 +1,8 @@
 #ifndef ALEPH_GEOMETRY_RIPS_SKELETON_HH__
 #define ALEPH_GEOMETRY_RIPS_SKELETON_HH__
 
-#include "Simplex.hh"
-#include "SimplicialComplex.hh"
+#include "topology/Simplex.hh"
+#include "topology/SimplicialComplex.hh"
 
 #include <vector>
 
@@ -18,8 +18,8 @@ public:
   using ElementType       = typename NearestNeighbours::ElementType;
   using IndexType         = typename NearestNeighbours::IndexType;
 
-  using Simplex           = Simplex<ElementType, IndexType>;
-  using SimplicialComplex = SimplicialComplex<Simplex>;
+  using Simplex           = topology::Simplex<ElementType, IndexType>;
+  using SimplicialComplex = topology::SimplicialComplex<Simplex>;
 
   SimplicialComplex build( const NearestNeighbours& nn, ElementType epsilon ) const
   {

@@ -3,7 +3,6 @@
 
 #include "persistenceDiagrams/PersistenceDiagram.hh"
 #include "persistentHomology/PersistencePairing.hh"
-#include "SimplicialComplex.hh"
 
 #include <map>
 #include <vector>
@@ -13,11 +12,12 @@ namespace aleph
 
 template <
   class Index,
-  class Simplex
+  class SimplicialComplex
 >
-std::vector< PersistenceDiagram<typename Simplex::DataType> > makePersistenceDiagrams( const PersistencePairing<Index>& pairing,
-                                                                                       const SimplicialComplex<Simplex>& K )
+std::vector< PersistenceDiagram<typename SimplicialComplex::ValueType::DataType> > makePersistenceDiagrams( const PersistencePairing<Index>& pairing,
+                                                                                                            const SimplicialComplex& K )
 {
+  using Simplex            = typename SimplicialComplex::ValueType;
   using PersistenceDiagram = PersistenceDiagram<typename Simplex::DataType>;
 
   std::map<std::size_t, PersistenceDiagram> persistenceDiagrams;

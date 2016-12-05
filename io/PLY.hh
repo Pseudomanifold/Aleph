@@ -1,11 +1,11 @@
 #ifndef ALEPH_PLY_HH__
 #define ALEPH_PLY_HH__
 
-#include "Simplex.hh"
-#include "SimplicialComplex.hh"
-
 #include "filtrations/Data.hh"
 #include "utilities/String.hh"
+
+#include "topology/Simplex.hh"
+#include "topology/SimplicialComplex.hh"
 
 #include <cassert>
 
@@ -26,15 +26,15 @@ namespace io
 template <
   class DataType,
   class VertexType
-> SimplicialComplex< Simplex<DataType, VertexType> > loadPLY( const std::string& filename, const std::string& property = std::string() )
+> topology::SimplicialComplex< topology::Simplex<DataType, VertexType> > loadPLY( const std::string& filename, const std::string& property = std::string() )
 {
   std::ifstream in( filename );
 
   if( !in )
     throw std::runtime_error( "Unable to open input filename" );
 
-  using Simplex           = Simplex<DataType, VertexType>;
-  using SimplicialComplex = SimplicialComplex<Simplex>;
+  using Simplex           = topology::Simplex<DataType, VertexType>;
+  using SimplicialComplex = topology::SimplicialComplex<Simplex>;
 
   // This stores the coordinates for further processing. They are not required
   // as the simplicial complex only uses the connectivity information. However,

@@ -8,8 +8,8 @@
 
 #include "persistentHomology/PersistencePairing.hh"
 
-#include "SimplicialComplex.hh"
-#include "SimplicialComplexConversions.hh"
+#include "topology/Conversions.hh"
+#include "topology/SimplicialComplex.hh"
 
 #include <algorithm>
 #include <tuple>
@@ -65,8 +65,10 @@ template <
   class ReductionAlgorithm = defaults::ReductionAlgorithm,
   class Representation     = defaults::Representation,
   class Simplex
-> std::vector< PersistenceDiagram<typename Simplex::DataType> > calculatePersistenceDiagrams( const SimplicialComplex<Simplex>& K )
+> std::vector< PersistenceDiagram<typename Simplex::DataType> > calculatePersistenceDiagrams( const topology::SimplicialComplex<Simplex>& K )
 {
+  using namespace topology;
+
   auto boundaryMatrix = makeBoundaryMatrix<Representation>( K );
   auto pairing        = calculatePersistencePairing<ReductionAlgorithm>( boundaryMatrix );
 

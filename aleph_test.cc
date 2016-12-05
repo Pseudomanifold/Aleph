@@ -8,9 +8,9 @@
 
 #include "persistentHomology/Calculation.hh"
 
-#include "Simplex.hh"
-#include "SimplicialComplex.hh"
-#include "SimplicialComplexConversions.hh"
+#include "topology/Conversions.hh"
+#include "topology/Simplex.hh"
+#include "topology/SimplicialComplex.hh"
 
 #include "algorithms/Standard.hh"
 #include "algorithms/Twist.hh"
@@ -29,6 +29,7 @@ using namespace aleph;
 using namespace algorithms;
 using namespace representations;
 using namespace filtrations;
+using namespace topology;
 using namespace utilities;
 
 using I  = unsigned;
