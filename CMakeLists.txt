@@ -38,11 +38,6 @@ ADD_EXECUTABLE( aleph_test
   aleph_test.cc
 )
 
-ADD_EXECUTABLE( aleph_function
-  aleph_function.cc
-)
-
-
 #
 # Place compile commands in the source directory
 #
