@@ -87,30 +87,6 @@ template <class Representation> BoundaryMatrix<Representation> load( const std::
   return M;
 }
 
-template <class Representation> std::ostream& operator<< ( std::ostream& o, const BoundaryMatrix<Representation>& M )
-{
-  using Index = typename Representation::Index;
-
-  auto numColumns = M.getNumColumns();
-
-  for( Index j = Index(0); j < numColumns; ++j )
-  {
-    auto column = M.getColumn( j );
-
-    if( !column.empty() )
-    {
-      for( auto&& c : column )
-        o << c << " ";
-    }
-    else
-      o << "-";
-
-    o << "\n";
-  }
-
-  return o;
-}
-
 }
 
 #endif

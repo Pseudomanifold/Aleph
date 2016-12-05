@@ -1,6 +1,7 @@
 #ifndef ALEPH_BOUNDARY_MATRIX_HH__
 #define ALEPH_BOUNDARY_MATRIX_HH__
 
+#include <ostream>
 #include <vector>
 
 namespace aleph
@@ -82,5 +83,33 @@ private:
 };
 
 }
+
+// ---------------------------------------------------------------------
+
+template <class Representation> std::ostream& operator<< ( std::ostream& o, const aleph::BoundaryMatrix<Representation>& M )
+{
+  using Index = typename Representation::Index;
+
+  auto numColumns = M.getNumColumns();
+
+  for( Index j = Index(0); j < numColumns; ++j )
+  {
+    auto column = M.getColumn( j );
+
+    if( !column.empty() )
+    {
+      for( auto&& c : column )
+        o << c << " ";
+    }
+    else
+      o << "-";
+
+    o << "\n";
+  }
+
+  return o;
+}
+
+// ---------------------------------------------------------------------
 
 #endif
