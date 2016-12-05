@@ -4,7 +4,7 @@ compiler:
   - gcc
 before_script:
   - sudo apt-get update -qq
-  - sudo apt-get install libboost-dev flann-dev
+  - sudo apt-get install libboost-dev libflann-dev
 script:
   - mkdir build
   - cd build
