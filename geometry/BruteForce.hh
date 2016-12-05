@@ -47,7 +47,7 @@ public:
     indices.resize( this->size() );
     distances.resize( this->size() );
 
-    auto D               = container.dimension();
+    auto D               = _container.dimension();
     DistanceFunctor dist = DistanceFunctor();
 
     for( IndexType i = 0; i < this->size(); i++ )

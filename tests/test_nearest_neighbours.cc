@@ -5,6 +5,7 @@
 
 #include "distances/Euclidean.hh"
 
+#include "geometry/BruteForce.hh"
 #include "geometry/FLANN.hh"
 #include "geometry/NearestNeighbours.hh"
 
@@ -16,6 +17,33 @@
 
 using namespace aleph::geometry;
 using namespace aleph;
+
+template <class Wrapper, class PointCloud> void testInternal( const PointCloud& pointCloud )
+{
+  Wrapper wrapper( pointCloud );
+
+  using IndexType   = typename Wrapper::IndexType;
+  using ElementType = typename Wrapper::ElementType;
+
+  std::vector< std::vector<IndexType> > indices;
+  std::vector< std::vector<ElementType> > distances;
+
+  // Check that an *empty* radius does not return any indices
+
+  wrapper.radiusSearch( static_cast<ElementType>( 0.0 ), indices, distances );
+
+  ALEPH_ASSERT_THROW( indices.size() == pointCloud.size() );
+  for( auto&& i : indices )
+    ALEPH_ASSERT_THROW( i.empty() == true );
+
+  // Check that a large radius returns *all* indices
+
+  wrapper.radiusSearch( static_cast<ElementType>( 8.0 ), indices, distances );
+
+  ALEPH_ASSERT_THROW( indices.size() == pointCloud.size() );
+  for( auto&& i : indices )
+    ALEPH_ASSERT_THROW( i.size() == pointCloud.size() );
+}
 
 template <class T> void test()
 {
@@ -29,29 +57,8 @@ template <class T> void test()
   ALEPH_ASSERT_THROW( pointCloud.size()      == 150 );
   ALEPH_ASSERT_THROW( pointCloud.dimension() ==   4);
 
-  FLANN<PointCloud, Distance> flannWrapper( pointCloud );
-
-  using IndexType   = typename FLANN<PointCloud, Distance>::IndexType;
-  using ElementType = typename FLANN<PointCloud, Distance>::ElementType;
-
-  std::vector< std::vector<IndexType> > indices;
-  std::vector< std::vector<ElementType> > distances;
-
-  // Check that an *empty* radius does not return any indices
-
-  flannWrapper.radiusSearch( static_cast<T>( 0.0 ), indices, distances );
-
-  ALEPH_ASSERT_THROW( indices.size() == pointCloud.size() );
-  for( auto&& i : indices )
-    ALEPH_ASSERT_THROW( i.empty() == true );
-
-  // Check that a large radius returns *all* indices
-
-  flannWrapper.radiusSearch( static_cast<T>( 8.0 ), indices, distances );
-
-  ALEPH_ASSERT_THROW( indices.size() == pointCloud.size() );
-  for( auto&& i : indices )
-    ALEPH_ASSERT_THROW( i.size() == pointCloud.size() );
+  testInternal< FLANN<PointCloud, Distance> >( pointCloud );
+  testInternal< BruteForce<PointCloud, Distance> >( pointCloud );
 
   ALEPH_TEST_END();
 }
