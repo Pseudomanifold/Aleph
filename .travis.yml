@@ -9,6 +9,8 @@ before_install:
   - sudo apt-get update -qq
   - sudo apt-get install libboost-dev libflann-dev
   - sudo apt-get install gcc-4.9 -y
+install:
+  - if [ "$CXX" = "g++" ]; then export CXX="g++-4.9" CC="gcc-4.9"; fi
 script:
   - mkdir build
   - cd build
