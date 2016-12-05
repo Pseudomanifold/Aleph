@@ -14,8 +14,8 @@ namespace distances
 template <class DataType> class InfinityDistance
 {
 public:
-  using PersistenceDiagram = PersistenceDiagram<DataType>;
-  using Point              = typename PersistenceDiagram::Point;
+  using PD    = PersistenceDiagram<DataType>;
+  using Point = typename PD::Point;
 
   DataType operator()( const Point& p, const Point& q ) const
   {
