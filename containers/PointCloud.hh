@@ -153,6 +153,22 @@ public:
                result );
   }
 
+  /**
+    Stores the $i$th point of the point cloud in a vector and returns
+    said vector. This interface is not very efficient but is provided
+    as a fallback/simplified variant.
+  */
+
+  std::vector<T> operator[]( std::size_t i ) const
+  {
+    std::vector<T> p;
+
+    this->get( i,
+               std::back_inserter( p ) );
+
+    return p;
+  }
+
 private:
   std::size_t _n; ///< Number of points
   std::size_t _d; ///< Dimension
