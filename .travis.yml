@@ -1,26 +1,19 @@
 language: cpp
 
-matrix:
-  include:
-    - os: linux
-      dist: trusty
-      sudo: required
-      addons:
-        apt:
-          sources:
-          - ubuntu-toolchain-r-test
-          packages:
-          - libboost-dev libflann-dev
-          - g++-4.9
-    - os: osx
+os: linux
+dist: trusty
+sudo: required
+addons:
+  apt:
+    sources:
+      - ubuntu-toolchain-r-test
+    packages:
+      - libboost-dev libflann-dev
+      - g++-4.9
 
 compiler:
   - clang
   - gcc
-
-before_install:
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get update -qq ; fi
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]];   then brew update            ; fi
 
 install:
   - if [ "$CXX" = "g++" ]; then export CXX="g++-4.9" CC="gcc-4.9"; fi
