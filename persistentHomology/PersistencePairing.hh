@@ -1,6 +1,7 @@
 #ifndef ALEPH_PERSISTENCE_PAIRING_HH__
 #define ALEPH_PERSISTENCE_PAIRING_HH__
 
+#include <algorithm>
 #include <limits>
 #include <utility>
 #include <vector>
@@ -65,6 +66,12 @@ public:
   }
 
   // Queries -----------------------------------------------------------
+
+  bool contains( Index creator, Index destroyer ) const
+  {
+    return std::find( _pairs.begin(), _pairs.end(),
+                      std::make_pair( creator, destroyer ) ) != _pairs.end();
+  }
 
   std::size_t size() const
   {
