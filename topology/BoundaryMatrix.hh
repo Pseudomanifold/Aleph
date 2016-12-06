@@ -231,11 +231,9 @@ private:
   bool _isDualized = false;
 };
 
-}
-
 // ---------------------------------------------------------------------
 
-template <class Representation> std::ostream& operator<< ( std::ostream& o, const aleph::BoundaryMatrix<Representation>& M )
+template <class Representation> std::ostream& operator<< ( std::ostream& o, const BoundaryMatrix<Representation>& M )
 {
   using Index = typename Representation::Index;
 
@@ -260,5 +258,7 @@ template <class Representation> std::ostream& operator<< ( std::ostream& o, cons
 }
 
 // ---------------------------------------------------------------------
+
+}
 
 #endif
