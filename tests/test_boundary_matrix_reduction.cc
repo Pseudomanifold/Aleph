@@ -41,13 +41,14 @@ template <class M> void reduceBoundaryMatrix( const M& m )
   for( auto&& pairing : pairings )
   {
     ALEPH_ASSERT_THROW( pairing.empty() == false );
-    ALEPH_ASSERT_THROW( pairing.size()  == 3 );
+    ALEPH_ASSERT_THROW( pairing.size()  == 4 );
   }
 
   for( auto&& pairing1 : pairings )
     for( auto&& pairing2 : pairings )
       ALEPH_ASSERT_THROW( pairing1 == pairing2 );
 
+  ALEPH_ASSERT_THROW( pairings.front().contains( Index(0) ) );
   ALEPH_ASSERT_THROW( pairings.front().contains( Index(1), Index(3) ) );
   ALEPH_ASSERT_THROW( pairings.front().contains( Index(2), Index(4) ) );
   ALEPH_ASSERT_THROW( pairings.front().contains( Index(5), Index(6) ) );
