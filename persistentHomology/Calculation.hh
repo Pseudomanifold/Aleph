@@ -13,6 +13,7 @@
 
 #include <algorithm>
 #include <tuple>
+#include <unordered_set>
 #include <vector>
 
 namespace aleph
@@ -35,6 +36,8 @@ template <
 
   auto numColumns = B.getNumColumns();
 
+  std::unordered_set<Index> creators;
+
   for( Index j = Index(0); j < numColumns; j++ )
   {
     Index i;
@@ -47,6 +50,10 @@ template <
       auto v = j;
       auto w = u;
 
+      // Column j is non-zero. It destroys the feature created by its
+      // lowest 1. Hence, i does not remain a creator.
+      creators.erase( i );
+
       if( B.isDualized() )
       {
         u  = numColumns - 1 - v;
@@ -55,6 +62,26 @@ template <
 
       pairing.add( u, v );
     }
+
+    // An invalid maximum index indicates that the corresponding column
+    // is empty. Hence, we need to think about whether it signifies one
+    // feature with infinite persistence.
+    else
+    {
+      // Only add creators that do not belong to the largest dimension
+      // of the boundary matrix. Else, there will be a lot of spurious
+      // features that cannot be destroyed due to their dimensions.
+      if( B.getDimension(j) != B.getDimension() )
+        creators.insert( j );
+    }
+  }
+
+  for( auto&& creator : creators )
+  {
+    if( B.isDualized() )
+      pairing.add( numColumns - 1 - creator );
+    else
+      pairing.add( creator );
   }
 
   std::sort( pairing.begin(), pairing.end() );
