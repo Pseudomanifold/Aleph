@@ -1,7 +1,7 @@
 #ifndef ALEPH_TOPOLOGY_CONVERSION_HH__
 #define ALEPH_TOPOLOGY_CONVERSION_HH__
 
-#include "boundaryMatrices/BoundaryMatrix.hh"
+#include "topology/BoundaryMatrix.hh"
 
 #include <algorithm>
 

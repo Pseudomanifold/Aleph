@@ -1,7 +1,7 @@
 #ifndef ALEPH_ALGORITHMS_TWIST_HH__
 #define ALEPH_ALGORITHMS_TWIST_HH__
 
-#include "boundaryMatrices/BoundaryMatrix.hh"
+#include "topology/BoundaryMatrix.hh"
 
 #include <tuple>
 #include <vector>

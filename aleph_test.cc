@@ -1,4 +1,8 @@
-#include "boundaryMatrices/BoundaryMatrix.hh"
+#include "algorithms/Standard.hh"
+#include "algorithms/Twist.hh"
+
+#include "filtrations/LowerStar.hh"
+#include "filtrations/UpperStar.hh"
 
 #include "persistenceDiagrams/PersistenceDiagram.hh"
 #include "persistenceDiagrams/Calculation.hh"
@@ -6,20 +10,15 @@
 
 #include "persistentHomology/Calculation.hh"
 
+#include "representations/Set.hh"
+#include "representations/Vector.hh"
+
+#include "topology/BoundaryMatrix.hh"
 #include "topology/Conversions.hh"
 #include "topology/Simplex.hh"
 #include "topology/SimplicialComplex.hh"
 
-#include "algorithms/Standard.hh"
-#include "algorithms/Twist.hh"
-
-#include "filtrations/LowerStar.hh"
-#include "filtrations/UpperStar.hh"
-
 #include "utilities/String.hh"
-
-#include "representations/Set.hh"
-#include "representations/Vector.hh"
 
 #include <iostream>
 

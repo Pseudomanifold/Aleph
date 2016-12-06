@@ -1,11 +1,10 @@
-#include "boundaryMatrices/BoundaryMatrix.hh"
-
 #include "config/Defaults.hh"
 
 #include "persistentHomology/Calculation.hh"
 
 #include "representations/Vector.hh"
 
+#include "topology/BoundaryMatrix.hh"
 #include "topology/io/Function.hh"
 
 #include <iostream>
