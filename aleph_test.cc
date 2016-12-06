@@ -1,6 +1,5 @@
 #include "boundaryMatrices/BoundaryMatrix.hh"
 #include "boundaryMatrices/Dualization.hh"
-#include "boundaryMatrices/IO.hh"
 
 #include "persistenceDiagrams/PersistenceDiagram.hh"
 #include "persistenceDiagrams/Calculation.hh"
@@ -43,7 +42,7 @@ using SC = SimplicialComplex<S>;
 
 int main()
 {
-  auto M = load<BM>( "Triangle.txt" );
+  auto M = BM::load( "Triangle.txt" );
 
   std::cout << "* Boundary matrix\n" << M << "\n"
             << "* Maximum dimension: " << M.getDimension() << "\n";
