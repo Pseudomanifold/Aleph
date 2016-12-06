@@ -66,14 +66,69 @@ public:
     return _representation.getDimension();
   }
 
-  void setDualized( bool value = true )
-  {
-    _isDualized = value;
-  }
-
   bool isDualized() const
   {
     return _isDualized;
+  }
+
+  // Dualization -------------------------------------------------------
+
+  BoundaryMatrix dualize() const
+  {
+    auto&& numColumns = this->getNumColumns();
+
+    std::vector< std::vector<Index> > dualMatrix( numColumns );
+    std::vector<Index> dualDimensions( numColumns );
+    std::vector<std::size_t> dualColumnSizes( numColumns );
+
+    // Determine the size of every column in the dualized matrix. This
+    // keeps memory re-allocation at a minimum.
+
+    for( Index j = 0; j < numColumns; j++ )
+    {
+      auto&& column = this->getColumn(j);
+
+      for( auto&& i : column )
+        ++dualColumnSizes[ numColumns - 1 - i ];
+    }
+
+    for( Index j = 0; j < numColumns; j++ )
+      dualMatrix[j].reserve( dualColumnSizes[j] );
+
+    // Calculate the actual anti-transpose of the matrix. Since the
+    // vectors have been properly resized, this operation should be
+    // relatively well-behaved.
+
+    for( Index j = 0; j < numColumns; j++ )
+    {
+      auto&& column = this->getColumn( j );
+
+      for( auto&& i : column )
+        dualMatrix[ numColumns - 1 - i ].push_back( numColumns - 1 - j );
+    }
+
+    auto&& d = this->getDimension();
+
+    // FIXME: Do I need this?
+    for( Index j = 0; j < numColumns; j++ )
+      dualDimensions.at( numColumns - 1 - j ) = d - this->getDimension( j ); // FIXME: Change operator later after debugging
+
+    BoundaryMatrix<Representation> M;
+    M.setNumColumns( static_cast<Index>( dualMatrix.size() ) );
+
+    for( Index j = 0; j < M.getNumColumns(); j++ )
+    {
+      // Do not assume that the column is properly sorted. A normal
+      // std::reverse should be sufficient in most cases here but I
+      // do not want to take any chances.
+      std::sort( dualMatrix.at(j).begin(), dualMatrix.at(j).end() );
+
+      M.setColumn( j,
+                   dualMatrix.at(j).begin(), dualMatrix.at(j).end() );
+    }
+
+    M._isDualized = !this->isDualized();
+    return M;
   }
 
   // I/O operations ----------------------------------------------------

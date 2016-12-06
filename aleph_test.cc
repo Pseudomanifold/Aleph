@@ -1,5 +1,4 @@
 #include "boundaryMatrices/BoundaryMatrix.hh"
-#include "boundaryMatrices/Dualization.hh"
 
 #include "persistenceDiagrams/PersistenceDiagram.hh"
 #include "persistenceDiagrams/Calculation.hh"
@@ -50,11 +49,11 @@ int main()
   calculatePersistencePairing<SR>( M );
   calculatePersistencePairing<TR>( M );
 
-  calculatePersistencePairing<SR>( dualize( M ) );
-  calculatePersistencePairing<TR>( dualize( M ) );
+  calculatePersistencePairing<SR>( M.dualize() );
+  calculatePersistencePairing<TR>( M.dualize() );
 
   std::cout << "* Boundary matrix [doubly-dualized]\n"
-            << dualize( dualize( M ) ) << "\n";
+            << M.dualize().dualize() << "\n";
 
   {
     S simplex( {0,1,2} );
@@ -83,8 +82,8 @@ int main()
 
     auto&& pairing1 = calculatePersistencePairing<SR>( M );
     auto&& pairing2 = calculatePersistencePairing<TR>( M );
-    auto&& pairing3 = calculatePersistencePairing<SR>( dualize( M ) );
-    auto&& pairing4 = calculatePersistencePairing<TR>( dualize( M ) );
+    auto&& pairing3 = calculatePersistencePairing<SR>( M.dualize() );
+    auto&& pairing4 = calculatePersistencePairing<TR>( M.dualize() );
 
     auto&& diagrams1 = makePersistenceDiagrams( pairing1, K );
     auto&& diagrams2 = makePersistenceDiagrams( pairing2, K );
