@@ -8,10 +8,10 @@
 #include "persistenceDiagrams/Calculation.hh"
 #include "persistenceDiagrams/Norms.hh"
 
-#include "persistentHomology/Calculation.hh"
-
 #include "representations/Set.hh"
 #include "representations/Vector.hh"
+
+#include "persistentHomology/Calculation.hh"
 
 #include "topology/BoundaryMatrix.hh"
 #include "topology/Conversions.hh"
