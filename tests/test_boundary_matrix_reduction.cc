@@ -35,6 +35,9 @@ template <class M> void reduceBoundaryMatrix( const M& m )
   pairings.push_back( aleph::calculatePersistencePairing<TwistAlgorithm>( m ) );
   pairings.push_back( aleph::calculatePersistencePairing<TwistAlgorithm>( m.dualize() ) );
 
+  ALEPH_ASSERT_THROW( m != m.dualize() );
+  ALEPH_ASSERT_THROW( m == m.dualize().dualize() );
+
   for( auto&& pairing : pairings )
   {
     ALEPH_ASSERT_THROW( pairing.empty() == false );

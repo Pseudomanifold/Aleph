@@ -90,6 +90,11 @@ public:
       return *std::max_element( _dimensions.begin(), _dimensions.end() );
   }
 
+  bool operator==( const Vector& other ) const
+  {
+    return _data == other._data && _dimensions == other._dimensions;
+  }
+
 private:
   std::vector< std::vector<Index> > _data;
   std::vector<Index> _dimensions;

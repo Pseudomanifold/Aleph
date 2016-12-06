@@ -71,6 +71,19 @@ public:
     return _isDualized;
   }
 
+  // Comparison --------------------------------------------------------
+
+  bool operator==( const BoundaryMatrix& other ) const
+  {
+    return    _representation == other._representation
+           && _isDualized     == other._isDualized;
+  }
+
+  bool operator!=( const BoundaryMatrix& other ) const
+  {
+    return !this->operator==( other );
+  }
+
   // Dualization -------------------------------------------------------
 
   BoundaryMatrix dualize() const
@@ -216,7 +229,6 @@ private:
   */
 
   bool _isDualized = false;
-
 };
 
 }

@@ -86,6 +86,10 @@ public:
       return *std::max_element( _dimensions.begin(), _dimensions.end() );
   }
 
+  bool operator==( const Set& other ) const
+  {
+    return _data == other._data && _dimensions == other._dimensions;
+  }
 
 private:
   std::vector< std::set<Index> > _data;
