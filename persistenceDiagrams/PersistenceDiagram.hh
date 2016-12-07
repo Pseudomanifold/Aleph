@@ -45,6 +45,12 @@ public:
       return _x == other._x && _y == other._y;
     }
 
+    bool isUnpaired() const
+    {
+      return    (  std::numeric_limits<DataType>::has_infinity && _y == std::numeric_limits<DataType>::infinity() )
+             || ( !std::numeric_limits<DataType>::has_infinity && _y == std::numeric_limits<DataType>::max() );
+    }
+
   private:
     DataType _x;
     DataType _y;
@@ -127,6 +133,19 @@ public:
   }
 
   // Queries -----------------------------------------------------------
+
+  /** @returns Betti number of the persistence diagram, i.e. the number of unpaired points */
+  std::size_t betti() const
+  {
+    auto numUnpairedPoints
+      = std::count_if( _points.begin(), _points.end(),
+                       [] ( const Point& p )
+                       {
+                         return p.isUnpaired();
+                       } );
+
+    return static_cast<std::size_t>( numUnpairedPoints );
+  }
 
   std::size_t size() const
   {
