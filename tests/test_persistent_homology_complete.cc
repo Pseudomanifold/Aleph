@@ -56,13 +56,15 @@ template <class T> void test()
   auto diagrams1 = calculatePersistenceDiagrams( K, dualize );
   auto diagrams2 = calculatePersistenceDiagrams( K, notDualized );
 
-  for( auto&& D1 : diagrams1 )
+  ALEPH_ASSERT_THROW( diagrams1.size() == diagrams2.size() );
+
+  for( std::size_t i = 0; i < diagrams1.size(); i++ )
   {
-    for( auto&& D2 : diagrams2 )
-    {
-      ALEPH_ASSERT_THROW( D1.dimension() == D2.dimension() );
-      ALEPH_ASSERT_THROW( D1 == D2 );
-    }
+    auto&& D1 = diagrams1.at(i);
+    auto&& D2 = diagrams2.at(i);
+
+    ALEPH_ASSERT_THROW( D1.dimension() == D2.dimension() );
+    ALEPH_ASSERT_THROW( D1 == D2 );
   }
 
   ALEPH_TEST_END();
