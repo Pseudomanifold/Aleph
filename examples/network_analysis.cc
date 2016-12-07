@@ -68,8 +68,9 @@ int main( int argc, char** argv )
 
     std::cout << "# Persistence diagram <" << input << ">\n"
               << "#\n"
-              << "# Dimension: " << D.dimension() << "\n"
-              << "# Entries  : " << D.size() << "\n"
+              << "# Dimension   : " << D.dimension() << "\n"
+              << "# Entries     : " << D.size() << "\n"
+              << "# Betti number: " << D.betti() << "\n"
               << D << "\n\n";
   }
 }
