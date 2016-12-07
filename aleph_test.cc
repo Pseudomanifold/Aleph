@@ -8,9 +8,6 @@
 #include "persistenceDiagrams/Calculation.hh"
 #include "persistenceDiagrams/Norms.hh"
 
-#include "representations/Set.hh"
-#include "representations/Vector.hh"
-
 #include "persistentHomology/Calculation.hh"
 
 #include "topology/BoundaryMatrix.hh"
@@ -18,15 +15,18 @@
 #include "topology/Simplex.hh"
 #include "topology/SimplicialComplex.hh"
 
+#include "topology/representations/Set.hh"
+#include "topology/representations/Vector.hh"
+
 #include "utilities/String.hh"
 
 #include <iostream>
 
 using namespace aleph;
 using namespace algorithms;
-using namespace representations;
 using namespace filtrations;
 using namespace topology;
+using namespace representations;
 using namespace utilities;
 
 using I  = unsigned;

@@ -8,6 +8,9 @@
 namespace aleph
 {
 
+namespace topology
+{
+
 namespace representations
 {
 
@@ -105,8 +108,10 @@ private:
   std::vector<Index> _dimensions;
 };
 
-}
+} // namespace representations
 
-}
+} // namespace topology
+
+} // namespace aleph
 
 #endif

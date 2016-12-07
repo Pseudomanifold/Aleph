@@ -14,6 +14,9 @@
 namespace aleph
 {
 
+namespace topology
+{
+
 namespace io
 {
 
@@ -118,8 +121,10 @@ template <
   }
 }
 
-}
+} // namespace io
 
-}
+} // namespace topology
+
+} // namespace aleph
 
 #endif

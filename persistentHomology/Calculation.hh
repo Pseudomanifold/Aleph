@@ -22,8 +22,10 @@ namespace aleph
 template <
   class ReductionAlgorithm,
   class Representation
-> PersistencePairing<typename Representation::Index> calculatePersistencePairing( const BoundaryMatrix<Representation>& M )
+> PersistencePairing<typename Representation::Index> calculatePersistencePairing( const topology::BoundaryMatrix<Representation>& M )
 {
+  using namespace topology;
+
   using Index              = typename Representation::Index;
   using PersistencePairing = PersistencePairing<Index>;
 
@@ -109,7 +111,7 @@ template <
   class ReductionAlgorithm = defaults::ReductionAlgorithm,
   class Representation     = defaults::Representation,
   class DataType
-> PersistenceDiagram<DataType> calculatePersistenceDiagram( const BoundaryMatrix<Representation>& boundaryMatrix,
+> PersistenceDiagram<DataType> calculatePersistenceDiagram( const topology::BoundaryMatrix<Representation>& boundaryMatrix,
                                                             const std::vector<DataType>& functionValues )
 {
   auto pairing = calculatePersistencePairing<ReductionAlgorithm>( boundaryMatrix );

@@ -14,6 +14,9 @@
 namespace aleph
 {
 
+namespace topology
+{
+
 template <class Representation> class BoundaryMatrix
 {
 public:
@@ -266,6 +269,8 @@ template <class Representation> std::ostream& operator<< ( std::ostream& o, cons
 
 // ---------------------------------------------------------------------
 
-}
+} // namespace topology
+
+} // namespace aleph
 
 #endif

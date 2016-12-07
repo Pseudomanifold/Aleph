@@ -3,7 +3,7 @@
 
 #include "algorithms/Twist.hh"
 
-#include "representations/Vector.hh"
+#include "topology/representations/Vector.hh"
 
 namespace aleph
 {
@@ -12,7 +12,7 @@ namespace defaults
 {
 
 using Index              = unsigned;
-using Representation     = representations::Vector<Index>;
+using Representation     = topology::representations::Vector<Index>;
 using ReductionAlgorithm = algorithms::Twist;
 
 }

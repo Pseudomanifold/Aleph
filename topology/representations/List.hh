@@ -1,5 +1,5 @@
-#ifndef ALEPH_REPRESENTATIONS_LIST_HH__
-#define ALEPH_REPRESENTATIONS_LIST_HH__
+#ifndef ALEPH_TOPOLOGY_REPRESENTATIONS_LIST_HH__
+#define ALEPH_TOPOLOGY_REPRESENTATIONS_LIST_HH__
 
 #include <algorithm>
 #include <list>
@@ -7,6 +7,9 @@
 #include <vector>
 
 namespace aleph
+{
+
+namespace topology
 {
 
 namespace representations
@@ -105,9 +108,11 @@ private:
   std::vector<Index> _dimensions;
 };
 
-}
+} // namespace representations
 
-}
+} // namespace topology
+
+} // namespace aleph
 
 
 #endif

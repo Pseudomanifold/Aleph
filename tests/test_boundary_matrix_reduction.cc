@@ -9,8 +9,8 @@
 
 #include "topology/BoundaryMatrix.hh"
 
-#include "representations/Set.hh"
-#include "representations/Vector.hh"
+#include "topology/representations/Set.hh"
+#include "topology/representations/Vector.hh"
 
 #include <vector>
 
@@ -58,13 +58,17 @@ template <class M> void reduceBoundaryMatrix( const M& m )
 
 template <class T> void setupBoundaryMatrix()
 {
+  using namespace aleph;
+  using namespace topology;
+  using namespace representations;
+
   ALEPH_TEST_BEGIN( "Boundary matrix setup & loading" );
 
-  using Set    = aleph::representations::Set<T>;
-  using Vector = aleph::representations::Vector<T>;
+  using Set    = Set<T>;
+  using Vector = Vector<T>;
 
-  auto m1 = aleph::BoundaryMatrix<Set>::load( CMAKE_SOURCE_DIR + std::string( "/tests/input/Triangle.txt" ) );
-  auto m2 = aleph::BoundaryMatrix<Vector>::load( CMAKE_SOURCE_DIR + std::string( "/tests/input/Triangle.txt" ) );
+  auto m1 = BoundaryMatrix<Set>::load( CMAKE_SOURCE_DIR + std::string( "/tests/input/Triangle.txt" ) );
+  auto m2 = BoundaryMatrix<Vector>::load( CMAKE_SOURCE_DIR + std::string( "/tests/input/Triangle.txt" ) );
 
   reduceBoundaryMatrix( m1 );
   reduceBoundaryMatrix( m2 );

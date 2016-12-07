@@ -15,7 +15,7 @@ namespace algorithms
 class Standard
 {
 public:
-  template <class Representation> void operator()( BoundaryMatrix<Representation>& M )
+  template <class Representation> void operator()( topology::BoundaryMatrix<Representation>& M )
   {
     using Index = typename Representation::Index;
 
