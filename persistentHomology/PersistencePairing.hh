@@ -73,6 +73,15 @@ public:
                       std::make_pair( creator, destroyer ) ) != _pairs.end();
   }
 
+  bool contains( Index creator ) const
+  {
+    return std::find_if( _pairs.begin(), _pairs.end(),
+                         [this, &creator] ( const ValueType& pair )
+                         {
+                           return pair.first == creator;
+                         } ) != _pairs.end();
+  }
+
   std::size_t size() const
   {
     return _pairs.size();
