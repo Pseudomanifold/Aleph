@@ -741,7 +741,6 @@ private:
         // simplex", but the data from its parent simplex. This ensures that
         // the data of a coface is always greater than or equal to the data of
         // its faces (assuming that the data type is comparable).
-
         _simplices.push_back( Simplex( *itFace,
                                        simplex.data() ) );
       }

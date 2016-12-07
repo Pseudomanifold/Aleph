@@ -102,6 +102,14 @@ public:
     , _data( data )
   {
     std::sort( _vertices.begin(), _vertices.end(), std::greater<VertexType>() );
+
+    // Ensures that the simplex does not contain the same vertex
+    // multiple times. This may result in the empty simplex, but
+    // there is no way around that.
+    _vertices.erase(
+      std::unique( _vertices.begin(), _vertices.end() ),
+      _vertices.end()
+    );
   }
 
   /**
