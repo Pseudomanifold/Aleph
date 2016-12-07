@@ -73,6 +73,11 @@ public:
     _data.at( column ).clear();
   }
 
+  void setDimension( Index column, Index dimension )
+  {
+    _dimensions.at( column ) = dimension;
+  }
+
   Index getDimension( Index column ) const
   {
     return _dimensions.at( column );

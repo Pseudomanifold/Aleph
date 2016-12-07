@@ -56,6 +56,11 @@ public:
     _representation.clearColumn( column );
   }
 
+  void setDimension( Index column, Index dimension )
+  {
+    _representation.setDimension( column, dimension );
+  }
+
   Index getDimension( Index column ) const
   {
     return _representation.getDimension( column );
@@ -138,6 +143,8 @@ public:
 
       M.setColumn( j,
                    dualMatrix.at(j).begin(), dualMatrix.at(j).end() );
+
+      M.setDimension( j, dualDimensions.at(j) );
     }
 
     M._isDualized = !this->isDualized();
