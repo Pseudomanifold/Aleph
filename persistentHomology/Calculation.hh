@@ -71,8 +71,8 @@ template <
       // Only add creators that do not belong to the largest dimension
       // of the boundary matrix. Else, there will be a lot of spurious
       // features that cannot be destroyed due to their dimensions.
-      if(    ( B.getDimension(j) != B.getDimension() )
-          || ( B.isDualized() && B.getDimension(j) != Index(0) ) )
+      if(    ( !B.isDualized() && B.getDimension(j) != B.getDimension() )
+          || (  B.isDualized() && B.getDimension(j) != Index(0) ) )
       {
         creators.insert( j );
       }
