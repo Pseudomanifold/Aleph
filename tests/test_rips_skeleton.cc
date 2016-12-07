@@ -32,7 +32,7 @@ template <class T> void test()
   FLANN flannWrapper( pointCloud );
   RipsSkeleton<FLANN> ripsSkeleton;
 
-  auto K        = ripsSkeleton.build( flannWrapper, 8.0 );
+  auto K        = ripsSkeleton( flannWrapper, 8.0 );
   auto numEdges = std::count_if( K.begin(), K.end(),
                                      [] ( const typename decltype(K)::ValueType& s )
                                      {

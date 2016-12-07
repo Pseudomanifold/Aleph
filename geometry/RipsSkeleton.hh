@@ -21,7 +21,7 @@ public:
   using Simplex           = topology::Simplex<ElementType, IndexType>;
   using SimplicialComplex = topology::SimplicialComplex<Simplex>;
 
-  SimplicialComplex build( const NearestNeighbours& nn, ElementType epsilon ) const
+  SimplicialComplex operator()( const NearestNeighbours& nn, ElementType epsilon ) const
   {
     auto numVertices = nn.size();
 

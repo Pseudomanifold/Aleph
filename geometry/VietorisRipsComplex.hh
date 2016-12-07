@@ -44,7 +44,7 @@ template <class NearestNeighbours> auto buildVietorisRipsComplex(
   geometry::RipsSkeleton<NearestNeighbours> ripsSkeleton;
 
   auto skeleton
-    = ripsSkeleton.build( nn, epsilon );
+    = ripsSkeleton( nn, epsilon );
 
   geometry::RipsExpander<SimplicialComplex> ripsExpander;
 
