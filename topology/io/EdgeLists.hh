@@ -74,11 +74,14 @@ public:
       }
     }
 
-    std::vector<Simplex> simplices;
-    simplices.reserve( vertices.size() + edges.size() );
+    // Using a set has the advantage of ensuring that duplicate
+    // simplices are deleted automatically. A duplicate simplex
+    // is usually created by the input data set itself. It must
+    // not be considered for any subsequent analysis.
+    std::set<Simplex> simplices;
 
-    simplices.insert( simplices.end(), vertices.begin(), vertices.end() );
-    simplices.insert( simplices.end(), edges.begin(), edges.end() );
+    simplices.insert( vertices.begin(), vertices.end() );
+    simplices.insert( edges.begin(), edges.end() );
 
     K = SimplicialComplex( simplices.begin(), simplices.end() );
   }
