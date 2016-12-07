@@ -4,6 +4,7 @@
 #include "persistenceDiagrams/PersistenceDiagram.hh"
 #include "persistentHomology/PersistencePairing.hh"
 
+#include <algorithm>
 #include <map>
 #include <vector>
 
@@ -52,6 +53,12 @@ std::vector< PersistenceDiagram<typename SimplicialComplex::ValueType::DataType>
 
     result.push_back( diagram );
   }
+
+  std::sort( result.begin(), result.end(),
+             [] ( const PersistenceDiagram& D1, const PersistenceDiagram& D2 )
+             {
+               return D1.dimension() < D2.dimension();
+             } );
 
   return result;
 }
