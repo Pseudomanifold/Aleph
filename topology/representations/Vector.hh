@@ -77,7 +77,7 @@ public:
 
   void clearColumn( Index column )
   {
-    _data.at( column ).clear();
+    _data.at( static_cast<std::size_t>( column ) ).clear();
   }
 
   void setDimension( Index column, Index dimension )
