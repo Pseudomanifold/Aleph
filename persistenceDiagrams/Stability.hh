@@ -21,6 +21,11 @@ template <class T> struct EventPoint
   T value;
   bool destroyer;
 
+  bool operator==( const EventPoint& other ) const noexcept
+  {
+    return value == other.value && destroyer == other.destroyer;
+  }
+
   bool operator<( const EventPoint& other ) const noexcept
   {
     // Sort event point by their corresponding values. In case of ties,
@@ -51,6 +56,38 @@ template <class DataType> std::vector< std::pair<DataType, DataType> > stability
   // FIXME: Remove after debugging
   for( auto&& ep : eventPoints )
     std::cout << ep.value << "," << ep.destroyer << "\n"; 
+
+  int numActiveFeatures = 0;
+
+  auto numDuplicateValues = [&eventPoints] ( std::size_t i )
+  {
+    auto eventPoint         = eventPoints.at(i);
+    unsigned numOccurrences = 0;
+    do
+    {
+      ++numOccurrences;
+      ++i;
+    }
+    while( i < eventPoints.size() && eventPoints.at(i) == eventPoint );
+
+    return numOccurrences;
+  };
+
+  for( std::size_t i = 0; i < eventPoints.size(); )
+  {
+    auto offset = numDuplicateValues(i);
+
+    if( eventPoints.at(i).destroyer )
+      numActiveFeatures -= offset;
+    else
+      numActiveFeatures += offset;
+
+    std::cout << eventPoints.at(i).value << ": " << numActiveFeatures << "\n";
+
+    i += offset;
+  }
+
+  return {};
 }
 
 } // namespace aleph
