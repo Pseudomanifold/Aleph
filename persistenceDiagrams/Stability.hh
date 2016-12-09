@@ -73,6 +73,8 @@ template <class DataType> std::vector< std::pair<DataType, DataType> > stability
     return numOccurrences;
   };
 
+  std::vector< std::pair<DataType, DataType> > points;
+
   for( std::size_t i = 0; i < eventPoints.size(); )
   {
     auto offset = numDuplicateValues(i);
@@ -84,10 +86,18 @@ template <class DataType> std::vector< std::pair<DataType, DataType> > stability
 
     std::cout << eventPoints.at(i).value << ": " << numActiveFeatures << "\n";
 
+    // FIXME: This is not sanitized; the resulting function will contain
+    // duplicate points...
+    points.push_back(
+      std::make_pair(
+        eventPoints.at(i).value,
+        numActiveFeatures )
+    );
+
     i += offset;
   }
 
-  return {};
+  return points;
 }
 
 } // namespace aleph
