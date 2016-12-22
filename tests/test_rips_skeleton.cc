@@ -41,7 +41,7 @@ template <class T> void test()
 
   ALEPH_ASSERT_THROW( K.empty() == false );
   ALEPH_ASSERT_THROW( numEdges > 0 );
-  ALEPH_ASSERT_THROW( numEdges == ( pointCloud.size() * ( pointCloud.size() - 1 ) ) / 2 );
+  ALEPH_ASSERT_THROW( static_cast<std::size_t>( numEdges ) == ( pointCloud.size() * ( pointCloud.size() - 1 ) ) / 2 );
 
   ALEPH_TEST_END();
 }
