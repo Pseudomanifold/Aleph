@@ -35,15 +35,15 @@ public:
           bool valid = false;
 
           std::tie( i, valid ) = M.getMaximumIndex( j );
-          while( valid && lut[i].second )
+          while( valid && lut[ std::size_t(i) ].second )
           {
-            M.addColumns( lut[i].first, j );
+            M.addColumns( lut[ std::size_t(i) ].first, j );
             std::tie( i, valid ) = M.getMaximumIndex( j );
           }
 
           if( valid )
           {
-            lut[i] = std::make_pair( j, true );
+            lut[ std::size_t(i) ] = std::make_pair( j, true );
             M.clearColumn( i );
           }
         }

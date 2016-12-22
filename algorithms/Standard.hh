@@ -21,7 +21,7 @@ public:
 
     auto numColumns = M.getNumColumns();
 
-    std::vector< std::pair<Index, bool> > lut( numColumns,
+    std::vector< std::pair<Index, bool> > lut( static_cast<std::size_t>( numColumns ),
                                                std::make_pair(0, false) );
 
     for( Index j = 0; j < numColumns; j++ )
@@ -30,14 +30,14 @@ public:
       bool valid = false;
 
       std::tie( i, valid ) = M.getMaximumIndex( j );
-      while( valid && lut[i].second )
+      while( valid && lut[ static_cast<std::size_t>(i) ].second )
       {
-        M.addColumns( lut[i].first, j );
+        M.addColumns( lut[ static_cast<std::size_t>(i) ].first, j );
         std::tie( i, valid ) = M.getMaximumIndex( j );
       }
 
       if( valid )
-        lut[i] = std::make_pair( j, true );
+        lut[ static_cast<std::size_t>(i) ] = std::make_pair( j, true );
     }
   }
 };
