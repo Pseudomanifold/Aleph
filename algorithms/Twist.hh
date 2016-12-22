@@ -22,7 +22,7 @@ public:
     auto dimension  = M.getDimension();
     auto numColumns = M.getNumColumns();
 
-    std::vector< std::pair<Index, bool> > lut( numColumns,
+    std::vector< std::pair<Index, bool> > lut( std::size_t(numColumns),
                                                std::make_pair(0, false) );
 
     for( Index d = dimension; d >= 1; d-- )
