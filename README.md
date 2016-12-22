@@ -1,6 +1,6 @@
 ![Aleph logo](Aleph.png "The logo of Aleph in all its glory")
 
-# Aleph &mdash; *A* *L*ibrary for *E*ploring *P*ersistent *H*omology
+# Aleph &mdash; *A* *L*ibrary for *E*xploring *P*ersistent *H*omology
 
 Aleph is a C++ library for exploring and extending usages of [persistent
 homology](https://en.wikipedia.org/wiki/Persistent_homology). Its main
