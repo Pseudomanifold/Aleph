@@ -32,7 +32,7 @@ public:
 
   std::pair<Index, bool> getMaximumIndex( Index column ) const
   {
-    if( _data.at( column ).empty() )
+    if( _data.at( static_cast<std::size_t>( column ) ).empty() )
       return std::make_pair( Index(0), false );
     else
       return std::make_pair( *_data.at( static_cast<std::size_t>( column ) ).rbegin(), true );
