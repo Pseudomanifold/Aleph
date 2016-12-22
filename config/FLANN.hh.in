@@ -1,0 +1,6 @@
+#ifndef ALEPH_CONFIG_FLANN_HH__
+#define ALEPH_CONFIG_FLANN_HH__
+
+#cmakedefine ALEPH_WITH_FLANN
+
+#endif
