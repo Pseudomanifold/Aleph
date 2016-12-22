@@ -96,6 +96,7 @@ public:
     return _points.erase( begin, end );
   }
 
+  /** Removes all points that appear on the diagonal of a persistence diagram */
   void removeDiagonal() noexcept
   {
     _points.erase(
@@ -103,6 +104,19 @@ public:
                       [] ( const Point& p )
                       {
                         return p.x() == p.y();
+                      } ),
+      _points.end()
+    );
+  }
+
+  /** Removes all unpaired points, i.e. points with infinite persistence */
+  void removeUnpaired() noexcept
+  {
+    _points.erase(
+      std::remove_if( _points.begin(), _points.end(),
+                      [] ( const Point& p )
+                      {
+                        return p.isUnpaired();
                       } ),
       _points.end()
     );
