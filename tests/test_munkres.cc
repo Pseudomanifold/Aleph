@@ -87,8 +87,6 @@ int main()
 {
   // 3x3 ---------------------------------------------------------------
 
-  threeByThree<short>         ();
-  threeByThree<unsigned short>();
   threeByThree<int>           ();
   threeByThree<unsigned int>  ();
   threeByThree<long>          ();
@@ -98,8 +96,6 @@ int main()
 
   // 4x4 ---------------------------------------------------------------
 
-  fourByFour<short>         ();
-  fourByFour<unsigned short>();
   fourByFour<int>           ();
   fourByFour<unsigned int>  ();
   fourByFour<long>          ();
