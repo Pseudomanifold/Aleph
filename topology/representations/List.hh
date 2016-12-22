@@ -22,8 +22,8 @@ public:
 
   void setNumColumns( Index numColumns )
   {
-    _data.resize( numColumns );
-    _dimensions.resize( numColumns );
+    _data.resize( static_cast<std::size_t>( numColumns ) );
+    _dimensions.resize( static_cast<std::size_t>( numColumns ) );
   }
 
   Index getNumColumns() const
@@ -33,16 +33,16 @@ public:
 
   std::pair<Index, bool> getMaximumIndex( Index column ) const
   {
-    if( _data.at( column ).empty() )
+    if( _data.at( static_cast<std::size_t>( column ) ).empty() )
       return std::make_pair( Index(0), false );
     else
-      return std::make_pair( _data.at( column ).back(), true );
+      return std::make_pair( _data.at( static_cast<std::size_t>( column ) ).back(), true );
   }
 
   void addColumns( Index source, Index target )
   {
-    auto&& sourceColumn = _data.at( source );
-    auto&& targetColumn = _data.at( target );
+    auto&& sourceColumn = _data.at( static_cast<std::size_t>( source ) );
+    auto&& targetColumn = _data.at( static_cast<std::size_t>( target ) );
 
     std::list<Index> result;
 
@@ -56,23 +56,23 @@ public:
   template <class InputIterator> void setColumn( Index column,
                                                  InputIterator begin, InputIterator end )
   {
-    _data.at( column ).assign( begin, end );
+    _data.at( static_cast<std::size_t>( column ) ).assign( begin, end );
 
     // Ensures proper sorting order. Else, the reduction algorithm will
     // not be able to reduce the matrix.
-    _data.at( column ).sort();
+    _data.at( static_cast<std::size_t>( column ) ).sort();
 
     // Upon initialization, the column must by necessity have the dimension
     // that is indicated by the amount of indices in its boundary. The case
     // of 0-simplices needs special handling.
-    _dimensions.at( column )
+    _dimensions.at( static_cast<std::size_t>( column ) )
         = begin == end ? 0
                        : static_cast<Index>( std::distance( begin, end ) - 1 );
   }
 
   std::vector<Index> getColumn( Index column ) const
   {
-    return { _data.at( column ).begin(), _data.at( column ).end() };
+    return { _data.at( static_cast<std::size_t>( column ) ).begin(), _data.at( static_cast<std::size_t>( column ) ).end() };
   }
 
   void clearColumn( Index column )
@@ -82,12 +82,12 @@ public:
 
   void setDimension( Index column, Index dimension )
   {
-    _dimensions.at( column ) = dimension;
+    _dimensions.at( static_cast<std::size_t>( column ) ) = dimension;
   }
 
   Index getDimension( Index column ) const
   {
-    return _dimensions.at( column );
+    return _dimensions.at( static_cast<std::size_t>( column ) );
   }
 
   Index getDimension() const
