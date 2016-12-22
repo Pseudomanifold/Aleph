@@ -10,7 +10,15 @@ ELSE()
   ADD_DEFINITIONS( "-std=c++11" ) 
 ENDIF()
 
+LIST( APPEND CMAKE_MODULE_PATH
+  ${CMAKE_SOURCE_DIR}/cmake/Modules
+)
+
 SET( CMAKE_EXPORT_COMPILE_COMMANDS ON )
+
+#
+# Macros and additional flags
+#
 
 INCLUDE( CheckCXXCompilerFlag )
 
@@ -29,9 +37,32 @@ ENABLE_IF_SUPPORTED( CMAKE_CXX_FLAGS "-Wself-init" )
 ENABLE_IF_SUPPORTED( CMAKE_CXX_FLAGS "-Wunsafe-loop-optimization" )
 ENABLE_IF_SUPPORTED( CMAKE_CXX_FLAGS "-pedantic" )
 
+#
+# Additional packages
+#
+
+FIND_PACKAGE( FLANN )
+
+IF( FLANN_FOUND )
+  SET( ALEPH_WITH_FLANN TRUE )
+ENDIF()
+
+#
+# Configuration files
+#
+
 CONFIGURE_FILE( ${CMAKE_SOURCE_DIR}/config/Base.hh.in ${CMAKE_SOURCE_DIR}/config/Base.hh )
+CONFIGURE_FILE( ${CMAKE_SOURCE_DIR}/config/FLANN.hh.in ${CMAKE_SOURCE_DIR}/config/FLANN.hh )
+
+#
+# Include directories
+#
 
 INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR} )
+
+#
+# Tests
+#
 
 # Enable testing globally. Individual tests may be found in the `tests`
 # subdirectory of the repository.
