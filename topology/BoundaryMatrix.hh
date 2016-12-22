@@ -11,6 +11,12 @@
 #include <string>
 #include <vector>
 
+// FIXME: This is only a temporary workaround. Depending on the index
+// type of the representation, conversions between signed and unsigned
+// data types may occur here.
+_Pragma( "GCC diagnostic push" )
+_Pragma( "GCC diagnostic ignored \"-Wsign-conversion\"" )
+
 namespace aleph
 {
 
@@ -272,5 +278,7 @@ template <class Representation> std::ostream& operator<< ( std::ostream& o, cons
 } // namespace topology
 
 } // namespace aleph
+
+_Pragma( "GCC diagnostic pop" )
 
 #endif
