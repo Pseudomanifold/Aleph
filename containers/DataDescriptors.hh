@@ -32,17 +32,20 @@ template <class Distance, class Container> std::vector<double> eccentricities( c
 
     double eccentricity = 0.0;
 
-    for( decltype(n) j = i+1; j < n; j++ )
+    for( decltype(n) j = 0; j < n; j++ )
     {
-      auto q        = container[j];
-      auto distance = dist( p.begin(),
-                            q.begin(),
-                            d );
+      if( i != j )
+      {
+        auto q        = container[j];
+        auto distance = dist( p.begin(),
+                              q.begin(),
+                              d );
 
-      distance = traits.from( distance );
-      distance = std::pow( distance, decltype(distance)( order ) ) / decltype(distance)(n);
+        distance = traits.from( distance );
+        distance = std::pow( distance, decltype(distance)( order ) ) / decltype(distance)(n);
 
-      distances.push_back( distance );
+        distances.push_back( distance );
+      }
     }
 
     eccentricity = std::accumulate( distances.begin(), distances.end(), 0.0 );
