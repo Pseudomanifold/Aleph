@@ -42,13 +42,29 @@ template <class InputIterator1, class InputIterator2> bool moreOrLessEqual( Inpu
   return true;
 }
 
+void truncatedGaussianTest()
+{
+  ALEPH_TEST_BEGIN( "Truncated Gaussian density estimation test" );
+
+  auto pc = load<double>( CMAKE_SOURCE_DIR + std::string( "/tests/input/Iris_comma_separated.txt" ) );
+  auto g1 = estimateDensityTruncatedGaussian( pc, 0.1 );
+  auto g2 = estimateDensityTruncatedGaussian( pc, 0.2 );
+  auto g3 = estimateDensityTruncatedGaussian( pc, 1.0 );
+
+  ALEPH_ASSERT_THROW( g1.size() == pc.size() );
+  ALEPH_ASSERT_THROW( g2.size() == pc.size() );
+  ALEPH_ASSERT_THROW( g3.size() == pc.size() );
+
+  ALEPH_TEST_END();
+}
+
 template <class D> void eccentricityTest()
 {
   ALEPH_TEST_BEGIN( "Eccentricity test" );
 
   auto pc = load<double>( CMAKE_SOURCE_DIR + std::string( "/tests/input/Iris_comma_separated.txt" ) );
-  auto e1  = eccentricities<D>( pc );
-  auto e2  = eccentricities<D>( pc, 2 );
+  auto e1 = eccentricities<D>( pc );
+  auto e2 = eccentricities<D>( pc, 2 );
 
   ALEPH_ASSERT_THROW( e1.empty() == false );
   ALEPH_ASSERT_THROW( e1.size()  == pc.size() );
@@ -63,6 +79,8 @@ template <class D> void eccentricityTest()
 int main()
 {
   std::cerr << "-- Euclidean distance\n";
+
+  truncatedGaussianTest();
 
   eccentricityTest<distances::Euclidean<double> >();
 }
