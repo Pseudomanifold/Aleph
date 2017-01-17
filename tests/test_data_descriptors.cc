@@ -1,6 +1,7 @@
 #include "config/Base.hh"
 
 #include "distances/Euclidean.hh"
+#include "distances/Manhattan.hh"
 
 #include "containers/PointCloud.hh"
 #include "containers/DataDescriptors.hh"
@@ -10,6 +11,7 @@
 #include <iostream>
 #include <iterator>
 #include <string>
+#include <type_traits>
 #include <vector>
 
 #include <cmath>
@@ -70,17 +72,46 @@ template <class D> void eccentricityTest()
   ALEPH_ASSERT_THROW( e1.size()  == pc.size() );
   ALEPH_ASSERT_THROW( e1.size()  == e2.size() );
 
-  ALEPH_ASSERT_THROW( moreOrLessEqual( e1.begin(), e1.end(), eccentricities1Euclidean.begin(), eccentricities1Euclidean.end() ) );
-  ALEPH_ASSERT_THROW( moreOrLessEqual( e2.begin(), e2.end(), eccentricities2Euclidean.begin(), eccentricities2Euclidean.end() ) );
+  if( std::is_same<D, distances::Euclidean<typename D::ResultType> >::value )
+  {
+    ALEPH_ASSERT_THROW( moreOrLessEqual( e1.begin(), e1.end(), eccentricities1Euclidean.begin(), eccentricities1Euclidean.end() ) );
+    ALEPH_ASSERT_THROW( moreOrLessEqual( e2.begin(), e2.end(), eccentricities2Euclidean.begin(), eccentricities2Euclidean.end() ) );
+  }
+
+  ALEPH_TEST_END();
+}
+
+template <class D> void distanceToMeasureTest()
+{
+  ALEPH_TEST_BEGIN( "Distance to a measure density estimator test" );
+
+  auto pc = load<double>( CMAKE_SOURCE_DIR + std::string( "/tests/input/Iris_comma_separated.txt" ) );
+  auto e1 = estimateDensityDistanceToMeasure<D>( pc,  1 );
+  auto e2 = estimateDensityDistanceToMeasure<D>( pc,  5 );
+  auto e3 = estimateDensityDistanceToMeasure<D>( pc, 10 );
+
+  ALEPH_ASSERT_THROW( e1.empty() == false );
+  ALEPH_ASSERT_THROW( e1.size()  == pc.size() );
+  ALEPH_ASSERT_THROW( e1.size()  == e2.size() );
 
   ALEPH_TEST_END();
 }
 
 int main()
 {
+  using T  = double;
+  using ED = distances::Euclidean<T>;
+  using MD = distances::Manhattan<T>;
+
   std::cerr << "-- Euclidean distance\n";
 
   truncatedGaussianTest();
 
-  eccentricityTest<distances::Euclidean<double> >();
+  eccentricityTest<ED>();
+  distanceToMeasureTest<ED>();
+
+  std::cerr << "-- Manhattan distance\n";
+
+  eccentricityTest<MD>();
+  distanceToMeasureTest<MD>();
 }
