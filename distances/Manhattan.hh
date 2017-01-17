@@ -22,7 +22,7 @@ namespace distances
   @see FLANN repository   (https://github.com/mariusmuja/flann)
 */
 
-class Manhattan
+template <class T> class Manhattan
 {
 public:
 
@@ -31,8 +31,8 @@ public:
   using is_kdtree_distance = bool;
 
   // Required for FLANN usage
-  using ElementType = double;
-  using ResultType  = double;
+  using ElementType = T;
+  using ResultType  = T;
 
   /**
     Given two ranges of double values, which are assumed to represent two
