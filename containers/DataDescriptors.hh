@@ -9,6 +9,9 @@
 #include "distances/Euclidean.hh"
 #include "distances/Traits.hh"
 
+#include "geometry/BruteForce.hh"
+#include "geometry/NearestNeighbours.hh"
+
 namespace aleph
 {
 
@@ -103,6 +106,51 @@ template <class Container> std::vector<double> estimateDensityTruncatedGaussian(
 
   return densities;
 }
+
+/**
+  Density estimator using the distance to a measure density estimator as
+  introduced by Chazal et al. in:
+
+      Persistence-based clustering in Riemannian manifolds
+
+  This density estimator is capable of using different distance
+  functors.
+*/
+
+template <
+  class Distance,
+  class Container,
+  class Wrapper = geometry::BruteForce<Container, Distance>
+> std::vector<double> estimateDensityDistanceToMeasure( const Container& container,
+                                                        unsigned k,
+                                                        Distance /* distance */ = Distance() )
+{
+  auto n = container.size();
+
+  std::vector<double> densities;
+  densities.reserve( n );
+
+  using IndexType = typename Wrapper::IndexType;
+
+  std::vector< std::vector<IndexType> > indices;
+  std::vector< std::vector<double> > distances;
+
+  Wrapper nnWrapper( container );
+  nnWrapper.neighbourSearch( k, indices, distances );
+
+  for( decltype(n) i = 0; i < n; i++ )
+  {
+
+    double density  = std::accumulate( distances[i].begin(), distances[i].end(), 0.0 );
+    density         = -density;
+    density        /= static_cast<double>( n );
+
+    densities.push_back( density );
+  }
+
+  return densities;
+}
+
 
 } // namespace aleph
 
