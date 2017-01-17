@@ -2,10 +2,13 @@
 #define ALEPH_GEOMETRY_RIPS_EXPANDER_HH__
 
 #include <algorithm>
+#include <iterator>
 #include <list>
+#include <limits>
 #include <set>
 #include <unordered_map>
 #include <unordered_set>
+#include <type_traits>
 #include <vector>
 
 namespace aleph
@@ -106,6 +109,34 @@ public:
     return S;
   }
 
+  template <class InputIterator> SimplicialComplex assignMaximumData( const SimplicialComplex& K, InputIterator begin, InputIterator end )
+  {
+    SimplicialComplex S;
+
+    using DataType_ = typename std::iterator_traits<InputIterator>::value_type;
+
+    static_assert( std::is_same<DataType, DataType_>::value, "Data types must agree" );
+
+    std::vector<DataType> dataValues( begin, end );
+
+    for( auto s : K )
+    {
+      DataType data = std::numeric_limits<DataType>::lowest();
+
+      for( auto&& v : s )
+        data = std::max( data, dataValues[v] );
+
+      s.setData( data );
+
+      // TODO: Not sure whether this is the best way of solving it;
+      // should I expect a generic simplicial complex to have this
+      // function?
+      S.push_back_without_validation( s );
+    }
+
+    return S;
+  }
+
 private:
 
   using VertexContainer    = std::unordered_set<VertexType>;
@@ -187,8 +218,8 @@ private:
   }
 };
 
-}
+} // namespace geometry
 
-}
+} // namespace aleph
 
 #endif
