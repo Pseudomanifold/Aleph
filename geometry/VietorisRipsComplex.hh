@@ -56,8 +56,47 @@ template <class NearestNeighbours> auto buildVietorisRipsComplex(
   return K;
 }
 
+/**
+  Convenience function for building a Vietoris--Rips complex from
+  unstructured data with additional values.
+
+  The additional values are assumed to be specified as a generic range
+  of input iterators. The order of values is assumed to be the same as
+  the order of points in the wrapper for nearest neighbours.
+*/
+
+template <
+  class NearestNeighbours,
+  class InputIterator
+>
+auto buildVietorisRipsComplex(
+  const NearestNeighbours& nn,
+  typename NearestNeighbours::ElementType epsilon,
+  unsigned dimension,
+  InputIterator begin, InputIterator end ) -> topology::SimplicialComplex< topology::Simplex<typename NearestNeighbours::ElementType, typename NearestNeighbours::IndexType> >
+{
+  using ElementType       = typename NearestNeighbours::ElementType;
+  using IndexType         = typename NearestNeighbours::IndexType;
+  using Simplex           = topology::Simplex<ElementType, IndexType>;
+  using SimplicialComplex = topology::SimplicialComplex<Simplex>;
+
+  geometry::RipsSkeleton<NearestNeighbours> ripsSkeleton;
+
+  auto skeleton
+    = ripsSkeleton( nn, epsilon );
+
+  geometry::RipsExpander<SimplicialComplex> ripsExpander;
+
+  auto K = ripsExpander( skeleton, dimension );
+  K      = ripsExpander.assignMaximumData( K, begin, end );
+
+  K.sort( filtrations::Data<Simplex>() );
+
+  return K;
 }
 
-}
+} // namespace geometry
+
+} // namespace aleph
 
 #endif
