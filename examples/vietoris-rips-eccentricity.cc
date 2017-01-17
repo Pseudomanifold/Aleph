@@ -10,6 +10,7 @@
 
 #include "persistentHomology/Calculation.hh"
 
+#include <algorithm>
 #include <iostream>
 #include <string>
 
@@ -45,6 +46,16 @@ int main( int argc, char** argv )
 
   auto eccentricity
     = eccentricities<Distance>( pointCloud, order );
+
+  {
+    auto minmax = std::minmax_element( eccentricity.begin(), eccentricity.end() );
+
+    std::transform( eccentricity.begin(), eccentricity.end(), eccentricity.begin(),
+                    [&minmax] ( double v )
+                    {
+                      return ( *minmax.second - v ) / ( *minmax.second - *minmax.first );
+                    } );
+  }
 
   std::cerr << "finished\n";
 
