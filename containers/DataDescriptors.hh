@@ -12,6 +12,13 @@
 namespace aleph
 {
 
+/**
+  Order-based eccentricity calculations. Eccentricity assigns low values
+  to central points in a point cloud without having to define the actual
+  centre of it. The order parameter can be used to decrease how much the
+  small distances influence the result.
+*/
+
 template <class Distance, class Container> std::vector<double> eccentricities( const Container& container,
                                                                                unsigned order = 1 )
 {
