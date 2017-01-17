@@ -92,9 +92,9 @@ public:
 
         for( auto itFace = s.begin_boundary(); itFace != s.end_boundary(); ++itFace )
         {
-          auto itFaceInK = K.find( *itFace );
-          if( itFaceInK != K.end() )
-            w = std::max( w, itFaceInK->data() );
+          auto itFaceInS = S.find( *itFace );
+          if( itFaceInS != S.end() )
+            w = std::max( w, itFaceInS->data() );
         }
 
         s.setData( w );
