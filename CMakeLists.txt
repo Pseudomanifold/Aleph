@@ -70,6 +70,7 @@ ENABLE_TESTING()
 
 ADD_SUBDIRECTORY( examples )
 ADD_SUBDIRECTORY( tests )
+ADD_SUBDIRECTORY( tools )
 
 #
 # Place compile commands in the source directory
