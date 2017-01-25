@@ -2,8 +2,10 @@
 #define ALEPH_STRING_HH__
 
 #include <algorithm>
+#include <limits>
 #include <regex>
 #include <sstream>
+#include <string>
 #include <vector>
 
 #include <cctype>
@@ -65,6 +67,24 @@ template <class T, class S> T convert( const S& sequence )
 
   std::istringstream converter( sequence );
   converter >> result;
+
+  // Try some special handling for some special tokens. Other errors are
+  // silently ignored. I am not sure whether this is the right behaviour
+  // but I see no pressing reason to change it now.
+  if( converter.fail() )
+  {
+    std::string string = sequence;
+
+    std::transform( string.begin(), string.end(),
+                    string.begin(), ::tolower );
+
+    if( string == "+inf" || string == "inf" || string == "+infinity" || string == "infinity" )
+      result = std::numeric_limits<T>::infinity();
+    else if ( string == "-inf" || string == "-infinity" )
+      result = -std::numeric_limits<T>::infinity();
+    else if( string == "nan" )
+      result = std::numeric_limits<T>::quiet_NaN();
+  }
 
   return result;
 }
