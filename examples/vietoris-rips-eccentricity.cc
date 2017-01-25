@@ -1,8 +1,11 @@
+#include "config/FLANN.hh"
+
 #include "containers/DataDescriptors.hh"
 #include "containers/PointCloud.hh"
 
 #include "distances/Euclidean.hh"
 
+#include "geometry/BruteForce.hh"
 #include "geometry/FLANN.hh"
 #include "geometry/VietorisRipsComplex.hh"
 
@@ -63,6 +66,8 @@ int main( int argc, char** argv )
 
   std::cerr << "* Calculating Vietoris--Rips complex with eps=" << epsilon << " and d=" << dimension << "...";
 
+#ifdef ALEPH_WITH_FLANN
+
   FLANN<PointCloud, Distance> flannWrapper( pointCloud );
 
   auto K
@@ -70,6 +75,17 @@ int main( int argc, char** argv )
                                 epsilon,
                                 unsigned( dimension ),
                                 eccentricity.begin(), eccentricity.end() );
+
+#else
+
+  BruteForce<PointCloud, Distance> flannWrapper( pointCloud );
+
+  auto K
+    = buildVietorisRipsComplex( flannWrapper,
+                                epsilon,
+                                unsigned( dimension ) );
+
+#endif
 
   std::cerr << "finished\n"
             << "* Obtained simplicial complex with " << K.size() << " simplices\n";
