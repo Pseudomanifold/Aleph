@@ -115,5 +115,12 @@ template <class Data, class Vertex> void quad()
 int main()
 {
   triangle<double, unsigned>();
+  triangle<double, short   >();
+  triangle<float,  unsigned>();
+  triangle<float,  short   >();
+
   quad<double, unsigned>();
+  quad<double, short   >();
+  quad<float,  unsigned>();
+  quad<float,  short   >();
 }

@@ -82,8 +82,10 @@ public:
   {
     SimplicialComplex S;
 
-    for( auto s : K )
+    for( auto it = K.begin_dimension(); it != K.end_dimension(); ++it )
     {
+      auto s = *it;
+
       // Re-calculate the weight of the simplex because its
       // dimensionality requirement is not satisfied
       if( s.dimension() > minDimension )
