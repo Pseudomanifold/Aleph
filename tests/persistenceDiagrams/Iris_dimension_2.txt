@@ -1,0 +1,5 @@
+# Data set : Iris
+# Dimension: 2
+# Epsilon  : 0.6
+0.509902	0.52915
+0.547723	0.556776
