@@ -1,9 +1,11 @@
 #include "config/Base.hh"
+#include "config/FLANN.hh"
 
 #include "containers/PointCloud.hh"
 
 #include "distances/Euclidean.hh"
 
+#include "geometry/BruteForce.hh"
 #include "geometry/FLANN.hh"
 #include "geometry/RipsSkeleton.hh"
 
@@ -27,12 +29,16 @@ template <class T> void test()
   ALEPH_ASSERT_THROW( pointCloud.size()      == 150 );
   ALEPH_ASSERT_THROW( pointCloud.dimension() ==   4);
 
-  using FLANN = FLANN<PointCloud, Distance>;
+#ifdef ALEPH_WITH_FLANN
+  using Wrapper = FLANN<PointCloud, Distance>;
+#else
+  using Wrapper = BruteForce<PointCloud, Distance>;
+#endif
 
-  FLANN flannWrapper( pointCloud );
-  RipsSkeleton<FLANN> ripsSkeleton;
+  Wrapper wrapper( pointCloud );
+  RipsSkeleton<Wrapper> ripsSkeleton;
 
-  auto K        = ripsSkeleton( flannWrapper, 8.0 );
+  auto K        = ripsSkeleton( wrapper, 8.0 );
   auto numEdges = std::count_if( K.begin(), K.end(),
                                      [] ( const typename decltype(K)::ValueType& s )
                                      {

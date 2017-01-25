@@ -1,5 +1,6 @@
 
 #include "config/Base.hh"
+#include "config/FLANN.hh"
 
 #include "containers/PointCloud.hh"
 
@@ -57,7 +58,9 @@ template <class T> void test()
   ALEPH_ASSERT_THROW( pointCloud.size()      == 150 );
   ALEPH_ASSERT_THROW( pointCloud.dimension() ==   4);
 
+#ifdef ALEPH_WITH_FLANN
   testInternal< FLANN<PointCloud, Distance> >( pointCloud );
+#endif
   testInternal< BruteForce<PointCloud, Distance> >( pointCloud );
 
   ALEPH_TEST_END();
