@@ -1,5 +1,7 @@
-#ifndef ALEPH_PERSISTENCE_DIAGRAMS_STABILITY_HH__
-#define ALEPH_PERSISTENCE_DIAGRAMS_STABILITY_HH__
+#ifndef ALEPH_PERSISTENCE_DIAGRAMS_PERSISTENCE_INDICATOR_FUNCTION_HH__
+#define ALEPH_PERSISTENCE_DIAGRAMS_PERSISTENCE_INDICATOR_FUNCTION_HH__
+
+#include "math/StepFunction.hh"
 
 #include "persistenceDiagrams/PersistenceDiagram.hh"
 
@@ -37,9 +39,20 @@ template <class T> struct EventPoint
 
 } // namespace detail
 
-template <class DataType> std::vector< std::pair<DataType, DataType> > stabilityFunction( const PersistenceDiagram<DataType>& D )
+
+/**
+  Calculates the persistence indicator function of a persistence
+  diagram. This function counts the number of 'active' intervals
+  for every parameter value. It is a stable summary of a diagram
+  and may be used to discern more information about the topology
+  and its variation over time.
+*/
+
+template <class DataType> aleph::math::StepFunction<DataType> persistenceIndicatorFunction( const PersistenceDiagram<DataType>& D )
 {
   using namespace detail;
+  using namespace math;
+
   using EP = EventPoint<DataType>;
 
   std::vector<EP> eventPoints;
@@ -75,6 +88,8 @@ template <class DataType> std::vector< std::pair<DataType, DataType> > stability
 
   std::vector< std::pair<DataType, DataType> > points;
 
+  StepFunction<DataType> f;
+
   for( std::size_t i = 0; i < eventPoints.size(); )
   {
     auto offset = numDuplicateValues(i);
@@ -94,10 +109,12 @@ template <class DataType> std::vector< std::pair<DataType, DataType> > stability
         numActiveFeatures )
     );
 
+    f.add( eventPoints.at(i).value, numActiveFeatures );
+
     i += offset;
   }
 
-  return points;
+  return f;
 }
 
 } // namespace aleph

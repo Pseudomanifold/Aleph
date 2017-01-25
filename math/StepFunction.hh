@@ -9,7 +9,7 @@ namespace aleph
 namespace math
 {
 
-template <class T> StepFunction
+template <class T> class StepFunction
 {
 public:
 
@@ -40,7 +40,7 @@ public:
   private:
     T _x = T();
     T _y = T();
-  }
+  };
 
   /** Adds a new point to the step function */
   void add( T x, T y ) noexcept
