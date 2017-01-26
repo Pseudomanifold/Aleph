@@ -43,13 +43,15 @@ template <class Simplex> PersistenceDiagram<typename Simplex::DataType> calculat
   SimplicialComplex<Simplex> S
     = SimplicialComplex<Simplex>( simplices.begin(), simplices.end() );
 
-  std::vector<Simplex> vertices;
+  std::vector<VertexType> vertices;
 
-  std::copy_if( simplices.begin(), simplices.end() ,
-                std::back_inserter( vertices ),
-                [] ( const Simplex& s ) { return s.dimension() == 0; } );
+  for( auto&& s : simplices )
+  {
+    if( s.dimension() == 0 )
+      vertices.push_back( *s.begin() );
+  }
 
-  UnionFind<Simplex> uf( vertices.begin(), vertices.end() );
+  UnionFind<VertexType> uf( vertices.begin(), vertices.end() );
   PersistenceDiagram<DataType> pd;
 
   for( auto&& simplex : S )
@@ -73,17 +75,15 @@ template <class Simplex> PersistenceDiagram<typename Simplex::DataType> calculat
       // Ensures that the younger component is always the first component. A
       // component is younger if it its parent vertex precedes the other one
       // in the current filtration.
-      {
-        auto uIndex = S.index( youngerComponent );
-        auto vIndex = S.index( olderComponent );
+      auto uIndex = S.index( Simplex( youngerComponent ) );
+      auto vIndex = S.index( Simplex( olderComponent ) );
 
-        // The younger component must have the _larger_ index as it is born
-        // _later_ in the filtration.
-        if( uIndex < vIndex )
-          std::swap( youngerComponent, olderComponent );
-      }
+      // The younger component must have the _larger_ index as it is born
+      // _later_ in the filtration.
+      if( uIndex < vIndex )
+        std::swap( youngerComponent, olderComponent );
 
-      auto creation    = youngerComponent.data();
+      auto creation    = S[uIndex].data();
       auto destruction = simplex.data();
 
       uf.merge( youngerComponent, olderComponent );
@@ -96,11 +96,14 @@ template <class Simplex> PersistenceDiagram<typename Simplex::DataType> calculat
   // All components in the Union--Find data structure now correspond to
   // essential 0-dimensional homology classes of the input complex.
 
-  std::vector<Simplex> roots;
+  std::vector<VertexType> roots;
   uf.roots( std::back_inserter( roots ) );
 
   for( auto&& root : roots )
-    pd.add( root.data() );
+  {
+    auto creator = *S.find( Simplex( root ) );
+    pd.add( creator.data() );
+  }
 
   // TODO: Return Union--Find data structure as well?
   return pd;
