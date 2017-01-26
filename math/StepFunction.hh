@@ -3,6 +3,7 @@
 
 #include <algorithm>
 #include <iterator>
+#include <ostream>
 #include <set>
 
 namespace aleph
@@ -87,11 +88,23 @@ public:
     return value;
   }
 
+  template <class U> friend std::ostream& operator<<( std::ostream&, const StepFunction<U>& f );
+
 private:
 
   /** All non-zero points of the step function */
   std::set<Point> _points;
 };
+
+// TODO: This does not need to be a friend function; it suffices to be
+// implemented using the public interface of the class.
+template <class T> std::ostream& operator<<( std::ostream& o, const StepFunction<T>& f )
+{
+  for( auto&& p : f._points )
+    o << p.x() << "\t" << p.y() << "\n";
+
+  return o;
+}
 
 } // namespace math
 
