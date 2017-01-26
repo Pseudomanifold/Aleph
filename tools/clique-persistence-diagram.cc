@@ -57,6 +57,8 @@ int main( int argc, char** argv )
   auto C
       = aleph::topology::getCliqueGraph( K, k );
 
+  C.sort( aleph::filtrations::Data<Simplex>() );
+
   std::cerr << "finished\n";
 
   std::cerr << "* " << k << "-cliques graph has " << C.size() << " simplices\n";
