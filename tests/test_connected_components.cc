@@ -12,6 +12,7 @@
 #include "tests/Base.hh"
 
 #include "persistentHomology/Calculation.hh"
+#include "persistentHomology/ConnectedComponents.hh"
 
 #include "topology/Simplex.hh"
 #include "topology/SimplicialComplex.hh"
@@ -59,6 +60,7 @@ template <class T> void test()
   K.sort( filtrations::Data<Simplex>() );
 
   auto diagrams = calculatePersistenceDiagrams( K );
+  auto diagram2 = calculateZeroDimensionalPersistenceDiagram( K );
 
   ALEPH_ASSERT_THROW( diagrams.empty() == false );
 
@@ -66,6 +68,8 @@ template <class T> void test()
 
   ALEPH_ASSERT_THROW( diagram1.empty() == false );
   ALEPH_ASSERT_THROW( diagram1.size()  == pointCloud.size() );
+  ALEPH_ASSERT_THROW( diagram2.empty() == false );
+  ALEPH_ASSERT_THROW( diagram1.size()  == diagram2.size() );
 
   ALEPH_TEST_END();
 }
