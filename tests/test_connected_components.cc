@@ -71,6 +71,18 @@ template <class T> void test()
   ALEPH_ASSERT_THROW( diagram2.empty() == false );
   ALEPH_ASSERT_THROW( diagram1.size()  == diagram2.size() );
 
+  using Point = typename decltype(diagram1)::Point;
+
+  auto sortPoints = [] ( const Point& p, const Point& q )
+  {
+    return p.x() < q.x() || ( p.x() == q.x() && p.y() < q.y() );
+  };
+
+  std::sort( diagram1.begin(), diagram1.end(), sortPoints );
+  std::sort( diagram2.begin(), diagram2.end(), sortPoints );
+
+  ALEPH_ASSERT_THROW( diagram1 == diagram2 );
+
   ALEPH_TEST_END();
 }
 
