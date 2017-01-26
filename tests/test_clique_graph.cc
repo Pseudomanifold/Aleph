@@ -25,6 +25,8 @@ template <class Data, class Vertex> void triangle()
 
   ALEPH_ASSERT_THROW( C.empty() == false );
 
+  std::cerr << C << "\n";
+
   ALEPH_TEST_END();
 }
 

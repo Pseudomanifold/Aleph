@@ -7,9 +7,6 @@
 #include <stdexcept>
 #include <vector>
 
-// FIXME: Remove after debugging
-#include <iostream>
-
 namespace aleph
 {
 
@@ -35,7 +32,7 @@ template <class Simplex> SimplicialComplex<Simplex> getCliqueGraph( const Simpli
   // Stores the co-faces of (k-1)-dimensional simplices. This is required for
   // the edge creation. Whenever two (or more) k-simplices appear in this map
   // they will be connected by an edge.
-  std::map<Simplex, std::vector<Simplex> > cofaceMap;
+  std::map<Simplex, std::vector<unsigned> > cofaceMap;
 
   std::vector<Simplex> vertices;
   std::vector<Simplex> edges;
@@ -75,14 +72,40 @@ template <class Simplex> SimplicialComplex<Simplex> getCliqueGraph( const Simpli
 
   for( auto&& pair : cofaceMap )
   {
-    auto&& face    = pair.first;
     auto&& indices = pair.second;
 
-    std::cerr << "Face: " << face << "\n"
-              << "  Number of co-faces: " << indices.size() << "\n";
+    if( indices.size() >= 2 )
+    {
+      for( std::size_t i = 0; i < indices.size(); i++ )
+      {
+        auto uIndex = indices[i];
+
+        for( std::size_t j = i+1; j < indices.size(); j++ )
+        {
+          auto vIndex = indices[j];
+
+          // TODO: What happens if the indices are invalid? Do I need to
+          // prepare for this situation explicitly?
+          auto&& s = K.at( uIndex );
+          auto&& t = K.at( vIndex );
+
+          // TODO: Does it make sense to make this configurable? As of now, I
+          // am restricting the weights to the usual maximum filtration, i.e.
+          // I am assuming a growth process here.
+          auto data = std::max( s.data(), t.data() );
+
+          edges.push_back( Simplex( {uIndex, vIndex}, data ) );
+        }
+      }
+    }
   }
 
-  return SimplicialComplex<Simplex>( vertices.begin(), vertices.end() );
+  std::vector<Simplex> simplices;
+  simplices.reserve( vertices.size() + edges.size() );
+  simplices.insert( simplices.end(), vertices.begin(), vertices.end() );
+  simplices.insert( simplices.end(), edges.begin()   , edges.end()    );
+
+  return SimplicialComplex<Simplex>( simplices.begin(), simplices.end() );
 }
 
 } // namespace topology
