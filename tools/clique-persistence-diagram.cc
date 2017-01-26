@@ -29,7 +29,7 @@ int main( int argc, char** argv )
   }
 
   std::string filename = argv[1];
-  unsigned k           = static_cast<unsigned>( std::stoul( argv[2] ) );
+  unsigned maxK        = static_cast<unsigned>( std::stoul( argv[2] ) );
 
   aleph::io::EdgeListReader reader;
   reader.setReadWeights( true );
@@ -47,26 +47,29 @@ int main( int argc, char** argv )
   }
 
   aleph::geometry::RipsExpander<SimplicialComplex> ripsExpander;
-  K = ripsExpander( K, k );
+  K = ripsExpander( K, maxK );
   K = ripsExpander.assignMaximumWeight( K );
 
   K.sort( aleph::filtrations::Data<Simplex>() );
 
-  std::cerr << "* Extracting " << k << "-cliques graph...";
+  for( unsigned k = 1; k <= maxK; k++ )
+  {
+    std::cerr << "* Extracting " << k << "-cliques graph...";
 
-  auto C
-      = aleph::topology::getCliqueGraph( K, k );
+    auto C
+        = aleph::topology::getCliqueGraph( K, k );
 
-  C.sort( aleph::filtrations::Data<Simplex>() );
+    C.sort( aleph::filtrations::Data<Simplex>() );
 
-  std::cerr << "finished\n";
+    std::cerr << "finished\n";
 
-  std::cerr << "* " << k << "-cliques graph has " << C.size() << " simplices\n";
+    std::cerr << "* " << k << "-cliques graph has " << C.size() << " simplices\n";
 
-  auto pd
-      = aleph::calculateZeroDimensionalPersistenceDiagram( C );
+    auto pd
+        = aleph::calculateZeroDimensionalPersistenceDiagram( C );
 
-  pd.removeDiagonal();
+    pd.removeDiagonal();
 
-  std::cout << pd << "\n";
+    std::cout << pd << "\n\n";
+  }
 }
