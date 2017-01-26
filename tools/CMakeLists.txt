@@ -1,3 +1,4 @@
+ADD_EXECUTABLE( clique-persistence-diagram     clique-persistence-diagram.cc )
 ADD_EXECUTABLE( persistence-indicator-function persistence-indicator-function.cc )
 ADD_EXECUTABLE( wasserstein-distance           wasserstein-distance.cc )
 
