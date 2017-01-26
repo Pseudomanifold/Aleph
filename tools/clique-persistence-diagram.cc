@@ -64,7 +64,9 @@ int main( int argc, char** argv )
   std::cerr << "* " << k << "-cliques graph has " << C.size() << " simplices\n";
 
   auto pd
-      = aleph::calculateZeroDimensionalPersistenceDiagram( K );
+      = aleph::calculateZeroDimensionalPersistenceDiagram( C );
+
+  pd.removeDiagonal();
 
   std::cout << pd << "\n";
 }

@@ -81,7 +81,10 @@ template <class Simplex> PersistenceDiagram<typename Simplex::DataType> calculat
       // The younger component must have the _larger_ index as it is born
       // _later_ in the filtration.
       if( uIndex < vIndex )
+      {
         std::swap( youngerComponent, olderComponent );
+        std::swap( uIndex, vIndex );
+      }
 
       auto creation    = S[uIndex].data();
       auto destruction = simplex.data();
