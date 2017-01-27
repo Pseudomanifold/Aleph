@@ -1,7 +1,6 @@
 #ifndef ALEPH_MATH_STEP_FUNCTION_HH__
 #define ALEPH_MATH_STEP_FUNCTION_HH__
 
-#include <algorithm>
 #include <iterator>
 #include <ostream>
 #include <set>
@@ -26,6 +25,13 @@ public:
   class IndicatorFunction
   {
   public:
+    IndicatorFunction( T a )
+      : _a( a    )
+      , _b( a    )
+      , _y( T(1) )
+    {
+    }
+
     IndicatorFunction( T a, T b, T y )
       : _a( a )
       , _b( b )
@@ -51,9 +57,17 @@ public:
       return this->y() * ( this->b() - this->a() );
     }
 
+    T operator()( T x ) const noexcept
+    {
+      if( this->a() <= x && x <= this->b() )
+        return this->y();
+      else
+        return T();
+    }
+
     bool operator<( const IndicatorFunction& other ) const
     {
-      // Permit that intervals intersect in a single point, as this is
+      // Permits that intervals intersect in a single point, as this is
       // simplifies the composition of multiple step functions.
       return this->b() <= other.a();
     }
@@ -62,38 +76,6 @@ public:
     T _a;
     T _b;
     T _y;
-  };
-
-  /**
-    Auxiliary class for representing a point 'on' the step function;
-    this assumes that the function consists of its non-zero points.
-  */
-
-  class Point
-  {
-  public:
-    Point( T x, T y )
-      : _x( x )
-      , _y( y )
-    {
-    }
-
-          T& x()       noexcept { return _x; }
-    const T& x() const noexcept { return _x; }
-
-          T& y()       noexcept { return _y; }
-    const T& y() const noexcept { return _y; }
-
-    bool operator<( const Point& other ) const
-    {
-      // Only compare by x coordinate; there must not be two or more
-      // points with the same coordinate.
-      return this->x() < other.x();
-    }
-
-  private:
-    T _x = T();
-    T _y = T();
   };
 
   /** Adds a new indicator function to the step function */
@@ -122,20 +104,15 @@ public:
   /** Returns the function value at a certain position */
   T operator()( T x ) const noexcept
   {
-    // TODO: Exploit the sorting order of the indicator functions and use the
-    // nearest interval that contains the point.
-    //
-    // TODO: Handle *multiple* intervals...
-    auto it = std::find_if( _indicatorFunctions.begin(), _indicatorFunctions.end(),
-                            [&x] ( const IndicatorFunction& f )
-                            {
-                              return f.contains(x);
-                            } );
+    T value = T();
 
-    if( it != _indicatorFunctions.end() )
-      return it->y();
-    else
-      return T();
+    for( auto&& f : _indicatorFunctions )
+    {
+      if( f.contains(x) )
+        value += f(x);
+    }
+
+    return value;
   }
 
   /** Calculates the sum of this step function with another step function */
