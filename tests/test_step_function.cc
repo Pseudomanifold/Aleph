@@ -16,12 +16,20 @@ template <class T> void testStepFunction()
   f.add( 2, 3, 1   );
   f.add( 3, 4, 2 );
 
+  StepFunction<T> g;
+  g.add( 0.5, 0.75, 1 );
+
   ALEPH_ASSERT_THROW( f(0)   == 1 );
   ALEPH_ASSERT_THROW( f(1)   == 1 );
   ALEPH_ASSERT_THROW( f(1.5) == 0 );
   ALEPH_ASSERT_THROW( f(2)   == 1 );
-  ALEPH_ASSERT_THROW( f(3)   == 1 ); // TODO: Incorrect
+  ALEPH_ASSERT_THROW( f(3)   == 3 );
   ALEPH_ASSERT_THROW( f(3.5) == 2 );
+  ALEPH_ASSERT_THROW( g(0.5) == 1 );
+  ALEPH_ASSERT_THROW( g(1.0) == 0 );
+
+  ALEPH_ASSERT_THROW( f.integral() == 4    );
+  ALEPH_ASSERT_THROW( g.integral() == 0.25 );
 
   ALEPH_TEST_END();
 }
