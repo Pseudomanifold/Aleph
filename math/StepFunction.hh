@@ -79,6 +79,30 @@ public:
       return T();
   }
 
+  /** Calculates the sum of this step function with another step function */
+  StepFunction operator+( const StepFunction& other ) const noexcept
+  {
+    auto&& f = *this;
+    auto&& g = other;
+
+    std::set<T> domain;
+
+    f.domain( std::inserter( domain, domain.begin() ) );
+    g.domain( std::inserter( domain, domain.begin() ) );
+
+    StepFunction<T> h;
+
+    for( auto&& x : domain )
+    {
+      auto y1 = f(x);
+      auto y2 = g(x);
+
+      h.add( x, y1+y2 );
+    }
+
+    return h;
+  }
+
   /** Calculates the integral over the domain of the step function */
   T integral() const noexcept
   {
