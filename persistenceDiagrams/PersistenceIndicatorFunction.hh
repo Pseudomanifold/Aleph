@@ -9,9 +9,6 @@
 #include <utility>
 #include <vector>
 
-// FIXME: Remove after debugging
-#include <iostream>
-
 namespace aleph
 {
 
@@ -101,18 +98,13 @@ template <class DataType> aleph::math::StepFunction<DataType> persistenceIndicat
     if( offset != 0 )
     {
       if( i != 0 && previous != eventPoints.at(i).value )
-      {
-        std::cerr << "Adding interval: " << previous << "," << eventPoints.at(i).value << "," << numActiveFeatures << "\n";
         f.add( previous, eventPoints.at(i).value, numActiveFeatures );
-      }
     }
 
     if( eventPoints.at(i).destroyer )
       numActiveFeatures -= offset;
     else
       numActiveFeatures += offset;
-
-    std::cout << eventPoints.at(i).value << ": " << numActiveFeatures << "\n";
 
     // FIXME: This is not sanitized; the resulting function will contain
     // duplicate points...
