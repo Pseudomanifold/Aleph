@@ -3,7 +3,9 @@
 #include "persistenceDiagrams/PersistenceDiagram.hh"
 #include "persistenceDiagrams/PersistenceIndicatorFunction.hh"
 
-#include "tests/Base.hh" 
+#include "tests/Base.hh"
+
+#include <set>
 
 using namespace aleph::math;
 
@@ -30,6 +32,15 @@ template <class T> void testStepFunction()
 
   ALEPH_ASSERT_THROW( f.integral() == 4    );
   ALEPH_ASSERT_THROW( g.integral() == 0.25 );
+
+  auto h = f+g;
+
+  std::set<T> D;
+  f.domain( std::inserter( D, D.begin() ) );
+  g.domain( std::inserter( D, D.begin() ) );
+
+  for( auto&& x : D )
+    ALEPH_ASSERT_THROW( h(x) != 0 );
 
   ALEPH_TEST_END();
 }

@@ -85,7 +85,7 @@ public:
   }
 
   /** Returns the domain of the function */
-  template <class OutputIterator> void domain( OutputIterator result )
+  template <class OutputIterator> void domain( OutputIterator result ) const noexcept
   {
     for( auto&& f : _indicatorFunctions )
     {
@@ -95,7 +95,7 @@ public:
   }
 
   /** Returns the image of the function */
-  template <class OutputIterator> void image( OutputIterator result )
+  template <class OutputIterator> void image( OutputIterator result ) const noexcept
   {
     for( auto&& f : _indicatorFunctions )
       *result++ = f.y();
@@ -128,12 +128,26 @@ public:
 
     StepFunction<T> h;
 
-    for( auto&& x : domain )
-    {
-      auto y1 = f(x);
-      auto y2 = g(x);
+    auto prev = domain.begin();
+    auto curr = domain.begin();
 
-      h.add( x, y1+y2 );
+    T value = f( *curr ) + g( *curr );
+
+    for( ; curr != domain.end(); )
+    {
+      if( prev != curr )
+      {
+        auto y1 = f(*curr);
+        auto y2 = g(*curr);
+
+        if( y1+y2 != value )
+        {
+          h.add( *prev, *curr, value );
+          value = y1+y2;
+        }
+      }
+
+      prev = curr++;
     }
 
     return h;
