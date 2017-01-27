@@ -46,6 +46,11 @@ public:
       return this->a() <= x && x <= this->b();
     }
 
+    T integral() const noexcept
+    {
+      return this->y() * ( this->b() - this->a() );
+    }
+
     bool operator<( const IndicatorFunction& other ) const
     {
       // Permit that intervals intersect in a single point, as this is
@@ -90,12 +95,6 @@ public:
     T _x = T();
     T _y = T();
   };
-
-  /** Adds a new point to the step function */
-  void add( T x, T y ) noexcept
-  {
-    _points.insert( Point(x,y) );
-  }
 
   /** Adds a new indicator function to the step function */
   void add( T a, T b, T y ) noexcept
@@ -182,24 +181,13 @@ public:
   /** Calculates the integral over the domain of the step function */
   T integral() const noexcept
   {
-    if( _points.empty() )
+    if( _indicatorFunctions.empty() )
       return T();
-
-    auto cur = _points.begin();
-    auto pre = _points.begin();
-
-    std::advance( cur, 1 );
 
     T value = T();
 
-    for( ; cur != _points.end(); )
-    {
-      auto c  = this->operator()( pre->x() );
-      auto t  = cur->x() - pre->x();
-      value  += c*t;
-
-      pre = cur++;
-    }
+    for( auto&& f : _indicatorFunctions )
+      value += f.integral();
 
     return value;
   }
@@ -210,9 +198,6 @@ private:
 
   /** All indicator functions of the step function */
   std::set<IndicatorFunction> _indicatorFunctions;
-
-  /** All non-zero points of the step function */
-  std::set<Point> _points;
 };
 
 // TODO: This does not need to be a friend function; it suffices to be
