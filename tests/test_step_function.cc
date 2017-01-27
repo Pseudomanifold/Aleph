@@ -45,6 +45,29 @@ template <class T> void testStepFunction()
   ALEPH_TEST_END();
 }
 
+template <class T> void testStepFunctionAddition()
+{
+  ALEPH_TEST_BEGIN( "Step function: Addition" );
+
+  StepFunction<T> f;
+  f.add( 0, 1, 1 );
+
+  StepFunction<T> g;
+  g.add( 0.25, 0.75, 1 );
+
+  auto h = f+g;
+
+  ALEPH_ASSERT_THROW( h( T(0   ) ) == 1 );
+  ALEPH_ASSERT_THROW( h( T(0.20) ) == 1 );
+  ALEPH_ASSERT_THROW( h( T(0.25) ) == 2 );
+  ALEPH_ASSERT_THROW( h( T(0.50) ) == 2 );
+  ALEPH_ASSERT_THROW( h( T(0.75) ) == 2 );
+  ALEPH_ASSERT_THROW( h( T(0.80) ) == 1 );
+  ALEPH_ASSERT_THROW( h( T(1.00) ) == 1 );
+
+  ALEPH_TEST_END();
+}
+
 template <class T> void testPersistenceIndicatorFunction()
 {
   using PersistenceDiagram = aleph::PersistenceDiagram<T>;
@@ -70,6 +93,9 @@ int main()
 {
   testStepFunction<double>();
   testStepFunction<float> ();
+
+  testStepFunctionAddition<double>();
+  testStepFunctionAddition<float> ();
 
   testPersistenceIndicatorFunction<double>();
   testPersistenceIndicatorFunction<float>();
