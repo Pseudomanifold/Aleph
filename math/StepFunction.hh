@@ -30,8 +30,11 @@ public:
     {
     }
 
-    T x() const noexcept { return _x; }
-    T y() const noexcept { return _y; }
+          T& x()       noexcept { return _x; }
+    const T& x() const noexcept { return _x; }
+
+          T& y()       noexcept { return _y; }
+    const T& y() const noexcept { return _y; }
 
     bool operator<( const Point& other ) const
     {
@@ -101,6 +104,22 @@ public:
     }
 
     return h;
+  }
+
+  /** Multiplies the given step function with a scalar value */
+  StepFunction operator*( T lambda ) const noexcept
+  {
+    StepFunction<T> f = *this;
+
+    for( auto&& p : f._points )
+      p.y() = p.y() * lambda;
+  }
+
+  /** Divides the given step function by a scalar value */
+  StepFunction operator/( T lambda ) const
+  {
+    // TODO: What about division by zero?
+    return this->operator*( 1/lambda );
   }
 
   /** Calculates the integral over the domain of the step function */
