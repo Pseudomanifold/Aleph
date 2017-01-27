@@ -66,12 +66,11 @@ template <class DataType> aleph::math::StepFunction<DataType> persistenceIndicat
 
   std::sort( eventPoints.begin(), eventPoints.end() );
 
-  // FIXME: Remove after debugging
-  for( auto&& ep : eventPoints )
-    std::cout << ep.value << "," << ep.destroyer << "\n"; 
-
   int numActiveFeatures = 0;
 
+  // Lambda expression for counting duplicate event points that appear after a
+  // certain index in the vector of event points. Duplicate event points occur
+  // if the persistence diagram contains points with equal values.
   auto numDuplicateValues = [&eventPoints] ( std::size_t i )
   {
     auto eventPoint         = eventPoints.at(i);
@@ -90,9 +89,23 @@ template <class DataType> aleph::math::StepFunction<DataType> persistenceIndicat
 
   StepFunction<DataType> f;
 
+  // Previous interval end point. This is required in order to create proper
+  // indicator functions later on.
+  DataType previous = DataType();
+
   for( std::size_t i = 0; i < eventPoints.size(); )
   {
     auto offset = numDuplicateValues(i);
+
+    // Create a new interval if the number of active intervals changes
+    if( offset != 0 )
+    {
+      if( i != 0 && previous != eventPoints.at(i).value )
+      {
+        std::cerr << "Adding interval: " << previous << "," << eventPoints.at(i).value << "," << numActiveFeatures << "\n";
+        f.add( previous, eventPoints.at(i).value, numActiveFeatures );
+      }
+    }
 
     if( eventPoints.at(i).destroyer )
       numActiveFeatures -= offset;
@@ -109,9 +122,8 @@ template <class DataType> aleph::math::StepFunction<DataType> persistenceIndicat
         numActiveFeatures )
     );
 
-    f.add( eventPoints.at(i).value, numActiveFeatures );
-
-    i += offset;
+    previous  = eventPoints.at(i).value;
+    i        += offset;
   }
 
   return f;
