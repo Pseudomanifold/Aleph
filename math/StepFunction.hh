@@ -2,9 +2,12 @@
 #define ALEPH_MATH_STEP_FUNCTION_HH__
 
 #include <iterator>
+#include <limits>
 #include <ostream>
 #include <set>
 #include <stdexcept>
+
+#include <cmath>
 
 namespace aleph
 {
@@ -108,8 +111,8 @@ public:
 
     for( auto&& f : _indicatorFunctions )
     {
-      if( f.contains(x) )
-        value += f(x);
+      if( f.contains(x) && std::abs( f(x) ) > value )
+        value = f(x);
     }
 
     return value;
@@ -131,18 +134,20 @@ public:
     auto prev = domain.begin();
     auto curr = domain.begin();
 
-    T value = f( *curr ) + g( *curr );
+    T value = T();
 
     for( ; curr != domain.end(); )
     {
       if( prev != curr )
       {
-        auto y1 = f(*curr);
-        auto y2 = g(*curr);
+        auto evaluationPoint = (*curr + *prev) / 2;
+
+        auto y1 = f(evaluationPoint);
+        auto y2 = g(evaluationPoint);
 
         if( y1+y2 != value )
         {
-          h.add( *prev, *curr, value );
+          h.add( *prev, *curr, y1+y2 );
           value = y1+y2;
         }
       }
