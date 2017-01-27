@@ -1,10 +1,13 @@
 #include "math/StepFunction.hh"
 
+#include "persistenceDiagrams/PersistenceDiagram.hh"
+#include "persistenceDiagrams/PersistenceIndicatorFunction.hh"
+
 #include "tests/Base.hh" 
 
 using namespace aleph::math;
 
-template <class T> void test()
+template <class T> void testStepFunction()
 {
   ALEPH_TEST_BEGIN( "Step function: Basic properties" );
 
@@ -23,8 +26,32 @@ template <class T> void test()
   ALEPH_TEST_END();
 }
 
+template <class T> void testPersistenceIndicatorFunction()
+{
+  using PersistenceDiagram = aleph::PersistenceDiagram<T>;
+
+  ALEPH_TEST_BEGIN( "Persistence indicator function" );
+
+  PersistenceDiagram pd1;
+  pd1.add(1,   2  );
+  pd1.add(1.5, 2.5);
+  pd1.add(2,   3  );
+
+  PersistenceDiagram pd2;
+  pd2.add(1,   2  );
+  pd2.add(3,   4  );
+
+  auto f = aleph::persistenceIndicatorFunction( pd1);
+  auto g = aleph::persistenceIndicatorFunction( pd2 );
+
+  ALEPH_TEST_END();
+}
+
 int main()
 {
-  test<double>();
-  test<float> ();
+  testStepFunction<double>();
+  testStepFunction<float> ();
+
+  testPersistenceIndicatorFunction<double>();
+  testPersistenceIndicatorFunction<float>();
 }
