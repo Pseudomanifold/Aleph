@@ -68,11 +68,10 @@ public:
   /** Returns the function value at a certain position */
   T operator()( T x ) const noexcept
   {
-    auto it = std::find_if( _points.begin(), _points.end(),
-                            [&x] ( const Point& p )
-                            {
-                              return p.x() == x;
-                            } );
+    // Find the point that is nearest to the query point and use its value as
+    // the result. I don't want to do any interpolation here.
+    auto it = std::lower_bound( _points.begin(), _points.end(),
+                                Point( x, T() ) );
 
     if( it != _points.end() )
       return it->y();
