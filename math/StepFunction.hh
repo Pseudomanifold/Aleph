@@ -5,6 +5,7 @@
 #include <iterator>
 #include <ostream>
 #include <set>
+#include <stdexcept>
 
 namespace aleph
 {
@@ -15,6 +16,48 @@ namespace math
 template <class T> class StepFunction
 {
 public:
+
+  /**
+    Auxiliary class for representing an indicator function interval of the step
+    function. Each indicator function is only non-zero within its interval, and
+    zero outside.
+  */
+
+  class IndicatorFunction
+  {
+  public:
+    IndicatorFunction( T a, T b, T y )
+      : _a( a )
+      , _b( b )
+      , _y( y )
+    {
+      if( a > b )
+        throw std::runtime_error( "Invalid interval specified" );
+    }
+
+    const T& a() const noexcept { return _a; }
+    const T& b() const noexcept { return _b; }
+
+          T& y()       noexcept { return _y; }
+    const T& y() const noexcept { return _y; }
+
+    bool contains( T x ) const noexcept
+    {
+      return this->a() <= x && x <= this->b();
+    }
+
+    bool operator<( const IndicatorFunction& other ) const
+    {
+      // Permit that intervals intersect in a single point, as this is
+      // simplifies the composition of multiple step functions.
+      return this->b() <= other.a();
+    }
+
+  private:
+    T _a;
+    T _b;
+    T _y;
+  };
 
   /**
     Auxiliary class for representing a point 'on' the step function;
@@ -54,29 +97,43 @@ public:
     _points.insert( Point(x,y) );
   }
 
+  /** Adds a new indicator function to the step function */
+  void add( T a, T b, T y ) noexcept
+  {
+    _indicatorFunctions.insert( IndicatorFunction(a,b,y) );
+  }
+
   /** Returns the domain of the function */
   template <class OutputIterator> void domain( OutputIterator result )
   {
-    for( auto&& p : _points )
-      *result++ = p.x();
+    for( auto&& f : _indicatorFunctions )
+    {
+      *result++ = f.a();
+      *result++ = f.b();
+    }
   }
 
   /** Returns the image of the function */
   template <class OutputIterator> void image( OutputIterator result )
   {
-    for( auto&& p : _points )
-      *result++ = p.y();
+    for( auto&& f : _indicatorFunctions )
+      *result++ = f.y();
   }
 
   /** Returns the function value at a certain position */
   T operator()( T x ) const noexcept
   {
-    // Find the point that is nearest to the query point and use its value as
-    // the result. I don't want to do any interpolation here.
-    auto it = std::lower_bound( _points.begin(), _points.end(),
-                                Point( x, T() ) );
+    // TODO: Exploit the sorting order of the indicator functions and use the
+    // nearest interval that contains the point.
+    //
+    // TODO: Handle *multiple* intervals...
+    auto it = std::find_if( _indicatorFunctions.begin(), _indicatorFunctions.end(),
+                            [&x] ( const IndicatorFunction& f )
+                            {
+                              return f.contains(x);
+                            } );
 
-    if( it != _points.end() )
+    if( it != _indicatorFunctions.end() )
       return it->y();
     else
       return T();
@@ -150,6 +207,9 @@ public:
   template <class U> friend std::ostream& operator<<( std::ostream&, const StepFunction<U>& f );
 
 private:
+
+  /** All indicator functions of the step function */
+  std::set<IndicatorFunction> _indicatorFunctions;
 
   /** All non-zero points of the step function */
   std::set<Point> _points;
