@@ -69,6 +69,9 @@ public:
   /** Calculates the integral over the domain of the step function */
   T integral() const noexcept
   {
+    if( _points.empty() )
+      return T();
+
     auto cur = _points.begin();
     auto pre = _points.begin();
 
