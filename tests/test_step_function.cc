@@ -25,7 +25,7 @@ template <class T> void testStepFunction()
   ALEPH_ASSERT_THROW( f(1)   == 1 );
   ALEPH_ASSERT_THROW( f(1.5) == 0 );
   ALEPH_ASSERT_THROW( f(2)   == 1 );
-  ALEPH_ASSERT_THROW( f(3)   == 3 );
+  ALEPH_ASSERT_THROW( f(3)   == 2 );
   ALEPH_ASSERT_THROW( f(3.5) == 2 );
   ALEPH_ASSERT_THROW( g(0.5) == 1 );
   ALEPH_ASSERT_THROW( g(1.0) == 0 );

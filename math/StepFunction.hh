@@ -200,8 +200,11 @@ private:
 // implemented using the public interface of the class.
 template <class T> std::ostream& operator<<( std::ostream& o, const StepFunction<T>& f )
 {
-  for( auto&& p : f._points )
-    o << p.x() << "\t" << p.y() << "\n";
+  for( auto&& I : f._indicatorFunctions )
+  {
+    o << I.a() << "\t" << I.y() << "\n"
+      << I.b() << "\t" << I.y() << "\n";
+  }
 
   return o;
 }
