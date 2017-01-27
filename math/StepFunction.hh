@@ -16,7 +16,7 @@ template <class T> class StepFunction
 {
 public:
 
- /**
+  /**
     Auxiliary class for representing a point 'on' the step function;
     this assumes that the function consists of its non-zero points.
   */
@@ -49,6 +49,20 @@ public:
   void add( T x, T y ) noexcept
   {
     _points.insert( Point(x,y) );
+  }
+
+  /** Returns the domain of the function */
+  template <class OutputIterator> void domain( OutputIterator result )
+  {
+    for( auto&& p : _points )
+      *result++ = p.x();
+  }
+
+  /** Returns the image of the function */
+  template <class OutputIterator> void image( OutputIterator result )
+  {
+    for( auto&& p : _points )
+      *result++ = p.y();
   }
 
   /** Returns the function value at a certain position */
