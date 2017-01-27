@@ -49,9 +49,14 @@ int main( int argc, char** argv )
 
   // Calculate persistence indicator functions -------------------------
 
+  unsigned i = 0;
   for( auto&& D : persistenceDiagrams )
   {
     auto f = aleph::persistenceIndicatorFunction( D );
-    std::cerr << f.integral() << "\n";
+
+    std::ofstream out( "/tmp/pif_" + std::to_string(i) + ".txt" );
+    out << f << "\n";
+
+    ++i;
   }
 }
