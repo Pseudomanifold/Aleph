@@ -76,13 +76,13 @@ template <class T> void testStepFunctionAddition()
 
     auto h = f+g;
 
-    ALEPH_ASSERT_THROW( h( T(0   ) ) == 1 );
-    ALEPH_ASSERT_THROW( h( T(0.20) ) == 1 );
-    ALEPH_ASSERT_THROW( h( T(0.25) ) == 3 );
-    ALEPH_ASSERT_THROW( h( T(0.50) ) == 3 );
-    ALEPH_ASSERT_THROW( h( T(0.75) ) == 3 );
-    ALEPH_ASSERT_THROW( h( T(0.80) ) == 1 );
-    ALEPH_ASSERT_THROW( h( T(1.00) ) == 1 );
+    ALEPH_ASSERT_EQUAL( h( T(0   ) ), 1 );
+    ALEPH_ASSERT_EQUAL( h( T(0.20) ), 1 );
+    ALEPH_ASSERT_EQUAL( h( T(0.25) ), 3 );
+    ALEPH_ASSERT_EQUAL( h( T(0.50) ), 3 );
+    ALEPH_ASSERT_EQUAL( h( T(0.75) ), 3 );
+    ALEPH_ASSERT_EQUAL( h( T(0.80) ), 1 );
+    ALEPH_ASSERT_EQUAL( h( T(1.00) ), 1 );
   }
 
   // Case 2: Overlap ---------------------------------------------------
@@ -98,13 +98,13 @@ template <class T> void testStepFunctionAddition()
 
     auto h = f+g;
 
-    ALEPH_ASSERT_THROW( h( T(0   ) ) == 1 );
-    ALEPH_ASSERT_THROW( h( T(0.40) ) == 1 );
-    ALEPH_ASSERT_THROW( h( T(0.50) ) == 3 );
-    ALEPH_ASSERT_THROW( h( T(0.75) ) == 3 );
-    ALEPH_ASSERT_THROW( h( T(1.00) ) == 3 );
-    ALEPH_ASSERT_THROW( h( T(1.10) ) == 2 );
-    ALEPH_ASSERT_THROW( h( T(1.50) ) == 2 );
+    ALEPH_ASSERT_EQUAL( h( T(0   ) ), 1 );
+    ALEPH_ASSERT_EQUAL( h( T(0.40) ), 1 );
+    ALEPH_ASSERT_EQUAL( h( T(0.50) ), 3 );
+    ALEPH_ASSERT_EQUAL( h( T(0.75) ), 3 );
+    ALEPH_ASSERT_EQUAL( h( T(1.00) ), 3 );
+    ALEPH_ASSERT_EQUAL( h( T(1.10) ), 2 );
+    ALEPH_ASSERT_EQUAL( h( T(1.50) ), 2 );
   }
 
   // Case 3: Touching ---------------------------------------------------
@@ -121,12 +121,12 @@ template <class T> void testStepFunctionAddition()
 
     auto h = f+g;
 
-    ALEPH_ASSERT_THROW( h( T(0   ) ) == 1 );
-    ALEPH_ASSERT_THROW( h( T(0.50) ) == 1 );
-    ALEPH_ASSERT_THROW( h( T(1.00) ) == 3 );
-    ALEPH_ASSERT_THROW( h( T(1.01) ) == 2 );
-    ALEPH_ASSERT_THROW( h( T(1.50) ) == 2 );
-    ALEPH_ASSERT_THROW( h( T(2.00) ) == 2 );
+    ALEPH_ASSERT_EQUAL( h( T(0   ) ), 1 );
+    ALEPH_ASSERT_EQUAL( h( T(0.50) ), 1 );
+    ALEPH_ASSERT_EQUAL( h( T(1.00) ), 3 );
+    ALEPH_ASSERT_EQUAL( h( T(1.01) ), 2 );
+    ALEPH_ASSERT_EQUAL( h( T(1.50) ), 2 );
+    ALEPH_ASSERT_EQUAL( h( T(2.00) ), 2 );
   }
 
   ALEPH_TEST_END();
