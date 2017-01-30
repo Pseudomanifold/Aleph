@@ -268,10 +268,12 @@ public:
   /** Multiplies the given step function with a scalar value */
   StepFunction operator*( I lambda ) const noexcept
   {
-    auto f = *this;
+    StepFunction f;
 
-    for( auto&& p : f._points )
-      p.y() = p.y() * lambda;
+    for( auto&& indicatorFunction : _indicatorFunctions )
+      f.add( indicatorFunction.a(), indicatorFunction.b(), lambda * indicatorFunction.y() ); 
+
+    return f;
   }
 
   /** Divides the given step function by a scalar value */
