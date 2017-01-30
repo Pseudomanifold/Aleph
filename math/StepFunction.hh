@@ -55,7 +55,7 @@ public:
 
     bool contains( D x ) const noexcept
     {
-      return this->a() <= x && x < this->b();
+      return this->a() <= x && x <= this->b();
     }
 
     I integral() const noexcept

@@ -7,15 +7,28 @@
 
 #include <set>
 
+#include <cmath>
+
 using namespace aleph::math;
+
+template <class T> bool almostEqual( T x, T y )
+{
+  auto difference = std::abs( x-y );
+  x               = std::abs( x );
+  y               = std::abs( y );
+
+  auto largest    = x < y ? y : x;
+
+  return difference <= largest * 2 * std::numeric_limits<T>::epsilon();
+}
 
 template <class T> void testStepFunction()
 {
   ALEPH_TEST_BEGIN( "Step function: Basic properties" );
 
   StepFunction<T> f;
-  f.add( 0, 1, 1   );
-  f.add( 2, 3, 1   );
+  f.add( 0, 1, 1 );
+  f.add( 2, 3, 1 );
   f.add( 3, 4, 2 );
 
   StepFunction<T> g;
@@ -30,7 +43,7 @@ template <class T> void testStepFunction()
   ALEPH_ASSERT_THROW( g(0.5) == 1 );
   ALEPH_ASSERT_THROW( g(1.0) == 0 );
 
-  ALEPH_ASSERT_THROW( f.integral() == 4    );
+  ALEPH_ASSERT_THROW( almostEqual( f.integral(), T(4) ) );
   ALEPH_ASSERT_THROW( g.integral() == 0.25 );
 
   auto h = f+g;
