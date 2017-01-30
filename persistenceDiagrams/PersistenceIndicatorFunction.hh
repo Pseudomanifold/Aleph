@@ -98,7 +98,7 @@ template <class DataType> aleph::math::StepFunction<DataType> persistenceIndicat
     if( offset != 0 )
     {
       if( i != 0 && previous != eventPoints.at(i).value )
-        f.add( previous, eventPoints.at(i).value, numActiveFeatures );
+        f.add( previous, eventPoints.at(i).value, static_cast<DataType>( numActiveFeatures ) );
     }
 
     if( eventPoints.at(i).destroyer )

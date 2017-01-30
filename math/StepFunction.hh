@@ -15,9 +15,12 @@ namespace aleph
 namespace math
 {
 
-template <class T> class StepFunction
+template <class D, class I = D> class StepFunction
 {
 public:
+
+  using Domain = D;
+  using Image  = I;
 
   /**
     Auxiliary class for representing an indicator function interval of the step
@@ -28,14 +31,14 @@ public:
   class IndicatorFunction
   {
   public:
-    IndicatorFunction( T a )
+    IndicatorFunction( D a )
       : _a( a    )
       , _b( a    )
-      , _y( T(1) )
+      , _y( I(1) )
     {
     }
 
-    IndicatorFunction( T a, T b, T y )
+    IndicatorFunction( D a, D b, I y )
       : _a( a )
       , _b( b )
       , _y( y )
@@ -44,28 +47,28 @@ public:
         throw std::runtime_error( "Invalid interval specified" );
     }
 
-    const T& a() const noexcept { return _a; }
-    const T& b() const noexcept { return _b; }
+    const D& a() const noexcept { return _a; }
+    const D& b() const noexcept { return _b; }
 
-          T& y()       noexcept { return _y; }
-    const T& y() const noexcept { return _y; }
+          I& y()       noexcept { return _y; }
+    const I& y() const noexcept { return _y; }
 
-    bool contains( T x ) const noexcept
+    bool contains( D x ) const noexcept
     {
-      return this->a() <= x && x <= this->b();
+      return this->a() <= x && x < this->b();
     }
 
-    T integral() const noexcept
+    I integral() const noexcept
     {
-      return this->y() * ( this->b() - this->a() );
+      return this->y() * static_cast<I>( ( this->b() - this->a() ) );
     }
 
-    T operator()( T x ) const noexcept
+    I operator()( D x ) const noexcept
     {
-      if( this->a() <= x && x <= this->b() )
+      if( this->contains( x ) ) 
         return this->y();
       else
-        return T();
+        return I();
     }
 
     bool operator<( const IndicatorFunction& other ) const
@@ -76,13 +79,13 @@ public:
     }
 
   private:
-    T _a;
-    T _b;
-    T _y;
+    D _a;
+    D _b;
+    I _y;
   };
 
   /** Adds a new indicator function to the step function */
-  void add( T a, T b, T y ) noexcept
+  void add( D a, D b, I y ) noexcept
   {
     _indicatorFunctions.insert( IndicatorFunction(a,b,y) );
   }
@@ -105,12 +108,14 @@ public:
   }
 
   /** Returns the function value at a certain position */
-  T operator()( T x ) const noexcept
+  I operator()( D x ) const noexcept
   {
-    T value = T();
+    I value = I();
 
     for( auto&& f : _indicatorFunctions )
     {
+      // TODO: Not sure whether I really want this. The step functions must not
+      // overlap anyway...
       if( f.contains(x) && std::abs( f(x) ) > value )
         value = f(x);
     }
@@ -124,17 +129,17 @@ public:
     auto&& f = *this;
     auto&& g = other;
 
-    std::set<T> domain;
+    std::set<D> domain;
 
     f.domain( std::inserter( domain, domain.begin() ) );
     g.domain( std::inserter( domain, domain.begin() ) );
 
-    StepFunction<T> h;
+    StepFunction<D,I> h;
 
     auto prev = domain.begin();
     auto curr = domain.begin();
 
-    T value = T();
+    I value = I();
 
     for( ; curr != domain.end(); )
     {
@@ -159,28 +164,28 @@ public:
   }
 
   /** Multiplies the given step function with a scalar value */
-  StepFunction operator*( T lambda ) const noexcept
+  StepFunction operator*( I lambda ) const noexcept
   {
-    StepFunction<T> f = *this;
+    auto f = *this;
 
     for( auto&& p : f._points )
       p.y() = p.y() * lambda;
   }
 
   /** Divides the given step function by a scalar value */
-  StepFunction operator/( T lambda ) const
+  StepFunction operator/( I lambda ) const
   {
     // TODO: What about division by zero?
     return this->operator*( 1/lambda );
   }
 
   /** Calculates the integral over the domain of the step function */
-  T integral() const noexcept
+  I integral() const noexcept
   {
     if( _indicatorFunctions.empty() )
-      return T();
+      return I();
 
-    T value = T();
+    I value = I();
 
     for( auto&& f : _indicatorFunctions )
       value += f.integral();
@@ -188,7 +193,7 @@ public:
     return value;
   }
 
-  template <class U> friend std::ostream& operator<<( std::ostream&, const StepFunction<U>& f );
+  template <class U, class V> friend std::ostream& operator<<( std::ostream&, const StepFunction<U, V>& f );
 
 private:
 
@@ -198,12 +203,12 @@ private:
 
 // TODO: This does not need to be a friend function; it suffices to be
 // implemented using the public interface of the class.
-template <class T> std::ostream& operator<<( std::ostream& o, const StepFunction<T>& f )
+template <class D, class I> std::ostream& operator<<( std::ostream& o, const StepFunction<D, I>& f )
 {
-  for( auto&& I : f._indicatorFunctions )
+  for( auto&& indicatorFunction : f._indicatorFunctions )
   {
-    o << I.a() << "\t" << I.y() << "\n"
-      << I.b() << "\t" << I.y() << "\n";
+    o << indicatorFunction.a() << "\t" << indicatorFunction.y() << "\n"
+      << indicatorFunction.b() << "\t" << indicatorFunction.y() << "\n";
   }
 
   return o;
