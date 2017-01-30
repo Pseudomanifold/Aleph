@@ -6,8 +6,11 @@
 #include "persistenceDiagrams/PersistenceDiagram.hh"
 
 #include <algorithm>
+#include <limits>
 #include <utility>
 #include <vector>
+
+#include <cmath>
 
 namespace aleph
 {
@@ -20,11 +23,6 @@ template <class T> struct EventPoint
   T value;
   bool destroyer;
 
-  bool operator==( const EventPoint& other ) const noexcept
-  {
-    return value == other.value && destroyer == other.destroyer;
-  }
-
   bool operator<( const EventPoint& other ) const noexcept
   {
     // Sort event point by their corresponding values. In case of ties,
@@ -33,6 +31,14 @@ template <class T> struct EventPoint
     return value < other.value || ( value == other.value && destroyer && !other.destroyer );
   }
 };
+
+template <class T> T next( T x )
+{
+  if( std::numeric_limits<T>::is_integer )
+    return x+1;
+  else
+    return std::nextafter( x, std::numeric_limits<T>::max() );
+}
 
 } // namespace detail
 
@@ -63,7 +69,26 @@ template <class DataType> aleph::math::StepFunction<DataType> persistenceIndicat
 
   std::sort( eventPoints.begin(), eventPoints.end() );
 
-  int numActiveFeatures = 0;
+  unsigned numActiveFeatures = 0;
+  bool isDegenerate          = false;
+
+  // Sanity check: A destroyer and a creator should never have the same
+  // function value. Else, the number of 'active' intervals will behave
+  // somewhat strangely.
+  if( eventPoints.size() >= 2 )
+  {
+    for( std::size_t i = 0; i < eventPoints.size(); i += 2 )
+    {
+      if( eventPoints[i].value == eventPoints[i+1].value )
+      {
+        if( eventPoints[i].destroyer != eventPoints[i+1].destroyer )
+        {
+          isDegenerate = true;
+          break;
+        }
+      }
+    }
+  }
 
   // Lambda expression for counting duplicate event points that appear after a
   // certain index in the vector of event points. Duplicate event points occur
@@ -72,17 +97,18 @@ template <class DataType> aleph::math::StepFunction<DataType> persistenceIndicat
   {
     auto eventPoint         = eventPoints.at(i);
     unsigned numOccurrences = 0;
+    unsigned numDestroyers  = 0;
     do
     {
+      numDestroyers += eventPoints.at(i).destroyer;
+
       ++numOccurrences;
       ++i;
     }
-    while( i < eventPoints.size() && eventPoints.at(i) == eventPoint );
+    while( i < eventPoints.size() && eventPoints.at(i).value == eventPoint.value );
 
-    return numOccurrences;
+    return std::make_pair( numOccurrences, numDestroyers );
   };
-
-  std::vector< std::pair<DataType, DataType> > points;
 
   StepFunction<DataType> f;
 
@@ -92,30 +118,38 @@ template <class DataType> aleph::math::StepFunction<DataType> persistenceIndicat
 
   for( std::size_t i = 0; i < eventPoints.size(); )
   {
-    auto offset = numDuplicateValues(i);
+    auto pair        = numDuplicateValues(i);
+    auto occurrences = pair.first;
+    auto destroyers  = pair.second;
+    auto creators    = occurrences - destroyers;
 
-    // Create a new interval if the number of active intervals changes
-    if( offset != 0 )
+    bool useNextPoint = false;
+
+    // Case 1: No duplicates or duplicates of the same type. In this case, the
+    // number of active intervals changes and we add an interval. It comprises
+    // the number of active intervals up to this point.
+    if( occurrences == 1 || creators == occurrences || creators == 0 )
     {
-      if( i != 0 && previous != eventPoints.at(i).value )
+      if( i != 0 )
         f.add( previous, eventPoints.at(i).value, static_cast<DataType>( numActiveFeatures ) );
     }
-
-    if( eventPoints.at(i).destroyer )
-      numActiveFeatures -= offset;
+    
+    // Case 2: There are duplicate creation & destruction values. This
+    // necessitates the creation of two intervals: one interval at the
+    // current even point, with the proper number of active intervals,
+    // the other one *directly* afterwards to indicate the destruction
+    // implied by the values.
     else
-      numActiveFeatures += offset;
+    {
+      f.add( previous, eventPoints.at(i).value, static_cast<DataType>( numActiveFeatures + creators ) );
+      useNextPoint = true;
+    }
 
-    // FIXME: This is not sanitized; the resulting function will contain
-    // duplicate points...
-    points.push_back(
-      std::make_pair(
-        eventPoints.at(i).value,
-        numActiveFeatures )
-    );
+    numActiveFeatures += creators;
+    numActiveFeatures -= destroyers;
 
-    previous  = eventPoints.at(i).value;
-    i        += offset;
+    previous  = useNextPoint ? next( eventPoints.at(i).value ) : eventPoints.at(i).value;
+    i        += occurrences;
   }
 
   return f;

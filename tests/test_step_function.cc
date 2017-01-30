@@ -43,8 +43,8 @@ template <class T> void testStepFunction()
   ALEPH_ASSERT_THROW( g(0.5) == 1 );
   ALEPH_ASSERT_THROW( g(1.0) == 0 );
 
-  ALEPH_ASSERT_THROW( almostEqual( f.integral(), T(4) ) );
-  ALEPH_ASSERT_THROW( g.integral() == 0.25 );
+  ALEPH_ASSERT_THROW( f.integral() == T(4.00) );
+  ALEPH_ASSERT_THROW( g.integral() == T(0.25) );
 
   auto h = f+g;
 
