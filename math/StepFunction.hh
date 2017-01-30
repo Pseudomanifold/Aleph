@@ -175,16 +175,8 @@ public:
       auto y5 = f( detail::next( prev ) );
       auto y6 = g( detail::next( prev ) );
 
-      std::cerr << "INTERVAL: "
-                << "  [" << prev << "," << curr << "]\n"
-                << "  f: " << f( prev ) << "," << f( curr ) << "\n"
-                << "  g: " << g( prev ) << "," << g( curr ) << "\n";
-
       if( y1 == y3 && y2 == y4 )
-      {
-        std::cerr << "--> regular\n";
         h.add( prev, curr, y1+y2 );
-      }
       else if( y1 != y3 || y2 != y4 )
       {
         if( y1 != y5 || y2 != y6 )
@@ -196,71 +188,10 @@ public:
         // Ensures that the next interval uses the proper start point for the
         // indicator function interval.
         curr = detail::next( curr );
-
-        std::cerr << "--> one or two functions change\n";
       }
-      else
-        std::cerr << "--> both change\n";
 
       prev = curr;
     }
-
-    std::cerr << h << "\n";
-
-#if 0
-
-    auto prev = *domain.begin();
-    auto curr = domain.begin();
-
-    I value = I();
-
-    for( ; curr != domain.end(); )
-    {
-      auto y1 = f( *curr );
-      auto y2 = f( detail::next( *curr ) );
-      auto y3 = g( *curr );
-      auto y4 = g( detail::next( *curr ) );
-
-      if( prev != *curr && y1+y3 != value )
-      {
-        // Case 1: The values agree with each other at all evaluation points,
-        // meaning that a simple addition of y-values is possible.
-        if( y1 == y2 && y3 == y4 )
-        {
-          std::cerr << prev << "," << *curr << "," << y1+y3 << "\n";
-
-          h.add( prev, *curr, y1+y3 );
-          value = y1+y3;
-
-          prev = *curr++;
-        }
-
-        // Case 2: The first function changes because the current evaluation
-        // point marks the end of one of its intervals. This requires the
-        // creation of a separate interval in the next step and another value
-        // afterwards.
-        else
-        {
-          std::cerr << prev << "," << *curr << "," << y1+y3 << "\n";
-
-          h.add( prev, *curr, y1+y3 );
-
-          value = y2+y4;
-          prev  = detail::next( *curr++ );
-        }
-      }
-      else
-      {
-        // Special handling for *last* interval: Intervals are only added if the
-        // value changes. Hence, if no change in value was detected and the loop
-        // is at the last point, the last interval needs to be closed manually.
-        if( y1+y3 == value && std::next( curr ) == domain.end() )
-          h.add( prev, *curr, y1+y3 );
-
-        prev = *curr++;
-      }
-    }
-#endif
 
     return h;
   }
@@ -271,7 +202,7 @@ public:
     StepFunction f;
 
     for( auto&& indicatorFunction : _indicatorFunctions )
-      f.add( indicatorFunction.a(), indicatorFunction.b(), lambda * indicatorFunction.y() ); 
+      f.add( indicatorFunction.a(), indicatorFunction.b(), lambda * indicatorFunction.y() );
 
     return f;
   }
