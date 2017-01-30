@@ -133,6 +133,28 @@ int main( int argc, char** argv )
   std::ofstream linout( "/tmp/DNA_" + std::to_string( n ) + "_lin.txt" );
   std::ofstream logout( "/tmp/DNA_" + std::to_string( n ) + "_log.txt" );
 
+  {
+    unsigned index = 0;
+
+    logout << "unset border\n";
+    logout << "set key off\n";
+    logout << "set xtics (";
+
+    for( auto&& logbin : logbins )
+    {
+      if( index != 0 )
+        logout << ",";
+
+      logout << "\"" << logbin <<  "\" " << index;
+
+      ++index;
+    }
+
+    logout << ") nomirror\n";
+  }
+
+  logout << "plot '-' matrix with image\n";
+
   for( auto&& pif : persistenceIndicatorFunctions )
   {
     std::vector<DataType> linhist(n);
@@ -154,4 +176,6 @@ int main( int argc, char** argv )
     print( linout, linhist );
     print( logout, loghist );
   }
+
+  logout << "e\n";
 }
