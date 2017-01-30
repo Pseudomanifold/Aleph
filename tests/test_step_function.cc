@@ -34,18 +34,19 @@ template <class T> void testStepFunction()
   StepFunction<T> g;
   g.add( 0.5, 0.75, 1 );
 
-  ALEPH_ASSERT_THROW( f(0)   == 1 );
-  ALEPH_ASSERT_THROW( f(1)   == 1 );
-  ALEPH_ASSERT_THROW( f(1.5) == 0 );
-  ALEPH_ASSERT_THROW( f(2)   == 1 );
-  ALEPH_ASSERT_THROW( f(3)   == 2 );
-  ALEPH_ASSERT_THROW( f(3.5) == 2 );
+  ALEPH_ASSERT_EQUAL( f(0)  , 1 );
+  ALEPH_ASSERT_EQUAL( f(1)  , 1 );
+  ALEPH_ASSERT_EQUAL( f(1.5), 0 );
+  ALEPH_ASSERT_EQUAL( f(2)  , 1 );
+  ALEPH_ASSERT_EQUAL( f(3)  , 2 );
+  ALEPH_ASSERT_EQUAL( f(3.5), 2 );
+  ALEPH_ASSERT_EQUAL( f(4.0), 2);
 
-  ALEPH_ASSERT_THROW( g(0.5) == 1 );
-  ALEPH_ASSERT_THROW( g(1.0) == 0 );
+  ALEPH_ASSERT_EQUAL( g(0.5),1 );
+  ALEPH_ASSERT_EQUAL( g(1.0), 0 );
 
-  ALEPH_ASSERT_THROW( f.integral() == T(4.00) );
-  ALEPH_ASSERT_THROW( g.integral() == T(0.25) );
+  ALEPH_ASSERT_EQUAL( f.integral(), T(4.00) );
+  ALEPH_ASSERT_EQUAL( g.integral(), T(0.25) );
 
   auto h = f+g;
 
@@ -127,6 +128,24 @@ template <class T> void testStepFunctionAddition()
     ALEPH_ASSERT_EQUAL( h( T(1.01) ), 2 );
     ALEPH_ASSERT_EQUAL( h( T(1.50) ), 2 );
     ALEPH_ASSERT_EQUAL( h( T(2.00) ), 2 );
+  }
+
+  // Case 4: Equality --------------------------------------------------
+  //
+  // If the functions fully coincide, this should be equivalent to scalar
+  // multiplication.
+
+  {
+    StepFunction<T> f;
+    f.add( 1,2, 1);
+
+    auto g = f*2;
+    auto h = f+f;
+
+    ALEPH_ASSERT_EQUAL( h(0  ), g(0  ) );
+    ALEPH_ASSERT_EQUAL( h(1  ), g(1  ) );
+    ALEPH_ASSERT_EQUAL( h(1.5), g(1.5) );
+    ALEPH_ASSERT_EQUAL( h(2  ), g(2  ) );
   }
 
   ALEPH_TEST_END();
