@@ -71,5 +71,10 @@ int main( int argc, char** argv )
     pd.removeDiagonal();
 
     std::cout << pd << "\n\n";
+
+    // FIXME: Improve output; format filename according to input string
+    std::ofstream out( "/tmp/" + std::to_string(k) + ".txt" );
+
+    out << pd << "\n";
   }
 }
