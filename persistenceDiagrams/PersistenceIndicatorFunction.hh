@@ -70,25 +70,6 @@ template <class DataType> aleph::math::StepFunction<DataType> persistenceIndicat
   std::sort( eventPoints.begin(), eventPoints.end() );
 
   unsigned numActiveFeatures = 0;
-  bool isDegenerate          = false;
-
-  // Sanity check: A destroyer and a creator should never have the same
-  // function value. Else, the number of 'active' intervals will behave
-  // somewhat strangely.
-  if( eventPoints.size() >= 2 )
-  {
-    for( std::size_t i = 0; i < eventPoints.size(); i += 2 )
-    {
-      if( eventPoints[i].value == eventPoints[i+1].value )
-      {
-        if( eventPoints[i].destroyer != eventPoints[i+1].destroyer )
-        {
-          isDegenerate = true;
-          break;
-        }
-      }
-    }
-  }
 
   // Lambda expression for counting duplicate event points that appear after a
   // certain index in the vector of event points. Duplicate event points occur
