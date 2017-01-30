@@ -1,5 +1,7 @@
 #include <algorithm>
+#include <fstream>
 #include <iostream>
+#include <map>
 #include <string>
 #include <vector>
 
@@ -10,6 +12,19 @@
 using DataType           = double;
 using PersistenceDiagram = aleph::PersistenceDiagram<DataType>;
 using StepFunction       = aleph::math::StepFunction<double>;
+
+template <class Map> void print( std::ostream& o, const Map& m )
+{
+  for( auto it = m.begin(); it != m.end(); ++it )
+  {
+    if( it != m.begin() )
+      o << "\t";
+
+    o << *it;
+  }
+
+  o << "\n";
+}
 
 int main( int argc, char** argv )
 {
@@ -100,4 +115,43 @@ int main( int argc, char** argv )
     std::cerr << logbin << " ";
 
   std::cerr << "\n";
+
+  // Prepare histogram calculation -------------------------------------
+
+  auto valueToLinIndex = [&min, &max, &linbins, &n] ( DataType value )
+  {
+    auto offset = ( max - min ) / (n-1);
+    return static_cast<std::size_t>( ( value - min ) / offset );
+  };
+
+  auto valueToLogIndex = [&min, &max, &logbins, &n] ( DataType value )
+  {
+    auto offset = ( std::log10( max ) - std::log10( min ) ) / (n-1);
+    return static_cast<std::size_t>( ( std::log10( value ) - std::log10( min ) ) / offset );
+  };
+
+  std::ofstream linout( "/tmp/DNA_" + std::to_string( n ) + "_lin.txt" );
+  std::ofstream logout( "/tmp/DNA_" + std::to_string( n ) + "_log.txt" );
+
+  for( auto&& pif : persistenceIndicatorFunctions )
+  {
+    std::vector<DataType> linhist(n);
+    std::vector<DataType> loghist(n);
+
+    std::set<DataType> domain;
+    pif.domain( std::inserter( domain, domain.begin() ) );
+
+    for( auto&& x : domain )
+    {
+      auto value  = pif(x);
+      auto linbin = valueToLinIndex(x);
+      auto logbin = valueToLogIndex(x);
+
+      linhist.at(linbin) += value;
+      loghist.at(logbin) += value;
+    }
+
+    print( linout, linhist );
+    print( logout, loghist );
+  }
 }
