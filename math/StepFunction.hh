@@ -6,6 +6,7 @@
 #include <ostream>
 #include <set>
 #include <stdexcept>
+#include <vector>
 
 #include <cmath>
 
@@ -14,6 +15,27 @@ namespace aleph
 
 namespace math
 {
+
+namespace detail
+{
+
+template <class T> T next( T x )
+{
+  if( std::numeric_limits<T>::is_integer )
+    return x+1;
+  else
+    return std::nextafter( x, std::numeric_limits<T>::max() );
+}
+
+template <class T> T previous( T x )
+{
+  if( std::numeric_limits<T>::is_integer )
+    return x-1;
+  else
+    return std::nextafter( x, std::numeric_limits<T>::lowest() );
+}
+
+} // namespace detail
 
 template <class D, class I = D> class StepFunction
 {
@@ -136,29 +158,109 @@ public:
 
     StepFunction<D,I> h;
 
-    auto prev = domain.begin();
+    if( domain.empty() )
+      return h;
+
+    auto prev = *domain.begin();
+    auto curr = *domain.begin();
+
+    for( auto it = std::next( domain.begin() ); it != domain.end(); ++it )
+    {
+      curr    = *it;
+
+      auto y1 = f( prev );
+      auto y2 = g( prev );
+      auto y3 = f( curr );
+      auto y4 = g( curr );
+      auto y5 = f( detail::next( prev ) );
+      auto y6 = g( detail::next( prev ) );
+
+      std::cerr << "INTERVAL: "
+                << "  [" << prev << "," << curr << "]\n"
+                << "  f: " << f( prev ) << "," << f( curr ) << "\n"
+                << "  g: " << g( prev ) << "," << g( curr ) << "\n";
+
+      if( y1 == y3 && y2 == y4 )
+      {
+        std::cerr << "--> regular\n";
+        h.add( prev, curr, y1+y2 );
+      }
+      else if( y1 != y3 || y2 != y4 )
+      {
+        if( y1 != y5 || y2 != y6 )
+          prev = detail::next( prev );
+
+        h.add( prev, detail::previous( curr ), y5+y6 );
+        h.add( curr, detail::next(     curr ), y3+y4 );
+
+        // Ensures that the next interval uses the proper start point for the
+        // indicator function interval.
+        curr = detail::next( curr );
+
+        std::cerr << "--> one or two functions change\n";
+      }
+      else
+        std::cerr << "--> both change\n";
+
+      prev = curr;
+    }
+
+    std::cerr << h << "\n";
+
+#if 0
+
+    auto prev = *domain.begin();
     auto curr = domain.begin();
 
     I value = I();
 
     for( ; curr != domain.end(); )
     {
-      if( prev != curr )
+      auto y1 = f( *curr );
+      auto y2 = f( detail::next( *curr ) );
+      auto y3 = g( *curr );
+      auto y4 = g( detail::next( *curr ) );
+
+      if( prev != *curr && y1+y3 != value )
       {
-        auto evaluationPoint = (*curr + *prev) / 2;
-
-        auto y1 = f(evaluationPoint);
-        auto y2 = g(evaluationPoint);
-
-        if( y1+y2 != value )
+        // Case 1: The values agree with each other at all evaluation points,
+        // meaning that a simple addition of y-values is possible.
+        if( y1 == y2 && y3 == y4 )
         {
-          h.add( *prev, *curr, y1+y2 );
-          value = y1+y2;
+          std::cerr << prev << "," << *curr << "," << y1+y3 << "\n";
+
+          h.add( prev, *curr, y1+y3 );
+          value = y1+y3;
+
+          prev = *curr++;
+        }
+
+        // Case 2: The first function changes because the current evaluation
+        // point marks the end of one of its intervals. This requires the
+        // creation of a separate interval in the next step and another value
+        // afterwards.
+        else
+        {
+          std::cerr << prev << "," << *curr << "," << y1+y3 << "\n";
+
+          h.add( prev, *curr, y1+y3 );
+
+          value = y2+y4;
+          prev  = detail::next( *curr++ );
         }
       }
+      else
+      {
+        // Special handling for *last* interval: Intervals are only added if the
+        // value changes. Hence, if no change in value was detected and the loop
+        // is at the last point, the last interval needs to be closed manually.
+        if( y1+y3 == value && std::next( curr ) == domain.end() )
+          h.add( prev, *curr, y1+y3 );
 
-      prev = curr++;
+        prev = *curr++;
+      }
     }
+#endif
 
     return h;
   }
