@@ -40,6 +40,7 @@ template <class T> void testStepFunction()
   ALEPH_ASSERT_THROW( f(2)   == 1 );
   ALEPH_ASSERT_THROW( f(3)   == 2 );
   ALEPH_ASSERT_THROW( f(3.5) == 2 );
+
   ALEPH_ASSERT_THROW( g(0.5) == 1 );
   ALEPH_ASSERT_THROW( g(1.0) == 0 );
 
@@ -62,21 +63,71 @@ template <class T> void testStepFunctionAddition()
 {
   ALEPH_TEST_BEGIN( "Step function: Addition" );
 
-  StepFunction<T> f;
-  f.add( 0, 1, 1 );
+  // Case 1: Inclusion -------------------------------------------------
+  //
+  // Use indicator intervals that are included in each other without any
+  // overlaps.
+  {
+    StepFunction<T> f;
+    f.add( 0, 1, 1 );
 
-  StepFunction<T> g;
-  g.add( 0.25, 0.75, 1 );
+    StepFunction<T> g;
+    g.add( 0.25, 0.75, 2 );
 
-  auto h = f+g;
+    auto h = f+g;
 
-  ALEPH_ASSERT_THROW( h( T(0   ) ) == 1 );
-  ALEPH_ASSERT_THROW( h( T(0.20) ) == 1 );
-  ALEPH_ASSERT_THROW( h( T(0.25) ) == 2 );
-  ALEPH_ASSERT_THROW( h( T(0.50) ) == 2 );
-  ALEPH_ASSERT_THROW( h( T(0.75) ) == 2 );
-  ALEPH_ASSERT_THROW( h( T(0.80) ) == 1 );
-  ALEPH_ASSERT_THROW( h( T(1.00) ) == 1 );
+    ALEPH_ASSERT_THROW( h( T(0   ) ) == 1 );
+    ALEPH_ASSERT_THROW( h( T(0.20) ) == 1 );
+    ALEPH_ASSERT_THROW( h( T(0.25) ) == 3 );
+    ALEPH_ASSERT_THROW( h( T(0.50) ) == 3 );
+    ALEPH_ASSERT_THROW( h( T(0.75) ) == 3 );
+    ALEPH_ASSERT_THROW( h( T(0.80) ) == 1 );
+    ALEPH_ASSERT_THROW( h( T(1.00) ) == 1 );
+  }
+
+  // Case 2: Overlap ---------------------------------------------------
+  //
+  // Use indicator intervals that overlap without being equal. This must
+  // only result in updates within the 'shared' region of the functions.
+  {
+    StepFunction<T> f;
+    f.add( 0, 1, 1 );
+
+    StepFunction<T> g;
+    g.add( 0.50, 1.50, 2 );
+
+    auto h = f+g;
+
+    ALEPH_ASSERT_THROW( h( T(0   ) ) == 1 );
+    ALEPH_ASSERT_THROW( h( T(0.40) ) == 1 );
+    ALEPH_ASSERT_THROW( h( T(0.50) ) == 3 );
+    ALEPH_ASSERT_THROW( h( T(0.75) ) == 3 );
+    ALEPH_ASSERT_THROW( h( T(1.00) ) == 3 );
+    ALEPH_ASSERT_THROW( h( T(1.10) ) == 2 );
+    ALEPH_ASSERT_THROW( h( T(1.50) ) == 2 );
+  }
+
+  // Case 3: Touching ---------------------------------------------------
+  //
+  // Use indicator intervals whose intervals touch. This is interesting
+  // insofar it requires creating a new interval directly subsequent to
+  // the critical point
+  {
+    StepFunction<T> f;
+    f.add( 0, 1, 1 );
+
+    StepFunction<T> g;
+    g.add( 1, 2, 2 );
+
+    auto h = f+g;
+
+    ALEPH_ASSERT_THROW( h( T(0   ) ) == 1 );
+    ALEPH_ASSERT_THROW( h( T(0.50) ) == 1 );
+    ALEPH_ASSERT_THROW( h( T(1.00) ) == 3 );
+    ALEPH_ASSERT_THROW( h( T(1.01) ) == 2 );
+    ALEPH_ASSERT_THROW( h( T(1.50) ) == 2 );
+    ALEPH_ASSERT_THROW( h( T(2.00) ) == 2 );
+  }
 
   ALEPH_TEST_END();
 }
