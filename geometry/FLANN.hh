@@ -1,11 +1,15 @@
 #ifndef ALEPH_GEOMETRY_FLANN_HH__
 #define ALEPH_GEOMETRY_FLANN_HH__
 
+#include "config/FLANN.hh"
+
 #include "distances/Traits.hh"
 
 #include "geometry/NearestNeighbours.hh"
 
-#include <flann/flann.hpp>
+#ifdef ALEPH_WITH_FLANN
+  #include <flann/flann.hpp>
+#endif
 
 #include <algorithm>
 #include <vector>
@@ -27,6 +31,7 @@ public:
   FLANN( const Container& container )
     : _container( container )
   {
+#ifdef ALEPH_WITH_FLANN
     _matrix
       = flann::Matrix<ElementType>( container.data(),
                                     container.size(), container.dimension() );
@@ -38,18 +43,21 @@ public:
       = new flann::Index<DistanceFunctor>( _matrix, indexParameters );
 
     _index->buildIndex();
+#endif
   }
 
   ~FLANN()
   {
+#ifdef ALEPH_WITH_FLANN
     delete _index;
+#endif
   }
 
   void radiusSearch( ElementType radius,
                      std::vector< std::vector<IndexType> >& indices,
                      std::vector< std::vector<ElementType> >& distances ) const
   {
-
+#ifdef ALEPH_WITH_FLANN
     flann::SearchParams searchParameters = flann::SearchParams();
     searchParameters.checks = flann::FLANN_CHECKS_UNLIMITED;
 
@@ -91,6 +99,7 @@ public:
                         return _traits.from( x );
                       } );
     }
+#endif
   }
 
   std::size_t size() const noexcept
@@ -106,6 +115,8 @@ public:
 private:
   const Container& _container;
 
+#ifdef ALEPH_WITH_FLANN
+
   /**
     Copy of container data. This makes interfacing with FLANN easier, at
     the expense of having large storage costs.
@@ -115,6 +126,8 @@ private:
 
   /** Index structure for queries. */
   flann::Index<DistanceFunctor>* _index = nullptr;
+
+#endif
 
   /** Required for optional distance functor conversions */
   Traits _traits;

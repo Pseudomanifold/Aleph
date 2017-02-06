@@ -1,6 +1,6 @@
-#include "containers/PointCloud.hh"
-
 #include "config/FLANN.hh"
+
+#include "containers/PointCloud.hh"
 
 #include "distances/Euclidean.hh"
 
