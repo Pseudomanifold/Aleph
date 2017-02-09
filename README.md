@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/Submanifold/Aleph.svg?branch=master)](https://travis-ci.org/Submanifold/Aleph)
+
 ![Aleph logo](Aleph.png "The logo of Aleph in all its glory")
 
 # Aleph &mdash; *A* *L*ibrary for *E*xploring *P*ersistent *H*omology
