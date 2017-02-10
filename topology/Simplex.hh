@@ -464,12 +464,6 @@ std::ostream& operator<<( std::ostream& o, const topology::Simplex<DataType, Ver
   return o;
 }
 
-template <class DataType>
-std::ostream& operator<<( std::ostream& o, const topology::Simplex<DataType>& s )
-{
-  return operator<< <DataType, typename topology::Simplex<DataType>::vertex_type>( o, s );
-}
-
 // ---------------------------------------------------------------------
 
 }
