@@ -217,6 +217,46 @@ public:
         simplices.push_back( Simplex( id ) );
     }
 
+    // Create edges ----------------------------------------------------
+
+    auto getSimplexByID = [&simplices] ( VertexType id )
+    {
+      auto position = std::find_if( simplices.begin(), simplices.end(),
+                                    [&id] ( const Simplex& s )
+                                    {
+                                      return s.dimension() == 0 && s[0] == id;
+                                    } );
+
+      if( position != simplices.end() )
+        return *position;
+      else
+        throw std::runtime_error( "Querying unknown simplex for edge creation" );
+    };
+
+    for( auto&& edge : edges )
+    {
+      auto u = getID( edge.source );
+      auto v = getID( edge.target );
+
+      // No optional data attached; need to create weight based on node
+      // weights, if those are available.
+      if( edge.dict.find( "weight" ) == edge.dict.end() )
+      {
+        auto uSimplex = getSimplexByID( u );
+        auto vSimplex = getSimplexByID( v );
+
+        // TODO: Permit the usage of other weight assignment strategies
+        // here, for example by using a functor.
+        auto data = std::max( uSimplex.data(), vSimplex.data() );
+
+        simplices.push_back( Simplex( {u,v}, data ) );
+      }
+
+      // Use converted weight
+      else
+        simplices.push_back( Simplex( {u,v}, convert<DataType>( edge.dict.at( "weight" ) ) ) );
+    }
+
     K = SimplicialComplex( simplices.begin(), simplices.end() );
   }
 
