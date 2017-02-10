@@ -15,6 +15,14 @@ ENABLE_IF_SUPPORTED( CMAKE_CXX_FLAGS "-Woverloaded-virtual" )
 ENABLE_IF_SUPPORTED( CMAKE_CXX_FLAGS "-Wself-init" )
 ENABLE_IF_SUPPORTED( CMAKE_CXX_FLAGS "-Wunsafe-loop-optimization" )
 
+IF( CMAKE_CXX_COMPILER_ID MATCHES "GNU" )
+  IF( CMAKE_CXX_COMPILER_VERSION VERSION_LESS "5.4" )
+    # Disable this warning for older versions of GCC because it will
+    # be triggered by some of the test cases.
+    ENABLE_IF_SUPPORTED( CMAKE_CXX_FLAGS "-Wno-missing-field-initializers" )
+  ENDIF()
+ENDIF()
+
 ENABLE_IF_SUPPORTED( CMAKE_CXX_FLAGS "-pedantic" )
 
 ADD_EXECUTABLE( test_boundary_matrix_reduction    test_boundary_matrix_reduction.cc )
