@@ -19,7 +19,10 @@ IF( CMAKE_CXX_COMPILER_ID MATCHES "GNU" )
   IF( CMAKE_CXX_COMPILER_VERSION VERSION_LESS "5.4" )
     # Disable this warning for older versions of GCC because it will
     # be triggered by some of the test cases.
-    ENABLE_IF_SUPPORTED( CMAKE_CXX_FLAGS "-Wno-missing-field-initializers" )
+    SET_SOURCE_FILES_PROPERTIES(
+      test_io_gml.cc
+      PROPERTIES COMPILE_FLAGS "-Wno-missing-field-initializers"
+    )
   ENDIF()
 ENDIF()
 
