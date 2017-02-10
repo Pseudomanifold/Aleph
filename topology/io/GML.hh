@@ -56,11 +56,17 @@ public:
     using namespace aleph::utilities;
 
     std::string line;
-    std::set<std::string> levels = { "graph", "node", "edge" };
+    std::set<std::string> levels     = { "graph", "node", "edge" };
+    std::set<std::string> attributes = { "id", "label", "source", "target", "weight" };
 
     auto isLevel = [&levels] ( const std::string& name )
     {
       return levels.find( name ) != levels.end();
+    };
+
+    auto isAttribute = [&attributes] ( const std::string& name )
+    {
+      return attributes.find( name ) != attributes.end();
     };
 
     // Specifies the current level the parse is in. May be either one of
@@ -71,10 +77,15 @@ public:
     // identified, this will become the current level.
     std::string lastLevel;
 
+    std::vector<Node> nodes;
+    std::vector<Edge> edges;
+
+    Node node;
+    Edge edge;
+
     while( std::getline( in, line ) )
     {
       line = trim( line );
-
 
       // Skip comment lines. This is somewhat wasteful because I am
       // splitting the complete string even though I merely need to
@@ -106,12 +117,47 @@ public:
       else if( line == "]" )
       {
         std::cerr << "* Leaving level = " << currentLevel.top() << "\n";
+
+        if( currentLevel.top() == "node" )
+          nodes.push_back( node );
+        else if( currentLevel.top() == "edge" )
+          edges.push_back( edge );
+
+        // Reset node and edge data structure to fill them again once
+        // a new level is being encountered.
+        node = {};
+        edge = {};
+
         currentLevel.pop();
+      }
+
+      // Attributes
+      else if( isAttribute( line ) )
+      {
       }
     }
 
     (void) K;
   }
+
+private:
+
+  /** Describes a parsed node along with all of its attributes */
+  struct Node
+  {
+    std::string id;
+
+    std::map<std::string, std::string> dict; // all remaining attributes
+  };
+
+  /** Describes a parsed edge along with all of its attributes */
+  struct Edge
+  {
+    std::string source;
+    std::string target;
+
+    std::map<std::string, std::string> dict; // all remaining attributes
+  };
 };
 
 } // namespace io
