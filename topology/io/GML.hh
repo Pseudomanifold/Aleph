@@ -3,6 +3,7 @@
 
 #include <fstream>
 #include <set>
+#include <regex>
 #include <stack>
 #include <string>
 #include <vector>
@@ -55,6 +56,10 @@ public:
   {
     using namespace aleph::utilities;
 
+    using Simplex           = typename SimplicialComplex::ValueType;
+    using DataType          = typename Simplex::DataType;
+    using VertexType        = typename Simplex::VertexType;
+
     std::string line;
     std::set<std::string> levels     = { "graph", "node", "edge" };
     std::set<std::string> attributes = { "id", "label", "source", "target", "weight" };
@@ -80,8 +85,13 @@ public:
     std::vector<Node> nodes;
     std::vector<Edge> edges;
 
+    Graph graph;
     Node node;
     Edge edge;
+
+    std::regex reAttribute = std::regex( "([[:alpha:]]+)[[:space:]]*.*" );
+    std::regex reKeyValue  = std::regex( "([[:alpha:]]+)[[:space:]]+([[:alpha:]]+)" );
+    std::regex reLabel     = std::regex( "(label)[[:space:]]+\"([^\"]+)\"" );
 
     while( std::getline( in, line ) )
     {
@@ -131,16 +141,92 @@ public:
         currentLevel.pop();
       }
 
-      // Attributes
-      else if( isAttribute( line ) )
+      // Check for attributes
+      else
       {
+        std::smatch matches;
+
+        auto&& dict = currentLevel.top() == "node" ? node.dict
+                                                   : currentLevel.top() == "edge" ? edge.dict
+                                                                                  : currentLevel.top() == "graph" ? graph.dict
+                                                                                                                  : throw std::runtime_error( "Current level is unknown" );
+
+        if( std::regex_match( line, matches, reAttribute ) )
+        {
+          auto name = matches[1];
+          if( isAttribute( name ) )
+          {
+            // Special matching for labels
+            if( name == "label" )
+              std::regex_match( line, matches, reLabel );
+
+            // Regular matching for all other attributes
+            else
+              std::regex_match( line, matches, reKeyValue );
+
+            auto value = matches[2];
+
+            if( name == "id" )
+              node.id = value;
+            else if( name == "source" )
+              edge.source = value;
+            else if( name == "target" )
+              edge.target = value;
+
+            // Just add it to the dictionary of optional values
+            else
+              dict[name] = value;
+          }
+          // Skip unknown attributes...
+          else
+          {
+          }
+        }
       }
     }
 
-    (void) K;
+    // Creates nodes (vertices) ----------------------------------------
+
+    std::set<std::string> nodeIDs;
+
+    for( auto&& node : nodes )
+      nodeIDs.insert( node.id );
+
+    if( nodeIDs.size() != nodes.size() )
+      throw std::runtime_error( "Encountered duplicate node ID" );
+
+    // Lambda expression for creating a numerical ID out of a parsed ID.
+    // This ensures that internal IDs always start with a zero.
+    auto getID = [&nodeIDs] ( const std::string& id )
+    {
+      return static_cast<VertexType>(
+        std::distance( nodeIDs.begin(), nodeIDs.find( id ) )
+      );
+    };
+
+    std::vector<Simplex> simplices;
+    simplices.reserve( nodes.size() + edges.size() );
+
+    for( auto&& node : nodes )
+    {
+      auto id = getID( node.id );
+
+      if( node.dict.find( "weight" ) != node.dict.end() )
+        simplices.push_back( Simplex( id, convert<DataType>( node.dict.at( "weight" ) ) ) );
+      else
+        simplices.push_back( Simplex( id ) );
+    }
+
+    K = SimplicialComplex( simplices.begin(), simplices.end() );
   }
 
 private:
+
+  /** Describes a parsed graph along with all of its attributes */
+  struct Graph
+  {
+    std::map<std::string, std::string> dict; // all remaining attributes
+  };
 
   /** Describes a parsed node along with all of its attributes */
   struct Node
@@ -158,6 +244,7 @@ private:
 
     std::map<std::string, std::string> dict; // all remaining attributes
   };
+
 };
 
 } // namespace io
