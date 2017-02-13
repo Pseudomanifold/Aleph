@@ -87,7 +87,7 @@ public:
 
     I operator()( D x ) const noexcept
     {
-      if( this->contains( x ) ) 
+      if( this->contains( x ) )
         return this->y();
       else
         return I();
