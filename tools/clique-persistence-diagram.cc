@@ -1,6 +1,10 @@
 #include <fstream>
+#include <iomanip>
 #include <iostream>
 #include <string>
+#include <sstream>
+
+#include <cmath>
 
 #include "filtrations/Data.hh"
 
@@ -14,11 +18,23 @@
 
 #include "topology/io/EdgeLists.hh"
 
+#include "utilities/Filesystem.hh"
+
 using DataType           = double;
 using VertexType         = unsigned;
 using Simplex            = aleph::topology::Simplex<DataType, VertexType>;
 using SimplicialComplex  = aleph::topology::SimplicialComplex<Simplex>;
 using PersistenceDiagram = aleph::PersistenceDiagram<DataType>;
+
+std::string formatOutput( const std::string& prefix, unsigned k, unsigned K )
+{
+  std::ostringstream stream;
+  stream << prefix;
+  stream << std::setw( int( std::log10( K ) + 1 ) ) << std::setfill( '0' ) << k;
+  stream << ".txt";
+
+  return stream.str();
+}
 
 int main( int argc, char** argv )
 {
@@ -68,13 +84,16 @@ int main( int argc, char** argv )
     auto pd
         = aleph::calculateZeroDimensionalPersistenceDiagram( C );
 
-    pd.removeDiagonal();
+    {
+      using namespace aleph::utilities;
+      auto outputFilename = formatOutput( "/tmp/" + stem( basename( filename ) ) + "_k", k, maxK );
 
-    std::cout << pd << "\n\n";
+      std::cerr << "* Storing output in '" << outputFilename << "'...\n";
 
-    // FIXME: Improve output; format filename according to input string
-    std::ofstream out( "/tmp/" + std::to_string(k) + ".txt" );
-
-    out << pd << "\n";
+      std::ofstream out( outputFilename );
+      out << "# Original filename: " << filename << "\n";
+      out << "# k                : " << k        << "\n";
+      out << pd << "\n";
+    }
   }
 }
