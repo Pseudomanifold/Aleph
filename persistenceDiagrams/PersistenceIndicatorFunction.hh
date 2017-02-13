@@ -114,7 +114,7 @@ template <class DataType> aleph::math::StepFunction<DataType> persistenceIndicat
       if( i != 0 )
         f.add( previous, eventPoints.at(i).value, static_cast<DataType>( numActiveFeatures ) );
     }
-    
+
     // Case 2: There are duplicate creation & destruction values. This
     // necessitates the creation of two intervals: one interval at the
     // current even point, with the proper number of active intervals,
