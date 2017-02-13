@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <fstream>
 #include <set>
+#include <stdexcept>
 #include <string>
 #include <vector>
 
@@ -24,6 +25,15 @@ public:
 
   void setReadWeights( bool value = true ) noexcept { _readWeights = value; }
   void setTrimLines( bool value = true )   noexcept { _trimLines = value; }
+
+  template <class SimplicialComplex> void operator()( const std::string& filename, SimplicialComplex& K )
+  {
+    std::ifstream in( filename );
+    if( !in )
+      throw std::runtime_error( "Unable to read input file" );
+
+    this->operator()( in, K );
+  }
 
   template <class SimplicialComplex> void operator()( std::ifstream& in, SimplicialComplex& K )
   {
