@@ -8,9 +8,6 @@
 #include <string>
 #include <vector>
 
-// FIXME: Remove after debugging
-#include <iostream>
-
 #include "utilities/String.hh"
 
 namespace aleph
@@ -90,7 +87,7 @@ public:
     Edge edge;
 
     std::regex reAttribute = std::regex( "([[:alpha:]]+)[[:space:]]*.*" );
-    std::regex reKeyValue  = std::regex( "([[:alpha:]]+)[[:space:]]+([[:alpha:]]+)" );
+    std::regex reKeyValue  = std::regex( "([[:alpha:]]+)[[:space:]]+([[:alnum:]]+)" );
     std::regex reLabel     = std::regex( "(label)[[:space:]]+\"([^\"]+)\"" );
 
     while( std::getline( in, line ) )
@@ -102,7 +99,7 @@ public:
       // know the first token.
       {
         auto tokens = split( line );
-        if( tokens.empty() == false && tokens.front() == "comment" )
+        if( tokens.empty() == false && ( tokens.front() == "comment" || tokens.front() == "Creator" ) )
           continue;
       }
 
@@ -118,7 +115,6 @@ public:
       // Opening a new level
       else if( line == "[" )
       {
-        std::cerr << "* Entering level = " << lastLevel << "\n";
         currentLevel.push( lastLevel );
         lastLevel = "";
       }
@@ -126,8 +122,6 @@ public:
       // Closing a new level
       else if( line == "]" )
       {
-        std::cerr << "* Leaving level = " << currentLevel.top() << "\n";
-
         if( currentLevel.top() == "node" )
           nodes.push_back( node );
         else if( currentLevel.top() == "edge" )
@@ -190,10 +184,11 @@ public:
     std::set<std::string> nodeIDs;
 
     for( auto&& node : nodes )
-      nodeIDs.insert( node.id );
-
-    if( nodeIDs.size() != nodes.size() )
-      throw std::runtime_error( "Encountered duplicate node ID" );
+    {
+      auto pair = nodeIDs.insert( node.id );
+      if( !pair.second )
+        throw std::runtime_error( "Duplicate node id '" + node.id + "'" );
+    }
 
     // Lambda expression for creating a numerical ID out of a parsed ID.
     // This ensures that internal IDs always start with a zero.
@@ -240,7 +235,7 @@ public:
 
       // No optional data attached; need to create weight based on node
       // weights, if those are available.
-      if( edge.dict.find( "weight" ) == edge.dict.end() )
+      if( edge.dict.find( "weight" ) == edge.dict.end() && edge.dict.find( "value" ) == edge.dict.end() )
       {
         auto uSimplex = getSimplexByID( u );
         auto vSimplex = getSimplexByID( v );
@@ -253,8 +248,10 @@ public:
       }
 
       // Use converted weight
-      else
+      else if( node.dict.find( "weight" ) != node.dict.end() )
         simplices.push_back( Simplex( {u,v}, convert<DataType>( edge.dict.at( "weight" ) ) ) );
+      else if( node.dict.find( "value" ) != node.dict.end() )
+        simplices.push_back( Simplex( {u,v}, convert<DataType>( edge.dict.at( "value" ) ) ) );
     }
 
     K = SimplicialComplex( simplices.begin(), simplices.end() );
