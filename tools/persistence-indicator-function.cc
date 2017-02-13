@@ -6,6 +6,8 @@
 #include "persistenceDiagrams/PersistenceDiagram.hh"
 #include "persistenceDiagrams/PersistenceIndicatorFunction.hh"
 
+#include "utilities/Filesystem.hh"
+
 using DataType           = double;
 using PersistenceDiagram = aleph::PersistenceDiagram<DataType>;
 
@@ -52,9 +54,16 @@ int main( int argc, char** argv )
   unsigned i = 0;
   for( auto&& D : persistenceDiagrams )
   {
-    auto f = aleph::persistenceIndicatorFunction( D );
+    auto f        = aleph::persistenceIndicatorFunction( D );
+    auto filename = filenames.at(i);
 
-    std::ofstream out( "/tmp/pif_" + std::to_string(i) + ".txt" );
+    using namespace aleph::utilities;
+
+    auto outputFilename = "/tmp/PIF_" + stem( basename( filename ) ) + ".txt";
+
+    std::cerr << "* Writing persistence indicator function to '" << outputFilename << "'...\n";
+
+    std::ofstream out( outputFilename );
     out << f << "\n";
 
     ++i;

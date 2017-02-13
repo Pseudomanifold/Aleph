@@ -90,6 +90,8 @@ int main( int argc, char** argv )
 
       std::cerr << "* Storing output in '" << outputFilename << "'...\n";
 
+      pd.removeDiagonal();
+
       std::ofstream out( outputFilename );
       out << "# Original filename: " << filename << "\n";
       out << "# k                : " << k        << "\n";
