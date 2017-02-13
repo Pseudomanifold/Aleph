@@ -27,27 +27,18 @@ template <class Simplex> SimplicialComplex<Simplex> getCliqueGraph( const Simpli
 {
   // Maps k-simplices to their corresponding index in the filtration order of
   // the simplicial complex. This simplifies the creation of edges.
-  std::map<Simplex, unsigned> simplexMap;
+  std::map<Simplex, std::size_t> simplexMap;
 
   // Stores the co-faces of (k-1)-dimensional simplices. This is required for
   // the edge creation. Whenever two (or more) k-simplices appear in this map
   // they will be connected by an edge.
-  std::map<Simplex, std::vector<unsigned> > cofaceMap;
+  std::map<Simplex, std::vector<std::size_t> > cofaceMap;
 
   std::vector<Simplex> vertices;
   std::vector<Simplex> edges;
 
-  unsigned index = 0;
-
-  // TODO: Improved traversal possible by taking only the k-dimensional
-  // simplices into account here.
-  for( auto&& s : K )
-  {
-    if( s.dimension() == k )
-      simplexMap[s] = index;
-
-    ++index;
-  }
+  for( auto itPair = K.range(k); itPair.first != itPair.second; ++itPair.first )
+   simplexMap[ *itPair.first ] = K.index( *itPair.first );
 
   for( auto&& pair : simplexMap )
   {
@@ -60,12 +51,14 @@ template <class Simplex> SimplicialComplex<Simplex> getCliqueGraph( const Simpli
 
   // Create vertices ---------------------------------------------------
 
+  using VertexType = typename Simplex::VertexType;
+
   for( auto&& pair : simplexMap )
   {
     auto&& simplex = pair.first;
     auto&& index   = pair.second;
 
-    vertices.push_back( Simplex( index, simplex.data() ) );
+    vertices.push_back( Simplex( VertexType(index), simplex.data() ) );
   }
 
   // Create edges ------------------------------------------------------
@@ -94,7 +87,7 @@ template <class Simplex> SimplicialComplex<Simplex> getCliqueGraph( const Simpli
           // I am assuming a growth process here.
           auto data = std::max( s.data(), t.data() );
 
-          edges.push_back( Simplex( {uIndex, vIndex}, data ) );
+          edges.push_back( Simplex( {VertexType(uIndex), VertexType(vIndex)}, data ) );
         }
       }
     }
