@@ -17,6 +17,7 @@
 #include "topology/SimplicialComplex.hh"
 
 #include "topology/io/EdgeLists.hh"
+#include "topology/io/GML.hh"
 
 #include "utilities/Filesystem.hh"
 
@@ -47,20 +48,29 @@ int main( int argc, char** argv )
   std::string filename = argv[1];
   unsigned maxK        = static_cast<unsigned>( std::stoul( argv[2] ) );
 
-  aleph::io::EdgeListReader reader;
-  reader.setReadWeights( true );
-  reader.setTrimLines( true );
-
   SimplicialComplex K;
 
+  // Input -------------------------------------------------------------
+
+  std::cerr << "* Reading '" << filename << "'...";
+
+  if( aleph::utilities::extension( filename ) == ".gml" )
   {
-    std::cerr << "* Reading '" << filename << "'...";
-
-    std::ifstream in( filename );
-    reader( in, K );
-
-    std::cerr << "finished\n";
+    aleph::topology::io::GMLReader reader;
+    reader( filename, K );
   }
+  else
+  {
+    aleph::io::EdgeListReader reader;
+    reader.setReadWeights( true );
+    reader.setTrimLines( true );
+
+    reader( filename, K );
+  }
+
+  std::cerr << "finished\n";
+
+  // Expansion ---------------------------------------------------------
 
   aleph::geometry::RipsExpander<SimplicialComplex> ripsExpander;
   K = ripsExpander( K, maxK );
