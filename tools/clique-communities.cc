@@ -46,16 +46,31 @@ template <class Simplex> std::string formatSimplex( const Simplex& s )
   return stream.str();
 }
 
+void usage()
+{
+  std::cerr << "Usage: clique_communities FILE THRESHOLD K\n"
+            << "\n"
+            << "Extracts clique communities from FILE, which is supposed to be\n"
+            << "a weighted graph. In the subsequent calculation, an edge whose\n"
+            << "weight is larger than THRESHOLD will be ignored. K denotes the\n"
+            << "maximum dimension of a simplex for the clique graph extraction\n"
+            << "and the clique community calculation. This does not correspond\n"
+            << "to the dimensionality of the clique. Hence, a parameter of K=2\n"
+            << "will result in calculating 3-clique communities because all of\n"
+            << "the 2-simplices have 3 vertices.\n\n";
+}
+
 int main( int argc, char** argv )
 {
-  if( argc <= 2 )
+  if( argc <= 3 )
   {
-    // TODO: Show usage
+    usage();
     return -1;
   }
 
   std::string filename = argv[1];
   double threshold     = std::stod( argv[2] );
+  unsigned maxK        = static_cast<unsigned>( std::stoul( argv[3] ) );
 
   SimplicialComplex K;
 
@@ -102,8 +117,6 @@ int main( int argc, char** argv )
   }
 
   // Expansion ---------------------------------------------------------
-
-  unsigned maxK = 12;
 
   aleph::geometry::RipsExpander<SimplicialComplex> ripsExpander;
   K = ripsExpander( K, maxK );
