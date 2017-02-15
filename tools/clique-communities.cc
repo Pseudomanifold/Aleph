@@ -29,6 +29,23 @@ using VertexType         = unsigned;
 using Simplex            = aleph::topology::Simplex<DataType, VertexType>;
 using SimplicialComplex  = aleph::topology::SimplicialComplex<Simplex>;
 
+template <class Simplex> std::string formatSimplex( const Simplex& s )
+{
+  std::ostringstream stream;
+  stream << "{";
+
+  for( auto it = s.begin(); it != s.end(); ++it )
+  {
+    if( it != s.begin() )
+      stream << ",";
+    stream << *it;
+  }
+
+  stream << "}";
+
+  return stream.str();
+}
+
 int main( int argc, char** argv )
 {
   if( argc <= 2 )
@@ -107,11 +124,6 @@ int main( int argc, char** argv )
 
     std::cerr << "* " << k << "-cliques graph has " << C.size() << " simplices\n";
 
-    // TODO:
-    //  - Calculate connected components of clique graph
-    //  - Look up original simplices in the simplicial complex
-    //  - Create output
-
     auto uf = aleph::topology::calculateConnectedComponents( C );
 
     std::set<VertexType> roots;
@@ -135,9 +147,21 @@ int main( int argc, char** argv )
                         return K.at(v);
                       } );
 
-      for( auto&& simplex : simplices )
-        std::cerr << simplex << " ";
-      std::cerr << "\n\n";
+      std::sort( simplices.begin(), simplices.end() );
+
+      std::cout << "[";
+
+      for( auto it = simplices.begin(); it != simplices.end(); ++it )
+      {
+        if( it != simplices.begin() )
+          std::cout << ",";
+
+        std::cout << formatSimplex( *it );
+      }
+
+      std::cout << "]\n";
     }
+
+    std::cout << "\n\n";
   }
 }
