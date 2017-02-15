@@ -40,6 +40,7 @@ ADD_EXECUTABLE( test_persistent_homology_complete test_persistent_homology_compl
 ADD_EXECUTABLE( test_point_clouds                 test_point_clouds.cc )
 ADD_EXECUTABLE( test_rips_expansion               test_rips_expansion.cc )
 ADD_EXECUTABLE( test_rips_skeleton                test_rips_skeleton.cc )
+ADD_EXECUTABLE( test_union_find                   test_union_find.cc )
 ADD_EXECUTABLE( test_step_function                test_step_function.cc )
 ADD_EXECUTABLE( test_wasserstein                  test_wasserstein.cc )
 
@@ -56,4 +57,5 @@ ADD_TEST( point_clouds                 test_point_clouds )
 ADD_TEST( rips_expansion               test_rips_expansion )
 ADD_TEST( rips_skeleton                test_rips_skeleton )
 ADD_TEST( step_function                test_step_function )
+ADD_TEST( union_find                   test_union_find )
 ADD_TEST( wasserstein                  test_wasserstein )
