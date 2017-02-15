@@ -1,6 +1,8 @@
 #include <algorithm>
 #include <fstream>
 #include <iostream>
+#include <iterator>
+#include <set>
 #include <string>
 #include <sstream>
 
@@ -13,6 +15,7 @@
 #include "persistentHomology/ConnectedComponents.hh"
 
 #include "topology/CliqueGraph.hh"
+#include "topology/ConnectedComponents.hh"
 #include "topology/Simplex.hh"
 #include "topology/SimplicialComplex.hh"
 
@@ -108,5 +111,33 @@ int main( int argc, char** argv )
     //  - Calculate connected components of clique graph
     //  - Look up original simplices in the simplicial complex
     //  - Create output
+
+    auto uf = aleph::topology::calculateConnectedComponents( C );
+
+    std::set<VertexType> roots;
+    uf.roots( std::inserter( roots, roots.begin() ) );
+
+    std::cerr << "* " << k << "-cliques graph has " << roots.size() << " connected components\n";
+
+    for( auto&& root : roots )
+    {
+      // The vertex IDs stored in the Union--Find data structure
+      // correspond to the indices of the simplicial complex. It
+      // thus suffices to map them back.
+      std::set<VertexType> vertices;
+      uf.get( root, std::inserter( vertices, vertices.begin() ) );
+
+      std::vector<Simplex> simplices;
+
+      std::transform( vertices.begin(), vertices.end(), std::back_inserter( simplices ),
+                      [&K] ( VertexType v )
+                      {
+                        return K.at(v);
+                      } );
+
+      for( auto&& simplex : simplices )
+        std::cerr << simplex << " ";
+      std::cerr << "\n\n";
+    }
   }
 }
