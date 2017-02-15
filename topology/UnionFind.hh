@@ -77,6 +77,28 @@ public:
     std::copy( r.begin(), r.end(), result );
   }
 
+  /**
+    Gets all vertices that make up a given connected component. The
+    parameter of this function should be a root vertex, i.e. one of
+    the creator vertices in the data structure.
+
+    Vertices will appear in random order.
+  */
+
+  template <class OutputIterator> void get( Vertex v, OutputIterator result )
+  {
+    std::unordered_set<Vertex> r;
+
+    auto&& parent = this->find(v);
+    for( auto&& pair : _parent )
+    {
+      if( this->find( pair.first ) == parent )
+        r.insert( pair.first );
+    }
+
+    std::copy( r.begin(), r.end(), result );
+  }
+
 private:
 
   /** Stores the usual parent--child relationship */
