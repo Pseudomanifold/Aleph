@@ -87,7 +87,7 @@ public:
     Edge edge;
 
     std::regex reAttribute = std::regex( "([[:alpha:]]+)[[:space:]]*.*" );
-    std::regex reKeyValue  = std::regex( "([[:alpha:]]+)[[:space:]]+([[:alnum:]]+)" );
+    std::regex reKeyValue  = std::regex( "([[:alpha:]]+)[[:space:]]+([[:alnum:]\\.]+)" );
     std::regex reLabel     = std::regex( "(label)[[:space:]]+\"([^\"]+)\"" );
 
     while( std::getline( in, line ) )
@@ -140,10 +140,10 @@ public:
       {
         std::smatch matches;
 
-        auto&& dict = currentLevel.top() == "node" ? node.dict
-                                                   : currentLevel.top() == "edge" ? edge.dict
-                                                                                  : currentLevel.top() == "graph" ? graph.dict
-                                                                                                                  : throw std::runtime_error( "Current level is unknown" );
+        auto* dict = currentLevel.top() == "node" ? &node.dict
+                                                  : currentLevel.top() == "edge" ? &edge.dict
+                                                                                 : currentLevel.top() == "graph" ? &graph.dict
+                                                                                                                 : throw std::runtime_error( "Current level is unknown" );
 
         if( std::regex_match( line, matches, reAttribute ) )
         {
@@ -169,7 +169,7 @@ public:
 
             // Just add it to the dictionary of optional values
             else
-              dict[name] = value;
+             dict->operator[]( name ) = value;
           }
           // Skip unknown attributes...
           else
@@ -206,6 +206,7 @@ public:
     {
       auto id = getID( node.id );
 
+      // TODO: Permit other names for weight attribute?
       if( node.dict.find( "weight" ) != node.dict.end() )
         simplices.push_back( Simplex( id, convert<DataType>( node.dict.at( "weight" ) ) ) );
       else
