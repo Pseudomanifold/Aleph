@@ -59,7 +59,7 @@ public:
 
     std::string line;
     std::set<std::string> levels     = { "graph", "node", "edge" };
-    std::set<std::string> attributes = { "id", "label", "source", "target", "weight" };
+    std::set<std::string> attributes = { "id", "label", "source", "target", "value", "weight" };
 
     auto isLevel = [&levels] ( const std::string& name )
     {
@@ -248,9 +248,9 @@ public:
       }
 
       // Use converted weight
-      else if( node.dict.find( "weight" ) != node.dict.end() )
+      else if( edge.dict.find( "weight" ) != edge.dict.end() )
         simplices.push_back( Simplex( {u,v}, convert<DataType>( edge.dict.at( "weight" ) ) ) );
-      else if( node.dict.find( "value" ) != node.dict.end() )
+      else if( edge.dict.find( "value" ) != edge.dict.end() )
         simplices.push_back( Simplex( {u,v}, convert<DataType>( edge.dict.at( "value" ) ) ) );
     }
 
