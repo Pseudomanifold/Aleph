@@ -91,6 +91,12 @@ int main( int argc, char** argv )
 
     std::cerr << "* " << k << "-cliques graph has " << C.size() << " simplices\n";
 
+    if( C.empty() )
+    {
+      std::cerr << "* Stopping here because no further cliques for processing exist\n";
+      break;
+    }
+
     auto pd
         = aleph::calculateZeroDimensionalPersistenceDiagram( C );
 
