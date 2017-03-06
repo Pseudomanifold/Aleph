@@ -32,7 +32,7 @@ using SimplicialComplex  = aleph::topology::SimplicialComplex<Simplex>;
 template <class Simplex> std::string formatSimplex( const Simplex& s )
 {
   std::ostringstream stream;
-  stream << "{";
+  stream << "[";
 
   for( auto it = s.begin(); it != s.end(); ++it )
   {
@@ -41,7 +41,7 @@ template <class Simplex> std::string formatSimplex( const Simplex& s )
     stream << *it;
   }
 
-  stream << "}";
+  stream << "]";
 
   return stream.str();
 }
@@ -144,6 +144,11 @@ int main( int argc, char** argv )
 
     std::cerr << "* " << k << "-cliques graph has " << roots.size() << " connected components\n";
 
+    std::cout << "{\n"
+              << "  \"" << threshold << "\":\n"
+              << "  {\n"
+              << "     \"" << k << "\": ";
+
     for( auto&& root : roots )
     {
       // The vertex IDs stored in the Union--Find data structure
@@ -175,6 +180,8 @@ int main( int argc, char** argv )
       std::cout << "]\n";
     }
 
-    std::cout << "\n\n";
+    std::cout << "  }\n";
   }
+
+  std::cout << "}\n";
 }
