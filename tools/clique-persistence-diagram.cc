@@ -1,6 +1,8 @@
+#include <algorithm>
 #include <fstream>
 #include <iomanip>
 #include <iostream>
+#include <limits>
 #include <string>
 #include <sstream>
 
@@ -70,6 +72,10 @@ int main( int argc, char** argv )
 
   std::cerr << "finished\n";
 
+  DataType maxWeight = std::numeric_limits<DataType>::lowest();
+  for( auto&& simplex : K )
+    maxWeight = std::max( maxWeight, simplex.data() );
+
   // Expansion ---------------------------------------------------------
 
   aleph::geometry::RipsExpander<SimplicialComplex> ripsExpander;
@@ -107,6 +113,15 @@ int main( int argc, char** argv )
       std::cerr << "* Storing output in '" << outputFilename << "'...\n";
 
       pd.removeDiagonal();
+
+      std::transform( pd.begin(), pd.end(), pd.begin(),
+                      [&maxWeight] ( const PersistenceDiagram::Point& p )
+                      {
+                        if( !std::isfinite( p.y() ) )
+                          return PersistenceDiagram::Point( p.x(), maxWeight );
+                        else
+                          return p;
+                      } );
 
       std::ofstream out( outputFilename );
       out << "# Original filename: " << filename << "\n";
