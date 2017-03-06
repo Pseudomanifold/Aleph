@@ -15,6 +15,7 @@
 #include "persistentHomology/ConnectedComponents.hh"
 
 #include "topology/CliqueGraph.hh"
+#include "topology/ConnectedComponents.hh"
 #include "topology/Simplex.hh"
 #include "topology/SimplicialComplex.hh"
 
@@ -37,7 +38,7 @@ SimplicialComplex filterSimplicialComplex( const SimplicialComplex& K, DataType 
                 [&threshold] ( const Simplex& s )
                 {
                   // TODO: Less than or equal vs. less than?
-                  return s.data() <= threshold;
+                  return s.data() < threshold;
                 } );
 
   return SimplicialComplex( simplices.begin(), simplices.end() );
@@ -108,6 +109,10 @@ int main( int argc, char** argv )
 
   K.sort( aleph::filtrations::Data<Simplex>() );
 
+  // Stores the accumulated persistence of vertices. Persistence
+  // accumulates if a vertex participates in a clique community.
+  std::map<VertexType, double> accumulatedPersistenceMap;
+
   for( unsigned k = 1; k <= maxK; k++ )
   {
     std::cerr << "* Extracting " << k << "-cliques graph...";
@@ -130,21 +135,53 @@ int main( int argc, char** argv )
     auto pd
         = aleph::calculateZeroDimensionalPersistenceDiagram( C );
 
-    // Stores the accumulated persistence of vertices. Persistence
-    // accumulates if a vertex participates in a clique community.
-    std::map<VertexType, double> accumulatedPersistenceMap;
-
+    // TODO: What about duplicates?
+    for( auto&& point : pd )
     {
-      for( auto&& point : pd )
-      {
-        // TODO:
-        //   - Extract simplicial complex of given threshold
-        //   - Calculate connected components
-        //   - Extract connected component containing the creator simplex
-        //   - Traverse the connected component and assign persistence
+      if( point.x() == point.y() )
+        continue;
 
-        auto epsilon = point.x();
+      // TODO:
+      //   - Extract simplicial complex of given threshold
+      //   - Calculate connected components
+      //   - Extract connected component containing the creator simplex
+      //   - Traverse the connected component and assign persistence
+
+      auto epsilon         = point.y();
+      auto filteredComplex = filterSimplicialComplex( C, epsilon );
+      auto uf              = calculateConnectedComponents( filteredComplex );
+
+      std::set<VertexType> roots;
+      uf.roots( std::inserter( roots, roots.begin() ) );
+
+      std::set<VertexType> cliqueVertices;
+
+      for( auto&& root : roots )
+      {
+        // Only consider roots that 'fit' the current creation threshold
+        // value. In the filtered complex, other connected components of
+        // a different persistence may still exist.
+        //
+        // TODO: Does it make sense to filter with upper _and_ lower
+        // bounds?
+        if( C.find( root )->data() == point.x() )
+        {
+          std::vector<VertexType> vertices;
+          uf.get( root, std::back_inserter( vertices ) );
+
+          for( auto&& vertex : vertices )
+          {
+            auto it = filteredComplex.find( vertex );
+            if( it == filteredComplex.end() )
+              throw std::runtime_error( "Unable to identify simplex in filtered simplicial complex" );
+
+            cliqueVertices.insert( it->begin(), it->end() );
+          }
+        }
       }
+
+      for( auto&& cliqueVertex : cliqueVertices )
+        accumulatedPersistenceMap[cliqueVertex] += point.persistence();
     }
 
     {
@@ -169,5 +206,17 @@ int main( int argc, char** argv )
       out << "# k                : " << k        << "\n";
       out << pd << "\n";
     }
+  }
+
+  {
+    using namespace aleph::utilities;
+    auto outputFilename = "/tmp/" + stem( basename( filename ) ) + ".txt";
+
+    std::cerr << "* Storing accumulated persistence values in '" << outputFilename << "'...\n";
+
+    std::ofstream out( outputFilename );
+
+    for( auto&& pair : accumulatedPersistenceMap )
+      out << pair.first << "\t" << pair.second << "\n";
   }
 }
