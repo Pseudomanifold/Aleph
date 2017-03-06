@@ -81,10 +81,23 @@ int main( int argc, char** argv )
 
   std::cerr << "* Reading '" << filename << "'...";
 
+  // Optional vector of node labels. If the graph contains node labels
+  // and I am able to read them, this vector will be filled.
+  std::vector<std::string> labels;
+
   if( aleph::utilities::extension( filename ) == ".gml" )
   {
     aleph::topology::io::GMLReader reader;
     reader( filename, K );
+
+    auto labelMap = reader.getNodeAttribute( "label" );
+
+    labels.resize( labelMap.size() );
+    for( auto&& pair : labelMap )
+      labels[ std::stoul( pair.first ) ] = pair.second;
+
+    if( labels.front().empty() )
+      labels.clear();
   }
   else
   {
@@ -218,6 +231,6 @@ int main( int argc, char** argv )
     std::ofstream out( outputFilename );
 
     for( auto&& pair : accumulatedPersistenceMap )
-      out << pair.first << "\t" << pair.second << "\n";
+      out << pair.first << "\t" << pair.second << ( labels.empty() ? "" : "\t" + labels.at( pair.first ) ) << "\n";
   }
 }
