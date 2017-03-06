@@ -34,7 +34,33 @@ void testERG()
   ALEPH_TEST_END();
 }
 
+void testWRG()
+{
+  ALEPH_TEST_BEGIN( "Weighted random graph" );
+
+  auto K0 = aleph::topology::generateWeightedRandomGraph( 10, 0.0 );
+  auto K1 = aleph::topology::generateWeightedRandomGraph( 10, 0.5 );
+
+  ALEPH_ASSERT_EQUAL( K0.size(), 10 );
+
+  ALEPH_ASSERT_THROW( K0.size() <= K1.size() );
+
+  if( K1.size() > 10 )
+  {
+    unsigned maxEdgeWeight = 0;
+
+    for( auto&& s : K1 )
+      maxEdgeWeight = std::max( maxEdgeWeight, s.data() );
+
+    ALEPH_ASSERT_THROW( maxEdgeWeight >= 1 );
+  }
+
+  ALEPH_TEST_END();
+}
+
+
 int main( int, char** )
 {
   testERG();
+  testWRG();
 }
