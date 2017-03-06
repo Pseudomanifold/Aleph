@@ -39,11 +39,21 @@ std::string formatOutput( const std::string& prefix, unsigned k, unsigned K )
   return stream.str();
 }
 
+void usage()
+{
+  std::cerr << "Usage: clique-persistence-diagram FILE K\n"
+            << "\n"
+            << "Calculates the clique persistence diagram for FILE, which is\n"
+            << "supposed to be a weighted graph. The K parameter denotes the\n"
+            << "maximum dimension of a simplex for extracting a clique graph\n"
+            << "and tracking persistence of clique communities.\n\n";
+}
+
 int main( int argc, char** argv )
 {
   if( argc <= 2 )
   {
-    // TODO: Show usage
+    usage();
     return -1;
   }
 
