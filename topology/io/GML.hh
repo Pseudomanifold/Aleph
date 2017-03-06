@@ -2,6 +2,7 @@
 #define ALEPH_TOPOLOGY_IO_GML_HH__
 
 #include <fstream>
+#include <map>
 #include <set>
 #include <regex>
 #include <stack>
@@ -51,6 +52,9 @@ public:
 
   template <class SimplicialComplex> void operator()( std::ifstream& in, SimplicialComplex& K )
   {
+    _nodes.clear();
+    _edges.clear();
+
     using namespace aleph::utilities;
 
     using Simplex           = typename SimplicialComplex::ValueType;
@@ -78,9 +82,6 @@ public:
     // Last level that was read by the parser. If an open bracket '[' is
     // identified, this will become the current level.
     std::string lastLevel;
-
-    std::vector<Node> nodes;
-    std::vector<Edge> edges;
 
     Graph graph;
     Node node;
@@ -123,9 +124,9 @@ public:
       else if( line == "]" )
       {
         if( currentLevel.top() == "node" )
-          nodes.push_back( node );
+          _nodes.push_back( node );
         else if( currentLevel.top() == "edge" )
-          edges.push_back( edge );
+          _edges.push_back( edge );
 
         // Reset node and edge data structure to fill them again once
         // a new level is being encountered.
@@ -183,7 +184,7 @@ public:
 
     std::set<std::string> nodeIDs;
 
-    for( auto&& node : nodes )
+    for( auto&& node : _nodes )
     {
       auto pair = nodeIDs.insert( node.id );
       if( !pair.second )
@@ -200,15 +201,16 @@ public:
     };
 
     std::vector<Simplex> simplices;
-    simplices.reserve( nodes.size() + edges.size() );
+    simplices.reserve( _nodes.size() + _edges.size() );
 
-    for( auto&& node : nodes )
+    for( auto&& node : _nodes )
     {
       auto id = getID( node.id );
 
-      // TODO: Permit other names for weight attribute?
       if( node.dict.find( "weight" ) != node.dict.end() )
         simplices.push_back( Simplex( id, convert<DataType>( node.dict.at( "weight" ) ) ) );
+      else if( node.dict.find( "value" ) != node.dict.end() )
+        simplices.push_back( Simplex( id, convert<DataType>( node.dict.at( "value" ) ) ) );
       else
         simplices.push_back( Simplex( id ) );
     }
@@ -229,7 +231,7 @@ public:
         throw std::runtime_error( "Querying unknown simplex for edge creation" );
     };
 
-    for( auto&& edge : edges )
+    for( auto&& edge : _edges )
     {
       auto u = getID( edge.source );
       auto v = getID( edge.target );
@@ -255,7 +257,29 @@ public:
         simplices.push_back( Simplex( {u,v}, convert<DataType>( edge.dict.at( "value" ) ) ) );
     }
 
-    K = SimplicialComplex( simplices.begin(), simplices.end() );
+    _graph = graph;
+    K      = SimplicialComplex( simplices.begin(), simplices.end() );
+  }
+
+  /**
+    Retrieves a map of attribute values for each node. The attributes
+    will be assigned to the node ID. Empty attributes signify that no
+    such information is available.
+  */
+
+  std::map<std::string, std::string> getNodeAttribute( const std::string& attribute ) const
+  {
+    std::map<std::string, std::string> map;
+
+    for( auto&& node : _nodes )
+    {
+      if( node.dict.find( attribute ) == node.dict.end() )
+        map[ node.id ] = std::string();
+      else
+        map[ node.id ] = node.dict.at( attribute );
+    }
+
+    return map;
   }
 
 private:
@@ -283,6 +307,15 @@ private:
     std::map<std::string, std::string> dict; // all remaining attributes
   };
 
+  // Local storage -----------------------------------------------------
+  //
+  // Variables in this section contain the result of the last parsing
+  // process. This is useful when clients are querying attributes.
+
+  Graph _graph;
+
+  std::vector<Node> _nodes;
+  std::vector<Edge> _edges;
 };
 
 } // namespace io
