@@ -181,7 +181,7 @@ int main( int argc, char** argv )
       }
 
       for( auto&& cliqueVertex : cliqueVertices )
-        accumulatedPersistenceMap[cliqueVertex] += point.persistence();
+        accumulatedPersistenceMap[cliqueVertex] += std::isfinite( point.persistence() ) ? point.persistence() : maxWeight - point.x();
     }
 
     {
