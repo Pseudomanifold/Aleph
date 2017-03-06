@@ -171,11 +171,12 @@ int main( int argc, char** argv )
 
           for( auto&& vertex : vertices )
           {
-            auto it = filteredComplex.find( vertex );
-            if( it == filteredComplex.end() )
-              throw std::runtime_error( "Unable to identify simplex in filtered simplicial complex" );
+            // Notice that the vertex identifier represents the index
+            // within the filtration of the _original_ complex, hence
+            // I can just access the corresponding simplex that way.
+            auto s = K.at( vertex );
 
-            cliqueVertices.insert( it->begin(), it->end() );
+            cliqueVertices.insert( s.begin(), s.end() );
           }
         }
       }
