@@ -3,6 +3,7 @@
 #include <iomanip>
 #include <iostream>
 #include <limits>
+#include <numeric>
 #include <string>
 #include <sstream>
 
@@ -11,6 +12,9 @@
 #include "filtrations/Data.hh"
 
 #include "geometry/RipsExpander.hh"
+
+#include "persistenceDiagrams/Norms.hh"
+#include "persistenceDiagrams/PersistenceDiagram.hh"
 
 #include "persistentHomology/ConnectedComponents.hh"
 
@@ -126,6 +130,9 @@ int main( int argc, char** argv )
   // accumulates if a vertex participates in a clique community.
   std::map<VertexType, double> accumulatedPersistenceMap;
 
+  std::vector<double> totalPersistenceValues;
+  totalPersistenceValues.reserve( maxK );
+
   for( unsigned k = 1; k <= maxK; k++ )
   {
     std::cerr << "* Extracting " << k << "-cliques graph...";
@@ -215,6 +222,8 @@ int main( int argc, char** argv )
                           return p;
                       } );
 
+      totalPersistenceValues.push_back( aleph::totalPersistence( pd, 1.0 ) );
+
       std::ofstream out( outputFilename );
       out << "# Original filename: " << filename << "\n";
       out << "# k                : " << k        << "\n";
@@ -230,7 +239,10 @@ int main( int argc, char** argv )
 
     std::ofstream out( outputFilename );
 
+    auto normalizationFactor
+      = std::accumulate( totalPersistenceValues.begin(), totalPersistenceValues.end(), 0.0 );
+
     for( auto&& pair : accumulatedPersistenceMap )
-      out << pair.first << "\t" << pair.second << ( labels.empty() ? "" : "\t" + labels.at( pair.first ) ) << "\n";
+      out << pair.first << "\t" << pair.second / normalizationFactor << ( labels.empty() ? "" : "\t" + labels.at( pair.first ) ) << "\n";
   }
 }
