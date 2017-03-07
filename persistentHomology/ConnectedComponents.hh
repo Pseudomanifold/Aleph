@@ -100,8 +100,8 @@ calculateZeroDimensionalPersistenceDiagram( const topology::SimplicialComplex<Si
 
       uf.merge( youngerComponent, olderComponent );
 
-      pd.add( creation        , destruction    );
-      pp.add( youngerComponent, olderComponent );
+      pd.add( creation                         , destruction                                   );
+      pp.add( static_cast<VertexType>( uIndex ), static_cast<VertexType>( S.index( simplex ) ) );
     }
   }
 
@@ -117,8 +117,8 @@ calculateZeroDimensionalPersistenceDiagram( const topology::SimplicialComplex<Si
   {
     auto creator = *S.find( Simplex( root ) );
 
-    pd.add( creator.data() );
-    pp.add( root           );
+    pd.add( creator.data()                                );
+    pp.add( static_cast<VertexType>( S.index( creator ) ) );
   }
 
   return std::make_tuple( pd, pp );
