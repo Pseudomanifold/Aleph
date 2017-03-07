@@ -130,9 +130,9 @@ int main( int argc, char** argv )
   // accumulates if a vertex participates in a clique community.
   std::map<VertexType, double> accumulatedPersistenceMap;
 
-  // Stores the number of cliques a vertex is a part of. Currently, I am
-  // using this only for debugging the algorithm.
-  std::map<VertexType, unsigned> numberOfCliques;
+  // Stores the number of clique communities a vertex is a part of.
+  // I am using this only for debugging the algorithm.
+  std::map<VertexType, unsigned> numberOfCliqueCommunities;
 
   std::vector<double> totalPersistenceValues;
   totalPersistenceValues.reserve( maxK );
@@ -172,10 +172,10 @@ int main( int argc, char** argv )
       std::set<VertexType> roots;
       uf.roots( std::inserter( roots, roots.begin() ) );
 
-      std::set<VertexType> cliqueVertices;
-
       for( auto&& root : roots )
       {
+        std::set<VertexType> cliqueVertices;
+
         // Only consider roots that 'fit' the current creation threshold
         // value. In the filtered complex, other connected components of
         // a different persistence may still exist.
@@ -197,12 +197,12 @@ int main( int argc, char** argv )
             cliqueVertices.insert( s.begin(), s.end() );
           }
         }
-      }
 
-      for( auto&& cliqueVertex : cliqueVertices )
-      {
-        accumulatedPersistenceMap[cliqueVertex] += std::isfinite( point.persistence() ) ? point.persistence() : maxWeight - point.x();
-        numberOfCliques[cliqueVertex]           += 1;
+        for( auto&& cliqueVertex : cliqueVertices )
+        {
+          accumulatedPersistenceMap[cliqueVertex] += std::isfinite( point.persistence() ) ? point.persistence() : maxWeight - point.x();
+          numberOfCliqueCommunities[cliqueVertex] += 1;
+        }
       }
     }
 
@@ -244,6 +244,6 @@ int main( int argc, char** argv )
       = std::accumulate( totalPersistenceValues.begin(), totalPersistenceValues.end(), 0.0 );
 
     for( auto&& pair : accumulatedPersistenceMap )
-      out << pair.first << "\t" << pair.second / normalizationFactor << "\t" << numberOfCliques.at(pair.first) <<  ( labels.empty() ? "" : "\t" + labels.at( pair.first ) ) << "\n";
+      out << pair.first << "\t" << pair.second / normalizationFactor << "\t" << numberOfCliqueCommunities.at(pair.first) <<  ( labels.empty() ? "" : "\t" + labels.at( pair.first ) ) << "\n";
   }
 }
