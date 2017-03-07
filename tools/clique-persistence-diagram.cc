@@ -219,7 +219,7 @@ int main( int argc, char** argv )
                         if( !std::isfinite( p.y() ) )
                           return PersistenceDiagram::Point( p.x(), maxWeight );
                         else
-                          return p;
+                          return PersistenceDiagram::Point( p );
                       } );
 
       totalPersistenceValues.push_back( aleph::totalPersistence( pd, 1.0 ) );
