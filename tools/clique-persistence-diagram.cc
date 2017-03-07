@@ -130,6 +130,10 @@ int main( int argc, char** argv )
   // accumulates if a vertex participates in a clique community.
   std::map<VertexType, double> accumulatedPersistenceMap;
 
+  // Stores the number of cliques a vertex is a part of. Currently, I am
+  // using this only for debugging the algorithm.
+  std::map<VertexType, unsigned> numberOfCliques;
+
   std::vector<double> totalPersistenceValues;
   totalPersistenceValues.reserve( maxK );
 
@@ -160,12 +164,6 @@ int main( int argc, char** argv )
     {
       if( point.x() == point.y() )
         continue;
-
-      // TODO:
-      //   - Extract simplicial complex of given threshold
-      //   - Calculate connected components
-      //   - Extract connected component containing the creator simplex
-      //   - Traverse the connected component and assign persistence
 
       auto epsilon         = point.y();
       auto filteredComplex = filterSimplicialComplex( C, epsilon );
@@ -202,7 +200,10 @@ int main( int argc, char** argv )
       }
 
       for( auto&& cliqueVertex : cliqueVertices )
+      {
         accumulatedPersistenceMap[cliqueVertex] += std::isfinite( point.persistence() ) ? point.persistence() : maxWeight - point.x();
+        numberOfCliques[cliqueVertex]           += 1;
+      }
     }
 
     {
@@ -243,6 +244,6 @@ int main( int argc, char** argv )
       = std::accumulate( totalPersistenceValues.begin(), totalPersistenceValues.end(), 0.0 );
 
     for( auto&& pair : accumulatedPersistenceMap )
-      out << pair.first << "\t" << pair.second / normalizationFactor << ( labels.empty() ? "" : "\t" + labels.at( pair.first ) ) << "\n";
+      out << pair.first << "\t" << pair.second / normalizationFactor << "\t" << numberOfCliques.at(pair.first) <<  ( labels.empty() ? "" : "\t" + labels.at( pair.first ) ) << "\n";
   }
 }
