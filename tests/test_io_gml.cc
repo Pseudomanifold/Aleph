@@ -7,6 +7,8 @@
 
 #include "topology/io/GML.hh"
 
+#include <set>
+
 template <class D, class V> void test( const std::string& filename )
 {
   ALEPH_TEST_BEGIN( "GML file parsing" );
@@ -22,6 +24,12 @@ template <class D, class V> void test( const std::string& filename )
   ALEPH_ASSERT_EQUAL( K.size(), 5 );
   ALEPH_ASSERT_EQUAL( std::count_if( K.begin(), K.end(), [] (const Simplex& s) { return s.dimension() == 0; } ), 3 );
   ALEPH_ASSERT_EQUAL( std::count_if( K.begin(), K.end(), [] (const Simplex& s) { return s.dimension() == 1; } ), 2 );
+
+  std::set<V> vertices;
+  K.vertices( std::inserter( vertices, vertices.begin() ) );
+
+  ALEPH_ASSERT_EQUAL( *vertices.begin(),  0 );
+  ALEPH_ASSERT_EQUAL( *vertices.rbegin(), 2 );
 
   ALEPH_TEST_END();
 }

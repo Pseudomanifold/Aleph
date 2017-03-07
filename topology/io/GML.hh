@@ -191,13 +191,28 @@ public:
         throw std::runtime_error( "Duplicate node id '" + node.id + "'" );
     }
 
-    // Lambda expression for creating a numerical ID out of a parsed ID.
-    // This ensures that internal IDs always start with a zero.
+    // Lambda expression for creating a numerical ID out of a parsed ID. In
+    // case non-numerical IDs are being used in the source file this Lambda
+    // expression ensures that internal IDs always start with a zero.
     auto getID = [&nodeIDs] ( const std::string& id )
     {
-      return static_cast<VertexType>(
-        std::distance( nodeIDs.begin(), nodeIDs.find( id ) )
-      );
+      // Try to be smart: If the node ID can be converted into the
+      // vertex type, we use the converted number instead.
+      try
+      {
+        auto convertedID = std::stoll( id );
+        return static_cast<VertexType>( convertedID );
+      }
+      catch( std::out_of_range& e )
+      {
+        throw;
+      }
+      catch( std::invalid_argument& )
+      {
+        return static_cast<VertexType>(
+          std::distance( nodeIDs.begin(), nodeIDs.find( id ) )
+        );
+      }
     };
 
     std::vector<Simplex> simplices;
