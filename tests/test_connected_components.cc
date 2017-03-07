@@ -60,7 +60,7 @@ template <class T> void test()
   K.sort( filtrations::Data<Simplex>() );
 
   auto diagrams = calculatePersistenceDiagrams( K );
-  auto diagram2 = calculateZeroDimensionalPersistenceDiagram( K );
+  auto diagram2 = std::get<0>( calculateZeroDimensionalPersistenceDiagram( K ) );
 
   ALEPH_ASSERT_THROW( diagrams.empty() == false );
 

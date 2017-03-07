@@ -3,10 +3,13 @@
 
 #include "persistenceDiagrams/PersistenceDiagram.hh"
 
+#include "persistentHomology/PersistencePairing.hh"
+
 #include "topology/SimplicialComplex.hh"
 #include "topology/UnionFind.hh"
 
 #include <algorithm>
+#include <tuple>
 #include <vector>
 
 namespace aleph
@@ -22,7 +25,12 @@ namespace aleph
   check this, though!
 */
 
-template <class Simplex> PersistenceDiagram<typename Simplex::DataType> calculateZeroDimensionalPersistenceDiagram( const topology::SimplicialComplex<Simplex>& K )
+template <class Simplex>
+  std::tuple<
+    PersistenceDiagram<typename Simplex::DataType>,
+    PersistencePairing<typename Simplex::VertexType>
+  >
+calculateZeroDimensionalPersistenceDiagram( const topology::SimplicialComplex<Simplex>& K )
 {
   using DataType   = typename Simplex::DataType;
   using VertexType = typename Simplex::VertexType;
@@ -53,6 +61,7 @@ template <class Simplex> PersistenceDiagram<typename Simplex::DataType> calculat
 
   UnionFind<VertexType> uf( vertices.begin(), vertices.end() );
   PersistenceDiagram<DataType> pd;
+  PersistencePairing<VertexType> pp;
 
   for( auto&& simplex : S )
   {
@@ -90,7 +99,9 @@ template <class Simplex> PersistenceDiagram<typename Simplex::DataType> calculat
       auto destruction = simplex.data();
 
       uf.merge( youngerComponent, olderComponent );
-      pd.add( creation, destruction );
+
+      pd.add( creation        , destruction    );
+      pp.add( youngerComponent, olderComponent );
     }
   }
 
@@ -105,11 +116,12 @@ template <class Simplex> PersistenceDiagram<typename Simplex::DataType> calculat
   for( auto&& root : roots )
   {
     auto creator = *S.find( Simplex( root ) );
+
     pd.add( creator.data() );
+    pp.add( root           );
   }
 
-  // TODO: Return Union--Find data structure as well?
-  return pd;
+  return std::make_tuple( pd, pp );
 }
 
 } // namespace aleph

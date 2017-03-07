@@ -156,8 +156,9 @@ int main( int argc, char** argv )
       break;
     }
 
-    auto pd
-        = aleph::calculateZeroDimensionalPersistenceDiagram( C );
+    auto&& tuple = aleph::calculateZeroDimensionalPersistenceDiagram( C );
+    auto&& pd    = std::get<0>( tuple );
+    auto&& pp    = std::get<1>( tuple );
 
     // TODO: What about duplicates?
     for( auto&& point : pd )
