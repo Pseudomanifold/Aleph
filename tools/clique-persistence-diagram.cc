@@ -170,10 +170,22 @@ int main( int argc, char** argv )
         continue;
       }
 
-      auto epsilon         = itPoint->y();
-      auto filteredComplex = filterSimplicialComplex( C, epsilon );
-      auto uf              = calculateConnectedComponents( filteredComplex );
+      SimplicialComplex filteredComplex;
 
+      {
+        std::vector<Simplex> simplices;
+        if( itPair->second < C.size() )
+        {
+          simplices.reserve( itPair->second );
+
+          std::copy( C.begin() + itPair->first, C.begin() + itPair->second, std::back_inserter( simplices ) );
+          filteredComplex = SimplicialComplex( simplices.begin(), simplices.end() );
+        }
+        else
+          filteredComplex = C;
+      }
+
+      auto uf          = calculateConnectedComponents( filteredComplex );
       auto desiredRoot = *C.at( itPair->first ).begin();
       auto root        = uf.find( desiredRoot ); // Normally, this should be a self-assignment,
                                                  // but in some cases the order of traversal is
