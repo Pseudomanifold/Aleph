@@ -160,22 +160,38 @@ int main( int argc, char** argv )
     auto&& pd    = std::get<0>( tuple );
     auto&& pp    = std::get<1>( tuple );
 
-    // TODO: What about duplicates?
-    for( auto&& point : pd )
+    auto itPoint = pd.begin();
+    for( auto itPair = pp.begin(); itPair != pp.end(); ++itPair )
     {
-      if( point.x() == point.y() )
+      // Skip zero-dimensional persistence pairs
+      if( itPoint->x() == itPoint->y() )
+      {
+        ++itPoint;
         continue;
+      }
 
-      auto epsilon         = point.y();
+      auto epsilon         = itPoint->y();
       auto filteredComplex = filterSimplicialComplex( C, epsilon );
       auto uf              = calculateConnectedComponents( filteredComplex );
 
       std::set<VertexType> roots;
       uf.roots( std::inserter( roots, roots.begin() ) );
 
+      bool foundRoot = false;
+
+      auto desiredRoot = *C.at( itPair->first ).begin();
+
+      if( itPair->second < C.size() )
+        std::cerr << C.at( itPair->first ) << " --> " << C.at( itPair->second ) << "\n";
+
       for( auto&& root : roots )
       {
+        std::cerr << "ROOT: " << root << "\n";
+        std::cerr << *C.find( Simplex( root ) ) << "\n";
+
         std::set<VertexType> cliqueVertices;
+
+        std::cerr << "DESIRED ROOT: " << desiredRoot << "," << uf.find( root ) << "," << uf.find( desiredRoot ) << "\n";
 
         // Only consider roots that 'fit' the current creation threshold
         // value. In the filtered complex, other connected components of
@@ -183,8 +199,12 @@ int main( int argc, char** argv )
         //
         // TODO: Does it make sense to filter with upper _and_ lower
         // bounds?
-        if( C.find( root )->data() == point.x() )
+        //if( C.find( root )->data() == point.x() )
+        if( uf.find( root ) == uf.find( desiredRoot ) )
         {
+          std::cerr << "FOUND CORRECT ROOT\n";
+          foundRoot = true;
+
           std::vector<VertexType> vertices;
           uf.get( root, std::back_inserter( vertices ) );
 
@@ -201,10 +221,17 @@ int main( int argc, char** argv )
 
         for( auto&& cliqueVertex : cliqueVertices )
         {
-          accumulatedPersistenceMap[cliqueVertex] += std::isfinite( point.persistence() ) ? point.persistence() : maxWeight - point.x();
+          accumulatedPersistenceMap[cliqueVertex] += std::isfinite( itPoint->persistence() ) ? itPoint->persistence() : maxWeight - itPoint->x();
           numberOfCliqueCommunities[cliqueVertex] += 1;
         }
       }
+
+      if( !foundRoot )
+        throw "CRAP";
+
+      std::cerr << "\n";
+
+      ++itPoint;
     }
 
     {
