@@ -174,62 +174,31 @@ int main( int argc, char** argv )
       auto filteredComplex = filterSimplicialComplex( C, epsilon );
       auto uf              = calculateConnectedComponents( filteredComplex );
 
-      std::set<VertexType> roots;
-      uf.roots( std::inserter( roots, roots.begin() ) );
-
-      bool foundRoot = false;
-
       auto desiredRoot = *C.at( itPair->first ).begin();
+      auto root        = uf.find( desiredRoot ); // Normally, this should be a self-assignment,
+                                                 // but in some cases the order of traversal is
+                                                 // slightly different, resulting in unexpected
+                                                 // roots.
 
-      if( itPair->second < C.size() )
-        std::cerr << C.at( itPair->first ) << " --> " << C.at( itPair->second ) << "\n";
+      std::set<VertexType> cliqueVertices;
+      std::vector<VertexType> vertices;
+      uf.get( root, std::back_inserter( vertices ) );
 
-      for( auto&& root : roots )
+      for( auto&& vertex : vertices )
       {
-        std::cerr << "ROOT: " << root << "\n";
-        std::cerr << *C.find( Simplex( root ) ) << "\n";
+        // Notice that the vertex identifier represents the index
+        // within the filtration of the _original_ complex, hence
+        // I can just access the corresponding simplex that way.
+        auto s = K.at( vertex );
 
-        std::set<VertexType> cliqueVertices;
-
-        std::cerr << "DESIRED ROOT: " << desiredRoot << "," << uf.find( root ) << "," << uf.find( desiredRoot ) << "\n";
-
-        // Only consider roots that 'fit' the current creation threshold
-        // value. In the filtered complex, other connected components of
-        // a different persistence may still exist.
-        //
-        // TODO: Does it make sense to filter with upper _and_ lower
-        // bounds?
-        //if( C.find( root )->data() == point.x() )
-        if( uf.find( root ) == uf.find( desiredRoot ) )
-        {
-          std::cerr << "FOUND CORRECT ROOT\n";
-          foundRoot = true;
-
-          std::vector<VertexType> vertices;
-          uf.get( root, std::back_inserter( vertices ) );
-
-          for( auto&& vertex : vertices )
-          {
-            // Notice that the vertex identifier represents the index
-            // within the filtration of the _original_ complex, hence
-            // I can just access the corresponding simplex that way.
-            auto s = K.at( vertex );
-
-            cliqueVertices.insert( s.begin(), s.end() );
-          }
-        }
-
-        for( auto&& cliqueVertex : cliqueVertices )
-        {
-          accumulatedPersistenceMap[cliqueVertex] += std::isfinite( itPoint->persistence() ) ? itPoint->persistence() : maxWeight - itPoint->x();
-          numberOfCliqueCommunities[cliqueVertex] += 1;
-        }
+        cliqueVertices.insert( s.begin(), s.end() );
       }
 
-      if( !foundRoot )
-        throw "CRAP";
-
-      std::cerr << "\n";
+      for( auto&& cliqueVertex : cliqueVertices )
+      {
+        accumulatedPersistenceMap[cliqueVertex] += std::isfinite( itPoint->persistence() ) ? itPoint->persistence() : maxWeight - itPoint->x();
+        numberOfCliqueCommunities[cliqueVertex] += 1;
+      }
 
       ++itPoint;
     }
