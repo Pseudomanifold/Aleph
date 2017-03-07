@@ -34,20 +34,6 @@ using Simplex            = aleph::topology::Simplex<DataType, VertexType>;
 using SimplicialComplex  = aleph::topology::SimplicialComplex<Simplex>;
 using PersistenceDiagram = aleph::PersistenceDiagram<DataType>;
 
-SimplicialComplex filterSimplicialComplex( const SimplicialComplex& K, DataType threshold )
-{
-  std::vector<Simplex> simplices;
-
-  std::copy_if( K.begin(), K.end(), std::back_inserter( simplices ),
-                [&threshold] ( const Simplex& s )
-                {
-                  // TODO: Less than or equal vs. less than?
-                  return s.data() < threshold;
-                } );
-
-  return SimplicialComplex( simplices.begin(), simplices.end() );
-}
-
 std::string formatOutput( const std::string& prefix, unsigned k, unsigned K )
 {
   std::ostringstream stream;
