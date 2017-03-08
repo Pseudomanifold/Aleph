@@ -75,8 +75,8 @@ public:
       return attributes.find( name ) != attributes.end();
     };
 
-    // Specifies the current level the parse is in. May be either one of
-    // the known levels above.
+    // Specifies the current level the parser is in. May be either one
+    // of the known levels above.
     std::stack<std::string> currentLevel;
 
     // Last level that was read by the parser. If an open bracket '[' is
