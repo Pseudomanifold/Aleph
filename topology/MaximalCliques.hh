@@ -23,6 +23,25 @@ void enumerateKoch( std::unordered_set<typename Simplex::VertexType>& C,
                     std::vector< std::vector<typename Simplex::VertexType> >& cliques,
                     const SimplicialComplex<Simplex>& K )
 {
+  using VertexType = typename Simplex::VertexType;
+
+  if( I.empty() && X.empty() )
+  {
+    cliques.push_back( std::vector<VertexType>( C.begin(), C.end() ) );
+    return;
+  }
+
+  // Pivot selection ---------------------------------------------------
+
+  /*
+   * NYI
+   */
+
+  // Bron--Kerbosch traversal ------------------------------------------
+
+  /*
+   * NYI
+   */
 }
 
 } // namespace detail
