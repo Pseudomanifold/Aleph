@@ -23,6 +23,8 @@ void enumerateKoch( std::unordered_set<typename Simplex::VertexType>& C,
                     std::vector< std::vector<typename Simplex::VertexType> >& cliques,
                     const SimplicialComplex<Simplex>& K )
 {
+  (void) K;
+
   using VertexType = typename Simplex::VertexType;
 
   if( I.empty() && X.empty() )
