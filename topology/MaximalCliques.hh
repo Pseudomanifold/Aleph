@@ -52,12 +52,12 @@ template <class VertexType>
 void enumerateKoch( std::unordered_set<VertexType>& C,
                     std::unordered_set<VertexType>& I,
                     std::unordered_set<VertexType>& X,
-                    std::vector< std::vector<VertexType> >& cliques,
+                    std::vector< std::set<VertexType> >& cliques,
                     const math::SparseBinaryMatrix<VertexType>& A )
 {
   if( I.empty() && X.empty() )
   {
-    cliques.push_back( std::vector<VertexType>( C.begin(), C.end() ) );
+    cliques.push_back( std::set<VertexType>( C.begin(), C.end() ) );
     return;
   }
 
@@ -126,12 +126,12 @@ template <class VertexType>
 void enumerateBronKerbosch( std::unordered_set<VertexType>& C,
                             std::unordered_set<VertexType>& I,
                             std::unordered_set<VertexType>& X,
-                            std::vector< std::vector<VertexType> >& cliques,
+                            std::vector< std::set<VertexType> >& cliques,
                             const math::SparseBinaryMatrix<VertexType>& A )
 {
   if( I.empty() && X.empty() )
   {
-    cliques.push_back( std::vector<VertexType>( C.begin(), C.end() ) );
+    cliques.push_back( std::set<VertexType>( C.begin(), C.end() ) );
     return;
   }
 
@@ -175,7 +175,7 @@ void enumerateBronKerbosch( std::unordered_set<VertexType>& C,
   clique, it contains the vertex indices.
 */
 
-template <class Simplex> auto maximalCliquesKoch( const SimplicialComplex<Simplex>& K ) -> std::vector< std::vector<typename Simplex::VertexType> >
+template <class Simplex> auto maximalCliquesKoch( const SimplicialComplex<Simplex>& K ) -> std::vector< std::set<typename Simplex::VertexType> >
 {
   using VertexType = typename Simplex::VertexType;
 
@@ -185,13 +185,13 @@ template <class Simplex> auto maximalCliquesKoch( const SimplicialComplex<Simple
 
   K.vertices( std::inserter( I, I.begin() ) );
 
-  std::vector< std::vector<VertexType> > cliques;
+  std::vector< std::set<VertexType> > cliques;
 
   detail::enumerateKoch( C, I, X, cliques, detail::adjacencyMatrix(K) );
   return cliques;
 }
 
-template <class Simplex> auto maximalCliquesBronKerbosch( const SimplicialComplex<Simplex>& K ) -> std::vector< std::vector<typename Simplex::VertexType> >
+template <class Simplex> auto maximalCliquesBronKerbosch( const SimplicialComplex<Simplex>& K ) -> std::vector< std::set<typename Simplex::VertexType> >
 {
   using VertexType = typename Simplex::VertexType;
 
@@ -201,7 +201,7 @@ template <class Simplex> auto maximalCliquesBronKerbosch( const SimplicialComple
 
   K.vertices( std::inserter( I, I.begin() ) );
 
-  std::vector< std::vector<VertexType> > cliques;
+  std::vector< std::set<VertexType> > cliques;
 
   detail::enumerateBronKerbosch( C, I, X, cliques, detail::adjacencyMatrix(K) );
   return cliques;
