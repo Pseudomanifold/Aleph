@@ -78,7 +78,7 @@ void enumerateKoch( std::unordered_set<VertexType>& C,
 
   // Bron--Kerbosch traversal ------------------------------------------
 
-  for( auto it = I.begin(); it != I.end(); ++it )
+  for( auto it = I.begin(); it != I.end(); )
   {
     auto element = *it;
 
@@ -129,7 +129,7 @@ void enumerateBronKerbosch( std::unordered_set<VertexType>& C,
     return;
   }
 
-  for( auto it = I.begin(); it != I.end(); ++it )
+  for( auto it = I.begin(); it != I.end(); )
   {
     auto element = *it;
     it = I.erase( it );
