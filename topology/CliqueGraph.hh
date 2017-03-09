@@ -3,6 +3,7 @@
 
 #include "topology/SimplicialComplex.hh"
 
+#include <list>
 #include <map>
 #include <stdexcept>
 #include <vector>
@@ -34,9 +35,6 @@ template <class Simplex> SimplicialComplex<Simplex> getCliqueGraph( const Simpli
   // they will be connected by an edge.
   std::map<Simplex, std::vector<std::size_t> > cofaceMap;
 
-  std::vector<Simplex> vertices;
-  std::vector<Simplex> edges;
-
   for( auto itPair = K.range(k); itPair.first != itPair.second; ++itPair.first )
    simplexMap[ *itPair.first ] = K.index( *itPair.first );
 
@@ -45,11 +43,16 @@ template <class Simplex> SimplicialComplex<Simplex> getCliqueGraph( const Simpli
     auto&& simplex = pair.first;
     auto&& index   = pair.second;
 
+    // TODO: Is the number of co-faces bounded? If so, I could reserve
+    // sufficient memory in the map.
     for( auto itFace = simplex.begin_boundary(); itFace != simplex.end_boundary(); ++itFace )
       cofaceMap[ *itFace ].push_back( index );
   }
 
   // Create vertices ---------------------------------------------------
+
+  std::vector<Simplex> vertices;
+  vertices.reserve( simplexMap.size() );
 
   using VertexType = typename Simplex::VertexType;
 
@@ -62,6 +65,11 @@ template <class Simplex> SimplicialComplex<Simplex> getCliqueGraph( const Simpli
   }
 
   // Create edges ------------------------------------------------------
+
+  // Since the number of edges is unknown beforehand, it makes sense to use a
+  // list rather than a vector here. Else, the allocation of larger swaths of
+  // memory will be problematic.
+  std::list<Simplex> edges;
 
   for( auto&& pair : cofaceMap )
   {
