@@ -110,9 +110,14 @@ int main( int argc, char** argv )
 
   // Expansion ---------------------------------------------------------
 
+  std::cerr << "* Expanding simplicial complex to k=" << maxK << "...";
+
   aleph::geometry::RipsExpander<SimplicialComplex> ripsExpander;
   K = ripsExpander( K, maxK );
   K = ripsExpander.assignMaximumWeight( K );
+
+  std::cerr << "finished\n"
+            << "* Expanded simplicial complex has " << K.size() << " simplices\n";
 
   K.sort( aleph::filtrations::Data<Simplex>() );
 
