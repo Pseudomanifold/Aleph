@@ -63,15 +63,17 @@ template <class Data, class Vertex> void triangles()
   ALEPH_ASSERT_EQUAL( C11.size(), 2 );
   ALEPH_ASSERT_EQUAL( C21.size(), 3 );
 
-  ALEPH_ASSERT_THROW( C11 == C12 );
-  ALEPH_ASSERT_THROW( C21 == C22 );
-
   ALEPH_ASSERT_THROW( std::find( C11.begin(), C11.end(), std::set<Vertex>( {0,1,2} ) ) != C11.end() );
   ALEPH_ASSERT_THROW( std::find( C11.begin(), C11.end(), std::set<Vertex>( {0,1,3} ) ) != C11.end() );
+  ALEPH_ASSERT_THROW( std::find( C12.begin(), C12.end(), std::set<Vertex>( {0,1,2} ) ) != C12.end() );
+  ALEPH_ASSERT_THROW( std::find( C12.begin(), C12.end(), std::set<Vertex>( {0,1,3} ) ) != C12.end() );
 
   ALEPH_ASSERT_THROW( std::find( C21.begin(), C21.end(), std::set<Vertex>( {0,3  } ) ) != C21.end() );
   ALEPH_ASSERT_THROW( std::find( C21.begin(), C21.end(), std::set<Vertex>( {0,1,2} ) ) != C21.end() );
   ALEPH_ASSERT_THROW( std::find( C21.begin(), C21.end(), std::set<Vertex>( {3,4,5} ) ) != C21.end() );
+  ALEPH_ASSERT_THROW( std::find( C22.begin(), C22.end(), std::set<Vertex>( {0,3  } ) ) != C22.end() );
+  ALEPH_ASSERT_THROW( std::find( C22.begin(), C22.end(), std::set<Vertex>( {0,1,2} ) ) != C22.end() );
+  ALEPH_ASSERT_THROW( std::find( C22.begin(), C22.end(), std::set<Vertex>( {3,4,5} ) ) != C22.end() );
 
   ALEPH_TEST_END();
 }
