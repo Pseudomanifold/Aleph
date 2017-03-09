@@ -61,6 +61,12 @@ void enumerateKoch( std::unordered_set<VertexType>& C,
     return;
   }
 
+  // TODO: Is this the correct way of calculating the set? In the
+  // algorithm, it appears that X and I are either both non-empty
+  // or empty.
+  if( I.empty() )
+    return;
+
   // Pivot selection ---------------------------------------------------
 
   auto pivot     = *I.begin();
