@@ -37,7 +37,7 @@ template <class Data, class Vertex> void triangles()
   // |/   /  |
   // 0---3---4
   //
-  // Expected cliques graph: {0,3}, {0,1,2}, {3,4,5}
+  // Expected cliques: {0,3}, {0,1,2}, {3,4,5}
   std::vector<Simplex> trianglesDisconnected
     = {
         {0,1}, {0,2}, {0,3}, {1,2}, {3,4}, {3,5}, {4,5},
@@ -47,16 +47,18 @@ template <class Data, class Vertex> void triangles()
   SimplicialComplex K1( trianglesConnected.begin()   , trianglesConnected.end() );
   SimplicialComplex K2( trianglesDisconnected.begin(), trianglesDisconnected.end() );
 
-  auto C1 = maximalCliquesKoch( K1 );
-  auto C2 = maximalCliquesKoch( K2 );
+  auto C11 = maximalCliquesBronKerbosch( K1 );
+  auto C12 = maximalCliquesKoch( K1 );
+  auto C21 = maximalCliquesBronKerbosch( K2 );
+  auto C22 = maximalCliquesKoch( K2 );
 
-  /*
-   * TODO: Figure out how to make this work...
+  ALEPH_ASSERT_THROW( C11.empty() == false );
+  ALEPH_ASSERT_THROW( C12.empty() == false );
+  ALEPH_ASSERT_THROW( C21.empty() == false );
+  ALEPH_ASSERT_THROW( C22.empty() == false );
 
-  ALEPH_ASSERT_THROW( C1.empty() == false );
-  ALEPH_ASSERT_THROW( C2.empty() == false );
-
-  */
+  ALEPH_ASSERT_EQUAL( C11.size(), C12.size() );
+  ALEPH_ASSERT_EQUAL( C21.size(), C22.size() );
 
   ALEPH_TEST_END();
 }
