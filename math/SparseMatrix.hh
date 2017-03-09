@@ -69,6 +69,16 @@ private:
   ColumnsType _columns;
 };
 
+template <class I, class D> class SparseMatrix
+{
+  /*
+    TODO: Implement this. In contrast to the binary matrix, this matrix
+    should also be capable of storing the value in a given column.
+
+    Hence, there is the need for an additional lookup data structure.
+  */
+};
+
 } // namespace math
 
 } // namespace aleph
