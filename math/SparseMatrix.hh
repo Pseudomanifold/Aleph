@@ -58,11 +58,17 @@ public:
     std::copy( c.begin(), c.end(), result );
   }
 
+  /** Returns number of non-zero entries in a given column */
+  std::size_t numEntries( IndexType column ) const
+  {
+    return _columns.at( column ).size();
+  }
+
+  /** Returns number of columns */
   std::size_t numColumns() const noexcept
   {
     return _columns.size();
   }
-
 
 private:
 
