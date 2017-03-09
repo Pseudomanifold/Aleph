@@ -2,10 +2,14 @@
 #define ALEPH_TOPOLOGY_MAXIMAL_CLIQUES_HH__
 
 #include <iterator>
+#include <set>
 #include <unordered_set>
 #include <vector>
 
+#include "math/SparseMatrix.hh"
+
 #include "SimplicialComplex.hh"
+
 
 namespace aleph
 {
@@ -15,6 +19,32 @@ namespace topology
 
 namespace detail
 {
+
+template <class Simplex> auto adjacencyMatrix( const SimplicialComplex<Simplex>& K ) -> math::SparseBinaryMatrix<typename Simplex::VertexType>
+{
+  using VertexType = typename Simplex::VertexType;
+  using Matrix     = math::SparseBinaryMatrix<VertexType>;
+
+  std::set<VertexType> vertices;
+  K.vertices( std::inserter( vertices, vertices.begin() );
+
+  Matrix A( vertices.size() );
+
+  // TODO: This ensures that vertex indices in the simplicial complex
+  // start at zero. Otherwise, I would first have to look up an index
+  // within the set above.
+  for( auto itPair = K.range(1); itPair.first != itPair.second; ++itPair.first )
+  {
+    auto s = *itPair.first;
+    auto u = s[0];
+    auto v = s[1];
+
+    A.set(u,v);
+    A.set(v,u);
+  }
+
+  return A;
+}
 
 template <class Simplex>
 void enumerateKoch( std::unordered_set<typename Simplex::VertexType>& C,
