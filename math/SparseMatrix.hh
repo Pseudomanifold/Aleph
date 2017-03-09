@@ -32,7 +32,7 @@ public:
     be added to the column. Else, the entry will be removed.
   */
 
-  void set( IndeType row, IndexType column )
+  void set( IndexType row, IndexType column )
   {
     _columns.at( column ).insert( row );
   }
@@ -45,17 +45,17 @@ public:
 
   bool get( IndexType row, IndexType column ) const
   {
-    auto&& column = _columns.at( column );
-    return column.find( row ) != column.end();
+    auto&& c = _columns.at( column );
+    return c.find( row ) != c.end();
   }
 
   /** Returns all non-zero values in a given column. */
   template <class OutputIterator> void get( IndexType column,
                                             OutputIterator result ) const
   {
-    auto&& column = _columns.at( column );
+    auto&& c = _columns.at( column );
 
-    std::copy( column.begin(), column.end(), result );
+    std::copy( c.begin(), c.end(), result );
   }
 
   std::size_t numColumns() const noexcept
