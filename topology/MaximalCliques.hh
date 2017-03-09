@@ -27,7 +27,7 @@ template <class Simplex> auto adjacencyMatrix( const SimplicialComplex<Simplex>&
   using Matrix     = math::SparseBinaryMatrix<VertexType>;
 
   std::set<VertexType> vertices;
-  K.vertices( std::inserter( vertices, vertices.begin() );
+  K.vertices( std::inserter( vertices, vertices.begin() ) );
 
   Matrix A( vertices.size() );
 
@@ -101,7 +101,7 @@ void enumerateBronKerbosch( std::unordered_set<typename Simplex::VertexType>& C,
     newC.insert( element );
 
     std::unordered_set<VertexType> neighbours;
-    A.get( element, std::inserter( neighbours, neighbours.begin() );
+    A.get( element, std::inserter( neighbours, neighbours.begin() ) );
 
     std::unordered_set<VertexType> newI;
     std::unordered_set<VertexType> newX;
