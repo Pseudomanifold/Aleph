@@ -1,13 +1,14 @@
 #ifndef ALEPH_TOPOLOGY_MAXIMAL_CLIQUES_HH__
 #define ALEPH_TOPOLOGY_MAXIMAL_CLIQUES_HH__
 
-#include <algorithm>
 #include <iterator>
 #include <set>
 #include <unordered_set>
 #include <vector>
 
 #include "math/SparseMatrix.hh"
+
+#include "utilities/UnorderedSetOperations.hh"
 
 #include "SimplicialComplex.hh"
 
@@ -106,15 +107,10 @@ void enumerateBronKerbosch( std::unordered_set<typename Simplex::VertexType>& C,
     std::unordered_set<VertexType> newI;
     std::unordered_set<VertexType> newX;
 
-    std::set_intersection( I.begin(), I.end(),
-                           neighbours.begin(), neighbours.end(),
-                           std::inserter( newI,
-                                          newI.begin() ) );
+    using namespace aleph::utilities;
 
-    std::set_intersection( X.begin(), X.end(),
-                           neighbours.begin(), neighbours.end(),
-                           std::inserter( newX,
-                                          newX.begin() ) );
+    set_intersection( I, neighbours, newI );
+    set_intersection( X, neighbours, newX );
 
     enumerateBronKerbosch( newC,
                            newI,
