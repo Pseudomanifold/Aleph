@@ -30,7 +30,7 @@ template <class Simplex> auto adjacencyMatrix( const SimplicialComplex<Simplex>&
   std::set<VertexType> vertices;
   K.vertices( std::inserter( vertices, vertices.begin() ) );
 
-  Matrix A( vertices.size() );
+  Matrix A( VertexType( vertices.size() ) );
 
   // TODO: This ensures that vertex indices in the simplicial complex
   // start at zero. Otherwise, I would first have to look up an index
@@ -48,17 +48,13 @@ template <class Simplex> auto adjacencyMatrix( const SimplicialComplex<Simplex>&
   return A;
 }
 
-template <class Simplex>
-void enumerateKoch( std::unordered_set<typename Simplex::VertexType>& C,
-                    std::unordered_set<typename Simplex::VertexType>& I,
-                    std::unordered_set<typename Simplex::VertexType>& X,
-                    std::vector< std::vector<typename Simplex::VertexType> >& cliques,
-                    const SimplicialComplex<Simplex>& K )
+template <class VertexType>
+void enumerateKoch( std::unordered_set<VertexType>& C,
+                    std::unordered_set<VertexType>& I,
+                    std::unordered_set<VertexType>& X,
+                    std::vector< std::vector<VertexType> >& cliques,
+                    const math::SparseBinaryMatrix<VertexType>& A )
 {
-  (void) K;
-
-  using VertexType = typename Simplex::VertexType;
-
   if( I.empty() && X.empty() )
   {
     cliques.push_back( std::vector<VertexType>( C.begin(), C.end() ) );
@@ -67,26 +63,66 @@ void enumerateKoch( std::unordered_set<typename Simplex::VertexType>& C,
 
   // Pivot selection ---------------------------------------------------
 
-  /*
-   * NYI
-   */
+  auto pivot     = *I.begin();
+  auto maxDegree = VertexType(0);
+
+  for( auto&& v : I )
+  {
+    auto degree = VertexType( A.numEntries(v) );
+    if( degree > maxDegree )
+    {
+      pivot     = v;
+      maxDegree = degree;
+    }
+  }
 
   // Bron--Kerbosch traversal ------------------------------------------
 
-  /*
-   * NYI
-   */
+  for( auto it = I.begin(); it != I.end(); ++it )
+  {
+    auto element = *it;
+
+    // If the currently selected element is a neighbour of the pivot vertex,
+    // just move on to another element.
+    if( A.get(element, pivot) )
+    {
+      ++it;
+      continue;
+    }
+
+    it = I.erase( it );
+
+    std::unordered_set<VertexType> newC = C;
+    newC.insert( element );
+
+    std::unordered_set<VertexType> neighbours;
+    A.get( element, std::inserter( neighbours, neighbours.begin() ) );
+
+    std::unordered_set<VertexType> newI;
+    std::unordered_set<VertexType> newX;
+
+    using namespace aleph::utilities;
+
+    set_intersection( I, neighbours, newI );
+    set_intersection( X, neighbours, newX );
+
+    enumerateKoch( newC,
+                   newI,
+                   newX,
+                   cliques,
+                   A );
+
+    X.insert( element );
+  }
 }
 
-template <class Simplex>
-void enumerateBronKerbosch( std::unordered_set<typename Simplex::VertexType>& C,
-                            std::unordered_set<typename Simplex::VertexType>& I,
-                            std::unordered_set<typename Simplex::VertexType>& X,
-                            std::vector< std::vector<typename Simplex::VertexType> >& cliques,
-                            const math::SparseBinaryMatrix<typename Simplex::VertexType>& A )
+template <class VertexType>
+void enumerateBronKerbosch( std::unordered_set<VertexType>& C,
+                            std::unordered_set<VertexType>& I,
+                            std::unordered_set<VertexType>& X,
+                            std::vector< std::vector<VertexType> >& cliques,
+                            const math::SparseBinaryMatrix<VertexType>& A )
 {
-  using VertexType = typename Simplex::VertexType;
-
   if( I.empty() && X.empty() )
   {
     cliques.push_back( std::vector<VertexType>( C.begin(), C.end() ) );
@@ -145,7 +181,7 @@ template <class Simplex> auto maximalCliquesKoch( const SimplicialComplex<Simple
 
   std::vector< std::vector<VertexType> > cliques;
 
-  detail::enumerateKoch( C, I, X, cliques, K );
+  detail::enumerateKoch( C, I, X, cliques, detail::adjacencyMatrix(K) );
   return cliques;
 }
 
