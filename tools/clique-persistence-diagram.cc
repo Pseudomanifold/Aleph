@@ -115,6 +115,9 @@ int main( int argc, char** argv )
 
   for( auto it = K.begin(); it != K.end(); ++it )
   {
+    if( K.dimension() == 0 )
+      continue;
+
     auto s = *it;
     s.setData( maxWeight - s.data() );
 
