@@ -165,6 +165,11 @@ public:
     K = SimplicialComplex( simplices.begin(), simplices.end() );
   }
 
+  std::map<std::string, std::string> getLabelMap() const noexcept
+  {
+    return _labels;
+  }
+
 private:
 
   enum class Mode
