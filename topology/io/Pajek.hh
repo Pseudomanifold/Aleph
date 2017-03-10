@@ -78,7 +78,7 @@ public:
       // requires us to load additional information.
       if( std::regex_match( line, matches, reKeyword ) )
       {
-        auto name = matches[1];
+        std::string name = matches[1];
         std::transform( name.begin(), name.end(), name.begin(), ::tolower );
 
         if( name == "vertices" || name == "verts" )
@@ -86,7 +86,7 @@ public:
           if( !std::regex_match( line, matches, reKeyValue ) )
             throw std::runtime_error( "Unable to parse vertices specification" );
 
-          auto value = std::toul( matches[2] );
+          auto value = std::stoul( matches[2] );
           mode       = Mode::Vertices;
 
           // TODO: We should use the value in order to check whether
@@ -131,7 +131,7 @@ public:
 
         Simplex edge( {source, target} );
 
-        if( !matches[3].empty() )
+        if( matches[3].matched )
         {
           auto weight = convert<DataType>( matches[3] );
           edge.setData( weight );
