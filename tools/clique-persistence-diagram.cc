@@ -108,6 +108,21 @@ int main( int argc, char** argv )
   for( auto&& simplex : K )
     maxWeight = std::max( maxWeight, simplex.data() );
 
+  // TODO: Make weight inversion configurable. It is not required for all data
+  // sets but should be used on an as-needed basis.
+
+  std::cerr << "* Inverting filtration weights...";
+
+  for( auto it = K.begin(); it != K.end(); ++it )
+  {
+    auto s = *it;
+    s.setData( maxWeight - s.data() );
+
+    K.replace( it, s );
+  }
+
+  std::cerr << "finished\n";
+
   // Expansion ---------------------------------------------------------
 
   std::cerr << "* Expanding simplicial complex to k=" << maxK << "...";
