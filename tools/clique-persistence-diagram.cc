@@ -241,7 +241,9 @@ int main( int argc, char** argv )
 
       for( auto&& cliqueVertex : cliqueVertices )
       {
-        accumulatedPersistenceMap[cliqueVertex] += std::isfinite( itPoint->persistence() ) ? itPoint->persistence() : maxWeight - itPoint->x();
+        auto persistence = std::isfinite( itPoint->persistence() ) ? std::pow( itPoint->persistence(), 2 ) : std::pow( 2*maxWeight - itPoint->x(), 2 );
+
+        accumulatedPersistenceMap[cliqueVertex] += persistence;
         numberOfCliqueCommunities[cliqueVertex] += 1;
       }
 
