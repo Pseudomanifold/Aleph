@@ -2,6 +2,7 @@
 #include <fstream>
 #include <iostream>
 #include <map>
+#include <sstream>
 #include <string>
 #include <vector>
 
@@ -134,26 +135,33 @@ int main( int argc, char** argv )
   std::ofstream logout( "/tmp/DNA_" + std::to_string( n ) + "_log.txt" );
 
   {
-    unsigned index = 0;
+    std::ostringstream stream;
 
-    logout << "unset border\n";
-    logout << "set key off\n";
-    logout << "set xtics (";
-
-    for( auto&& logbin : logbins )
     {
-      if( index != 0 )
-        logout << ",";
+      unsigned index = 0;
 
-      logout << "\"" << logbin <<  "\" " << index;
+      stream << "unset border\n";
+      stream << "set key off\n";
+      stream << "set xtics (";
 
-      ++index;
+      for( auto&& logbin : logbins )
+      {
+        if( index != 0 )
+          stream << ",";
+
+        stream << "\"" << logbin <<  "\" " << index;
+
+        ++index;
+      }
+
+      stream << ") nomirror\n";
     }
 
-    logout << ") nomirror\n";
-  }
+    stream << "plot '-' matrix with image\n";
 
-  logout << "plot '-' matrix with image\n";
+    linout << stream.str();
+    logout << stream.str();
+  }
 
   for( auto&& pif : persistenceIndicatorFunctions )
   {
@@ -171,7 +179,7 @@ int main( int argc, char** argv )
 
       linhist.at(linbin) += value;
 
-      if( login )
+      if( logbin < loghist.size() )
         loghist.at(logbin) += value;
     }
 
