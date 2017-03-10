@@ -31,6 +31,26 @@ template <class D, class V> void test( const std::string& filename )
   ALEPH_ASSERT_EQUAL( *vertices.begin(),  1  );
   ALEPH_ASSERT_EQUAL( *vertices.rbegin(), 10 );
 
+  auto itSigma = K.find( Simplex( {2,8} ) );
+  auto itTau   = K.find( Simplex( {5,7} ) );
+
+  ALEPH_ASSERT_THROW( itSigma != K.end() );
+  ALEPH_ASSERT_THROW( itTau   != K.end() );
+
+  auto w1 = itSigma->data();
+  auto w2 = itTau->data();
+
+  if( w1 == w2 )
+  {
+    ALEPH_ASSERT_EQUAL( w1, 0 );
+    ALEPH_ASSERT_EQUAL( w2, 0 );
+  }
+  else
+  {
+    ALEPH_ASSERT_EQUAL( w1, 23 );
+    ALEPH_ASSERT_EQUAL( w2, 42 );
+  }
+
   ALEPH_TEST_END();
 }
 
