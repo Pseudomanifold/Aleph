@@ -33,7 +33,7 @@ template <class Map> void print( std::ostream& o, const Map& m, unsigned row )
 {
   unsigned column = 0;
   for( auto it = m.begin(); it != m.end(); ++it )
-    o << row << "\t" << column++ << "\t" << *it << "\n";
+    o << column++ << "\t" << row << "\t" << *it << "\n";
 
   o << "\n";
 }
