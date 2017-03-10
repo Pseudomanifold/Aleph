@@ -14,15 +14,26 @@ using DataType           = double;
 using PersistenceDiagram = aleph::PersistenceDiagram<DataType>;
 using StepFunction       = aleph::math::StepFunction<double>;
 
-template <class Map> void print( std::ostream& o, const Map& m )
-{
-  for( auto it = m.begin(); it != m.end(); ++it )
-  {
-    if( it != m.begin() )
-      o << "\t";
+/*
+  Prints a vector in a simple matrix-like format. Given a row index, all
+  of the entries are considered to be the columns of the matrix:
 
-    o << *it;
-  }
+    Input:   {4,5,6}, row = 23
+
+    Output:  23 0 4
+             23 1 5
+             23 2 6
+             <empty line>
+
+  This output format is flexible and permits direct usage in other tools
+  such as TikZ or pgfplots.
+*/
+
+template <class Map> void print( std::ostream& o, const Map& m, unsigned row )
+{
+  unsigned column = 0;
+  for( auto it = m.begin(); it != m.end(); ++it )
+    o << row << "\t" << column++ << "\t" << *it << "\n";
 
   o << "\n";
 }
@@ -134,31 +145,7 @@ int main( int argc, char** argv )
   std::ofstream linout( "/tmp/DNA_" + std::to_string( n ) + "_lin.txt" );
   std::ofstream logout( "/tmp/DNA_" + std::to_string( n ) + "_log.txt" );
 
-  auto makeHeader = [] ( std::ofstream& out, const std::vector<DataType>& bins )
-  {
-    unsigned index = 0;
-    out << "unset border\n";
-    out << "set key off\n";
-    out << "set xtics (";
-
-    for( auto&& bin : bins )
-    {
-      if( index != 0 )
-        out << ",";
-
-      out << "\"" << bin <<  "\" " << index;
-
-      ++index;
-    }
-
-    out << ") nomirror\n";
-
-    out << "plot '-' matrix with image\n";
-  };
-
-  makeHeader( linout, linbins );
-  makeHeader( logout, logbins );
-
+  unsigned index = 0;
   for( auto&& pif : persistenceIndicatorFunctions )
   {
     std::vector<DataType> linhist(n);
@@ -179,9 +166,9 @@ int main( int argc, char** argv )
         loghist.at(logbin) += value;
     }
 
-    print( linout, linhist );
-    print( logout, loghist );
-  }
+    print( linout, linhist, index );
+    print( logout, loghist, index );
 
-  logout << "e\n";
+    ++index;
+  }
 }
