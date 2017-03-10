@@ -134,34 +134,30 @@ int main( int argc, char** argv )
   std::ofstream linout( "/tmp/DNA_" + std::to_string( n ) + "_lin.txt" );
   std::ofstream logout( "/tmp/DNA_" + std::to_string( n ) + "_log.txt" );
 
+  auto makeHeader = [] ( std::ofstream& out, const std::vector<DataType>& bins )
   {
-    std::ostringstream stream;
+    unsigned index = 0;
+    out << "unset border\n";
+    out << "set key off\n";
+    out << "set xtics (";
 
+    for( auto&& bin : bins )
     {
-      unsigned index = 0;
+      if( index != 0 )
+        out << ",";
 
-      stream << "unset border\n";
-      stream << "set key off\n";
-      stream << "set xtics (";
+      out << "\"" << bin <<  "\" " << index;
 
-      for( auto&& logbin : logbins )
-      {
-        if( index != 0 )
-          stream << ",";
-
-        stream << "\"" << logbin <<  "\" " << index;
-
-        ++index;
-      }
-
-      stream << ") nomirror\n";
+      ++index;
     }
 
-    stream << "plot '-' matrix with image\n";
+    out << ") nomirror\n";
 
-    linout << stream.str();
-    logout << stream.str();
-  }
+    out << "plot '-' matrix with image\n";
+  };
+
+  makeHeader( linout, linbins );
+  makeHeader( logout, logbins );
 
   for( auto&& pif : persistenceIndicatorFunctions )
   {
