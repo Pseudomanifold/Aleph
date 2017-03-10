@@ -1,0 +1,13 @@
+%
+% This graph contains vertex labels and three edges, two with weights, the
+% other one without.
+%
+
+*Vertices 3
+1 "Node A"
+2 "Node B"
+3 "Node C"
+*Edges
+1 2
+2 3 42
+1 3 23
