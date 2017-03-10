@@ -170,7 +170,9 @@ int main( int argc, char** argv )
       auto logbin = valueToLogIndex(x);
 
       linhist.at(linbin) += value;
-      loghist.at(logbin) += value;
+
+      if( login )
+        loghist.at(logbin) += value;
     }
 
     print( linout, linhist );
