@@ -42,6 +42,8 @@ public:
 
   template <class SimplicialComplex> void operator()( std::ifstream& in, SimplicialComplex& K )
   {
+    _labels.clear();
+
     using namespace aleph::utilities;
 
     using Simplex           = typename SimplicialComplex::ValueType;
@@ -57,10 +59,10 @@ public:
 
     std::smatch matches;
 
-    std::vector<Simplex> vertices;
-    std::vector<Simplex> edges;
+    std::vector<Simplex> simplices;
 
     std::string line;
+
     while( std::getline( in, line ) )
     {
       // Although this is not explicitly specified in the rather terse
@@ -87,7 +89,9 @@ public:
           auto value = std::toul( matches[2] );
           mode       = Mode::Vertices;
 
-          vertices.reserve( value );
+          // TODO: We should use the value in order to check whether
+          // additional vertices need to be added.
+          simplices.reserve( value );
         }
         else if( name == "edges" || name == "arcs" )
           mode = Mode::Edges;
@@ -113,12 +117,27 @@ public:
         // TODO: We could potentially support vertex weights here as well but
         // the original file format specification apparently does not account
         // for it.
-        vertices.push_back( Simplex( VertexType( std::stoul(id) ) ) );
+        simplices.push_back( Simplex( VertexType( std::stoul(id) ) ) );
       }
 
       // 2nd case: Proceed according to parser mode: edges
       else if( mode == Mode::Edges )
       {
+        if( !std::regex_match( line, matches, reEdge ) )
+          throw std::runtime_error( "Unable to parse edge identifier" );
+
+        auto source = VertexType( std::stoul( matches[1] ) );
+        auto target = VertexType( std::stoul( matches[2] ) );
+
+        Simplex edge( {source, target} );
+
+        if( !matches[3].empty() )
+        {
+          auto weight = convert<DataType>( matches[3] );
+          edge.setData( weight );
+        }
+
+        simplices.push_back( edge );
       }
 
       // 2nd case: Proceed according to parse mode: unspecified
@@ -128,6 +147,8 @@ public:
         // put up warnings here, though...
       }
     }
+
+    K = SimplicialComplex( simplices.begin(), simplices.end() );
   }
 
 private:
