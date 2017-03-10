@@ -25,6 +25,7 @@
 
 #include "topology/io/EdgeLists.hh"
 #include "topology/io/GML.hh"
+#include "topology/io/Pajek.hh"
 
 #include "utilities/Filesystem.hh"
 
@@ -92,6 +93,25 @@ int main( int argc, char** argv )
 
     if( labels.empty() )
       labels.clear();
+  }
+  else if( aleph::utilities::extension( filename ) == ".net" )
+  {
+    aleph::topology::io::PajekReader reader;
+    reader( filename, K );
+
+    auto labelMap = reader.getLabelMap();
+
+    // Note that this assumes that the labels are convertible to
+    // numbers.
+    //
+    // TODO: Solve this generically?
+    for( auto&& pair : labelMap )
+      if( !pair.second.empty() )
+        labels[ static_cast<VertexType>( std::stoul( pair.first ) ) ] = pair.second;
+
+    if( labels.empty() )
+      labels.clear();
+
   }
   else
   {
