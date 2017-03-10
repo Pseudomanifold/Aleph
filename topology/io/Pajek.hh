@@ -60,6 +60,7 @@ public:
     std::smatch matches;
 
     std::vector<Simplex> simplices;
+    std::size_t numVertices = 0;
 
     std::string line;
 
@@ -86,12 +87,10 @@ public:
           if( !std::regex_match( line, matches, reKeyValue ) )
             throw std::runtime_error( "Unable to parse vertices specification" );
 
-          auto value = std::stoul( matches[2] );
-          mode       = Mode::Vertices;
+          numVertices = std::stoul( matches[2] );
+          mode        = Mode::Vertices;
 
-          // TODO: We should use the value in order to check whether
-          // additional vertices need to be added.
-          simplices.reserve( value );
+          simplices.reserve( numVertices );
         }
         else if( name == "edges" || name == "arcs" )
           mode = Mode::Edges;
@@ -123,6 +122,21 @@ public:
       // 2nd case: Proceed according to parser mode: edges
       else if( mode == Mode::Edges )
       {
+        // Check if there are sufficiently many vertices created. If
+        // not, create all of the manually. Note that this procedure
+        // merely works in cases where vertices do not have a label,
+        // because this case permits leaving out the IDs in the data
+        // file. If vertices have labels their number must match the
+        // one specified in the file. Everything else is an error.
+        if( simplices.empty() )
+        {
+          for( std::size_t i = 0; i < numVertices; i++ )
+            simplices.push_back( Simplex( VertexType(i+1) ) );
+        }
+
+        if( simplices.size() < numVertices )
+          throw std::runtime_error( "Missing at least one vertex specification" );
+
         if( !std::regex_match( line, matches, reEdge ) )
           throw std::runtime_error( "Unable to parse edge identifier" );
 
