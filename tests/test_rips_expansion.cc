@@ -8,6 +8,7 @@
 #include "topology/Simplex.hh"
 #include "topology/SimplicialComplex.hh"
 
+#include <algorithm>
 #include <iterator>
 #include <set>
 #include <vector>
@@ -149,6 +150,19 @@ template <class Data, class Vertex> void expanderComparison()
   K2.sort( aleph::filtrations::Data<Simplex>() );
 
   ALEPH_ASSERT_THROW( K1 == K2 );
+
+  auto K3 = retd( K, 3, 2 );
+  K3 = retd.assignMaximumWeight( K3, K );
+
+  K3.sort( aleph::filtrations::Data<Simplex>() );
+
+  ALEPH_ASSERT_THROW( K3.size() < K2.size() );
+
+  {
+    auto numSimplices = std::count_if( K2.begin(), K2.end(), [] ( const Simplex& s ) { return s.dimension() >= 2 && s.dimension() <= 3; } );
+
+    ALEPH_ASSERT_EQUAL( decltype(K3.size())( numSimplices ), K3.size() );
+  }
 
   ALEPH_TEST_END();
 }
