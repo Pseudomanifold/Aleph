@@ -676,7 +676,7 @@ public:
 
   bool operator!=( const SimplicialComplex<Simplex>& other ) const
   {
-    return this->operator==( other );
+    return !this->operator==( other );
   }
 
   // debug -------------------------------------------------------------
