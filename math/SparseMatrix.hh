@@ -19,6 +19,7 @@ public:
   using IndexType   = T;
   using ColumnType  = std::set<IndexType>;
   using ColumnsType = std::vector<ColumnType>;
+  using size_type   = typename ColumnType::size_type;
 
 
   SparseBinaryMatrix( IndexType columns )
@@ -34,7 +35,7 @@ public:
 
   void set( IndexType row, IndexType column )
   {
-    _columns.at( column ).insert( row );
+    _columns.at( size_type( column ) ).insert( row );
   }
 
   /**
@@ -45,7 +46,7 @@ public:
 
   bool get( IndexType row, IndexType column ) const
   {
-    auto&& c = _columns.at( column );
+    auto&& c = _columns.at( size_type( column ) );
     return c.find( row ) != c.end();
   }
 
@@ -53,7 +54,7 @@ public:
   template <class OutputIterator> void get( IndexType column,
                                             OutputIterator result ) const
   {
-    auto&& c = _columns.at( column );
+    auto&& c = _columns.at( size_type( column ) );
 
     std::copy( c.begin(), c.end(), result );
   }
@@ -61,7 +62,7 @@ public:
   /** Returns number of non-zero entries in a given column */
   std::size_t numEntries( IndexType column ) const
   {
-    return _columns.at( column ).size();
+    return _columns.at( size_type( column ) ).size();
   }
 
   /** Returns number of columns */
