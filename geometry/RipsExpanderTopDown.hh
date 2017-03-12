@@ -85,7 +85,7 @@ public:
 
   SimplicialComplex operator()( const SimplicialComplex& K, unsigned kMax )
   {
-    return this->operator()( K, kMax, 1 );
+    return this->operator()( K, kMax, 0 );
   }
 
   SimplicialComplex operator()( const SimplicialComplex& K, unsigned kMax, unsigned kMin )
@@ -98,7 +98,7 @@ public:
     {
       auto C = std::vector<VertexType>( clique.begin(), clique.end() );
 
-      for( unsigned k = kMin; k <= std::min( kMax + 1, unsigned( C.size() ) ); k++ )
+      for( unsigned k = kMin + 1; k <= std::min( kMax + 1, unsigned( C.size() ) ); k++ )
       {
         do
         {
@@ -106,10 +106,11 @@ public:
         }
         while( detail::next_combination( C.begin(), C.begin() + k, C.end() ) );
       }
-
     }
 
-    return SimplicialComplex( simplices.begin(), simplices.end() );
+    SimplicialComplex S;
+    S.insert_without_validation( simplices.begin(), simplices.end() );
+    return S;
   }
 
   // Weight assignment -------------------------------------------------
