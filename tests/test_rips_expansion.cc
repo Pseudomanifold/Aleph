@@ -1,4 +1,5 @@
 #include "geometry/RipsExpander.hh"
+#include "geometry/RipsExpanderTopDown.hh"
 
 #include "tests/Base.hh"
 
@@ -112,6 +113,38 @@ template <class Data, class Vertex> void quad()
   ALEPH_TEST_END();
 }
 
+template <class Data, class Vertex> void expanderComparison()
+{
+  ALEPH_TEST_BEGIN( "Rips expander comparison" );
+
+  using Simplex           = Simplex<Data, Vertex>;
+  using SimplicialComplex = SimplicialComplex<Simplex>;
+
+  std::vector<Simplex> simplices
+    = { {0},
+        {1},
+        {2},
+        {3},
+        Simplex( {0,1}, Data(1) ),
+        Simplex( {0,2}, Data( std::sqrt(2.0) ) ),
+        Simplex( {1,2}, Data(1) ),
+        Simplex( {2,3}, Data(1) ),
+        Simplex( {0,3}, Data(1) ),
+        Simplex( {1,3}, Data( std::sqrt(2.0) ) ) };
+
+  SimplicialComplex K( simplices.begin(), simplices.end() );
+
+  RipsExpander<SimplicialComplex> re;
+  RipsExpanderTopDown<SimplicialComplex> retd;
+
+  auto K1 = re( K, 3 );
+  auto K2 = retd( K, 3 );
+
+  ALEPH_ASSERT_EQUAL( K1.size(), K2.size() );
+
+  ALEPH_TEST_END();
+}
+
 int main()
 {
   triangle<double, unsigned>();
@@ -123,4 +156,9 @@ int main()
   quad<double, short   >();
   quad<float,  unsigned>();
   quad<float,  short   >();
+
+  expanderComparison<double, unsigned>();
+  expanderComparison<double, short   >();
+  expanderComparison<float,  unsigned>();
+  expanderComparison<float,  short   >();
 }
