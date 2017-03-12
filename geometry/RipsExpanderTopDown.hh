@@ -2,6 +2,7 @@
 #define ALEPH_GEOMETRY_RIPS_EXPANDER_TOP_DOWN_HH__
 
 #include <algorithm>
+#include <limits>
 #include <list>
 #include <vector>
 
@@ -109,6 +110,46 @@ public:
     }
 
     return SimplicialComplex( simplices.begin(), simplices.end() );
+  }
+
+  // Weight assignment -------------------------------------------------
+
+  /**
+    Given a simplicial complex K, uses another simplicial complex S to
+    look up the weights that are to be assigned to K. The look up uses
+    simplices from the specified dimension only and uses their maximum
+    weight as the weight for the simplex in K.
+  */
+
+  SimplicialComplex assignMaximumWeight( const SimplicialComplex& K, const SimplicialComplex& S, unsigned dimension = 1 )
+  {
+    SimplicialComplex R;
+
+    for( auto s : K )
+    {
+      std::vector<VertexType> vertices( s.begin(), s.end() );
+      DataType weight = std::numeric_limits<DataType>::lowest();
+
+      // Unable to assign a 0-simplex a weight using nothing but the
+      // 1-simplices, for example.
+      if( s.dimension() < dimension )
+        continue;
+
+      do
+      {
+        auto lookup = Simplex( vertices.begin(), vertices.begin() + dimension );
+        auto it     = S.find( lookup );
+
+        if( it != S.end() )
+          weight = std::max( weight, it->data() );
+      }
+      while( detail::next_combination( vertices.begin(), vertices.begin() + dimension, vertices.end() ) );
+
+      s.setData( weight );
+      R.push_back_without_validation( s );
+    }
+
+    return R;
   }
 };
 
