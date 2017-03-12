@@ -24,7 +24,7 @@ public:
 
   SparseBinaryMatrix( IndexType columns )
   {
-    _columns.resize( columns );
+    _columns.resize( size_type( columns ) );
   }
 
   /**
