@@ -1,5 +1,7 @@
 #include "tests/Base.hh"
 
+#include "geometry/RipsExpanderTopDown.hh"
+
 #include "topology/MaximalCliques.hh"
 
 #include "topology/Simplex.hh"
@@ -74,6 +76,11 @@ template <class Data, class Vertex> void triangles()
   ALEPH_ASSERT_THROW( std::find( C22.begin(), C22.end(), std::set<Vertex>( {0,3  } ) ) != C22.end() );
   ALEPH_ASSERT_THROW( std::find( C22.begin(), C22.end(), std::set<Vertex>( {0,1,2} ) ) != C22.end() );
   ALEPH_ASSERT_THROW( std::find( C22.begin(), C22.end(), std::set<Vertex>( {3,4,5} ) ) != C22.end() );
+
+  aleph::geometry::RipsExpanderTopDown<SimplicialComplex> expander;
+
+  auto expandedK1 = expander( K1, 3 );
+  auto expandedK2 = expander( K2, 3 );
 
   ALEPH_TEST_END();
 }
