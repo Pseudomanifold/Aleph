@@ -97,7 +97,7 @@ public:
     {
       auto C = std::vector<VertexType>( clique.begin(), clique.end() );
 
-      for( unsigned k = kMin; k <= std::min( kMax, unsigned( C.size() ) ); k++ )
+      for( unsigned k = kMin; k <= std::min( kMax + 1, unsigned( C.size() ) ); k++ )
       {
         do
         {
