@@ -142,6 +142,14 @@ template <class Data, class Vertex> void expanderComparison()
 
   ALEPH_ASSERT_EQUAL( K1.size(), K2.size() );
 
+  K1 = re.assignMaximumWeight( K1 );
+  K2 = retd.assignMaximumWeight( K2, K );
+
+  K1.sort( aleph::filtrations::Data<Simplex>() );
+  K2.sort( aleph::filtrations::Data<Simplex>() );
+
+  ALEPH_ASSERT_THROW( K1 == K2 );
+
   ALEPH_TEST_END();
 }
 

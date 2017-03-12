@@ -128,22 +128,27 @@ public:
     for( auto s : K )
     {
       std::vector<VertexType> vertices( s.begin(), s.end() );
+      std::sort( vertices.begin(), vertices.end() );
+
       DataType weight = std::numeric_limits<DataType>::lowest();
 
       // Unable to assign a 0-simplex a weight using nothing but the
       // 1-simplices, for example.
       if( s.dimension() < dimension )
+      {
+        R.push_back_without_validation( s );
         continue;
+      }
 
       do
       {
-        auto lookup = Simplex( vertices.begin(), vertices.begin() + dimension );
+        auto lookup = Simplex( vertices.begin(), vertices.begin() + dimension + 1 );
         auto it     = S.find( lookup );
 
         if( it != S.end() )
           weight = std::max( weight, it->data() );
       }
-      while( detail::next_combination( vertices.begin(), vertices.begin() + dimension, vertices.end() ) );
+      while( detail::next_combination( vertices.begin(), vertices.begin() + dimension + 1, vertices.end() ) );
 
       s.setData( weight );
       R.push_back_without_validation( s );
