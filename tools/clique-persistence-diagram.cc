@@ -320,7 +320,7 @@ int main( int argc, char** argv )
                       [&maxWeight] ( const PersistenceDiagram::Point& p )
                       {
                         if( !std::isfinite( p.y() ) )
-                          return PersistenceDiagram::Point( p.x(), maxWeight );
+                          return PersistenceDiagram::Point( p.x(), 2 * maxWeight );
                         else
                           return PersistenceDiagram::Point( p );
                       } );
