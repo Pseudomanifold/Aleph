@@ -165,7 +165,7 @@ template <class Data, class Vertex> void expanderComparison()
   }
 
   auto K4 = retd( K, 3, 2 );
-  K4 = retd.assignMaximumWeight( K4, K4 );
+  K4 = retd.assignMaximumWeight( K4, K );
   K4.sort( aleph::filtrations::Data<Simplex>() );
 
   ALEPH_ASSERT_EQUAL( K3.size(), K4.size() );
