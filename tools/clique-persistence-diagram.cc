@@ -84,20 +84,22 @@ int main( int argc, char** argv )
 {
   static option commandLineOptions[] =
   {
-    { "centrality"    , no_argument,       nullptr, 'c' },
-    { "invert-weights", no_argument,       nullptr, 'i' },
-    { "reverse"       , no_argument,       nullptr, 'r' },
+    { "centrality"    , no_argument      , nullptr, 'c' },
+    { "ignore-empty"  , no_argument      , nullptr, 'e' },
+    { "invert-weights", no_argument      , nullptr, 'i' },
+    { "reverse"       , no_argument      , nullptr, 'r' },
     { "min-k"         , required_argument, nullptr, 'k' },
-    { nullptr         , 0          ,       nullptr,  0  }
+    { nullptr         , 0                , nullptr,  0  }
   };
 
   bool calculateCentrality = false;
+  bool ignoreEmpty         = false;
   bool invertWeights       = false;
   bool reverse             = false;
   unsigned minK            = 0;
 
   int option = 0;
-  while( ( option = getopt_long( argc, argv, "k:cir", commandLineOptions, nullptr ) ) != -1 )
+  while( ( option = getopt_long( argc, argv, "k:ceir", commandLineOptions, nullptr ) ) != -1 )
   {
     switch( option )
     {
@@ -107,6 +109,10 @@ int main( int argc, char** argv )
 
     case 'c':
       calculateCentrality = true;
+      break;
+
+    case 'e':
+      ignoreEmpty = true;
       break;
 
     case 'i':
@@ -261,7 +267,7 @@ int main( int argc, char** argv )
 
     std::cerr << "* " << k << "-cliques graph has " << C.size() << " simplices\n";
 
-    if( C.empty() )
+    if( !ignoreEmpty && C.empty())
     {
       std::cerr << "* Stopping here because no further cliques for processing exist\n";
       break;
@@ -330,6 +336,7 @@ int main( int argc, char** argv )
       std::cerr << "finished\n";
     }
 
+    if( !C.empty() )
     {
       using namespace aleph::utilities;
       auto outputFilename = formatOutput( "/tmp/" + stem( basename( filename ) ) + "_k", k, maxK );
