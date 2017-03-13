@@ -58,7 +58,15 @@ void usage()
             << "maximum dimension of a simplex for extracting a clique graph\n"
             << "and tracking persistence of clique communities.\n\n"
             << ""
-            << "Optional arguments:\n"
+            << "******************\n"
+            << "Optional arguments\n"
+            << "******************\n"
+            << "\n"
+            << " --centrality    : If specified, calculates centralities for\n"
+            << "                   all vertices. Note that this uses copious\n"
+            << "                   amounts of time because *all* communities\n"
+            << "                   need to be extracted and inspected.\n"
+            << "\n"
             << " --invert-weights: If specified, inverts input weights. This\n"
             << "                   is useful if the original weights measure\n"
             << "                   the strength of a relationship, and not a\n"
@@ -75,19 +83,25 @@ int main( int argc, char** argv )
 {
   static option commandLineOptions[] =
   {
+    { "centrality"    , no_argument, nullptr, 'c' },
     { "invert-weights", no_argument, nullptr, 'i' },
     { "reverse"       , no_argument, nullptr, 'r' },
     { nullptr         , 0          , nullptr,  0  }
   };
 
-  bool invertWeights = false;
-  bool reverse       = false;
+  bool calculateCentrality = false;
+  bool invertWeights       = false;
+  bool reverse             = false;
 
   int option = 0;
-  while( ( option = getopt_long( argc, argv, "ir", commandLineOptions, nullptr ) ) != -1 )
+  while( ( option = getopt_long( argc, argv, "cir", commandLineOptions, nullptr ) ) != -1 )
   {
     switch( option )
     {
+    case 'c':
+      calculateCentrality = true;
+      break;
+
     case 'i':
       invertWeights = true;
       break;
@@ -237,61 +251,63 @@ int main( int argc, char** argv )
     auto&& pd    = std::get<0>( tuple );
     auto&& pp    = std::get<1>( tuple );
 
-    auto itPoint = pd.begin();
-    for( auto itPair = pp.begin(); itPair != pp.end(); ++itPair )
+    pd.removeDiagonal();
+
+    if( calculateCentrality )
     {
-      // Skip zero-dimensional persistence pairs
-      if( itPoint->x() == itPoint->y() )
-      {
-        ++itPoint;
-        continue;
-      }
+      std::cerr << "* Calculating centrality measure (this may take a very long time!)...";
 
-      SimplicialComplex filteredComplex;
-
+      auto itPoint = pd.begin();
+      for( auto itPair = pp.begin(); itPair != pp.end(); ++itPair )
       {
-        std::vector<Simplex> simplices;
-        if( itPair->second < C.size() )
+        SimplicialComplex filteredComplex;
+
         {
-          simplices.reserve( itPair->second );
+          std::vector<Simplex> simplices;
+          if( itPair->second < C.size() )
+          {
+            simplices.reserve( itPair->second );
 
-          std::copy( C.begin() + itPair->first, C.begin() + itPair->second, std::back_inserter( simplices ) );
-          filteredComplex = SimplicialComplex( simplices.begin(), simplices.end() );
+            std::copy( C.begin() + itPair->first, C.begin() + itPair->second, std::back_inserter( simplices ) );
+            filteredComplex = SimplicialComplex( simplices.begin(), simplices.end() );
+          }
+          else
+            filteredComplex = C;
         }
-        else
-          filteredComplex = C;
+
+        auto uf          = calculateConnectedComponents( filteredComplex );
+        auto desiredRoot = *C.at( itPair->first ).begin();
+        auto root        = uf.find( desiredRoot ); // Normally, this should be a self-assignment,
+                                                   // but in some cases the order of traversal is
+                                                   // slightly different, resulting in unexpected
+                                                   // roots.
+
+        std::set<VertexType> cliqueVertices;
+        std::vector<VertexType> vertices;
+        uf.get( root, std::back_inserter( vertices ) );
+
+        for( auto&& vertex : vertices )
+        {
+          // Notice that the vertex identifier represents the index
+          // within the filtration of the _original_ complex, hence
+          // I can just access the corresponding simplex that way.
+          auto s = K.at( vertex );
+
+          cliqueVertices.insert( s.begin(), s.end() );
+        }
+
+        for( auto&& cliqueVertex : cliqueVertices )
+        {
+          auto persistence = std::isfinite( itPoint->persistence() ) ? std::pow( itPoint->persistence(), 2 ) : std::pow( 2*maxWeight - itPoint->x(), 2 );
+
+          accumulatedPersistenceMap[cliqueVertex] += persistence;
+          numberOfCliqueCommunities[cliqueVertex] += 1;
+        }
+
+        ++itPoint;
       }
 
-      auto uf          = calculateConnectedComponents( filteredComplex );
-      auto desiredRoot = *C.at( itPair->first ).begin();
-      auto root        = uf.find( desiredRoot ); // Normally, this should be a self-assignment,
-                                                 // but in some cases the order of traversal is
-                                                 // slightly different, resulting in unexpected
-                                                 // roots.
-
-      std::set<VertexType> cliqueVertices;
-      std::vector<VertexType> vertices;
-      uf.get( root, std::back_inserter( vertices ) );
-
-      for( auto&& vertex : vertices )
-      {
-        // Notice that the vertex identifier represents the index
-        // within the filtration of the _original_ complex, hence
-        // I can just access the corresponding simplex that way.
-        auto s = K.at( vertex );
-
-        cliqueVertices.insert( s.begin(), s.end() );
-      }
-
-      for( auto&& cliqueVertex : cliqueVertices )
-      {
-        auto persistence = std::isfinite( itPoint->persistence() ) ? std::pow( itPoint->persistence(), 2 ) : std::pow( 2*maxWeight - itPoint->x(), 2 );
-
-        accumulatedPersistenceMap[cliqueVertex] += persistence;
-        numberOfCliqueCommunities[cliqueVertex] += 1;
-      }
-
-      ++itPoint;
+      std::cerr << "finished\n";
     }
 
     {
@@ -299,8 +315,6 @@ int main( int argc, char** argv )
       auto outputFilename = formatOutput( "/tmp/" + stem( basename( filename ) ) + "_k", k, maxK );
 
       std::cerr << "* Storing output in '" << outputFilename << "'...\n";
-
-      pd.removeDiagonal();
 
       std::transform( pd.begin(), pd.end(), pd.begin(),
                       [&maxWeight] ( const PersistenceDiagram::Point& p )
