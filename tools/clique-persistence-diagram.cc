@@ -9,6 +9,10 @@
 
 #include <cmath>
 
+// TODO: Replace this as soon as possible with a more modern option
+// parser interface.
+#include <getopt.h>
+
 #include "filtrations/Data.hh"
 
 #include "geometry/RipsExpander.hh"
@@ -47,24 +51,64 @@ std::string formatOutput( const std::string& prefix, unsigned k, unsigned K )
 
 void usage()
 {
-  std::cerr << "Usage: clique-persistence-diagram FILE K\n"
+  std::cerr << "Usage: clique-persistence-diagram [--invert-weights] [--reverse] FILE K\n"
             << "\n"
             << "Calculates the clique persistence diagram for FILE, which is\n"
             << "supposed to be a weighted graph. The K parameter denotes the\n"
             << "maximum dimension of a simplex for extracting a clique graph\n"
-            << "and tracking persistence of clique communities.\n\n";
+            << "and tracking persistence of clique communities.\n\n"
+            << ""
+            << "Optional arguments:\n"
+            << " --invert-weights: If specified, inverts input weights. This\n"
+            << "                   is useful if the original weights measure\n"
+            << "                   the strength of a relationship, and not a\n"
+            << "                   dissimilarity.\n"
+            << "\n"
+            << " --reverse       : Reverses the enumeration order of cliques\n"
+            << "                   by looking for higher-dimensional cliques\n"
+            << "                   before enumerating lower-dimensional ones\n"
+            << "                   instead of the other way around.\n"
+            << "\n\n";
 }
 
 int main( int argc, char** argv )
 {
-  if( argc <= 2 )
+  static option commandLineOptions[] =
+  {
+    { "invert-weights", no_argument, nullptr, 'i' },
+    { "reverse"       , no_argument, nullptr, 'r' },
+    { nullptr         , 0          , nullptr,  0  }
+  };
+
+  bool invertWeights = false;
+  bool reverse       = false;
+
+  int option = 0;
+  while( ( option = getopt_long( argc, argv, "ir", commandLineOptions, nullptr ) ) != -1 )
+  {
+    switch( option )
+    {
+    case 'i':
+      invertWeights = true;
+      break;
+
+    case 'r':
+      reverse = true;
+      break;
+
+    default:
+      break;
+    }
+  }
+
+  if( (argc - optind ) < 2 )
   {
     usage();
     return -1;
   }
 
-  std::string filename = argv[1];
-  unsigned maxK        = static_cast<unsigned>( std::stoul( argv[2] ) );
+  std::string filename = argv[optind++];
+  unsigned maxK        = static_cast<unsigned>( std::stoul( argv[optind++] ) );
 
   SimplicialComplex K;
 
@@ -128,23 +172,23 @@ int main( int argc, char** argv )
   for( auto&& simplex : K )
     maxWeight = std::max( maxWeight, simplex.data() );
 
-  // TODO: Make weight inversion configurable. It is not required for all data
-  // sets but should be used on an as-needed basis.
-
-  std::cerr << "* Inverting filtration weights...";
-
-  for( auto it = K.begin(); it != K.end(); ++it )
+  if( invertWeights )
   {
-    if( K.dimension() == 0 )
-      continue;
+    std::cerr << "* Inverting filtration weights...";
 
-    auto s = *it;
-    s.setData( maxWeight - s.data() );
+    for( auto it = K.begin(); it != K.end(); ++it )
+    {
+      if( K.dimension() == 0 )
+        continue;
 
-    K.replace( it, s );
+      auto s = *it;
+      s.setData( maxWeight - s.data() );
+
+      K.replace( it, s );
+    }
+
+    std::cerr << "finished\n";
   }
-
-  std::cerr << "finished\n";
 
   // Expansion ---------------------------------------------------------
 
