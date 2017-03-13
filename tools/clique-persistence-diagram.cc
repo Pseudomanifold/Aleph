@@ -219,7 +219,7 @@ int main( int argc, char** argv )
   {
     aleph::geometry::RipsExpanderTopDown<SimplicialComplex> ripsExpander;
     auto L = ripsExpander( K, maxK, minK );
-    L      = ripsExpander.assignMaximumWeight( L, K );
+    K      = ripsExpander.assignMaximumWeight( L, K );
   }
   else
   {
@@ -244,7 +244,11 @@ int main( int argc, char** argv )
   std::vector<double> totalPersistenceValues;
   totalPersistenceValues.reserve( maxK );
 
-  for( unsigned k = 1; k <= maxK; k++ )
+  // By traversing the clique graphs in descending order I can be sure
+  // that a graph will be available. Otherwise, in case of a minimum k
+  // parameter and a reverted expansion, only empty clique graphs will
+  // be traversed.
+  for( unsigned k = maxK; k >= 1; k-- )
   {
     std::cerr << "* Extracting " << k << "-cliques graph...";
 
