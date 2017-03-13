@@ -16,6 +16,7 @@
 #include "filtrations/Data.hh"
 
 #include "geometry/RipsExpander.hh"
+#include "geometry/RipsExpanderTopDown.hh"
 
 #include "persistenceDiagrams/Norms.hh"
 #include "persistenceDiagrams/PersistenceDiagram.hh"
@@ -83,21 +84,27 @@ int main( int argc, char** argv )
 {
   static option commandLineOptions[] =
   {
-    { "centrality"    , no_argument, nullptr, 'c' },
-    { "invert-weights", no_argument, nullptr, 'i' },
-    { "reverse"       , no_argument, nullptr, 'r' },
-    { nullptr         , 0          , nullptr,  0  }
+    { "centrality"    , no_argument,       nullptr, 'c' },
+    { "invert-weights", no_argument,       nullptr, 'i' },
+    { "reverse"       , no_argument,       nullptr, 'r' },
+    { "min-k"         , required_argument, nullptr, 'k' },
+    { nullptr         , 0          ,       nullptr,  0  }
   };
 
   bool calculateCentrality = false;
   bool invertWeights       = false;
   bool reverse             = false;
+  unsigned minK            = 0;
 
   int option = 0;
-  while( ( option = getopt_long( argc, argv, "cir", commandLineOptions, nullptr ) ) != -1 )
+  while( ( option = getopt_long( argc, argv, "k:cir", commandLineOptions, nullptr ) ) != -1 )
   {
     switch( option )
     {
+    case 'k':
+      minK = unsigned( std::stoul( optarg ) );
+      break;
+
     case 'c':
       calculateCentrality = true;
       break;
@@ -208,9 +215,18 @@ int main( int argc, char** argv )
 
   std::cerr << "* Expanding simplicial complex to k=" << maxK << "...";
 
-  aleph::geometry::RipsExpander<SimplicialComplex> ripsExpander;
-  K = ripsExpander( K, maxK );
-  K = ripsExpander.assignMaximumWeight( K );
+  if( reverse )
+  {
+    aleph::geometry::RipsExpanderTopDown<SimplicialComplex> ripsExpander;
+    auto L = ripsExpander( K, maxK, minK );
+    L      = ripsExpander.assignMaximumWeight( L, K );
+  }
+  else
+  {
+    aleph::geometry::RipsExpander<SimplicialComplex> ripsExpander;
+    K = ripsExpander( K, maxK );
+    K = ripsExpander.assignMaximumWeight( K );
+  }
 
   std::cerr << "finished\n"
             << "* Expanded simplicial complex has " << K.size() << " simplices\n";
