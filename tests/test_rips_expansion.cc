@@ -164,6 +164,23 @@ template <class Data, class Vertex> void expanderComparison()
     ALEPH_ASSERT_EQUAL( decltype(K3.size())( numSimplices ), K3.size() );
   }
 
+  auto K4 = retd( K, 3, 2 );
+  K4 = retd.assignMaximumWeight( K4, K4 );
+  K4.sort( aleph::filtrations::Data<Simplex>() );
+
+  ALEPH_ASSERT_EQUAL( K3.size(), K4.size() );
+
+  {
+    auto it1 = K3.begin();
+    auto it2 = K4.begin();
+
+    for( ; it1 != K3.end() && it2 != K4.end(); ++it1, ++it2 )
+    {
+      ALEPH_ASSERT_THROW( *it1 == *it2 );
+      ALEPH_ASSERT_EQUAL( it1->data(), it2->data() );
+    }
+  }
+
   ALEPH_TEST_END();
 }
 
