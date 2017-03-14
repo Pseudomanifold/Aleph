@@ -87,6 +87,7 @@ int main( int argc, char** argv )
     { "centrality"    , no_argument      , nullptr, 'c' },
     { "ignore-empty"  , no_argument      , nullptr, 'e' },
     { "invert-weights", no_argument      , nullptr, 'i' },
+    { "normalize"     , no_argument      , nullptr, 'n' },
     { "reverse"       , no_argument      , nullptr, 'r' },
     { "min-k"         , required_argument, nullptr, 'k' },
     { nullptr         , 0                , nullptr,  0  }
@@ -95,6 +96,7 @@ int main( int argc, char** argv )
   bool calculateCentrality = false;
   bool ignoreEmpty         = false;
   bool invertWeights       = false;
+  bool normalize           = false;
   bool reverse             = false;
   unsigned minK            = 0;
 
@@ -117,6 +119,10 @@ int main( int argc, char** argv )
 
     case 'i':
       invertWeights = true;
+      break;
+
+    case 'n':
+      normalize = true;
       break;
 
     case 'r':
@@ -196,8 +202,35 @@ int main( int argc, char** argv )
   std::cerr << "finished\n";
 
   DataType maxWeight = std::numeric_limits<DataType>::lowest();
+  DataType minWeight = std::numeric_limits<DataType>::max();
   for( auto&& simplex : K )
+  {
     maxWeight = std::max( maxWeight, simplex.data() );
+    minWeight = std::min( minWeight, simplex.data() );
+  }
+
+  if( normalize && maxWeight != minWeight )
+  {
+    std::cerr << "* Normalizing weights to [0,1]...";
+
+    auto range = maxWeight - minWeight;
+
+    for (auto it = K.begin(); it != K.end(); ++it )
+    {
+      if( it->dimension() == 0 )
+        continue;
+
+      auto s = *it;
+
+      s.setData( ( s.data() - minWeight ) / range );
+      K.replace( it, s );
+    }
+
+    maxWeight = DataType(1);
+    minWeight = DataType(0);
+
+    std::cerr << "finished\n";
+  }
 
   if( invertWeights )
   {
@@ -205,7 +238,7 @@ int main( int argc, char** argv )
 
     for( auto it = K.begin(); it != K.end(); ++it )
     {
-      if( K.dimension() == 0 )
+      if( it->dimension() == 0 )
         continue;
 
       auto s = *it;
