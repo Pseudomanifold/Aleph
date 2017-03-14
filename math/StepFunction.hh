@@ -177,13 +177,29 @@ public:
 
       if( y1 == y3 && y2 == y4 )
         h.add( prev, curr, y1+y2 );
+
+      // A subdivision of the interval [prev, curr] is required because
+      // at least one of the functions differs on the end points of the
+      // interval.
       else if( y1 != y3 || y2 != y4 )
       {
+        // Make the interval smaller if we hit a point where at least a
+        // single function changes.
         if( y1 != y5 || y2 != y6 )
           prev = detail::next( prev );
 
-        h.add( prev, detail::previous( curr ), y5+y6 );
-        h.add( curr, detail::next(     curr ), y3+y4 );
+        if( y5+y6 != y3+y4 )
+        {
+          // [prev, curr - epsilon]: y5+y6
+          // [curr, curr + epsilon]: y3+y4
+          h.add( prev, detail::previous( curr ), y5+y6 );
+          h.add( curr, detail::next(     curr ), y3+y4 );
+        }
+
+        // FIXME: Not sure whether this is really the best workaround
+        // here or whether I need a different strategy.
+        else
+          h.add( prev, detail::next( curr ), y3+y4 );
 
         // Ensures that the next interval uses the proper start point for the
         // indicator function interval.
