@@ -6,6 +6,8 @@
 #include <string>
 #include <vector>
 
+#include <getopt.h>
+
 #include "persistenceDiagrams/IO.hh"
 #include "persistenceDiagrams/PersistenceDiagram.hh"
 #include "persistenceDiagrams/PersistenceIndicatorFunction.hh"
@@ -40,7 +42,34 @@ template <class Map> void print( std::ostream& o, const Map& m, unsigned row )
 
 int main( int argc, char** argv )
 {
-  if( argc <= 3 )
+  static option commandLineOptions[] =
+  {
+    { "min-k", required_argument, nullptr, 'k' },
+    { "max-k", required_argument, nullptr, 'K' },
+    { nullptr, 0                , nullptr,  0  }
+  };
+
+  int option = 0;
+
+  unsigned minK = 0;
+  unsigned maxK = 0;
+
+  while( ( option = getopt_long( argc, argv, "k:K:", commandLineOptions, nullptr ) ) != -1 )
+  {
+    switch( option )
+    {
+    case 'k':
+      minK = unsigned( std::stoul( optarg ) );
+      break;
+    case 'K':
+      maxK = unsigned( std::stoul( optarg ) );
+      break;
+    default:
+      break;
+    }
+  }
+
+  if( argc - optind < 2 )
   {
     // TODO: Show usage
     return -1;
