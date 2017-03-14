@@ -200,4 +200,14 @@ int main( int argc, char** argv )
 
     ++index;
   }
+
+  // Extend the output with sufficiently many empty histograms. This
+  // ensures that the output has the same dimensions.
+  for( unsigned i = unsigned( persistenceIndicatorFunctions.size() ); i < maxK; i++ )
+  {
+    std::vector<DataType> hist(n);
+
+    print( linout, hist, i );
+    print( logout, hist, i );
+  }
 }
