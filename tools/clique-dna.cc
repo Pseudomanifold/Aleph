@@ -75,7 +75,7 @@ int main( int argc, char** argv )
     return -1;
   }
 
-  unsigned n = static_cast<unsigned>( std::stoul( argv[1] ) );
+  unsigned n = static_cast<unsigned>( std::stoul( argv[optind++] ) );
 
   std::vector<std::string> filenames;
   std::vector<PersistenceDiagram> persistenceDiagrams;
@@ -83,7 +83,7 @@ int main( int argc, char** argv )
 
   std::set<DataType> domain;
 
-  for( int i = 2; i < argc; i++ )
+  for( int i = optind; i < argc; i++ )
   {
     filenames.push_back( argv[i] );
 
