@@ -26,42 +26,44 @@ namespace topology
 
 template <class Simplex> SimplicialComplex<Simplex> getCliqueGraph( const SimplicialComplex<Simplex>& K, unsigned k )
 {
-  // Maps k-simplices to their corresponding index in the filtration order of
-  // the simplicial complex. This simplifies the creation of edges.
-  std::map<Simplex, std::size_t> simplexMap;
-
   // Stores the co-faces of (k-1)-dimensional simplices. This is required for
   // the edge creation. Whenever two (or more) k-simplices appear in this map
   // they will be connected by an edge.
   std::map<Simplex, std::vector<std::size_t> > cofaceMap;
 
-  for( auto itPair = K.range(k); itPair.first != itPair.second; ++itPair.first )
-   simplexMap[ *itPair.first ] = K.index( *itPair.first );
-
-  for( auto&& pair : simplexMap )
-  {
-    auto&& simplex = pair.first;
-    auto&& index   = pair.second;
-
-    // TODO: Is the number of co-faces bounded? If so, I could reserve
-    // sufficient memory in the map.
-    for( auto itFace = simplex.begin_boundary(); itFace != simplex.end_boundary(); ++itFace )
-      cofaceMap[ *itFace ].push_back( index );
-  }
-
-  // Create vertices ---------------------------------------------------
-
   std::vector<Simplex> vertices;
-  vertices.reserve( simplexMap.size() );
-
   using VertexType = typename Simplex::VertexType;
 
-  for( auto&& pair : simplexMap )
   {
-    auto&& simplex = pair.first;
-    auto&& index   = pair.second;
+    // Maps k-simplices to their corresponding index in the filtration order of
+    // the simplicial complex. This simplifies the creation of edges.
+    std::map<Simplex, std::size_t> simplexMap;
 
-    vertices.push_back( Simplex( VertexType(index), simplex.data() ) );
+    for( auto itPair = K.range(k); itPair.first != itPair.second; ++itPair.first )
+     simplexMap[ *itPair.first ] = K.index( *itPair.first );
+
+    for( auto&& pair : simplexMap )
+    {
+      auto&& simplex = pair.first;
+      auto&& index   = pair.second;
+
+      // TODO: Is the number of co-faces bounded? If so, I could reserve
+      // sufficient memory in the map.
+      for( auto itFace = simplex.begin_boundary(); itFace != simplex.end_boundary(); ++itFace )
+        cofaceMap[ *itFace ].push_back( index );
+    }
+
+    // Create vertices -------------------------------------------------
+
+    vertices.reserve( simplexMap.size() );
+
+    for( auto&& pair : simplexMap )
+    {
+      auto&& simplex = pair.first;
+      auto&& index   = pair.second;
+
+      vertices.push_back( Simplex( VertexType(index), simplex.data() ) );
+    }
   }
 
   // Create edges ------------------------------------------------------
