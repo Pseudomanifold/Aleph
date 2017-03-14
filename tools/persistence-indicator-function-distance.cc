@@ -46,7 +46,7 @@ double distance( const std::vector<DataSet>& dataSet1, const std::vector<DataSet
     if( it != dataSet.end() )
       return it->persistenceIndicatorFunction;
     else
-      return PersistenceIndicatorFunction();
+      return const PersistenceIndicatorFunction();
   };
 
   double d = 0.0;
