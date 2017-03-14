@@ -104,12 +104,11 @@ template <class Simplex> SimplicialComplex<Simplex> getCliqueGraph( const Simpli
     }
   }
 
-  std::vector<Simplex> simplices;
-  simplices.reserve( vertices.size() + edges.size() );
-  simplices.insert( simplices.end(), vertices.begin(), vertices.end() );
-  simplices.insert( simplices.end(), edges.begin()   , edges.end()    );
+  SimplicialComplex<Simplex> L;
+  L.insert_without_validation( vertices.begin(), vertices.end() );
+  L.insert_without_validation( edges.begin(), edges.end() );
 
-  return SimplicialComplex<Simplex>( simplices.begin(), simplices.end() );
+  return L;
 }
 
 } // namespace topology
