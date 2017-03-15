@@ -23,6 +23,7 @@ using PersistenceIndicatorFunction = aleph::math::StepFunction<DataType>;
 
 struct DataSet
 {
+  std::string name;
   std::string filename;
   unsigned dimension;
 
@@ -63,18 +64,76 @@ double distance( const std::vector<DataSet>& dataSet1, const std::vector<DataSet
   return d;
 }
 
+double wassersteinDistance( const std::vector<DataSet>& dataSet1, const std::vector<DataSet>& dataSet2, unsigned minDimension, unsigned maxDimension, double power )
+{
+  auto getPersistenceDiagram = [] ( const std::vector<DataSet>& dataSet, unsigned dimension )
+  {
+    auto it = std::find_if( dataSet.begin(), dataSet.end(),
+                            [&dimension] ( const DataSet& dataSet )
+                            {
+                              return dataSet.dimension == dimension;
+                            } );
+
+    if( it != dataSet.end() )
+      return PersistenceDiagram( it->persistenceDiagram );
+    else
+      return PersistenceDiagram();
+  };
+
+  double d = 0.0;
+
+  for( unsigned dimension = minDimension; dimension <= maxDimension; dimension++ )
+  {
+    auto D1 = getPersistenceDiagram( dataSet1, dimension );
+    auto D2 = getPersistenceDiagram( dataSet2, dimension );
+
+    d += aleph::distances::wassersteinDistance( D1, D2, power );
+  }
+
+  d = std::pow( d, 1.0 / d );
+  return d;
+}
+
+
 int main( int argc, char** argv )
 {
-  if( argc <= 1 )
+  static option commandLineOptions[] =
+  {
+    { "power"      , required_argument, nullptr, 'p' },
+    { "wasserstein", no_argument      , nullptr, 'w' },
+    { nullptr      , 0                , nullptr,  0  }
+  };
+
+  double power                = 2.0;
+  bool useWassersteinDistance = false;
+
+  int option = 0;
+  while( ( option = getopt_long( argc, argv, "p:w", commandLineOptions, nullptr ) ) != -1 )
+  {
+    switch( option )
+    {
+    case 'p':
+      power = std::stod( optarg );
+      break;
+    case 'w':
+      useWassersteinDistance = true;
+      break;
+    default:
+      break;
+    }
+  }
+
+  if( ( argc - optind ) <= 1 )
   {
     // TODO: Show usage
     return -1;
   }
 
-  // Maps data sets to file names. Whether a new filename constitutes
-  // a new data set is decided by taking a look at the prefix of the
-  // filename.
-  std::map<std::string, std::vector<DataSet> > dataSets;
+  // Maps filenames to indices. I need this to ensure that the internal
+  // ordering of files coincides with the shell's ordering.
+  std::map<std::string, unsigned> filenameMap;
+
+  std::vector< std::vector<DataSet> > dataSets;
 
   // TODO: Make this regular expression more, well, 'expressive' and
   // support more methods of specifying a dimension.
@@ -90,8 +149,15 @@ int main( int argc, char** argv )
     std::vector<std::string> filenames;
     filenames.reserve( argc - 1 );
 
-    for( int i = 1; i < argc; i++ )
+    unsigned index = 0;
+
+    for( int i = optind; i < argc; i++ )
+    {
       filenames.push_back( argv[i] );
+      filenameMap[ filenames.back() ] = index++;
+    }
+
+    dataSets.resize( filenameMap.size() );
 
     for( auto&& filename : filenames )
     {
@@ -100,7 +166,7 @@ int main( int argc, char** argv )
         auto name      = matches[1];
         auto dimension = unsigned( std::stoul( matches[2] ) );
 
-        dataSets[name].push_back( { filename, dimension, {}, {} } );
+        dataSets[ filenameMap[filename] ].push_back( { name, filename, dimension, {}, {} } );
 
         minDimension = std::min( minDimension, dimension );
         maxDimension = std::max( maxDimension, dimension );
@@ -112,9 +178,9 @@ int main( int argc, char** argv )
 
   std::vector<PersistenceDiagram> persistenceDiagrams;
 
-  for( auto&& pair : dataSets )
+  for( auto&& sets : dataSets )
   {
-    for( auto&& dataSet : pair.second )
+    for( auto&& dataSet : sets )
     {
       std::cerr << "* Processing '" << dataSet.filename << "'...";
 
