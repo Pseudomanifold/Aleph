@@ -120,7 +120,7 @@ double wassersteinDistance( const std::vector<DataSet>& dataSet1, const std::vec
     d += aleph::distances::wassersteinDistance( D1, D2, power );
   }
 
-  d = std::pow( d, 1.0 / d );
+  d = std::pow( d, 1.0 / power );
   return d;
 }
 
