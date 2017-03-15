@@ -3,6 +3,7 @@
 
 #include "topology/SimplicialComplex.hh"
 
+#include <iterator>
 #include <list>
 #include <map>
 #include <stdexcept>
@@ -104,8 +105,8 @@ template <class Simplex> SimplicialComplex<Simplex> getCliqueGraph( const Simpli
   }
 
   SimplicialComplex<Simplex> L;
-  L.insert_without_validation( vertices.begin(), vertices.end() );
-  L.insert_without_validation( edges.begin(), edges.end() );
+  L.insert_without_validation( std::make_move_iterator( vertices.begin() ), std::make_move_iterator( vertices.end() ) );
+  L.insert_without_validation( std::make_move_iterator( edges.begin() ), std::make_move_iterator( edges.end() ) );
 
   return L;
 }
