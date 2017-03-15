@@ -310,8 +310,6 @@ int main( int argc, char** argv )
     auto&& pd    = std::get<0>( tuple );
     auto&& pp    = std::get<1>( tuple );
 
-    pd.removeDiagonal();
-
     if( calculateCentrality )
     {
       std::cerr << "* Calculating centrality measure (this may take a very long time!)...";
@@ -319,6 +317,21 @@ int main( int argc, char** argv )
       auto itPoint = pd.begin();
       for( auto itPair = pp.begin(); itPair != pp.end(); ++itPair )
       {
+        // Skip zero-dimensional persistence pairs. This looks somewhat
+        // wrong but is correct---recall that we are operating on _two_
+        // iterators at once!
+        //
+        // The persistence pair iterator is 'dumb' and has no knowledge
+        // about the persistence values. Hence, we need the iterator of
+        // the persistence diagram as well.
+        //
+        // Note that the diagram must not be modified for this to work!
+        if( itPoint->x() == itPoint->y() )
+        {
+          ++itPoint;
+          continue;
+        }
+
         SimplicialComplex filteredComplex;
 
         {
@@ -368,6 +381,8 @@ int main( int argc, char** argv )
 
       std::cerr << "finished\n";
     }
+
+    pd.removeDiagonal();
 
     if( !C.empty() )
     {
