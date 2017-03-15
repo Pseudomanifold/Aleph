@@ -39,6 +39,28 @@ struct DataSet
   PersistenceIndicatorFunction persistenceIndicatorFunction;
 };
 
+void storeMatrix( const std::vector< std::vector<double> >& M, std::ostream& out )
+{
+  if( M.empty() )
+    return;
+
+  auto rows = M.size();
+  auto cols = M.front().size();
+
+  for( decltype(rows) row = 0; row < rows; row++ )
+  {
+    for( decltype(cols) col = 0; col < cols; col++ )
+    {
+      if( col != 0 )
+        out << " ";
+
+      out << M[row][col];
+    }
+
+    out << "\n";
+  }
+}
+
 // Calculates the distance between two data sets. This requires enumerating all
 // dimensions, and finding the corresponding persistence indicator function. If
 // no such function exists, the function uses the norm of the function.
@@ -235,8 +257,12 @@ int main( int argc, char** argv )
 
       distances[row][col] = d;
       distances[col][row] = d;
-
-      std::cerr << "D[" << row << "][" << col << "]: " << d << "\n";
     }
   }
+
+  std::cerr << "Storing matrix...";
+
+  storeMatrix( distances, std::cout );
+
+  std::cerr << "finished\n";
 }
