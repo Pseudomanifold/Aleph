@@ -3,7 +3,6 @@
 
 #include "topology/SimplicialComplex.hh"
 
-#include <iterator>
 #include <list>
 #include <map>
 #include <stdexcept>
@@ -30,7 +29,7 @@ template <class Simplex> SimplicialComplex<Simplex> getCliqueGraph( const Simpli
   // Stores the co-faces of (k-1)-dimensional simplices. This is required for
   // the edge creation. Whenever two (or more) k-simplices appear in this map
   // they will be connected by an edge.
-  std::map<Simplex, std::list<std::size_t> > cofaceMap;
+  std::map<Simplex, std::vector<std::size_t> > cofaceMap;
 
   std::vector<Simplex> vertices;
   using VertexType = typename Simplex::VertexType;
@@ -80,13 +79,13 @@ template <class Simplex> SimplicialComplex<Simplex> getCliqueGraph( const Simpli
 
     if( indices.size() >= 2 )
     {
-      for( auto it1 = indices.begin(); it1 != indices.end(); ++it1 )
+      for( std::size_t i = 0; i < indices.size(); i++ )
       {
-        auto uIndex = *it1;
+        auto uIndex = indices[i];
 
-        for( auto it2 = std::next( it1 ); it2 != indices.end(); ++it2 )
+        for( std::size_t j = i+1; j < indices.size(); j++ )
         {
-          auto vIndex = *it2;
+          auto vIndex = indices[j];
 
           // TODO: What happens if the indices are invalid? Do I need to
           // prepare for this situation explicitly?
