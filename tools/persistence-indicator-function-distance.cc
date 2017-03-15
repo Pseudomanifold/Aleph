@@ -162,7 +162,14 @@ int main( int argc, char** argv )
     for( int i = optind; i < argc; i++ )
     {
       filenames.push_back( argv[i] );
-      filenameMap[ filenames.back() ] = index++;
+
+      if( std::regex_match( filenames.back(), matches, reDataSetPrefix ) )
+      {
+        auto name = matches[1];
+
+        if( filenameMap.find( name ) == filenameMap.end() )
+          filenameMap[ name ] = index++;
+      }
     }
 
     dataSets.resize( filenameMap.size() );
@@ -174,7 +181,7 @@ int main( int argc, char** argv )
         auto name      = matches[1];
         auto dimension = unsigned( std::stoul( matches[2] ) );
 
-        dataSets[ filenameMap[filename] ].push_back( { name, filename, dimension, {}, {} } );
+        dataSets.at( filenameMap[name] ).push_back( { name, filename, dimension, {}, {} } );
 
         minDimension = std::min( minDimension, dimension );
         maxDimension = std::max( maxDimension, dimension );
