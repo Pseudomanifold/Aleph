@@ -6,6 +6,14 @@
 #include <string>
 #include <vector>
 
+#include <cmath>
+
+// TODO: Replace this as soon as possible with a more modern option
+// parser interface.
+#include <getopt.h>
+
+#include "distances/Wasserstein.hh"
+
 #include "persistenceDiagrams/IO.hh"
 #include "persistenceDiagrams/PersistenceDiagram.hh"
 #include "persistenceDiagrams/PersistenceIndicatorFunction.hh"
@@ -211,7 +219,12 @@ int main( int argc, char** argv )
     std::size_t col = 0;
     for( auto it2 = std::next( it1 ); it2 != dataSets.end(); ++it2, ++col )
     {
-      auto d = distance( it1->second, it2->second, minDimension, maxDimension );
+      double d = 0.0;
+
+      if( useWassersteinDistance )
+        d = wassersteinDistance( *it1, *it2, minDimension, maxDimension, power );
+      else
+        d = distance( *it1, *it2, minDimension, maxDimension );
 
       distances[row][col] = d;
       distances[col][row] = d;
