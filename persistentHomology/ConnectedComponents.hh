@@ -93,27 +93,8 @@ calculateZeroDimensionalPersistenceDiagram( const topology::SimplicialComplex<Si
 
   using namespace topology;
 
-  // Extract {0,1}-simplices -----------------------------------------
-  //
-  // Note that there is a range predicate for the simplicial complex class that
-  // does essentially the same thing. However, the results of the query must be
-  // consistent with respect to the filtration order.
-  std::vector<Simplex> simplices;
-
-  std::copy_if( K.begin(), K.end(),
-                std::back_inserter( simplices ),
-                [] ( const Simplex& s ) { return s.dimension() <= 1; } );
-
-  SimplicialComplex<Simplex> S
-    = SimplicialComplex<Simplex>( simplices.begin(), simplices.end() );
-
   std::vector<VertexType> vertices;
-
-  for( auto&& s : simplices )
-  {
-    if( s.dimension() == 0 )
-      vertices.push_back( *s.begin() );
-  }
+  K.vertices( std::back_inserter( vertices ) );
 
   UnionFind<VertexType> uf( vertices.begin(), vertices.end() );
   PersistenceDiagram<DataType> pd;
@@ -121,49 +102,50 @@ calculateZeroDimensionalPersistenceDiagram( const topology::SimplicialComplex<Si
 
   CalculationTraits ct( pp );
 
-  for( auto&& simplex : S )
+  for( auto&& simplex : K )
   {
-    // Only edges can destroy a component
-    if( simplex.dimension() == 1 )
+    // Only edges can destroy a component; we may safely skip any other
+    // simplex with a different dimension.
+    if( simplex.dimension() != 1 )
+      continue;
+
+    // Prepare component destruction -----------------------------------
+
+    VertexType u = *( simplex.begin() );
+    VertexType v = *( simplex.begin() + 1 );
+
+    auto youngerComponent = uf.find( u );
+    auto olderComponent   = uf.find( v );
+
+    // If the component has already been merged by some other edge, we are
+    // not interested in it any longer.
+    if( youngerComponent == olderComponent )
+      continue;
+
+    // Ensures that the younger component is always the first component. A
+    // component is younger if it its parent vertex precedes the other one
+    // in the current filtration.
+    auto uIndex = K.index( Simplex( youngerComponent ) );
+    auto vIndex = K.index( Simplex( olderComponent ) );
+
+    // The younger component must have the _larger_ index as it is born
+    // _later_ in the filtration.
+    if( uIndex < vIndex )
     {
-      // Prepare component destruction -------------------------------
-
-      VertexType u = *( simplex.begin() );
-      VertexType v = *( simplex.begin() + 1 );
-
-      auto youngerComponent = uf.find( u );
-      auto olderComponent   = uf.find( v );
-
-      // If the component has already been merged by some other edge, we are
-      // not interested in it any longer.
-      if( youngerComponent == olderComponent )
-        continue;
-
-      // Ensures that the younger component is always the first component. A
-      // component is younger if it its parent vertex precedes the other one
-      // in the current filtration.
-      auto uIndex = S.index( Simplex( youngerComponent ) );
-      auto vIndex = S.index( Simplex( olderComponent ) );
-
-      // The younger component must have the _larger_ index as it is born
-      // _later_ in the filtration.
-      if( uIndex < vIndex )
-      {
-        std::swap( youngerComponent, olderComponent );
-        std::swap( uIndex, vIndex );
-      }
-
-      auto creation    = S[uIndex].data();
-      auto destruction = simplex.data();
-
-      uf.merge( youngerComponent, olderComponent );
-
-      pd.add( creation                         , destruction                                   );
-      ct.add( static_cast<VertexType>( uIndex ), static_cast<VertexType>( S.index( simplex ) ) );
+      std::swap( youngerComponent, olderComponent );
+      std::swap( uIndex, vIndex );
     }
+
+    auto creation    = K[uIndex].data();
+    auto destruction = simplex.data();
+
+    uf.merge( youngerComponent, olderComponent );
+
+    pd.add( creation                         , destruction                                   );
+    ct.add( static_cast<VertexType>( uIndex ), static_cast<VertexType>( K.index( simplex ) ) );
   }
 
-  // Store information about unpaired simplices ----------------------
+  // Store information about unpaired simplices ------------------------
   //
   // All components in the Union--Find data structure now correspond to
   // essential 0-dimensional homology classes of the input complex.
@@ -173,10 +155,10 @@ calculateZeroDimensionalPersistenceDiagram( const topology::SimplicialComplex<Si
 
   for( auto&& root : roots )
   {
-    auto creator = *S.find( Simplex( root ) );
+    auto creator = *K.find( Simplex( root ) );
 
     pd.add( creator.data()                                );
-    ct.add( static_cast<VertexType>( S.index( creator ) ) );
+    ct.add( static_cast<VertexType>( K.index( creator ) ) );
   }
 
   return std::make_tuple( pd, pp );
