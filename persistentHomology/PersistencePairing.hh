@@ -15,6 +15,8 @@ public:
 
   // Typedefs & aliases ------------------------------------------------
 
+  using IndexType     = Index;
+
   using ValueType     = std::pair<Index, Index>;
   using ContainerType = std::vector<ValueType>;
 
