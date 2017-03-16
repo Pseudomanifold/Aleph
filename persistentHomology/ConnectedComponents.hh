@@ -15,6 +15,59 @@
 namespace aleph
 {
 
+namespace traits
+{
+
+template <class Pairing> class PersistencePairingCalculation
+{
+public:
+
+  PersistencePairingCalculation( Pairing& pairing )
+    : _pairing( pairing )
+  {
+  }
+
+  using IndexType = typename Pairing::IndexType;
+
+  void add( IndexType u, IndexType v )
+  {
+    _pairing.add( u, v );
+  }
+
+  void add( IndexType u )
+  {
+    _pairing.add( u );
+  }
+
+private:
+  Pairing& _pairing;
+};
+
+template <class Pairing> class NoPersistencePairingCalculation
+{
+public:
+
+  NoPersistencePairingCalculation( Pairing& pairing )
+    : _pairing( pairing )
+  {
+  }
+
+  using IndexType = typename Pairing::IndexType;
+
+  void add( IndexType /* u */, IndexType /* v */ ) const noexcept
+  {
+  }
+
+  void add( IndexType /* u */ ) const noexcept
+  {
+  }
+
+private:
+  Pairing& _pairing;
+};
+
+} // namespace traits
+
 /**
   Calculates zero-dimensional persistent homology, i.e. tracking of connected
   components, for a given simplicial complex. This is highly-efficient, as it
@@ -25,7 +78,10 @@ namespace aleph
   check this, though!
 */
 
-template <class Simplex>
+template <
+  class Simplex,
+  class CalculationTraits = traits::NoPersistencePairingCalculation< PersistencePairing<typename Simplex::VertexType> >
+>
   std::tuple<
     PersistenceDiagram<typename Simplex::DataType>,
     PersistencePairing<typename Simplex::VertexType>
@@ -62,6 +118,8 @@ calculateZeroDimensionalPersistenceDiagram( const topology::SimplicialComplex<Si
   UnionFind<VertexType> uf( vertices.begin(), vertices.end() );
   PersistenceDiagram<DataType> pd;
   PersistencePairing<VertexType> pp;
+
+  CalculationTraits ct( pp );
 
   for( auto&& simplex : S )
   {
@@ -101,7 +159,7 @@ calculateZeroDimensionalPersistenceDiagram( const topology::SimplicialComplex<Si
       uf.merge( youngerComponent, olderComponent );
 
       pd.add( creation                         , destruction                                   );
-      pp.add( static_cast<VertexType>( uIndex ), static_cast<VertexType>( S.index( simplex ) ) );
+      ct.add( static_cast<VertexType>( uIndex ), static_cast<VertexType>( S.index( simplex ) ) );
     }
   }
 
@@ -118,7 +176,7 @@ calculateZeroDimensionalPersistenceDiagram( const topology::SimplicialComplex<Si
     auto creator = *S.find( Simplex( root ) );
 
     pd.add( creator.data()                                );
-    pp.add( static_cast<VertexType>( S.index( creator ) ) );
+    ct.add( static_cast<VertexType>( S.index( creator ) ) );
   }
 
   return std::make_tuple( pd, pp );
