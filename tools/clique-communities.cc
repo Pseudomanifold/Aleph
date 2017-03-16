@@ -177,7 +177,7 @@ int main( int argc, char** argv )
         std::cout << formatSimplex( *it );
       }
 
-      std::cout << "            ]";
+      std::cout << "]";
 
       if( root != *roots.rbegin() )
         std::cout << ",";
