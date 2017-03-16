@@ -124,6 +124,9 @@ int main( int argc, char** argv )
 
   K.sort( aleph::filtrations::Data<Simplex>() );
 
+  std::cout << "{\n"
+            << "  \"" << threshold << "\": {\n";
+
   for( unsigned k = 1; k <= maxK; k++ )
   {
     std::cerr << "* Extracting " << k << "-cliques graph...";
@@ -144,10 +147,7 @@ int main( int argc, char** argv )
 
     std::cerr << "* " << k << "-cliques graph has " << roots.size() << " connected components\n";
 
-    std::cout << "{\n"
-              << "  \"" << threshold << "\":\n"
-              << "  {\n"
-              << "     \"" << k << "\": ";
+    std::cout << "    \"" << (k+1) << "\": [\n";
 
     for( auto&& root : roots )
     {
@@ -167,7 +167,7 @@ int main( int argc, char** argv )
 
       std::sort( simplices.begin(), simplices.end() );
 
-      std::cout << "[";
+      std::cout << "            [";
 
       for( auto it = simplices.begin(); it != simplices.end(); ++it )
       {
@@ -177,11 +177,22 @@ int main( int argc, char** argv )
         std::cout << formatSimplex( *it );
       }
 
-      std::cout << "]\n";
+      std::cout << "            ]";
+
+      if( root != *roots.rbegin() )
+        std::cout << ",";
+
+      std::cout << "\n";
     }
 
-    std::cout << "  }\n";
+    std::cout << "    ]";
+
+    if( k < maxK )
+      std::cout << "  ,";
+
+    std::cout << "\n";
   }
 
-  std::cout << "}\n";
+  std::cout << "  }\n"
+            << "}\n";
 }
