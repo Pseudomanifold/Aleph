@@ -132,6 +132,31 @@ int main( int argc, char** argv )
 
   std::cerr << "finished\n";
 
+  DataType maxWeight = std::numeric_limits<DataType>::lowest();
+  DataType minWeight = std::numeric_limits<DataType>::max();
+  for( auto&& simplex : K )
+  {
+    maxWeight = std::max( maxWeight, simplex.data() );
+    minWeight = std::min( minWeight, simplex.data() );
+  }
+
+  // TODO: Make this configurable...
+  std::cerr << "* Inverting filtration weights...";
+
+  for( auto it = K.begin(); it != K.end(); ++it )
+  {
+    if( it->dimension() == 0 )
+      continue;
+
+    auto s = *it;
+    s.setData( maxWeight - s.data() );
+
+    K.replace( it, s );
+  }
+
+  std::cerr << "finished\n";
+
+
   // Thresholding ------------------------------------------------------
 
   {
