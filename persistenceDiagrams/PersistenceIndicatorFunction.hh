@@ -117,7 +117,7 @@ template <class DataType> aleph::math::StepFunction<DataType> persistenceIndicat
 
     // Case 2: There are duplicate creation & destruction values. This
     // necessitates the creation of two intervals: one interval at the
-    // current even point, with the proper number of active intervals,
+    // current event point, with the proper number of active intervals,
     // the other one *directly* afterwards to indicate the destruction
     // implied by the values.
     else
