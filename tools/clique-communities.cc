@@ -96,7 +96,7 @@ int main( int argc, char** argv )
     }
   }
 
-  if( ( argc - optind ) <= 3 )
+  if( (argc - optind) < 3 )
   {
     usage();
     return -1;
