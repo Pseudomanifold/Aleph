@@ -6,6 +6,10 @@
 #include <string>
 #include <sstream>
 
+// TODO: Replace this as soon as possible with a more modern option
+// parser interface.
+#include <getopt.h>
+
 #include <cmath>
 
 #include "filtrations/Data.hh"
@@ -46,6 +50,8 @@ template <class Simplex> std::string formatSimplex( const Simplex& s )
   return stream.str();
 }
 
+
+// FIXME: This is outdated...
 void usage()
 {
   std::cerr << "Usage: clique_communities FILE THRESHOLD K\n"
@@ -62,15 +68,43 @@ void usage()
 
 int main( int argc, char** argv )
 {
-  if( argc <= 3 )
+  static option commandLineOptions[] =
+  {
+    { "normalize"     , no_argument, nullptr, 'n' },
+    { "invert-weights", no_argument, nullptr, 'i' },
+    { nullptr         , 0          , nullptr,  0  }
+  };
+
+  bool normalize     = false;
+  bool invertWeights = false;
+
+  int option = 0;
+  while( ( option = getopt_long( argc, argv, "in", commandLineOptions, nullptr ) ) != -1 )
+  {
+    switch( option )
+    {
+    case 'i':
+      invertWeights = true;
+      break;
+
+    case 'n':
+      normalize = true;
+      break;
+
+    default:
+      break;
+    }
+  }
+
+  if( ( argc - optind ) <= 3 )
   {
     usage();
     return -1;
   }
 
-  std::string filename = argv[1];
-  double threshold     = std::stod( argv[2] );
-  unsigned maxK        = static_cast<unsigned>( std::stoul( argv[3] ) );
+  std::string filename = argv[optind++];
+  double threshold     = std::stod( argv[optind++] );
+  unsigned maxK        = static_cast<unsigned>( std::stoul( argv[optind++] ) );
 
   SimplicialComplex K;
 
@@ -115,6 +149,58 @@ int main( int argc, char** argv )
 
     std::cerr << "finished\n";
   }
+
+  DataType maxWeight = std::numeric_limits<DataType>::lowest();
+  DataType minWeight = std::numeric_limits<DataType>::max();
+  for( auto&& simplex : K )
+  {
+    maxWeight = std::max( maxWeight, simplex.data() );
+    minWeight = std::min( minWeight, simplex.data() );
+  }
+
+  // TODO: Copied from 'clique-persistence-diagram.cc'
+  if( normalize && maxWeight != minWeight )
+  {
+    std::cerr << "* Normalizing weights to [0,1]...";
+
+    auto range = maxWeight - minWeight;
+
+    for (auto it = K.begin(); it != K.end(); ++it )
+    {
+      if( it->dimension() == 0 )
+        continue;
+
+      auto s = *it;
+
+      s.setData( ( s.data() - minWeight ) / range );
+      K.replace( it, s );
+    }
+
+    maxWeight = DataType(1);
+    minWeight = DataType(0);
+
+    std::cerr << "finished\n";
+  }
+
+  // TODO: Copied from 'clique-persistence-diagram.cc'
+  if( invertWeights )
+  {
+    std::cerr << "* Inverting filtration weights...";
+
+    for( auto it = K.begin(); it != K.end(); ++it )
+    {
+      if( it->dimension() == 0 )
+        continue;
+
+      auto s = *it;
+      s.setData( maxWeight - s.data() );
+
+      K.replace( it, s );
+    }
+
+    std::cerr << "finished\n";
+  }
+
 
   // Expansion ---------------------------------------------------------
 
