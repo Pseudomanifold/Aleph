@@ -330,11 +330,15 @@ int main( int argc, char** argv )
       auto itPoint = pd.begin();
       for( auto itPair = pp.begin(); itPair != pp.end(); ++itPair )
       {
-        auto simplex = C.at( itPair->first );
+        auto simplex = K.at( *C.at( itPair->first ).begin() );
         assert( simplex.data() == itPoint->x() );
 
         for( auto&& vertex : simplex )
-          maximumPersistence[vertex] = std::max( maximumPersistence[vertex], itPoint->persistence() );
+        {
+          auto persistence = std::isfinite( itPoint->persistence() ) ? itPoint->persistence() : 2*maxWeight - itPoint->x();
+
+          maximumPersistence[vertex] = std::max( maximumPersistence[vertex], persistence );
+        }
 
         ++itPoint;
       }
