@@ -166,8 +166,16 @@ template <class T> void testPersistenceIndicatorFunction()
   pd2.add(1,   2  );
   pd2.add(3,   4  );
 
+  PersistenceDiagram pd3;
+  pd3.add(0,1);
+  pd3.add(1,2);
+
   auto f = aleph::persistenceIndicatorFunction( pd1);
   auto g = aleph::persistenceIndicatorFunction( pd2 );
+  auto h = aleph::persistenceIndicatorFunction( pd3 );
+
+  ALEPH_ASSERT_EQUAL( h(0), 1 );
+  ALEPH_ASSERT_EQUAL( h(2), 1 );
 
   ALEPH_TEST_END();
 }
