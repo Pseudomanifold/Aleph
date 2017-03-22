@@ -67,9 +67,12 @@ template <class T> void test()
   auto diagram1 = diagrams.front();
 
   ALEPH_ASSERT_THROW( diagram1.empty() == false );
-  ALEPH_ASSERT_THROW( diagram1.size()  == pointCloud.size() );
+  ALEPH_ASSERT_EQUAL( diagram1.size(), pointCloud.size() );
+
+  diagram1.removeDiagonal();
+
   ALEPH_ASSERT_THROW( diagram2.empty() == false );
-  ALEPH_ASSERT_THROW( diagram1.size()  == diagram2.size() );
+  ALEPH_ASSERT_EQUAL( diagram1.size(), diagram2.size() );
 
   using Point = typename decltype(diagram1)::Point;
 
