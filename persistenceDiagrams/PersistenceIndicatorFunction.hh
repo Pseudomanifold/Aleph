@@ -122,7 +122,7 @@ template <class DataType> aleph::math::StepFunction<DataType> persistenceIndicat
     // implied by the values.
     else
     {
-      f.add( previous, eventPoints.at(i).value, static_cast<DataType>( numActiveFeatures + creators ) );
+      f.add( previous, eventPoints.at(i).value, static_cast<DataType>( numActiveFeatures ) );
       useNextPoint = true;
     }
 
