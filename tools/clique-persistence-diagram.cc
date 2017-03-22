@@ -100,7 +100,6 @@ int main( int argc, char** argv )
     { "normalize"     , no_argument      , nullptr, 'n' },
     { "reverse"       , no_argument      , nullptr, 'r' },
     { "min-k"         , required_argument, nullptr, 'k' },
-    { "threshold"     , required_argument, nullptr, 't' },
     { nullptr         , 0                , nullptr,  0  }
   };
 
@@ -110,10 +109,9 @@ int main( int argc, char** argv )
   bool normalize           = false;
   bool reverse             = false;
   unsigned minK            = 0;
-  double threshold         = 0.0;
 
   int option = 0;
-  while( ( option = getopt_long( argc, argv, "k:ceir", commandLineOptions, nullptr ) ) != -1 )
+  while( ( option = getopt_long( argc, argv, "k:ceinr", commandLineOptions, nullptr ) ) != -1 )
   {
     switch( option )
     {
@@ -139,10 +137,6 @@ int main( int argc, char** argv )
 
     case 'r':
       reverse = true;
-      break;
-
-    case 't':
-      threshold = std::stod( optarg );
       break;
 
     default:
@@ -299,10 +293,6 @@ int main( int argc, char** argv )
   std::vector<double> totalPersistenceValues;
   totalPersistenceValues.reserve( maxK );
 
-  // Stores the maximum persistence value for a vertex. This permits
-  // removing individual vertices based on their clique affiliation.
-  std::map<VertexType, double> maximumPersistence;
-
   // By traversing the clique graphs in descending order I can be sure
   // that a graph will be available. Otherwise, in case of a minimum k
   // parameter and a reverted expansion, only empty clique graphs will
@@ -326,34 +316,11 @@ int main( int argc, char** argv )
       break;
     }
 
-    auto&& tuple = calculateCentrality || threshold != 0.0 ? aleph::calculateZeroDimensionalPersistenceDiagram<Simplex, aleph::traits::PersistencePairingCalculation<aleph::PersistencePairing<VertexType> > >( C )
+    auto&& tuple = calculateCentrality ? aleph::calculateZeroDimensionalPersistenceDiagram<Simplex, aleph::traits::PersistencePairingCalculation<aleph::PersistencePairing<VertexType> > >( C )
                                        : aleph::calculateZeroDimensionalPersistenceDiagram( C );
 
     auto&& pd    = std::get<0>( tuple );
     auto&& pp    = std::get<1>( tuple );
-
-    if( threshold != 0.0 )
-    {
-      std::cerr << "* Removing vertices with a persistence threshold <= " << threshold << "...";
-
-      auto itPoint = pd.begin();
-      for( auto itPair = pp.begin(); itPair != pp.end(); ++itPair )
-      {
-        auto simplex = K.at( *C.at( itPair->first ).begin() );
-        assert( simplex.data() == itPoint->x() );
-
-        for( auto&& vertex : simplex )
-        {
-          auto persistence = std::isfinite( itPoint->persistence() ) ? itPoint->persistence() : 2*maxWeight - itPoint->x();
-
-          maximumPersistence[vertex] = std::max( maximumPersistence[vertex], persistence );
-        }
-
-        ++itPoint;
-      }
-
-      std::cerr << "finished\n";
-    }
 
     if( calculateCentrality )
     {
@@ -451,9 +418,6 @@ int main( int argc, char** argv )
       out << pd << "\n";
     }
   }
-
-  for( auto&& pair : maximumPersistence )
-    std::cout << pair.first << "\t" << pair.second << "\n";
 
   {
     using namespace aleph::utilities;
