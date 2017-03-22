@@ -316,11 +316,10 @@ int main( int argc, char** argv )
       break;
     }
 
-    auto&& tuple = calculateCentrality ? aleph::calculateZeroDimensionalPersistenceDiagram<Simplex, aleph::traits::PersistencePairingCalculation<aleph::PersistencePairing<VertexType> > >( C )
-                                       : aleph::calculateZeroDimensionalPersistenceDiagram( C );
-
+    auto&& tuple = aleph::calculateZeroDimensionalPersistenceDiagram<Simplex, aleph::traits::PersistencePairingCalculation<aleph::PersistencePairing<VertexType> > >( C );
     auto&& pd    = std::get<0>( tuple );
     auto&& pp    = std::get<1>( tuple );
+    auto&& cs    = std::get<2>( tuple );
 
     if( calculateCentrality )
     {
