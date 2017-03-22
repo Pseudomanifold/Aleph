@@ -170,12 +170,29 @@ template <class T> void testPersistenceIndicatorFunction()
   pd3.add(0,1);
   pd3.add(1,2);
 
+  PersistenceDiagram pd4;
+  pd4.add(0,1);
+  pd4.add(0,6);
+  pd4.add(1,2);
+  pd4.add(2,3);
+  pd4.add(3,6);
+  pd4.add(5,8);
+
   auto f = aleph::persistenceIndicatorFunction( pd1);
   auto g = aleph::persistenceIndicatorFunction( pd2 );
   auto h = aleph::persistenceIndicatorFunction( pd3 );
+  auto i = aleph::persistenceIndicatorFunction( pd4 );
 
   ALEPH_ASSERT_EQUAL( h(0), 1 );
   ALEPH_ASSERT_EQUAL( h(2), 1 );
+
+  ALEPH_ASSERT_EQUAL( i(T(0.1)), 2 );
+  ALEPH_ASSERT_EQUAL( i(T(1.1)), 2 );
+  ALEPH_ASSERT_EQUAL( i(T(2.1)), 2 );
+  ALEPH_ASSERT_EQUAL( i(T(3.1)), 2 );
+  ALEPH_ASSERT_EQUAL( i(T(5.1)), 3 );
+  ALEPH_ASSERT_EQUAL( i(T(6.1)), 1 );
+  ALEPH_ASSERT_EQUAL( i(T(8.1)), 0 );
 
   ALEPH_TEST_END();
 }
