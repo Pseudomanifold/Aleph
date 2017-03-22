@@ -414,7 +414,12 @@ int main( int argc, char** argv )
       std::ofstream out( outputFilename );
       out << "# Original filename: " << filename << "\n";
       out << "# k                : " << k        << "\n";
-      out << pd << "\n";
+
+      {
+        auto itPoint = pd.begin();
+        for( auto itPair = pp.begin(); itPair != pp.end(); ++itPair, ++itPoint )
+          out << itPoint->x() << "\t" << itPoint->y() << "\t" << cs.at( *C.at( itPair->first ).begin()  ) << "\n";
+      }
     }
   }
 
