@@ -51,6 +51,15 @@ std::string formatOutput( const std::string& prefix, unsigned k, unsigned K )
   return stream.str();
 }
 
+std::string formatLabel( const std::string label )
+{
+  // No whitespace---nothing to do
+  if( label.find( '\t' ) == std::string::npos && label.find( ' ' ) == std::string::npos )
+    return label;
+  else
+    return "\""+label+"\"";
+}
+
 void usage()
 {
   std::cerr << "Usage: clique-persistence-diagram [--invert-weights] [--reverse] FILE K\n"
@@ -436,8 +445,6 @@ int main( int argc, char** argv )
                           return PersistenceDiagram::Point( p );
                       } );
 
-      totalPersistenceValues.push_back( aleph::totalPersistence( pd, 1.0 ) );
-
       std::ofstream out( outputFilename );
       out << "# Original filename: " << filename << "\n";
       out << "# k                : " << k        << "\n";
@@ -456,10 +463,7 @@ int main( int argc, char** argv )
 
     std::ofstream out( outputFilename );
 
-    auto normalizationFactor
-      = std::accumulate( totalPersistenceValues.begin(), totalPersistenceValues.end(), 0.0 );
-
     for( auto&& pair : accumulatedPersistenceMap )
-      out << pair.first << "\t" << pair.second / normalizationFactor << "\t" << numberOfCliqueCommunities.at(pair.first) <<  ( labels.empty() ? "" : "\t" + labels.at( pair.first ) ) << "\n";
+      out << pair.first << "\t" << pair.second << "\t" << numberOfCliqueCommunities.at(pair.first) <<  ( labels.empty() ? "" : "\t" + formatLabel( labels.at( pair.first ) ) ) << "\n";
   }
 }
