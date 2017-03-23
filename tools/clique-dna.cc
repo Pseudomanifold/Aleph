@@ -157,6 +157,24 @@ int main( int argc, char** argv )
 
   std::cerr << "\n";
 
+  for( auto it = linbins.begin(); it != linbins.end(); ++it )
+  {
+    if( it != linbins.begin() )
+    {
+      auto prev = std::prev( it );
+      domain.insert( ( *prev + *it ) / 2.0 );
+    }
+  }
+
+  for( auto it = logbins.begin(); it != logbins.end(); ++it )
+  {
+    if( it != logbins.begin() && std::isfinite( *it ) )
+    {
+      auto prev = std::prev( it );
+      domain.insert( ( *prev + *it ) / 2.0 );
+    }
+  }
+
   // Prepare histogram calculation -------------------------------------
 
   auto valueToLinIndex = [&min, &max, &linbins, &n] ( DataType value )
@@ -180,19 +198,16 @@ int main( int argc, char** argv )
     std::vector<DataType> linhist(n);
     std::vector<DataType> loghist(n);
 
-    std::set<DataType> domain;
-    pif.domain( std::inserter( domain, domain.begin() ) );
-
     for( auto&& x : domain )
     {
       auto value  = pif(x);
       auto linbin = valueToLinIndex(x);
       auto logbin = valueToLogIndex(x);
 
-      linhist.at(linbin) += value;
+      linhist.at(linbin) = std::max( linhist.at(linbin), value );
 
       if( logbin < loghist.size() )
-        loghist.at(logbin) += value;
+        loghist.at(logbin) = std::max( loghist.at(logbin), value );
     }
 
     print( linout, linhist, index );
