@@ -33,15 +33,6 @@ using VertexType         = unsigned;
 using Simplex            = aleph::topology::Simplex<DataType, VertexType>;
 using SimplicialComplex  = aleph::topology::SimplicialComplex<Simplex>;
 
-std::string formatLabel( const std::string label )
-{
-  // No whitespace---nothing to do
-  if( label.find( '\t' ) == std::string::npos && label.find( ' ' ) == std::string::npos )
-    return label;
-  else
-    return "\""+label+"\"";
-}
-
 template <class Simplex> std::string formatSimplex( const Simplex& s, bool useLabels, const std::map<VertexType, std::string>& labels )
 {
   std::ostringstream stream;
@@ -53,7 +44,7 @@ template <class Simplex> std::string formatSimplex( const Simplex& s, bool useLa
       stream << ",";
 
     if( useLabels )
-      stream << formatLabel( labels.at( *it ) );
+      stream << "\"" << labels.at( *it ) << "\"";
     else
       stream << *it;
   }
