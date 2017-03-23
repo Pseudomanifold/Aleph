@@ -33,7 +33,16 @@ using VertexType         = unsigned;
 using Simplex            = aleph::topology::Simplex<DataType, VertexType>;
 using SimplicialComplex  = aleph::topology::SimplicialComplex<Simplex>;
 
-template <class Simplex> std::string formatSimplex( const Simplex& s )
+std::string formatLabel( const std::string label )
+{
+  // No whitespace---nothing to do
+  if( label.find( '\t' ) == std::string::npos && label.find( ' ' ) == std::string::npos )
+    return label;
+  else
+    return "\""+label+"\"";
+}
+
+template <class Simplex> std::string formatSimplex( const Simplex& s, bool useLabels, const std::map<VertexType, std::string>& labels )
 {
   std::ostringstream stream;
   stream << "[";
@@ -42,7 +51,11 @@ template <class Simplex> std::string formatSimplex( const Simplex& s )
   {
     if( it != s.begin() )
       stream << ",";
-    stream << *it;
+
+    if( useLabels )
+      stream << formatLabel( labels.at( *it ) );
+    else
+      stream << *it;
   }
 
   stream << "]";
@@ -70,21 +83,27 @@ int main( int argc, char** argv )
 {
   static option commandLineOptions[] =
   {
+    { "labels"        , no_argument, nullptr, 'l' },
     { "normalize"     , no_argument, nullptr, 'n' },
     { "invert-weights", no_argument, nullptr, 'i' },
     { nullptr         , 0          , nullptr,  0  }
   };
 
+  bool useLabels     = false;
   bool normalize     = false;
   bool invertWeights = false;
 
   int option = 0;
-  while( ( option = getopt_long( argc, argv, "in", commandLineOptions, nullptr ) ) != -1 )
+  while( ( option = getopt_long( argc, argv, "iln", commandLineOptions, nullptr ) ) != -1 )
   {
     switch( option )
     {
     case 'i':
       invertWeights = true;
+      break;
+
+    case 'l':
+      useLabels = true;
       break;
 
     case 'n':
@@ -114,12 +133,29 @@ int main( int argc, char** argv )
   // calculation. It would make sense to share some functions
   // between the two applications.
 
+  // Optional map of node labels. If the graph contains node labels and
+  // I am able to read them, this map will be filled.
+  std::map<VertexType, std::string> labels;
+
   std::cerr << "* Reading '" << filename << "'...";
 
   if( aleph::utilities::extension( filename ) == ".gml" )
   {
     aleph::topology::io::GMLReader reader;
     reader( filename, K );
+
+    auto labelMap = reader.getNodeAttribute( "label" );
+
+    // Note that this assumes that the labels are convertible to
+    // numbers.
+    //
+    // TODO: Solve this generically?
+    for( auto&& pair : labelMap )
+      if( !pair.second.empty() )
+        labels[ static_cast<VertexType>( std::stoul( pair.first ) ) ] = pair.second;
+
+    if( labels.empty() )
+      labels.clear();
   }
   else
   {
@@ -260,7 +296,7 @@ int main( int argc, char** argv )
         if( it != simplices.begin() )
           std::cout << ",";
 
-        std::cout << formatSimplex( *it );
+        std::cout << formatSimplex( *it, useLabels, labels );
       }
 
       std::cout << "]";
