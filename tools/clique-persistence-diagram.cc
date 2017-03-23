@@ -325,7 +325,9 @@ int main( int argc, char** argv )
     {
       std::cerr << "* Calculating centrality measure (this may take a very long time!)...";
 
-      auto itPoint = pd.begin();
+      auto progress = 0.f;
+      auto itPoint  = pd.begin();
+
       for( auto itPair = pp.begin(); itPair != pp.end(); ++itPair )
       {
         // Skip zero-dimensional persistence pairs. This looks somewhat
@@ -386,6 +388,13 @@ int main( int argc, char** argv )
           accumulatedPersistenceMap[cliqueVertex] += persistence;
           numberOfCliqueCommunities[cliqueVertex] += 1;
         }
+
+        progress = float( std::distance( pd.begin(), itPoint ) ) / float( pd.size() ) * 100.f;
+
+        if( itPoint == pd.begin() )
+          std::cerr << "  0%";
+        else
+          std::cerr << "\b\b\b\b \b" << std::fixed << std::setw(3) << std::setprecision(0) << progress << "%";
 
         ++itPoint;
       }
