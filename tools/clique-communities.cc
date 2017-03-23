@@ -159,23 +159,7 @@ int main( int argc, char** argv )
 
   std::cerr << "finished\n";
 
-  // Thresholding ------------------------------------------------------
-
-  {
-    std::cerr << "* Filtering input data to threshold epsilon=" << threshold << "...";
-
-    std::vector<Simplex> simplices;
-
-    std::remove_copy_if( K.begin(), K.end(), std::back_inserter( simplices ),
-                         [&threshold] ( const Simplex& s )
-                         {
-                           return s.data() > threshold;
-                         } );
-
-    K = SimplicialComplex( simplices.begin(), simplices.end() );
-
-    std::cerr << "finished\n";
-  }
+  // Determining weights -----------------------------------------------
 
   DataType maxWeight = std::numeric_limits<DataType>::lowest();
   DataType minWeight = std::numeric_limits<DataType>::max();
@@ -228,6 +212,26 @@ int main( int argc, char** argv )
     std::cerr << "finished\n";
   }
 
+
+
+
+  // Thresholding ------------------------------------------------------
+
+  {
+    std::cerr << "* Filtering input data to threshold epsilon=" << threshold << "...";
+
+    std::vector<Simplex> simplices;
+
+    std::remove_copy_if( K.begin(), K.end(), std::back_inserter( simplices ),
+                         [&threshold] ( const Simplex& s )
+                         {
+                           return s.data() > threshold;
+                         } );
+
+    K = SimplicialComplex( simplices.begin(), simplices.end() );
+
+    std::cerr << "finished\n";
+  }
 
   // Expansion ---------------------------------------------------------
 
