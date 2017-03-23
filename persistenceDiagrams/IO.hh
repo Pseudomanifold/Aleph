@@ -45,7 +45,7 @@ template <class T> PersistenceDiagram<T> load( const std::string& filename )
 
     auto tokens = split( line );
 
-    if( tokens.size() == 2 )
+    if( tokens.size() >= 2 )
     {
       T a = convert<T>( tokens[0] );
       T b = convert<T>( tokens[1] );
