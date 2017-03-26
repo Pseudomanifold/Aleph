@@ -120,13 +120,18 @@ calculateZeroDimensionalPersistenceDiagram( const topology::SimplicialComplex<Si
   UnionFind<VertexType> uf( vertices.begin(), vertices.end() );
   PersistenceDiagram<DataType> pd;                               // Persistence diagram
   PersistencePairing<VertexType> pp;                             // Persistence pairing
-  std::unordered_map<typename Simplex::VertexType, unsigned> cs; // Component sizes
+  std::unordered_map<VertexType, unsigned> cs;                   // Component sizes
+  std::unordered_map<VertexType, std::vector<VertexType> > cc;   // Connected components
+  std::unordered_map<VertexType, DataType> ap;                   // Accumulated persistence
 
   PairingCalculationTraits ct( pp );
   ElementCalculationTraits et;
 
   for( auto&& vertex : vertices )
+  {
     cs[vertex] = 1;
+    cc[vertex] = { vertex };
+  }
 
   for( auto&& simplex : K )
   {
@@ -168,6 +173,14 @@ calculateZeroDimensionalPersistenceDiagram( const topology::SimplicialComplex<Si
     uf.merge( youngerComponent, olderComponent );
 
     cs[olderComponent] += cs[youngerComponent];
+
+    cc[olderComponent].insert( cc[olderComponent].end(),
+                               cc[youngerComponent].begin(), cc[youngerComponent].end() );
+
+    for( auto&& vertex : cc[youngerComponent] )
+      ap[vertex] += DataType( destruction - creation );
+
+    cc.erase(youngerComponent);
 
     if( et( creation, destruction ) )
     {
