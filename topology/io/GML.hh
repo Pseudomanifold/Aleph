@@ -255,6 +255,8 @@ public:
       // weights, if those are available.
       if( edge.dict.find( "weight" ) == edge.dict.end() && edge.dict.find( "value" ) == edge.dict.end() )
       {
+        // TODO: This is very slow and could be sped up by maintaining
+        // the simplex ID somewhere else with faster access.
         auto uSimplex = getSimplexByID( u );
         auto vSimplex = getSimplexByID( v );
 
