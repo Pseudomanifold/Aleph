@@ -23,6 +23,11 @@ public:
   {
     return true;
   }
+
+  template <class... T> bool initialize( T... /* arguments */ )
+  {
+    return true;
+  }
 };
 
 } // namespace utilities
