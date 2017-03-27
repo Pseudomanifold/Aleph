@@ -248,7 +248,6 @@ int main( int argc, char** argv )
 {
   static option commandLineOptions[] =
   {
-    { "centrality"    , no_argument      , nullptr, 'c' },
     { "ignore-empty"  , no_argument      , nullptr, 'e' },
     { "invert-weights", no_argument      , nullptr, 'i' },
     { "normalize"     , no_argument      , nullptr, 'n' },
@@ -257,7 +256,6 @@ int main( int argc, char** argv )
     { nullptr         , 0                , nullptr,  0  }
   };
 
-  bool calculateCentrality = false;
   bool ignoreEmpty         = false;
   bool invertWeights       = false;
   bool normalize           = false;
@@ -265,16 +263,12 @@ int main( int argc, char** argv )
   unsigned minK            = 0;
 
   int option = 0;
-  while( ( option = getopt_long( argc, argv, "k:ceinr", commandLineOptions, nullptr ) ) != -1 )
+  while( ( option = getopt_long( argc, argv, "k:einr", commandLineOptions, nullptr ) ) != -1 )
   {
     switch( option )
     {
     case 'k':
       minK = unsigned( std::stoul( optarg ) );
-      break;
-
-    case 'c':
-      calculateCentrality = true;
       break;
 
     case 'e':
