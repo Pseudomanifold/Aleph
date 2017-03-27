@@ -52,6 +52,11 @@ namespace
 class CliqueCommunityInformationFunctor
 {
 public:
+  CliqueCommunityInformationFunctor( SimplicialComplex& K )
+    : _K( K )
+  {
+  }
+
   void initialize( VertexType v )
   {
     _cs[v] = 1;
@@ -73,8 +78,26 @@ public:
     _cc[older].insert( _cc[older].end(),
                        _cc[younger].begin(), _cc[younger].end() );
 
+    std::unordered_set<VertexType> cliqueVertices;
+
     for( auto&& vertex : _cc[younger] )
-      _ap[vertex] += DataType( destruction - creation );
+    {
+      auto&& simplex = _K.at( vertex );
+
+      cliqueVertices.insert( simplex.begin(),
+                             simplex.end() );
+    }
+
+    // I don't want to count clique communities of negligible
+    // persistence...
+    if( creation != destruction )
+    {
+      for( auto&& vertex : cliqueVertices )
+      {
+        _vim[vertex].accumulatedPersistence    += std::pow( DataType( destruction - creation ), DataType(2) );
+        _vim[vertex].numberOfCliqueCommunities += 1;
+      }
+    }
 
     _cc.erase(younger);
   }
@@ -83,8 +106,21 @@ public:
                    DataType creation    // creation threshold
                  )
   {
+    std::unordered_set<VertexType> cliqueVertices;
+
     for( auto&& vertex : _cc[vertex] )
-      _ap[vertex] += DataType( _destruction - creation );
+    {
+      auto&& simplex = _K.at( vertex );
+
+      cliqueVertices.insert( simplex.begin(),
+                             simplex.end() );
+    }
+
+    for( auto&& vertex : cliqueVertices )
+    {
+      _vim[vertex].accumulatedPersistence    += std::pow( DataType( _destruction - creation ), DataType(2) );
+      _vim[vertex].numberOfCliqueCommunities += 1;
+    }
   }
 
   void setDestructionThreshold( DataType threshold )
@@ -98,10 +134,45 @@ public:
     return _cs.at( vertex );
   }
 
+  /** Query accumulated persistence information */
+  DataType accumulatedPersistence( VertexType vertex ) const
+  {
+    return _vim.at( vertex ).accumulatedPersistence;
+  }
+
+  /** Query number of clique communities */
+  unsigned numberOfCliqueCommunities( VertexType vertex ) const
+  {
+    return _vim.at( vertex ).numberOfCliqueCommunities;
+  }
+
 private:
+
+  // Original simplicial complex for looking up the vertices during
+  // merging and centrality calculations.
+  SimplicialComplex& _K;
+
+  // Vertex information storage class. That way, I only require
+  // a single map for looking up vertex information. The single
+  // component map is not a mistake, though: it needs to remain
+  // outside this struct because information needs to be erased
+  // from it.
+  struct VertexInformation
+  {
+    unsigned numberOfCliqueCommunities;
+    DataType accumulatedPersistence;
+  };
+
+  std::unordered_map<VertexType, VertexInformation> _vim;
+
+  // Maps with relative vertex indices --------------------------------
+  //
+  // The maps below use indices relative to the persistence diagram in
+  // that dimension. Hence, they count the number of features or their
+  // sizes without having direct knowledge about any other dimensions.
+
   std::unordered_map<VertexType, unsigned> _cs;                 // Component sizes
   std::unordered_map<VertexType, std::vector<VertexType> > _cc; // Connected components
-  std::unordered_map<VertexType, DataType> _ap;                 // Accumulated persistence
 
   /**
     Destruction threshold to use for essential persistent homology
@@ -366,6 +437,9 @@ int main( int argc, char** argv )
   std::vector<double> totalPersistenceValues;
   totalPersistenceValues.reserve( maxK );
 
+  CliqueCommunityInformationFunctor ccif( K );
+  ccif.setDestructionThreshold( 2 * maxWeight );
+
   // By traversing the clique graphs in descending order I can be sure
   // that a graph will be available. Otherwise, in case of a minimum k
   // parameter and a reverted expansion, only empty clique graphs will
@@ -389,12 +463,11 @@ int main( int argc, char** argv )
       break;
     }
 
-    CliqueCommunityInformationFunctor ccif;
-    ccif.setDestructionThreshold( 2 * maxWeight );
-
     auto&& tuple = aleph::calculateZeroDimensionalPersistenceDiagram<Simplex, aleph::traits::PersistencePairingCalculation<aleph::PersistencePairing<VertexType> > >( C, ccif );
     auto&& pd    = std::get<0>( tuple );
     auto&& pp    = std::get<1>( tuple );
+
+#if 0
 
     if( calculateCentrality )
     {
@@ -476,6 +549,7 @@ int main( int argc, char** argv )
 
       std::cerr << "finished\n";
     }
+#endif
 
     pd.removeDiagonal();
 
@@ -520,7 +594,15 @@ int main( int argc, char** argv )
 
     std::ofstream out( outputFilename );
 
-    for( auto&& pair : accumulatedPersistenceMap )
-      out << pair.first << "\t" << pair.second << "\t" << numberOfCliqueCommunities.at(pair.first) <<  ( labels.empty() ? "" : "\t" + formatLabel( labels.at( pair.first ) ) ) << "\n";
+    std::set<VertexType> vertices;
+    K.vertices( std::inserter( vertices, vertices.end() ) );
+
+    for( auto&& vertex : vertices )
+    {
+      out << vertex
+          << "\t" << ccif.accumulatedPersistence( vertex )
+          << "\t" << ccif.numberOfCliqueCommunities( vertex )
+          << ( labels.empty() ? "" : "\t" + formatLabel( labels.at( vertex ) ) ) << "\n";
+    }
   }
 }
