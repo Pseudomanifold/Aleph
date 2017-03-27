@@ -245,9 +245,15 @@ int main( int argc, char** argv )
 
   for( auto it1 = dataSets.begin(); it1 != dataSets.end(); ++it1, ++row )
   {
-    std::size_t col = row+1;
-    for( auto it2 = std::next( it1 ); it2 != dataSets.end(); ++it2, ++col )
+    std::size_t col = 0;
+    for( auto it2 = dataSets.begin(); it2 != dataSets.end(); ++it2, ++col )
     {
+      if( it1 == it2 )
+      {
+        distances[row][row] = 0.0;
+        continue;
+      }
+
       double d = 0.0;
 
       if( useWassersteinDistance )
