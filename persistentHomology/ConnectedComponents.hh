@@ -12,7 +12,6 @@
 
 #include <algorithm>
 #include <tuple>
-#include <unordered_map>
 #include <vector>
 
 namespace aleph
@@ -122,18 +121,12 @@ calculateZeroDimensionalPersistenceDiagram( const topology::SimplicialComplex<Si
   UnionFind<VertexType> uf( vertices.begin(), vertices.end() );
   PersistenceDiagram<DataType> pd;                               // Persistence diagram
   PersistencePairing<VertexType> pp;                             // Persistence pairing
-  std::unordered_map<VertexType, std::vector<VertexType> > cc;   // Connected components
-  std::unordered_map<VertexType, DataType> ap;                   // Accumulated persistence
 
   PairingCalculationTraits ct( pp );
   ElementCalculationTraits et;
 
   for( auto&& vertex : vertices )
-  {
-    cc[vertex] = { vertex };
-
     functor.initialize( vertex );
-  }
 
   for( auto&& simplex : K )
   {
@@ -174,18 +167,10 @@ calculateZeroDimensionalPersistenceDiagram( const topology::SimplicialComplex<Si
 
     uf.merge( youngerComponent, olderComponent );
 
-    cc[olderComponent].insert( cc[olderComponent].end(),
-                               cc[youngerComponent].begin(), cc[youngerComponent].end() );
-
     functor( youngerComponent,
              olderComponent,
              creation,
              destruction );
-
-    for( auto&& vertex : cc[youngerComponent] )
-      ap[vertex] += DataType( destruction - creation );
-
-    cc.erase(youngerComponent);
 
     if( et( creation, destruction ) )
     {
