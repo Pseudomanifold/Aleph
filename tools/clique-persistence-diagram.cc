@@ -6,6 +6,8 @@
 #include <numeric>
 #include <string>
 #include <sstream>
+#include <unordered_map>
+#include <vector>
 
 #include <cassert>
 #include <cmath>
@@ -41,6 +43,50 @@ using Simplex            = aleph::topology::Simplex<DataType, VertexType>;
 using SimplicialComplex  = aleph::topology::SimplicialComplex<Simplex>;
 using PersistenceDiagram = aleph::PersistenceDiagram<DataType>;
 
+namespace
+{
+
+// Basic functor for calculating all sorts of additional information
+// about clique communities. This is easier than using the algorithm
+// interface in order to provide said information.
+class CliqueCommunityInformationFunctor
+{
+public:
+  void initialize( VertexType v )
+  {
+    _cs[v] = 1;
+    _cc[v] = {v};
+  }
+
+  void operator()( VertexType younger,  // younger connected component
+                   VertexType older,    // older connected component
+                   DataType creation,   // creation threshold
+                   DataType destruction // destruction threshold
+                 )
+  {
+    // Increase component size recursively by increasing the vertex
+    // count for the older connected component.
+    _cs[older] += _cs[younger];
+
+    // Copy all vertices of the younger component to the older component
+    // in order to signal that they are now merged.
+    _cc[older].insert( _cc[older].end(),
+                       _cc[younger].begin(), _cc[younger].end() );
+
+    for( auto&& vertex : _cc[younger] )
+      _ap[vertex] += DataType( destruction - creation );
+
+    _cc.erase(younger);
+  }
+
+private:
+  std::unordered_map<VertexType, unsigned> _cs;                 // Component sizes
+  std::unordered_map<VertexType, std::vector<VertexType> > _cc; // Connected components
+  std::unordered_map<VertexType, DataType> _ap;                 // Accumulated persistence
+};
+
+} // anonymous namespace
+
 std::string formatOutput( const std::string& prefix, unsigned k, unsigned K )
 {
   std::ostringstream stream;
@@ -62,6 +108,7 @@ std::string formatLabel( const std::string label )
 
 void usage()
 {
+  // TODO: This is outdated...
   std::cerr << "Usage: clique-persistence-diagram [--invert-weights] [--reverse] FILE K\n"
             << "\n"
             << "Calculates the clique persistence diagram for FILE, which is\n"
