@@ -112,13 +112,13 @@ public:
     _cc.erase(younger);
   }
 
-  void operator()( VertexType vertex,   // root of an essential connected component
-                   DataType creation    // creation threshold
+  void operator()( VertexType root,   // root of an essential connected component
+                   DataType creation  // creation threshold
                  )
   {
     std::unordered_set<VertexType> cliqueVertices;
 
-    for( auto&& vertex : _cc[vertex] )
+    for( auto&& vertex : _cc[root] )
     {
       auto&& simplex = _K.at( vertex );
 
