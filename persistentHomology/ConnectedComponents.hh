@@ -107,8 +107,7 @@ template <
 >
   std::tuple<
     PersistenceDiagram<typename Simplex::DataType>,
-    PersistencePairing<typename Simplex::VertexType>,
-    std::unordered_map<typename Simplex::VertexType, unsigned>
+    PersistencePairing<typename Simplex::VertexType>
   >
 calculateZeroDimensionalPersistenceDiagram( const topology::SimplicialComplex<Simplex>& K, Functor&& functor = Functor() )
 {
@@ -123,7 +122,6 @@ calculateZeroDimensionalPersistenceDiagram( const topology::SimplicialComplex<Si
   UnionFind<VertexType> uf( vertices.begin(), vertices.end() );
   PersistenceDiagram<DataType> pd;                               // Persistence diagram
   PersistencePairing<VertexType> pp;                             // Persistence pairing
-  std::unordered_map<VertexType, unsigned> cs;                   // Component sizes
   std::unordered_map<VertexType, std::vector<VertexType> > cc;   // Connected components
   std::unordered_map<VertexType, DataType> ap;                   // Accumulated persistence
 
@@ -132,7 +130,6 @@ calculateZeroDimensionalPersistenceDiagram( const topology::SimplicialComplex<Si
 
   for( auto&& vertex : vertices )
   {
-    cs[vertex] = 1;
     cc[vertex] = { vertex };
 
     functor.initialize( vertex );
@@ -177,8 +174,6 @@ calculateZeroDimensionalPersistenceDiagram( const topology::SimplicialComplex<Si
 
     uf.merge( youngerComponent, olderComponent );
 
-    cs[olderComponent] += cs[youngerComponent];
-
     cc[olderComponent].insert( cc[olderComponent].end(),
                                cc[youngerComponent].begin(), cc[youngerComponent].end() );
 
@@ -197,8 +192,6 @@ calculateZeroDimensionalPersistenceDiagram( const topology::SimplicialComplex<Si
       pd.add( creation                         , destruction                                   );
       ct.add( static_cast<VertexType>( uIndex ), static_cast<VertexType>( K.index( simplex ) ) );
     }
-    else
-      cs.erase( youngerComponent );
   }
 
   // Store information about unpaired simplices ------------------------
@@ -220,7 +213,7 @@ calculateZeroDimensionalPersistenceDiagram( const topology::SimplicialComplex<Si
              creator.data() );
   }
 
-  return std::make_tuple( pd, pp, cs );
+  return std::make_tuple( pd, pp );
 }
 
 } // namespace aleph

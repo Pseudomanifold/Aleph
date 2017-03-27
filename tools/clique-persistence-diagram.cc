@@ -92,6 +92,12 @@ public:
     _destruction = threshold;
   }
 
+  /** Query component size information */
+  unsigned getComponentSize( VertexType vertex ) const
+  {
+    return _cs.at( vertex );
+  }
+
 private:
   std::unordered_map<VertexType, unsigned> _cs;                 // Component sizes
   std::unordered_map<VertexType, std::vector<VertexType> > _cc; // Connected components
@@ -383,10 +389,12 @@ int main( int argc, char** argv )
       break;
     }
 
-    auto&& tuple = aleph::calculateZeroDimensionalPersistenceDiagram<Simplex, aleph::traits::PersistencePairingCalculation<aleph::PersistencePairing<VertexType> > >( C );
+    CliqueCommunityInformationFunctor ccif;
+    ccif.setDestructionThreshold( 2 * maxWeight );
+
+    auto&& tuple = aleph::calculateZeroDimensionalPersistenceDiagram<Simplex, aleph::traits::PersistencePairingCalculation<aleph::PersistencePairing<VertexType> > >( C, ccif );
     auto&& pd    = std::get<0>( tuple );
     auto&& pp    = std::get<1>( tuple );
-    auto&& cs    = std::get<2>( tuple );
 
     if( calculateCentrality )
     {
@@ -494,7 +502,12 @@ int main( int argc, char** argv )
       {
         auto itPoint = pd.begin();
         for( auto itPair = pp.begin(); itPair != pp.end(); ++itPair, ++itPoint )
-          out << itPoint->x() << "\t" << itPoint->y() << "\t" << cs.at( *C.at( itPair->first ).begin()  ) << "\n";
+        {
+          auto&& simplex = C.at( itPair->first );
+          auto&& vertex  = *simplex.begin();
+
+          out << itPoint->x() << "\t" << itPoint->y() << "\t" << ccif.getComponentSize( vertex ) << "\n";
+        }
       }
     }
   }
