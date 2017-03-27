@@ -110,7 +110,7 @@ template <
     PersistencePairing<typename Simplex::VertexType>,
     std::unordered_map<typename Simplex::VertexType, unsigned>
   >
-calculateZeroDimensionalPersistenceDiagram( const topology::SimplicialComplex<Simplex>& K, Functor functor = Functor() )
+calculateZeroDimensionalPersistenceDiagram( const topology::SimplicialComplex<Simplex>& K, Functor&& functor = Functor() )
 {
   using DataType   = typename Simplex::DataType;
   using VertexType = typename Simplex::VertexType;
