@@ -79,10 +79,30 @@ public:
     _cc.erase(younger);
   }
 
+  void operator()( VertexType vertex,   // root of an essential connected component
+                   DataType creation    // creation threshold
+                 )
+  {
+    for( auto&& vertex : _cc[vertex] )
+      _ap[vertex] += DataType( _destruction - creation );
+  }
+
+  void setDestructionThreshold( DataType threshold )
+  {
+    _destruction = threshold;
+  }
+
 private:
   std::unordered_map<VertexType, unsigned> _cs;                 // Component sizes
   std::unordered_map<VertexType, std::vector<VertexType> > _cc; // Connected components
   std::unordered_map<VertexType, DataType> _ap;                 // Accumulated persistence
+
+  /**
+    Destruction threshold to use for essential persistent homology
+    classes. This threshold needs to be set by the client.
+  */
+
+  DataType _destruction = std::numeric_limits<DataType>::infinity();
 };
 
 } // anonymous namespace
