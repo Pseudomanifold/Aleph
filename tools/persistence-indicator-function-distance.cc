@@ -245,7 +245,7 @@ int main( int argc, char** argv )
 
   for( auto it1 = dataSets.begin(); it1 != dataSets.end(); ++it1, ++row )
   {
-    std::size_t col = 0;
+    std::size_t col = row+1;
     for( auto it2 = std::next( it1 ); it2 != dataSets.end(); ++it2, ++col )
     {
       double d = 0.0;
