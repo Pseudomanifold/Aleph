@@ -8,6 +8,8 @@
 #include "topology/SimplicialComplex.hh"
 #include "topology/UnionFind.hh"
 
+#include "utilities/EmptyFunctor.hh"
+
 #include <algorithm>
 #include <tuple>
 #include <unordered_map>
@@ -100,14 +102,15 @@ public:
 template <
   class Simplex,
   class PairingCalculationTraits = traits::NoPersistencePairingCalculation< PersistencePairing<typename Simplex::VertexType> >,
-  class ElementCalculationTraits = traits::NoDiagonalElementCalculation
+  class ElementCalculationTraits = traits::NoDiagonalElementCalculation,
+  class Functor = aleph::utilities::EmptyFunctor
 >
   std::tuple<
     PersistenceDiagram<typename Simplex::DataType>,
     PersistencePairing<typename Simplex::VertexType>,
     std::unordered_map<typename Simplex::VertexType, unsigned>
   >
-calculateZeroDimensionalPersistenceDiagram( const topology::SimplicialComplex<Simplex>& K )
+calculateZeroDimensionalPersistenceDiagram( const topology::SimplicialComplex<Simplex>& K, Functor functor = Functor() )
 {
   using DataType   = typename Simplex::DataType;
   using VertexType = typename Simplex::VertexType;
@@ -131,6 +134,8 @@ calculateZeroDimensionalPersistenceDiagram( const topology::SimplicialComplex<Si
   {
     cs[vertex] = 1;
     cc[vertex] = { vertex };
+
+    functor.initialize( vertex );
   }
 
   for( auto&& simplex : K )
@@ -177,6 +182,11 @@ calculateZeroDimensionalPersistenceDiagram( const topology::SimplicialComplex<Si
     cc[olderComponent].insert( cc[olderComponent].end(),
                                cc[youngerComponent].begin(), cc[youngerComponent].end() );
 
+    functor( youngerComponent,
+             olderComponent,
+             creation,
+             destruction );
+
     for( auto&& vertex : cc[youngerComponent] )
       ap[vertex] += DataType( destruction - creation );
 
@@ -205,6 +215,9 @@ calculateZeroDimensionalPersistenceDiagram( const topology::SimplicialComplex<Si
 
     pd.add( creator.data()                                );
     ct.add( static_cast<VertexType>( K.index( creator ) ) );
+
+    functor( root,
+             creator.data() );
   }
 
   return std::make_tuple( pd, pp, cs );
