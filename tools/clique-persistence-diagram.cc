@@ -55,6 +55,16 @@ public:
   CliqueCommunityInformationFunctor( SimplicialComplex& K )
     : _K( K )
   {
+    std::vector<VertexType> vertices;
+    _K.vertices( std::inserter( vertices, vertices.end() ) );
+
+    // Ensure proper initialization for all vertices, regardless of
+    // whether they appear in any clique community or not.
+    for( auto&& vertex : vertices )
+    {
+      _vim[vertex].accumulatedPersistence    = DataType();
+      _vim[vertex].numberOfCliqueCommunities = 0;
+    }
   }
 
   void initialize( VertexType v )
