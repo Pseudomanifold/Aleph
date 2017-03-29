@@ -88,7 +88,7 @@ double distance( const std::vector<DataSet>& dataSet1, const std::vector<DataSet
     auto g = getPersistenceIndicatorFunction( dataSet2, dimension );
 
     g = g * (-1.0);
-    d = d + (f+g).integral();
+    d = d + (f+g).abs().integral();
   }
 
   return d;
