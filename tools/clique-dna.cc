@@ -177,6 +177,22 @@ int main( int argc, char** argv )
     }
   }
 
+  // Replace domain ---------------------------------------------------
+
+  {
+    std::set<DataType> newDomain;
+
+    for( auto&& x : domain )
+    {
+      if( x != *domain.rbegin() )
+        newDomain.insert( std::nextafter( x,  std::numeric_limits<DataType>::max() ) );
+      if( x != *domain.begin() )
+        newDomain.insert( std::nextafter( x, -std::numeric_limits<DataType>::max() ) );
+    }
+
+    domain.swap( newDomain );
+  }
+
   // Prepare histogram calculation -------------------------------------
 
   auto valueToLinIndex = [&min, &max, &linbins, &n] ( DataType value )
