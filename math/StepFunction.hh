@@ -9,6 +9,7 @@
 #include <vector>
 
 #include <cmath>
+#include <cstdlib>
 
 namespace aleph
 {
@@ -242,6 +243,18 @@ public:
       value += f.integral();
 
     return value;
+  }
+
+  /** Calculates the absolute value of the function */
+  StepFunction& abs() noexcept
+  {
+    std::set<IndicatorFunction> indicatorFunctions;
+
+    for( auto&& f : _indicatorFunctions )
+      indicatorFunctions.insert( IndicatorFunction( f.a(), f.b(), std::abs( f.y() ) ) );
+
+    _indicatorFunctions.swap( indicatorFunctions );
+    return *this;
   }
 
   template <class U, class V> friend std::ostream& operator<<( std::ostream&, const StepFunction<U, V>& f );
