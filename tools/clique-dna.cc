@@ -6,6 +6,8 @@
 #include <string>
 #include <vector>
 
+#include <cmath>
+
 #include <getopt.h>
 
 #include "persistenceDiagrams/IO.hh"
@@ -108,7 +110,7 @@ int main( int argc, char** argv )
     return -1;
 
   auto min = *domain.begin();
-  auto max = *domain.rbegin();
+  auto max = std::nextafter( *domain.rbegin(), std::numeric_limits<DataType>::max() );
 
   std::cerr << "* Domain: [" << min << "," << max << "]\n";
 
@@ -122,7 +124,7 @@ int main( int argc, char** argv )
 
   for( unsigned i = 0; i < n; i++ )
   {
-    auto offset = ( max - min ) / (n-1);
+    auto offset = ( max - min ) / n;
     auto value  = min + i * offset;
 
     linbins.push_back( value );
@@ -179,13 +181,13 @@ int main( int argc, char** argv )
 
   auto valueToLinIndex = [&min, &max, &linbins, &n] ( DataType value )
   {
-    auto offset = ( max - min ) / (n-1);
+    auto offset = ( max - min ) / n;
     return static_cast<std::size_t>( ( value - min ) / offset );
   };
 
   auto valueToLogIndex = [&min, &max, &logbins, &n] ( DataType value )
   {
-    auto offset = ( std::log10( max ) - std::log10( min ) ) / (n-1);
+    auto offset = ( std::log10( max ) - std::log10( min ) ) / n;
     return static_cast<std::size_t>( ( std::log10( value ) - std::log10( min ) ) / offset );
   };
 
