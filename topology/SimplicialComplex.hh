@@ -12,7 +12,7 @@
 #include <functional>
 #include <initializer_list>
 #include <iterator>
-#include <iosfwd>
+#include <ostream>
 #include <limits>
 #include <set>
 #include <type_traits>
