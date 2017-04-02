@@ -1,6 +1,12 @@
 language: cpp
 
-os: linux
+os:
+  - linux
+  - osx
+
+
+osx_image: xcode8.3
+
 dist: trusty
 sudo: required
 addons:
