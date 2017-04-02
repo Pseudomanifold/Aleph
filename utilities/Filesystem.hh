@@ -1,7 +1,7 @@
 #ifndef ALEPH_UTILITIES_FILESYSTEM_HH__
 #define ALEPH_UTILITIES_FILESYSTEM_HH__
 
-#ifdef __unix__
+#if defined(__unix__) || defined(__unix) || ( defined(__APPLE__) && defined(__MACH__) )
   #include <libgen.h>
   #include <unistd.h>
 #endif
@@ -20,7 +20,7 @@ std::string basename( const std::string& path )
 
   std::string result;
 
-#if defined(__unix__) && defined(_POSIX_VERSION) && _POSIX_VERSION >= 200112L
+#if defined(_POSIX_VERSION) && _POSIX_VERSION >= 200112L
 
   char* buffer = new char[ path.size() + 1 ];
   std::copy( path.begin(), path.end(), buffer );
