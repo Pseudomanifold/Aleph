@@ -67,11 +67,13 @@ public:
     ResultType diff2  = 0.0;
     ResultType diff3  = 0.0;
 
-    Iterator1 last      = a; 
+    Iterator1 last      = a;
     Iterator1 lastGroup = last;
 
-    std::advance( last,     size );
-    std::advance( lastGroup, -3 );
+    using DifferenceType = typename std::iterator_traits<Iterator1>::difference_type;
+
+    std::advance( last,      DifferenceType( size ) );
+    std::advance( lastGroup, DifferenceType( -3 ) );
 
     while( a < lastGroup )
     {
