@@ -53,11 +53,11 @@ public:
 #endif
   }
 
+#ifdef ALEPH_WITH_FLN
   void radiusSearch( ElementType radius,
                      std::vector< std::vector<IndexType> >& indices,
                      std::vector< std::vector<ElementType> >& distances ) const
   {
-#ifdef ALEPH_WITH_FLANN
     flann::SearchParams searchParameters = flann::SearchParams();
     searchParameters.checks = flann::FLANN_CHECKS_UNLIMITED;
 
@@ -99,8 +99,15 @@ public:
                         return _traits.from( x );
                       } );
     }
-#endif
   }
+
+#else
+  void radiusSearch( ElementType /* radius */,
+                     std::vector< std::vector<IndexType> >& /* indices */,
+                     std::vector< std::vector<ElementType> >& /* distances */ ) const
+  {
+  }
+#endif
 
   std::size_t size() const noexcept
   {
@@ -133,8 +140,8 @@ private:
   Traits _traits;
 };
 
-}
+} // namespace geometry
 
-}
+} // namespace aleph
 
 #endif
