@@ -22,7 +22,14 @@ compiler:
   - gcc
 
 install:
-  - if [ "$CXX" = "g++" ]; then export CXX="g++-4.9" CC="gcc-4.9"; fi
+  - 'if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
+       :
+     else
+       # Linux; special handling in order to ensure that the build
+       # uses a more modern GCC version.
+       if [ "$CXX" = "g++" ]; then
+         export CXX="g++-4.9" CC="gcc-4.9";
+     fi'
 
 script:
   - mkdir build
