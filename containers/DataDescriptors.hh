@@ -3,6 +3,7 @@
 
 #include <cmath>
 
+#include <algorithm>
 #include <numeric>
 #include <vector>
 
@@ -27,6 +28,11 @@ template <class Distance, class Container> std::vector<double> eccentricities( c
 {
   auto n = container.size();
   auto d = container.dimension();
+
+  // Ensures that subsequent algorithms always operate on a non-empty
+  // range of iterators.
+  if( n == 0 )
+    return {};
 
   std::vector<double> eccentricities;
   eccentricities.reserve( n );
@@ -53,14 +59,21 @@ template <class Distance, class Container> std::vector<double> eccentricities( c
                               d );
 
         distance = traits.from( distance );
-        distance = std::pow( distance, decltype(distance)( order ) ) / decltype(distance)(n);
+
+        if( order > 0 )
+          distance = std::pow( distance, decltype(distance)( order ) ) / decltype(distance)(n);
 
         distances.push_back( distance );
       }
     }
 
-    eccentricity = std::accumulate( distances.begin(), distances.end(), 0.0 );
-    eccentricity = std::pow( eccentricity, 1.0 / order );
+    if( order > 0 )
+    {
+      eccentricity = std::accumulate( distances.begin(), distances.end(), 0.0 );
+      eccentricity = std::pow( eccentricity, 1.0 / order );
+    }
+    else
+      eccentricity = *std::max_element( distances.begin(), distances.end() );
 
     eccentricities.push_back( eccentricity );
   }

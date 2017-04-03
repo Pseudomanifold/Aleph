@@ -65,13 +65,18 @@ template <class D> void eccentricityTest()
   ALEPH_TEST_BEGIN( "Eccentricity test" );
 
   auto pc = load<double>( CMAKE_SOURCE_DIR + std::string( "/tests/input/Iris_comma_separated.txt" ) );
+  auto e0 = eccentricities<D>( pc, 0 );
   auto e1 = eccentricities<D>( pc );
   auto e2 = eccentricities<D>( pc, 2 );
 
-  ALEPH_ASSERT_THROW( e1.empty() == false );
-  ALEPH_ASSERT_THROW( e1.size()  == pc.size() );
-  ALEPH_ASSERT_THROW( e1.size()  == e2.size() );
+  ALEPH_ASSERT_THROW( e0.empty() == false );
 
+  ALEPH_ASSERT_EQUAL( e0.size(), pc.size() );
+  ALEPH_ASSERT_EQUAL( e0.size(), e1.size() );
+  ALEPH_ASSERT_EQUAL( e0.size(), e2.size() );
+
+  // Only run this test for the Euclidean distance. I have no ground
+  // truth values for the other distance measures.
   if( std::is_same<D, distances::Euclidean<typename D::ResultType> >::value )
   {
     ALEPH_ASSERT_THROW( moreOrLessEqual( e1.begin(), e1.end(), eccentricities1Euclidean.begin(), eccentricities1Euclidean.end() ) );
