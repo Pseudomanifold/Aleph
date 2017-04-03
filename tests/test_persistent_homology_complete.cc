@@ -1,6 +1,3 @@
-#include "algorithms/Standard.hh"
-#include "algorithms/Twist.hh"
-
 #include "config/Base.hh"
 
 #include "containers/PointCloud.hh"
@@ -14,6 +11,8 @@
 #include "tests/Base.hh"
 
 #include "persistentHomology/Calculation.hh"
+#include "persistentHomology/algorithms/Standard.hh"
+#include "persistentHomology/algorithms/Twist.hh"
 
 #include "topology/Simplex.hh"
 #include "topology/SimplicialComplex.hh"

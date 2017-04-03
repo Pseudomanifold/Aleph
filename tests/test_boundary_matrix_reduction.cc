@@ -1,11 +1,10 @@
-#include "algorithms/Standard.hh"
-#include "algorithms/Twist.hh"
-
 #include "config/Base.hh"
 
 #include "tests/Base.hh"
 
 #include "persistentHomology/Calculation.hh"
+#include "persistentHomology/algorithms/Standard.hh"
+#include "persistentHomology/algorithms/Twist.hh"
 
 #include "topology/BoundaryMatrix.hh"
 

@@ -1,7 +1,7 @@
 #ifndef ALEPH_DEFAULTS_HH__
 #define ALEPH_DEFAULTS_HH__
 
-#include "algorithms/Twist.hh"
+#include "persistentHomology/algorithms/Twist.hh"
 
 #include "topology/representations/Vector.hh"
 
