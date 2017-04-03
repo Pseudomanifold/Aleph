@@ -20,8 +20,8 @@ template <class M> void reduceBoundaryMatrix( const M& m )
 
   ALEPH_ASSERT_THROW( m.getNumColumns() > 0 );
 
-  using StandardAlgorithm = aleph::algorithms::Standard;
-  using TwistAlgorithm    = aleph::algorithms::Twist;
+  using StandardAlgorithm = aleph::persistentHomology::algorithms::Standard;
+  using TwistAlgorithm    = aleph::persistentHomology::algorithms::Twist;
 
   using Index   = typename M::Index;
   using Pairing = aleph::PersistencePairing<Index>;

@@ -13,10 +13,10 @@ namespace defaults
 
 using Index              = unsigned;
 using Representation     = topology::representations::Vector<Index>;
-using ReductionAlgorithm = algorithms::Twist;
+using ReductionAlgorithm = persistentHomology::algorithms::Twist;
 
-}
+} // namespace defaults
 
-}
+} // namespace aleph
 
 #endif

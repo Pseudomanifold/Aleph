@@ -24,7 +24,7 @@
 
 #include <vector>
 
-using namespace aleph::algorithms;
+using namespace aleph::persistentHomology::algorithms;
 using namespace aleph::geometry;
 using namespace aleph::topology;
 using namespace aleph;
