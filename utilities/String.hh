@@ -89,8 +89,8 @@ template <class T, class S> T convert( const S& sequence )
   return result;
 }
 
-}
+} // namespace utilities
 
-}
+} // namespace aleph
 
 #endif

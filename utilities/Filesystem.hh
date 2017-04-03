@@ -89,8 +89,8 @@ std::string extension( const std::string& path )
   return filename.substr( pos );
 }
 
-} // namespace "utilities"
+} // namespace utilities
 
-} // namespace "aleph"
+} // namespace aleph
 
 #endif

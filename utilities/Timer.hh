@@ -65,8 +65,8 @@ private:
   std::chrono::steady_clock::time_point _start;
 };
 
-}
+} // namespace utilities
 
-}
+} // namespace aleph
 
 #endif
