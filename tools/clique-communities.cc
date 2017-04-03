@@ -150,7 +150,7 @@ int main( int argc, char** argv )
   }
   else
   {
-    aleph::io::EdgeListReader reader;
+    aleph::topology::io::EdgeListReader reader;
     reader.setReadWeights( true );
     reader.setTrimLines( true );
 

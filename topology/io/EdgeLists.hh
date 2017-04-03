@@ -13,6 +13,9 @@
 namespace aleph
 {
 
+namespace topology
+{
+
 namespace io
 {
 
@@ -103,8 +106,10 @@ private:
   bool _trimLines                = true;
 };
 
-}
+} // namespace io
 
-}
+} // namespace topology
+
+} // namespace aleph
 
 #endif

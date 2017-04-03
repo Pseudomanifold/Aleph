@@ -87,7 +87,6 @@ auto generateWeightedRandomGraph( unsigned n, double p ) -> SimplicialComplex< S
 
 }
 
-
 } // namespace topology
 
 } // namespace aleph

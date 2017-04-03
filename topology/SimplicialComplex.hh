@@ -805,8 +805,8 @@ template <class Simplex> std::ostream& operator<<( std::ostream& o,
 
 // ---------------------------------------------------------------------
 
-}
+} // namespace topology
 
-}
+} // namespace aleph
 
 #endif

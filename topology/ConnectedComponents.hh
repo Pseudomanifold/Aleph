@@ -50,8 +50,8 @@ template <class SimplicialComplex> UnionFind<typename SimplicialComplex::ValueTy
   return uf;
 }
 
-} // namespace "topology"
+} // namespace topology
 
-} // namespace "aleph"
+} // namespace aleph
 
 #endif

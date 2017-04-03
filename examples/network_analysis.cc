@@ -24,7 +24,7 @@ int main( int argc, char** argv )
   if( argc <= 1 )
     return -1;
 
-  aleph::io::EdgeListReader reader;
+  aleph::topology::io::EdgeListReader reader;
 
   std::string input = argv[1];
   std::ifstream in( input );

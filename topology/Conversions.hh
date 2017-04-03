@@ -48,8 +48,8 @@ template <
   return M;
 }
 
-}
+} // namespace topology
 
-}
+} // namespace aleph
 
 #endif

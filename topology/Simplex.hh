@@ -466,8 +466,8 @@ std::ostream& operator<<( std::ostream& o, const topology::Simplex<DataType, Ver
 
 // ---------------------------------------------------------------------
 
-}
+} // namespace topology
 
-}
+} // namespace aleph
 
 #endif

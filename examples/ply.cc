@@ -31,7 +31,7 @@ int main( int argc, char** argv )
     property = argv[2];
 
   auto K
-    = aleph::io::loadPLY<DataType, VertexType>( filename, property );
+    = aleph::topology::io::loadPLY<DataType, VertexType>( filename, property );
 
   // TODO:
   //   - Expansion (higher-dimensional simplices)
