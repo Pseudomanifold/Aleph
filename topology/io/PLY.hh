@@ -48,6 +48,42 @@ std::map<std::string, unsigned short> TypeSizeMap = {
   { "uint8"  , 1 }
 };
 
+/*
+  Reads a single value from a binary input stream, reversing the storage
+  order if necessary.
+*/
+
+template <class T> void readValue( std::ifstream& stream,
+                                   std::size_t bytes,
+                                   bool reverse,
+                                   T& target )
+{
+  if( !reverse || bytes == 1 )
+    stream.read( reinterpret_cast<char*>( &target ), static_cast<std::streamsize>( bytes ) );
+  else
+  {
+    char* buffer         = new char[bytes];
+    char* reversedBuffer = new char[bytes];
+
+    stream.read( buffer, static_cast<std::streamsize>( bytes ) );
+
+    for( std::size_t i = 0; i < bytes; i++ )
+      reversedBuffer[i] = buffer[ bytes - 1 - i ];
+
+    std::copy( reversedBuffer, reversedBuffer + bytes, target );
+
+    // FIXME: Superfluous?
+#if 0
+    memcpy( reinterpret_cast<void*>( &target ),
+            reinterpret_cast<void*>( reversedBuffer ),
+            bytes );
+#endif
+
+    delete[] reversedBuffer;
+    delete[] buffer;
+  }
+}
+
 } // namespace detail
 
 /**
@@ -68,8 +104,14 @@ public:
   // elements is somewhat superfluous when parsing ASCII files.
   struct PropertyDescriptor
   {
-    unsigned index; // Offset of attribute
-    unsigned bytes; // Number of bytes
+    unsigned index;       // Offset of attribute for ASCII data
+    unsigned bytesOffset; // Offset of attribute for binary data
+    unsigned bytes;       // Number of bytes
+
+    // Only used for lists: Here, both the length parameter and the
+    // entry parameter of a list usually have different lengths.
+    unsigned bytesListSize;
+    unsigned bytesListEntry;
   };
 
   template <class SimplicialComplex> void operator()( const std::string& filename, SimplicialComplex& K )
@@ -88,16 +130,18 @@ public:
     // The header needs to consist of the word "ply", followed by a "format"
     // description.
 
-    std::size_t numVertices = 0;
-    std::size_t numFaces    = 0;
+    std::size_t numVertices       = 0; // Number of edges
+    std::size_t vertexSizeInBytes = 0; // Only relevant for binary files
+    std::size_t numFaces          = 0; // Number of faces
+    std::size_t faceSizeInBytes   = 0; // Only relevant for binary files
 
     // Current line in file. This is required because I prefer reading the
     // file line by line via `std::getline`.
     std::string line;
 
-    bool headerParsed       = false;
-    bool parseBinary        = false;
-    bool littleEndian       = false;
+    bool headerParsed = false;
+    bool parseBinary  = false;
+    bool littleEndian = false;
 
     std::getline( in, line );
     line = utilities::trim( line );
@@ -138,7 +182,12 @@ public:
     // The parser expects certain properties, viz. "x", "y", and "z" to be
     // present in all files. Else, an error is raised.
     std::map<std::string, PropertyDescriptor> properties;
-    unsigned propertyIndex = 0;
+
+    unsigned propertyIndex  = 0; // Offset for properties in ASCII files
+    unsigned propertyOffset = 0; // Offset for properties in binary files
+
+    bool readingVertexProperties = false;
+    bool readingFaceProperties   = false;
 
     // Parse the rest of the header, taking care to skip any comment lines.
     do
@@ -170,9 +219,15 @@ public:
         name = utilities::trim( name );
 
         if( name == "vertex" )
-          numVertices = numElements;
+        {
+          numVertices             = numElements;
+          readingVertexProperties = true;
+        }
         else if( name == "face" )
-          numFaces = numElements;
+        {
+          numFaces              = numElements;
+          readingFaceProperties = true;
+        }
       }
       else if( line.substr( 0, 8) == "property" )
       {
@@ -187,23 +242,50 @@ public:
         converter >> dataType
                   >> name;
 
-        // Skip property lists; we will handle them implicitly when
-        // converting all faces.
+        dataType = utilities::trim( dataType );
+        name     = utilities::trim( name );
+
+        PropertyDescriptor descriptor;
+        descriptor.index = propertyIndex;
+
+        // List of properties require a special handling. The syntax is
+        // "property list SIZE_TYPE ENTRY_TYPE NAME", e.g. "property
+        // list uint float vertex_height".
         if( dataType == "list" )
-          continue;
+        {
+          std::string sizeType = name;
+          std::string entryType;
+          std::string listName;
+
+          converter >> entryType
+                    >> listName;
+
+          utilities::trim( entryType );
+          utilities::trim( listName );
+
+          descriptor.bytesListSize  = detail::TypeSizeMap.at( sizeType );
+          descriptor.bytesListEntry = detail::TypeSizeMap.at( entryType );
+
+          name = listName;
+        }
+        else
+        {
+          descriptor.bytes       = detail::TypeSizeMap.at( dataType );
+          descriptor.bytesOffset = propertyOffset;
+        }
 
         if( !converter )
           throw std::runtime_error( "Property conversion error: Expecting data type and name of property" );
 
-        name = utilities::trim( name );
+        if( readingFaceProperties )
+          faceSizeInBytes += descriptor.bytes;
+        else if( readingVertexProperties )
+          vertexSizeInBytes += descriptor.bytes;
 
-        PropertyDescriptor descriptor;
-        descriptor.index = propertyIndex;
-        descriptor.bytes = detail::TypeSizeMap.at( dataType );
+        propertyOffset += descriptor.bytes;
+        propertyIndex  += 1;
 
         properties[name] = descriptor;
-
-        ++propertyIndex;
       }
 
       if( line == "end_header" )
