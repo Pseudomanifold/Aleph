@@ -10,6 +10,7 @@
 #include <cassert>
 
 #include <fstream>
+#include <limits>
 #include <map>
 #include <set>
 #include <stdexcept>
@@ -104,6 +105,8 @@ public:
   // elements is somewhat superfluous when parsing ASCII files.
   struct PropertyDescriptor
   {
+    std::string name;     // Property name (or list name)
+
     unsigned index;       // Offset of attribute for ASCII data
     unsigned bytesOffset; // Offset of attribute for binary data
     unsigned bytes;       // Number of bytes
@@ -175,13 +178,10 @@ public:
         throw std::runtime_error( "Format error: Expecting \"ascii 1.0\" or \"binary_little_endian 1.0\" or \"binary_big_endian 1.0\" " );
     }
 
-    // Maps properties of a PLY file to an index. The index specifies at
-    // which position in a single vertex specification line the selected
-    // property appears.
-    //
-    // The parser expects certain properties, viz. "x", "y", and "z" to be
-    // present in all files. Else, an error is raised.
-    std::map<std::string, PropertyDescriptor> properties;
+    // All properties stored in the PLY file in the order in which they
+    // were discovered. The parse requires the existence of some of the
+    // properties, e.g. "x", "y", and "z" in order to work correctly.
+    std::vector<PropertyDescriptor> properties;
 
     unsigned propertyIndex  = 0; // Offset for properties in ASCII files
     unsigned propertyOffset = 0; // Offset for properties in binary files
@@ -265,13 +265,13 @@ public:
 
           descriptor.bytesListSize  = detail::TypeSizeMap.at( sizeType );
           descriptor.bytesListEntry = detail::TypeSizeMap.at( entryType );
-
-          name = listName;
+          descriptor.name           = listName;
         }
         else
         {
           descriptor.bytes       = detail::TypeSizeMap.at( dataType );
           descriptor.bytesOffset = propertyOffset;
+          descriptor.name        = name;
         }
 
         if( !converter )
@@ -285,7 +285,7 @@ public:
         propertyOffset += descriptor.bytes;
         propertyIndex  += 1;
 
-        properties[name] = descriptor;
+        properties.push_back( descriptor );
       }
 
       if( line == "end_header" )
@@ -328,13 +328,27 @@ private:
 
   template <class Simplex> std::vector<Simplex> parseASCII( std::ifstream& in,
                                                             std::size_t numVertices, std::size_t numFaces,
-                                                            const std::map<std::string,PropertyDescriptor>& properties )
+                                                            const std::vector<PropertyDescriptor>& properties )
   {
     using DataType   = typename Simplex::DataType;
     using VertexType = typename Simplex::VertexType;
 
     std::vector<Simplex> simplices;
     std::string line;
+
+    auto getPropertyIndex = [&properties] ( const std::string& property )
+    {
+      auto it = std::find_if( properties.begin(), properties.end(),
+                              [&property] ( const PropertyDescriptor& descriptor )
+                              {
+                                return descriptor.name == property;
+                              } );
+
+      if( it != properties.end() )
+        return it->index;
+      else
+        return std::numeric_limits<unsigned>::max();
+    };
 
     // Read vertices -----------------------------------------------------
 
@@ -347,9 +361,10 @@ private:
       line        = utilities::trim( line );
       auto tokens = utilities::split( line );
 
-      auto ix     = properties.at( "x" ).index;
-      auto iy     = properties.at( "y" ).index;
-      auto iz     = properties.at( "z" ).index;
+      auto ix     = getPropertyIndex( "x" );
+      auto iy     = getPropertyIndex( "y" );
+      auto iz     = getPropertyIndex( "z" );
+      auto iw     = getPropertyIndex( _property );
 
       auto x      = std::stod( tokens.at( ix ) );
       auto y      = std::stod( tokens.at( iy ) );
@@ -360,13 +375,11 @@ private:
       // No property for reading weights specified, or the specified
       // property could not be found; just use the default weight of
       // the simplex class.
-      if( _property.empty() || properties.find( _property ) == properties.end() )
+      if( _property.empty() || iw == std::numeric_limits<unsigned>::max() )
         simplices.push_back( { VertexType( vertexIndex ) } );
       else
       {
-        auto iw    = properties.at( _property ).index;
         DataType w = aleph::utilities::convert<DataType>( tokens.at(iw) );
-
         simplices.push_back( Simplex( VertexType( vertexIndex ), w ) );
       }
     }
