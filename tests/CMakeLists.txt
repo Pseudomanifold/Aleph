@@ -1,3 +1,4 @@
+#
 # The tests should always have these nasty flags enabled. What's the
 # use of the test without them?
 #
@@ -6,7 +7,16 @@
 #
 ENABLE_IF_SUPPORTED( CMAKE_CXX_FLAGS "-Wall" )
 ENABLE_IF_SUPPORTED( CMAKE_CXX_FLAGS "-Wextra" )
-ENABLE_IF_SUPPORTED( CMAKE_CXX_FLAGS "-Werror" )
+
+# There are some issues with user-installed libraries in Mac OS X that
+# cause warnings to appear in code that does *not* belong to Aleph, so
+# I rather want this switch to be disabled.
+#
+# The automated tests under Linux will still have this setting though,
+# so I should not miss to many issues.
+IF( NOT ${CMAKE_SYSTEM_NAME} MATCHES "Darwin" )
+  ENABLE_IF_SUPPORTED( CMAKE_CXX_FLAGS "-Werror" )
+ENDIF()
 
 ENABLE_IF_SUPPORTED( CMAKE_CXX_FLAGS "-Wconversion" )
 ENABLE_IF_SUPPORTED( CMAKE_CXX_FLAGS "-Wnon-virtual-dtor" )
