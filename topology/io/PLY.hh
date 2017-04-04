@@ -50,17 +50,51 @@ std::map<std::string, unsigned short> TypeSizeMap = {
 };
 
 /*
+  Maps PLY data types to their 'signedness'. This is required for
+  parsing binary files later on.
+
+  TODO: Use this to extend parse
+*/
+
+std::map<std::string, bool> TypeSignednessMap = {
+  { "double" , true },
+  { "float"  , true },
+  { "int"    , true },
+  { "int32"  , true },
+  { "uint"   , false },
+  { "uint32" , false },
+  { "short"  , true },
+  { "ushort" , false },
+  { "char"   , true },
+  { "uchar"  , false },
+  { "uint8"  , false }
+};
+
+/* Describes an arbitrary value of a PLY file */
+union PLYValue
+{
+  double         d;
+  float          f;
+  int            i;
+  short          s;
+  char           c;
+  unsigned       u;
+  unsigned short us;
+  unsigned char  uc;
+};
+
+/*
   Reads a single value from a binary input stream, reversing the storage
   order if necessary.
 */
 
 template <class T> void readValue( std::ifstream& stream,
                                    std::size_t bytes,
-                                   bool reverse,
-                                   T& target )
+                                   bool littleEndian,
+                                   T* target )
 {
-  if( !reverse || bytes == 1 )
-    stream.read( reinterpret_cast<char*>( &target ), static_cast<std::streamsize>( bytes ) );
+  if( !littleEndian || bytes == 1 )
+    stream.read( reinterpret_cast<char*>( target ), static_cast<std::streamsize>( bytes ) );
   else
   {
     char* buffer         = new char[bytes];
@@ -106,7 +140,6 @@ public:
   struct PropertyDescriptor
   {
     std::string name;     // Property name (or list name)
-
     unsigned index;       // Offset of attribute for ASCII data
     unsigned bytesOffset; // Offset of attribute for binary data
     unsigned bytes;       // Number of bytes
@@ -307,9 +340,17 @@ public:
 
     if( parseBinary )
     {
+      simplices = this->parseBinary<Simplex>( in,
+                                              numVertices, numFaces,
+                                              littleEndian,
+                                              properties );
     }
     else
-      simplices = this->parseASCII<Simplex>( in, numVertices, numFaces, properties );
+    {
+      simplices = this->parseASCII<Simplex>( in,
+                                             numVertices, numFaces,
+                                             properties );
+    }
 
     in.close();
 
@@ -325,6 +366,57 @@ public:
   }
 
 private:
+
+  template <class Simplex> std::vector<Simplex> parseBinary( std::ifstream& in,
+                                                             std::size_t numVertices,
+                                                             std::size_t numFaces,
+                                                             bool littleEndian,
+                                                             const std::vector<PropertyDescriptor>& properties )
+  {
+    using DataType   = typename Simplex::DataType;
+    using VertexType = typename Simplex::VertexType;
+
+    DataType weight = DataType();
+
+    for( std::size_t vertexIndex = 0; vertexIndex < numVertices; vertexIndex++ )
+    {
+      std::vector<double> coordinates;
+
+      for( auto&& descriptor : properties )
+      {
+        // Only faces may have lists for now...
+        if( descriptor.bytesListSize + descriptor.bytesListEntry != 0 )
+          continue;
+
+        detail::PLYValue pv;
+
+        switch( descriptor.bytes )
+        {
+          case 8:
+            detail::readValue( in, descriptor.bytes, littleEndian, &pv.d );
+            break;
+          case 4:
+            detail::readValue( in, descriptor.bytes, littleEndian, &pv.f );
+            break;
+          case 2:
+            detail::readValue( in, descriptor.bytes, littleEndian, &pv.s );
+            break;
+          case 1:
+            detail::readValue( in, descriptor.bytes, littleEndian, &pv.c );
+            break;
+        }
+
+        // FIXME: Not sure whether this is legal...
+        if( descriptor.name == "x" || descriptor.name == "y" || descriptor.name == "z" )
+          coordinates.push_back( pv.d );
+      }
+    }
+
+    for( std::size_t faceIndex = 0; faceIndex < numVertices; faceIndex++ )
+    {
+    }
+  }
+
 
   template <class Simplex> std::vector<Simplex> parseASCII( std::ifstream& in,
                                                             std::size_t numVertices, std::size_t numFaces,
