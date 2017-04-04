@@ -31,7 +31,7 @@ int main( int argc, char** argv )
   if( argc >= 3 )
     property = argv[2];
 
-  aleph::io::PLYReader plyReader;
+  aleph::topology::io::PLYReader plyReader;
   plyReader.setDataProperty( property );
 
   SimplicialComplex K;
