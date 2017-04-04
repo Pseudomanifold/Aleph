@@ -74,13 +74,14 @@ public:
   // Mesh modification -------------------------------------------------
 
   /** Adds a new vertex to the mesh */
-  void addVertex( Position x, Position y, Position z )
+  void addVertex( Position x, Position y, Position z, Data d = Data() )
   {
     Vertex v;
 
     v.x = x;
     v.y = y;
     v.z = z;
+    v.d = d;
 
     _vertices.push_back( std::make_shared<Vertex>( v ) );
   }
