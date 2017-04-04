@@ -1,4 +1,3 @@
-
 #include "distances/Hausdorff.hh"
 #include "distances/NearestNeighbour.hh"
 
@@ -13,8 +12,10 @@
 
 #include <iostream>
 
-using DataType   = double;
-using VertexType = unsigned;
+using DataType          = double;
+using VertexType        = unsigned;
+using Simplex           = aleph::topology::Simplex<DataType, VertexType>;
+using SimplicialComplex = aleph::topology::SimplicialComplex<Simplex>;
 
 int main( int argc, char** argv )
 {
@@ -30,8 +31,11 @@ int main( int argc, char** argv )
   if( argc >= 3 )
     property = argv[2];
 
-  auto K
-    = aleph::topology::io::loadPLY<DataType, VertexType>( filename, property );
+  aleph::io::PLYReader plyReader;
+  plyReader.setDataProperty( property );
+
+  SimplicialComplex K;
+  plyReader( filename, K );
 
   // TODO:
   //   - Expansion (higher-dimensional simplices)
