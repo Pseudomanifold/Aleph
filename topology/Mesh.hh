@@ -23,7 +23,7 @@ namespace topology
   a standard half-edge data structure.
 */
 
-template <class Position> class Mesh
+template <class Position = float, class Data = float> class Mesh
 {
 public:
   struct Face;
@@ -63,12 +63,15 @@ public:
 
   struct Vertex
   {
-    Position x;
-    Position y;
-    Position z;
+    Position x = Position();
+    Position y = Position();
+    Position z = Position();
+    Data     d = Data();
 
     HalfEdgePointer edge;
   };
+
+  // Mesh modification -------------------------------------------------
 
   /** Adds a new vertex to the mesh */
   void addVertex( Position x, Position y, Position z )
@@ -161,6 +164,38 @@ public:
       edge->next = *next;
       edge->prev = *prev;
     }
+  }
+
+  // Mesh queries ------------------------------------------------------
+
+  std::vector<VertexPointer> getLowerNeighbours( const Vertex& v )
+  {
+    auto neighbours = this->getNeighbours( v );
+    auto d          = v.d;
+
+    neighbours.erase( std::remove_if( neighbours.begin(), neighbours.end(),
+                                      [&d] ( const VertexPointer& neighbour )
+                                      {
+                                        return neighbour->d >= d;
+                                      } ),
+                      neighbours.end() );
+
+    return neighbours;
+  }
+
+  std::vector<VertexPointer> getHigherNeighbours( const Vertex& v )
+  {
+    auto neighbours = this->getNeighbours( v );
+    auto d          = v.d;
+
+    neighbours.erase( std::remove_if( neighbours.begin(), neighbours.end(),
+                                      [&d] ( const VertexPointer& neighbour )
+                                      {
+                                        return neighbour->d <= d;
+                                      } ),
+                      neighbours.end() );
+
+    return neighbours;
   }
 
 private:
