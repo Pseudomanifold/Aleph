@@ -182,7 +182,7 @@ public:
 
   // Mesh queries ------------------------------------------------------
 
-  std::vector<VertexPointer> getLowerNeighbours( const Vertex& v )
+  std::vector<VertexPointer> getLowerNeighbours( const Vertex& v ) const noexcept
   {
     auto neighbours = this->getNeighbours( v );
     auto d          = v.d;
@@ -197,7 +197,7 @@ public:
     return neighbours;
   }
 
-  std::vector<VertexPointer> getHigherNeighbours( const Vertex& v )
+  std::vector<VertexPointer> getHigherNeighbours( const Vertex& v ) const noexcept
   {
     auto neighbours = this->getNeighbours( v );
     auto d          = v.d;
@@ -212,10 +212,15 @@ public:
     return neighbours;
   }
 
+  VertexPointer vertex( std::size_t id ) const
+  {
+    return _vertices.at( id );
+  }
+
 private:
 
   /** Gets all vertices that are adjacent to a given vertex */
-  std::vector<VertexPointer> getNeighbours( const Vertex& v )
+  std::vector<VertexPointer> getNeighbours( const Vertex& v ) const noexcept
   {
     std::vector<VertexPointer> neighbours;
 
@@ -223,7 +228,7 @@ private:
     do
     {
       if( edge )
-        neighbours.push_back( edge->target );
+        neighbours.push_back( edge->target() );
       else
         break;
 
@@ -235,7 +240,7 @@ private:
   }
 
   /** Gets all edges that are incident on a given vertex. */
-  std::vector<HalfEdgePointer> getEdges( const Vertex& v )
+  std::vector<HalfEdgePointer> getEdges( const Vertex& v ) const noexcept
   {
     std::vector<HalfEdgePointer> edges;
 
@@ -259,7 +264,7 @@ private:
     a pointer to the edge is being returned.
   */
 
-  HalfEdgePointer getEdge( Index u, Index v )
+  HalfEdgePointer getEdge( Index u, Index v ) const noexcept
   {
     auto source = _vertices.at(u);           // Edge source vertex
     auto target = _vertices.at(v);           // Edge target vertex
