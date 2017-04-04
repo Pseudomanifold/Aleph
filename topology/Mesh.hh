@@ -1,13 +1,12 @@
 #ifndef ALEPH_TOPOLOGY_MESH_HH__
 #define ALEPH_TOPOLOGY_MESH_HH__
 
+#include <cassert>
+
 #include <algorithm>
 #include <iterator>
 #include <memory>
 #include <vector>
-
-// TODO: Remove after debugging
-#include <iostream>
 
 namespace aleph
 {
@@ -71,6 +70,7 @@ public:
     HalfEdgePointer edge;
   };
 
+  /** Adds a new vertex to the mesh */
   void addVertex( Position x, Position y, Position z )
   {
     Vertex v;
@@ -111,8 +111,6 @@ public:
 
       if( !edge )
       {
-        std::cerr << "Unknown edge: " << *curr << "--" << *next << "\n";
-
         edge      = std::make_shared<HalfEdge>();
         auto pair = std::make_shared<HalfEdge>();
 
@@ -129,7 +127,10 @@ public:
           target->edge = pair;
       }
       else
-        std::cerr << "Known edge:   " << *curr << "--" << *next << "\n";
+      {
+        assert( !edge->face );
+        edge->face = face;
+      }
 
       edges.push_back( edge );
     }
@@ -154,7 +155,8 @@ public:
 
       auto&& edge = *itEdge;
 
-      std::cerr << "Next: " << edge->next << ", prev: " << edge->prev << "\n";
+      assert( !edge->next );
+      assert( !edge->prev );
 
       edge->next = *next;
       edge->prev = *prev;
@@ -206,17 +208,6 @@ private:
       return nullptr;
   }
 
- //   HE_edge* edge = vert->edge;
-
- //    do {
-
- //         // do something with edge, edge->pair or edge->face
- //         edge = edge->pair->next;
-
- //    } while (edge != vert->edge);
-
-  std::vector<FacePointer>     _faces;
-  std::vector<HalfEdgePointer> _edges;
   std::vector<VertexPointer>   _vertices;
 };
 
