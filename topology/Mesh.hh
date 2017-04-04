@@ -71,6 +71,19 @@ public:
     HalfEdgePointer edge;
   };
 
+  // Mesh attributes ---------------------------------------------------
+
+  std::size_t vertices() const noexcept
+  {
+    return _vertices.size();
+  }
+
+  std::size_t faces() const noexcept
+  {
+    // TODO: Not yet implemented
+    return 0;
+  }
+
   // Mesh modification -------------------------------------------------
 
   /** Adds a new vertex to the mesh */

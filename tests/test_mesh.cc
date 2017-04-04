@@ -1,6 +1,7 @@
 #include "tests/Base.hh"
 
 #include "topology/Mesh.hh"
+#include "topology/MorseSmaleComplex.hh"
 
 #include <vector>
 
@@ -43,6 +44,9 @@ void test2()
   M.addFace( f2.begin(), f2.end() );
   M.addFace( f3.begin(), f3.end() );
   M.addFace( f4.begin(), f4.end() );
+
+  aleph::topology::MorseSmaleComplex<decltype(M)> msc;
+  msc( M );
 }
 
 int main(int, char**)
