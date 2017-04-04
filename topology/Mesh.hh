@@ -165,6 +165,26 @@ public:
 
 private:
 
+  /** Gets all vertices that are adjacent to a given vertex */
+  std::vector<VertexPointer> getNeighbours( const Vertex& v )
+  {
+    std::vector<VertexPointer> neighbours;
+
+    auto edge = v.edge;
+    do
+    {
+      if( edge )
+        neighbours.push_back( edge->target );
+      else
+        break;
+
+      edge = edge->pair->next;
+    }
+    while( edge != v.edge );
+
+    return neighbours;
+  }
+
   /** Gets all edges that are incident on a given vertex. */
   std::vector<HalfEdgePointer> getEdges( const Vertex& v )
   {
@@ -208,7 +228,12 @@ private:
       return nullptr;
   }
 
-  std::vector<VertexPointer>   _vertices;
+  /**
+    Stores all vertex pointers. This is sufficient to store the
+    complete mesh.
+  */
+
+  std::vector<VertexPointer> _vertices;
 };
 
 } // namespace topology
