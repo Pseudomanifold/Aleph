@@ -246,9 +246,27 @@ public:
     return neighbours;
   }
 
-  VertexPointer vertex( std::size_t id ) const
+  VertexPointer vertex( Index id ) const
   {
+    // TODO: Improve ID-based query? Currently, ID and index of the
+    // vertex with respect to the vector are the same. I am not sure
+    // whether this is smart.
     return _vertices.at( id );
+  }
+
+  /**
+    Checks whether an edge between two vertices that are identified by
+    their index exists.
+  */
+
+  bool hasEdge( Index u, Index v ) const
+  {
+    auto&& source = this->vertex(u);
+    auto&& target = this->vertex(v);
+
+    auto neighbours = this->getNeighbours( source );
+
+    return std::find( neighbours.begin(), neighbours.end(), target ) != neighbours.end();
   }
 
 private:
