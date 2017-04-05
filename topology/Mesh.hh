@@ -6,6 +6,7 @@
 #include <algorithm>
 #include <iterator>
 #include <memory>
+#include <unordered_set>
 #include <vector>
 
 namespace aleph
@@ -80,8 +81,17 @@ public:
 
   std::size_t faces() const noexcept
   {
-    // TODO: Not yet implemented
-    return 0;
+    std::unordered_set<FacePointer> faces;
+
+    for( auto&& vertex : _vertices )
+    {
+      auto&& edge = vertex->edge;
+      auto&& face = edge->face;
+
+      faces.insert( face );
+    }
+
+    return faces.size();
   }
 
   // Mesh modification -------------------------------------------------
