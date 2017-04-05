@@ -64,10 +64,11 @@ public:
 
   struct Vertex
   {
-    Position x = Position();
-    Position y = Position();
-    Position z = Position();
-    Data     d = Data();
+    Index    id   = Index();
+    Position x    = Position();
+    Position y    = Position();
+    Position z    = Position();
+    Data     data = Data();
 
     HalfEdgePointer edge;
   };
@@ -97,14 +98,15 @@ public:
   // Mesh modification -------------------------------------------------
 
   /** Adds a new vertex to the mesh */
-  void addVertex( Position x, Position y, Position z, Data d = Data() )
+  void addVertex( Position x, Position y, Position z, Data data = Data() )
   {
     Vertex v;
 
-    v.x = x;
-    v.y = y;
-    v.z = z;
-    v.d = d;
+    v.id   = _vertices.size();
+    v.x    = x;
+    v.y    = y;
+    v.z    = z;
+    v.data = data;
 
     _vertices.push_back( std::make_shared<Vertex>( v ) );
   }
@@ -192,15 +194,37 @@ public:
 
   // Mesh queries ------------------------------------------------------
 
+  /**
+    The link of a vertex is defined as all simplices in the closed star
+    that are disjoint from the vertex. For 2-manifolds, this will yield
+    a cycle of edges and vertices.
+
+    This function will represent the cycle by returning all vertex IDs,
+    in an order that is consistent with the orientation of the mesh.
+  */
+
+  std::vector<Index> link( const Vertex& v ) const noexcept
+  {
+    auto neighbours = this->getNeighbours( v );
+
+    std::vector<Index> result;
+    result.reserve( neighbours.size() );
+
+    for( auto&& neighbour : neighbours )
+      result.push_back( neighbour->id );
+
+    return result;
+  }
+
   std::vector<VertexPointer> getLowerNeighbours( const Vertex& v ) const noexcept
   {
     auto neighbours = this->getNeighbours( v );
-    auto d          = v.d;
+    auto data       = v.data;
 
     neighbours.erase( std::remove_if( neighbours.begin(), neighbours.end(),
-                                      [&d] ( const VertexPointer& neighbour )
+                                      [&data] ( const VertexPointer& neighbour )
                                       {
-                                        return neighbour->d >= d;
+                                        return neighbour->data >= data;
                                       } ),
                       neighbours.end() );
 
@@ -210,12 +234,12 @@ public:
   std::vector<VertexPointer> getHigherNeighbours( const Vertex& v ) const noexcept
   {
     auto neighbours = this->getNeighbours( v );
-    auto d          = v.d;
+    auto data       = v.data;
 
     neighbours.erase( std::remove_if( neighbours.begin(), neighbours.end(),
-                                      [&d] ( const VertexPointer& neighbour )
+                                      [&data] ( const VertexPointer& neighbour )
                                       {
-                                        return neighbour->d <= d;
+                                        return neighbour->data <= data;
                                       } ),
                       neighbours.end() );
 
