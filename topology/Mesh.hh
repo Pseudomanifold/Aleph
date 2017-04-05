@@ -210,10 +210,6 @@ public:
       auto curr = vertex->edge->target();
       auto edge = vertex->edge->pair;
 
-      std::cerr << "\nBEFORE ITERATION: " << vertex->edge->pair->next << "\n";
-      std::cerr << "STARTING WITH EDGE " << vertex->edge->target()->id << " -- " << edge->target()->id << "\n";
-      std::cerr << "STARTING EDGE = " << edge << " (" << vertex->edge->pair << ")\n";
-
       do
       {
         assert( !edge->face );
@@ -223,9 +219,6 @@ public:
         {
           if( !e->pair->face )
           {
-            std::cerr << "EDGE "<< e->target()->id << " -- " << e->pair->target()->id << "\n";
-            std::cerr << "EDGE TO UPDATE: " << e->pair << "\n";
-
             e->pair->next = edge;
 
             edge          = e->pair;
@@ -354,8 +347,6 @@ private:
         edges.push_back( edge );
       else
         break;
-
-      //std::cerr << "T: " << edge->target()->id << " (" << v.id << "," << v.edge->target()->id << ")\n";
 
       edge = edge->pair->next;
     }
