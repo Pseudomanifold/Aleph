@@ -7,6 +7,8 @@
 
 void test1()
 {
+  ALEPH_TEST_BEGIN( "Simple mesh");
+
   aleph::topology::Mesh<double> M;
 
   M.addVertex( 0.0, 0.0, 0.0 );
@@ -19,10 +21,24 @@ void test1()
 
   M.addFace( f1.begin(), f1.end() );
   M.addFace( f2.begin(), f2.end() );
+
+  ALEPH_ASSERT_EQUAL( M.vertices(), 4 );
+  ALEPH_ASSERT_EQUAL( M.faces(), 2 );
+
+  ALEPH_ASSERT_THROW( M.hasEdge(0,1) );
+  ALEPH_ASSERT_THROW( M.hasEdge(1,0) );
+  ALEPH_ASSERT_THROW( M.hasEdge(1,2) );
+  ALEPH_ASSERT_THROW( M.hasEdge(2,1) );
+  ALEPH_ASSERT_THROW( M.hasEdge(0,2) );
+  ALEPH_ASSERT_THROW( M.hasEdge(2,0) );
+
+  ALEPH_TEST_END();
 }
 
 void test2()
 {
+  ALEPH_TEST_BEGIN( "More complex mesh" );
+
   aleph::topology::Mesh<double> M;
 
   M.addVertex( 0.0, 0.0, 0.0, 0.0 );
@@ -47,6 +63,8 @@ void test2()
 
   aleph::topology::MorseSmaleComplex<decltype(M)> msc;
   msc( M );
+
+  ALEPH_TEST_END();
 }
 
 int main(int, char**)
