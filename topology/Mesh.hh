@@ -89,7 +89,8 @@ public:
       auto&& edge = vertex->edge;
       auto&& face = edge->face;
 
-      faces.insert( face );
+      if( face )
+        faces.insert( face );
     }
 
     return faces.size();
@@ -264,7 +265,7 @@ public:
     auto&& source = this->vertex(u);
     auto&& target = this->vertex(v);
 
-    auto neighbours = this->getNeighbours( source );
+    auto neighbours = this->getNeighbours( *source );
 
     return std::find( neighbours.begin(), neighbours.end(), target ) != neighbours.end();
   }
