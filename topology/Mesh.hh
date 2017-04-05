@@ -190,11 +190,56 @@ public:
 
       auto&& edge = *itEdge;
 
-      assert( !edge->next );
-      assert( !edge->prev );
+      //assert( !edge->next );
+      //assert( !edge->prev );
 
       edge->next = *next;
       edge->prev = *prev;
+    }
+
+    // Extend boundary -------------------------------------------------
+    //
+    // Traverse all vertices whose paired edges have an empty face. Any
+    // of these edges is part of the boundary face.
+
+    for( auto&& vertex : _vertices )
+    {
+      if( !vertex->edge || vertex->edge->pair->face )
+        continue;
+
+      auto curr = vertex->edge->target();
+      auto edge = vertex->edge->pair;
+
+      std::cerr << "\nBEFORE ITERATION: " << vertex->edge->pair->next << "\n";
+      std::cerr << "STARTING WITH EDGE " << vertex->edge->target()->id << " -- " << edge->target()->id << "\n";
+      std::cerr << "STARTING EDGE = " << edge << " (" << vertex->edge->pair << ")\n";
+
+      do
+      {
+        assert( !edge->face );
+        auto edges = this->getEdges( *curr );
+
+        for( auto&& e : edges )
+        {
+          if( !e->pair->face )
+          {
+            std::cerr << "EDGE "<< e->target()->id << " -- " << e->pair->target()->id << "\n";
+            std::cerr << "EDGE TO UPDATE: " << e->pair << "\n";
+
+            e->pair->next = edge;
+
+            edge          = e->pair;
+            curr          = e->pair->pair->target();
+
+            break;
+          }
+        }
+      }
+      while( curr != vertex );
+
+      // Close the loop around the boundary face by adding a pointer to
+      // the identified edge.
+      vertex->edge->pair->next = edge;
     }
   }
 
@@ -309,6 +354,8 @@ private:
         edges.push_back( edge );
       else
         break;
+
+      //std::cerr << "T: " << edge->target()->id << " (" << v.id << "," << v.edge->target()->id << ")\n";
 
       edge = edge->pair->next;
     }
