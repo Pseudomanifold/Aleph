@@ -139,16 +139,20 @@ public:
       auto target = _vertices.at( *next );   // Edge target vertex
       auto edge   = getEdge( *curr, *next ); // Edge
 
+      // Case 1: A new edge. Create a new edge and a new pair. Set edges
+      // of source and target vertex correctly. Moreover, initialize the
+      // paired edge with sensible default values.
       if( !edge )
       {
         edge      = std::make_shared<HalfEdge>();
         auto pair = std::make_shared<HalfEdge>();
 
-        edge->face   = face;
-        edge->pair   = pair;
-        edge->vertex = target;
-        pair->vertex = source;
+        pair->vertex = source; // This is flipped by design: We point to the
+                               // target vertex of the flipped edge. This is
+                               // just the source vertex again.
+
         pair->pair   = edge;
+        edge->pair   = pair;
 
         if( !source->edge )
           source->edge = edge;
@@ -156,11 +160,12 @@ public:
         if( !target->edge )
           target->edge = pair;
       }
-      else
-      {
-        assert( !edge->face );
-        edge->face = face;
-      }
+
+      assert( !edge->face );
+      assert(  edge->pair );
+
+      edge->face   = face;
+      edge->vertex = target;
 
       edges.push_back( edge );
     }
