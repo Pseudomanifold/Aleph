@@ -125,7 +125,7 @@ public:
     // Stores all half-edges created (or found) by this function in the
     // order in which they belong to the face.
     std::vector<HalfEdgePointer> edges;
-    edges.reserve( std::distance( begin, end ) );
+    edges.reserve( static_cast<std::size_t>( std::distance( begin, end ) ) );
 
     for( InputIterator it = begin; it != end; ++it )
     {
