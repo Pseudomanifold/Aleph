@@ -355,6 +355,26 @@ private:
     return edges;
   }
 
+  /** Gets all faces that are incident on a given vertex */
+  std::vector<FacePointer> getFaces( const Vertex& v ) const noexcept
+  {
+    std::vector<FacePointer> faces;
+
+    auto edge = v.edge;
+    do
+    {
+      if( edge && edge->face )
+        faces.push_back( edge->face );
+      else
+        break;
+
+      edge = edge->pair->next;
+    }
+    while( edge != v.edge );
+
+    return faces;
+  }
+
   /**
     Check whether a given (directed) edge already exists. If so,
     a pointer to the edge is being returned.
