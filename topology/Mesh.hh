@@ -239,6 +239,25 @@ public:
   // Mesh queries ------------------------------------------------------
 
   /**
+    The closed star of a vertex is defined as the smallest simplicial
+    subcomplex containing the given vertex and all simplices of which
+    the vertex is a face.
+  */
+
+  Mesh closedStar( const Vertex& v ) const noexcept
+  {
+    auto faces = this->getFaces( v );
+
+    // TODO:
+    //   - Get all faces
+    //   - Enumerate their vertices
+    //   - Add them to the new mesh
+    //   - Add the faces to the new mesh
+
+    return {};
+  }
+
+  /**
     The link of a vertex is defined as all simplices in the closed star
     that are disjoint from the vertex. For 2-manifolds, this will yield
     a cycle of edges and vertices.
