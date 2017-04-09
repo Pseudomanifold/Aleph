@@ -207,8 +207,8 @@ public:
 
       auto&& edge = *itEdge;
 
-      //assert( !edge->next );
-      //assert( !edge->prev );
+      assert( !edge->next );
+      assert( !edge->prev );
 
       edge->next = *next;
       edge->prev = *prev;
@@ -263,7 +263,38 @@ public:
 
   Mesh closedStar( const Vertex& v ) const noexcept
   {
+    Mesh M;
     auto faces = this->getFaces( v );
+
+    {
+      std::unordered_set<VertexPointer> vertices;
+
+      for( auto&& f : faces )
+      {
+        auto&& v = f->vertices();
+        vertices.insert( vertices.end(), v.begin(), v.end() );
+      }
+
+
+      for( auto&& v : vertices )
+      {
+        // FIXME: Need to incorporate information about vertex ID here
+        M.addVertex( 0, 0, 0 );
+      }
+    }
+
+    for( auto&& f : faces )
+    {
+      auto&& vertices = f->vertices();
+
+      // FIXME: Refactor interface to obtain ID automatically; I really
+      // do not need the raw pointers here.
+      std::vector<Index> indices;
+      for( auto&& v : vertices )
+        indices.push_back( v->id );
+
+      M.addFace( indices.begin(), indices.end() );
+    }
 
     // TODO:
     //   - Get all faces
@@ -271,7 +302,7 @@ public:
     //   - Add them to the new mesh
     //   - Add the faces to the new mesh
 
-    return {};
+    return M;
   }
 
   /**
