@@ -207,9 +207,6 @@ public:
 
       auto&& edge = *itEdge;
 
-      assert( !edge->next );
-      assert( !edge->prev );
-
       edge->next = *next;
       edge->prev = *prev;
     }
