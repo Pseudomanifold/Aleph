@@ -60,6 +60,23 @@ public:
   struct Face
   {
     HalfEdgePointer edge;
+
+    /** Collects al vertices of the given face */
+    std::vector<VertexPointer> vertices() const
+    {
+      std::vector<VertexPointer> v;
+
+      auto e = edge;
+
+      do
+      {
+        v.push_back( e->target );
+        e = e->next;
+      }
+      while( e != edge );
+
+      return v;
+    }
   };
 
   struct Vertex
