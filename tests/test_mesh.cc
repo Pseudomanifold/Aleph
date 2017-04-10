@@ -32,6 +32,8 @@ void test1()
   ALEPH_ASSERT_THROW( M.hasEdge(0,2) );
   ALEPH_ASSERT_THROW( M.hasEdge(2,0) );
 
+  ALEPH_ASSERT_EQUAL( M.numConnectedComponents(), 1 );
+
   {
     auto st    = M.star( 0 );
     auto faces = M.faces();
@@ -55,6 +57,11 @@ void test1()
     ALEPH_ASSERT_EQUAL( v1, 0 );
     ALEPH_ASSERT_EQUAL( v2, 1 );
     ALEPH_ASSERT_EQUAL( v3, 2 );
+  }
+
+  {
+    auto link = M.link( 0 );
+    ALEPH_ASSERT_EQUAL( link.size(), 2 );
   }
 
   ALEPH_TEST_END();

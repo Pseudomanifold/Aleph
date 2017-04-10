@@ -362,9 +362,10 @@ public:
     in an order that is consistent with the orientation of the mesh.
   */
 
-  std::vector<Index> link( const Vertex& v ) const noexcept
+  std::vector<Index> link( Index id ) const noexcept
   {
-    auto neighbours = this->getNeighbours( v );
+    auto&& vertex     = this->getVertex( id );
+    auto&& neighbours = this->getNeighbours( *vertex );
 
     std::vector<Index> result;
     result.reserve( neighbours.size() );
