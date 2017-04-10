@@ -99,12 +99,23 @@ public:
 
   // Mesh attributes ---------------------------------------------------
 
-  std::size_t vertices() const noexcept
+  std::vector<Index> vertices() const noexcept
+  {
+    std::vector<Index> result;
+    result.reserve( _vertices.size() );
+
+    for( auto&& pair : _vertices )
+      result.push_back( pair.first );
+
+    return result;
+  }
+
+  std::size_t numVertices() const noexcept
   {
     return _vertices.size();
   }
 
-  std::size_t faces() const noexcept
+  std::size_t numFaces() const noexcept
   {
     std::unordered_set<FacePointer> faces;
 
@@ -277,22 +288,30 @@ public:
     the vertex is a face.
   */
 
-  Mesh closedStar( const Vertex& v ) const noexcept
+  Mesh closedStar( Index id ) const noexcept
   {
     Mesh M;
-    auto faces = this->getFaces( v );
+
+    auto vertex = this->getVertex( id );
+    auto faces  = this->getFaces( *vertex );
 
     {
-      std::unordered_set<VertexPointer> vertices;
+      std::unordered_set<Index> vertices;
 
       for( auto&& f : faces )
       {
         auto&& v = f->vertices();
-        vertices.insert( vertices.end(), v.begin(), v.end() );
+        vertices.insert( v.begin(), v.end() );
       }
 
       for( auto&& v : vertices )
-        M.addVertex( v.x, v.y, v.z, v.d, v.id );
+      {
+        auto oldVertex = this->getVertex( v );
+
+        M.addVertex( oldVertex->x, oldVertex->y, oldVertex->z,
+                     oldVertex->data,
+                     oldVertex->id );
+      }
     }
 
     for( auto&& f : faces )
@@ -326,10 +345,11 @@ public:
     return result;
   }
 
-  std::vector<VertexPointer> getLowerNeighbours( const Vertex& v ) const noexcept
+  std::vector<Index> getLowerNeighbours( Index id ) const noexcept
   {
-    auto neighbours = this->getNeighbours( v );
-    auto data       = v.data;
+    auto&& vertex     = this->getVertex( id );
+    auto&& neighbours = this->getNeighbours( *vertex );
+    auto&& data       = vertex->data;
 
     neighbours.erase( std::remove_if( neighbours.begin(), neighbours.end(),
                                       [&data] ( const VertexPointer& neighbour )
@@ -338,13 +358,23 @@ public:
                                       } ),
                       neighbours.end() );
 
-    return neighbours;
+    std::vector<Index> result;
+    result.reserve( neighbours.size() );
+
+    std::transform( neighbours.begin(), neighbours.end(), std::back_inserter( result ),
+                    [] ( const VertexPointer& neighbour )
+                    {
+                      return neighbour->id;
+                    } );
+
+    return result;
   }
 
-  std::vector<VertexPointer> getHigherNeighbours( const Vertex& v ) const noexcept
+  std::vector<Index> getHigherNeighbours( Index id ) const noexcept
   {
-    auto neighbours = this->getNeighbours( v );
-    auto data       = v.data;
+    auto&& vertex     = this->getVertex( id );
+    auto&& neighbours = this->getNeighbours( *vertex );
+    auto&& data       = vertex->data;
 
     neighbours.erase( std::remove_if( neighbours.begin(), neighbours.end(),
                                       [&data] ( const VertexPointer& neighbour )
@@ -353,7 +383,17 @@ public:
                                       } ),
                       neighbours.end() );
 
-    return neighbours;
+    std::vector<Index> result;
+    result.reserve( neighbours.size() );
+
+    std::transform( neighbours.begin(), neighbours.end(), std::back_inserter( result ),
+                    [] ( const VertexPointer& neighbour )
+                    {
+                      return neighbour->id;
+                    } );
+
+
+    return result;
   }
 
   /**

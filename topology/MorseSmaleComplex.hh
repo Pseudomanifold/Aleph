@@ -15,19 +15,17 @@ template <class Mesh> class MorseSmaleComplex
 public:
   void operator()( const Mesh& M )
   {
-    auto n = M.vertices();
+    auto&& vertices = M.vertices();
 
-    for( decltype(n) i = 0; i < n; i++ )
+    for( auto&& vertex : vertices )
     {
-      auto v = M.vertex(i);
-
-      auto higherNeigbours = M.getHigherNeighbours( *v );
-      auto lowerNeighbours = M.getLowerNeighbours( *v );
+      auto higherNeigbours = M.getHigherNeighbours( vertex );
+      auto lowerNeighbours = M.getLowerNeighbours( vertex );
 
       std::cerr << "No. higher neighbours: " << higherNeigbours.size() << "\n"
                 << "No. lower  neighbours: " << lowerNeighbours.size() << "\n";
 
-      std::cerr << "[" << i << "]: ";
+      std::cerr << "[" << vertex << "]: ";
 
       if( higherNeigbours.empty() )
         std::cerr << "Maximum\n";
