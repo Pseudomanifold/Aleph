@@ -33,18 +33,18 @@ void test1()
   ALEPH_ASSERT_THROW( M.hasEdge(2,0) );
 
   {
-    auto cl    = M.closedStar( 0 );
+    auto st    = M.star( 0 );
     auto faces = M.faces();
 
-    ALEPH_ASSERT_EQUAL( cl.numVertices(), 3 );
-    ALEPH_ASSERT_EQUAL( cl.numFaces(),    1 );
+    ALEPH_ASSERT_EQUAL( st.numVertices(), 3 );
+    ALEPH_ASSERT_EQUAL( st.numFaces(),    1 );
 
-    ALEPH_ASSERT_THROW( cl.hasEdge(0,1) );
-    ALEPH_ASSERT_THROW( cl.hasEdge(1,0) );
-    ALEPH_ASSERT_THROW( cl.hasEdge(1,2) );
-    ALEPH_ASSERT_THROW( cl.hasEdge(2,1) );
-    ALEPH_ASSERT_THROW( cl.hasEdge(0,2) );
-    ALEPH_ASSERT_THROW( cl.hasEdge(2,0) );
+    ALEPH_ASSERT_THROW( st.hasEdge(0,1) );
+    ALEPH_ASSERT_THROW( st.hasEdge(1,0) );
+    ALEPH_ASSERT_THROW( st.hasEdge(1,2) );
+    ALEPH_ASSERT_THROW( st.hasEdge(2,1) );
+    ALEPH_ASSERT_THROW( st.hasEdge(0,2) );
+    ALEPH_ASSERT_THROW( st.hasEdge(2,0) );
 
     ALEPH_ASSERT_EQUAL( faces.front().size(), 3 );
 

@@ -312,12 +312,11 @@ public:
   // Mesh queries ------------------------------------------------------
 
   /**
-    The closed star of a vertex is defined as the smallest simplicial
-    subcomplex containing the given vertex and all simplices of which
-    the vertex is a face.
+    The star of a vertex is defined as the mesh that contains all the
+    triangles and edges of which the vertex is a face.
   */
 
-  Mesh closedStar( Index id ) const noexcept
+  Mesh star( Index id ) const noexcept
   {
     Mesh M;
 
