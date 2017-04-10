@@ -116,6 +116,30 @@ public:
     return _vertices.size();
   }
 
+  // TODO: Better return type?
+  std::vector< std::vector<Index> > faces() const noexcept
+  {
+    std::unordered_set<FacePointer> faces;
+
+    for( auto&& pair : _vertices )
+    {
+      auto&& vertex = pair.second;
+      auto&& edge   = vertex->edge;
+      auto&& face   = edge->face;
+
+      if( face )
+        faces.insert( face );
+    }
+
+    std::vector< std::vector<Index> > results;
+    results.reserve( faces.size() );
+
+    for( auto&& face : faces )
+      results.push_back( face->vertices() );
+
+    return results;
+  }
+
   std::size_t numFaces() const noexcept
   {
     std::unordered_set<FacePointer> faces;
