@@ -295,10 +295,10 @@ public:
           if( !e->pair->face )
           {
             e->pair->next = edge;
+            edge->prev    = e->pair;
 
             edge          = e->pair;
             curr          = e->pair->pair->target();
-
             break;
           }
         }
@@ -308,6 +308,7 @@ public:
       // Close the loop around the boundary face by adding a pointer to
       // the identified edge.
       vertex->edge->pair->next = edge;
+      edge->prev               = vertex->edge->pair;
     }
   }
 
@@ -481,9 +482,9 @@ private:
       else
         break;
 
-      edge = edge->pair->next;
+      edge = edge->prev->pair;
     }
-    while( edge != v.edge );
+    while( edge != v.edge && edge->source()->id == v.id );
 
     return neighbours;
   }
