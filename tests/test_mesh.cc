@@ -22,8 +22,8 @@ void test1()
   M.addFace( f1.begin(), f1.end() );
   M.addFace( f2.begin(), f2.end() );
 
-  ALEPH_ASSERT_EQUAL( M.vertices(), 4 );
-  ALEPH_ASSERT_EQUAL( M.faces(), 2 );
+  ALEPH_ASSERT_EQUAL( M.numVertices(), 4 );
+  ALEPH_ASSERT_EQUAL( M.numFaces()   , 2 );
 
   ALEPH_ASSERT_THROW( M.hasEdge(0,1) );
   ALEPH_ASSERT_THROW( M.hasEdge(1,0) );
@@ -31,6 +31,20 @@ void test1()
   ALEPH_ASSERT_THROW( M.hasEdge(2,1) );
   ALEPH_ASSERT_THROW( M.hasEdge(0,2) );
   ALEPH_ASSERT_THROW( M.hasEdge(2,0) );
+
+  {
+    auto cl = M.closedStar( 0 );
+
+    ALEPH_ASSERT_EQUAL( cl.numVertices(), 3 );
+    ALEPH_ASSERT_EQUAL( cl.numFaces(),    1 );
+
+    ALEPH_ASSERT_THROW( cl.hasEdge(0,1) );
+    ALEPH_ASSERT_THROW( cl.hasEdge(1,0) );
+    ALEPH_ASSERT_THROW( cl.hasEdge(1,2) );
+    ALEPH_ASSERT_THROW( cl.hasEdge(2,1) );
+    ALEPH_ASSERT_THROW( cl.hasEdge(0,2) );
+    ALEPH_ASSERT_THROW( cl.hasEdge(2,0) );
+  }
 
   ALEPH_TEST_END();
 }
