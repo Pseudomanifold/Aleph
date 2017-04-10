@@ -353,11 +353,6 @@ public:
     return neighbours;
   }
 
-  VertexPointer vertex( Index id ) const
-  {
-    return _vertices.at( id );
-  }
-
   /**
     Checks whether an edge between two vertices that are identified by
     their index exists.
@@ -365,8 +360,8 @@ public:
 
   bool hasEdge( Index u, Index v ) const
   {
-    auto&& source = this->vertex(u);
-    auto&& target = this->vertex(v);
+    auto&& source = this->getVertex(u);
+    auto&& target = this->getVertex(v);
 
     auto neighbours = this->getNeighbours( *source );
 
@@ -456,6 +451,16 @@ private:
       return *itEdge;
     else
       return nullptr;
+  }
+
+  /**
+    Returns vertex with the given ID. This is an internal function
+    that is used to obtain all information about a vertex.
+  */
+
+  VertexPointer getVertex( Index id ) const
+  {
+    return _vertices.at( id );
   }
 
   /**
