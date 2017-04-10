@@ -5,6 +5,7 @@
 
 #include <algorithm>
 #include <iterator>
+#include <limits>
 #include <memory>
 #include <stdexcept>
 #include <unordered_map>
@@ -77,7 +78,7 @@ public:
 
       do
       {
-        v.push_back( e->target()->id );
+        v.push_back( e->source()->id );
         e = e->next;
       }
       while( e != edge );
@@ -135,11 +136,11 @@ public:
   // Mesh modification -------------------------------------------------
 
   /** Adds a new vertex to the mesh */
-  void addVertex( Position x, Position y, Position z, Data data = Data(), Index id = Index() )
+  void addVertex( Position x, Position y, Position z, Data data = Data(), Index id = std::numeric_limits<Index>::max() )
   {
     Vertex v;
 
-    v.id   = id == Index() ? std::max( _vertices.size(), _largestVertexID ) : id;
+    v.id   = id == std::numeric_limits<Index>::max() ? std::max( _vertices.size(), _largestVertexID ) : id;
     v.x    = x;
     v.y    = y;
     v.z    = z;
@@ -201,10 +202,14 @@ public:
 
         if( !target->edge )
           target->edge = pair;
-
-        if( !face->edge )
-          face->edge = edge;
       }
+
+      // Ensures that the first edge that is specified for the new face
+      // will be set as the outgoing edge of the face. This is not just
+      // a 'cosmetic' choice but also ensures that vertex IDs for every
+      // face are reported in the original order.
+      if( !face->edge )
+        face->edge = edge;
 
       assert( !edge->face );
       assert(  edge->pair );
