@@ -1,6 +1,9 @@
 #ifndef ALEPH_TOPOLOGY_MORSE_SMALE_COMPLEX__
 #define ALEPH_TOPOLOGY_MORSE_SMALE_COMPLEX__
 
+#include <algorithm>
+#include <vector>
+
 // TODO: Remove after debugging
 #include <iostream>
 
@@ -17,6 +20,8 @@ template <class Mesh> class MorseSmaleComplex
 public:
   void operator()( const Mesh& M )
   {
+    std::cerr << "\n";
+
     auto&& vertices = M.vertices();
 
     for( auto&& vertex : vertices )
@@ -24,31 +29,34 @@ public:
       auto higherNeigbours = M.getHigherNeighbours( vertex );
       auto lowerNeighbours = M.getLowerNeighbours( vertex );
 
+      std::size_t nl = 0;
+      std::size_t nu = 0;
+
+      std::tie( nl, nu ) = contiguousSegments( M, vertex );
+
       std::cerr << "[" << vertex << "]: ";
 
       if( higherNeigbours.empty() )
-      {
-        std::cerr << "Maximum\n"
-                  << "  k = " << contiguousSegments( M, vertex ) << "\n";
-      }
+        std::cerr << "Maximum\n";
       else if( lowerNeighbours.empty() )
-        std::cerr << "Minimum\n"
-                  << "  k = " << contiguousSegments( M, vertex ) << "\n";
+        std::cerr << "Minimum\n";
       else
       {
-        std::cerr << "Saddle\n"
-                  << "  k = " << contiguousSegments( M, vertex ) << "\n";
-
-        std::cerr << "  + ";
-        for( auto&& neighbour : higherNeigbours )
-          std::cerr << neighbour << " ";
+        std::cerr << "Saddle\n";
+        std::cerr << "  +: ";
+        for( auto&& n : higherNeigbours )
+          std::cerr << n << " " ;
         std::cerr << "\n";
 
-        std::cerr << "  - ";
-        for( auto&& neighbour : lowerNeighbours )
-          std::cerr << neighbour << " ";
+        std::cerr << "  -: ";
+        for( auto&& n : lowerNeighbours )
+          std::cerr << n << " " ;
         std::cerr << "\n";
       }
+
+      std::cerr << "  nl: " << nl << "\n"
+                << "  nu: " << nu << "\n\n";
+
     }
   }
 private:
@@ -58,38 +66,51 @@ private:
     a vertex, with respect to the given mesh.
   */
 
-  static std::size_t contiguousSegments( const Mesh& M, typename Mesh::Index id )
+  static std::pair<std::size_t, std::size_t> contiguousSegments( const Mesh& M, typename Mesh::Index id )
   {
     using Index = typename Mesh::Index;
 
+    auto data = M.data(id);
     auto link = M.link(id);
-    auto curr = link.begin();
-    auto next = std::next( curr );
 
-    UnionFind<Index> uf( link.begin(), link.end() );
+    std::vector<Index> upperLink;
+    std::vector<Index> lowerLink;
 
-    for( ; curr != link.end(); )
+    std::copy_if( link.begin(), link.end(), std::back_inserter( upperLink ), [&data, &M] ( Index& u ) { return M.data(u) >= data; } );
+    std::copy_if( link.begin(), link.end(), std::back_inserter( lowerLink ), [&data, &M] ( Index& u ) { return M.data(u) <= data; } );
+
+    auto&& numConnectedComponents = [&M, &id] ( const std::vector<Index>& link )
     {
-      if( next == link.end() )
-        next = link.begin();
+      auto curr = link.begin();
+      auto next = std::next( curr );
 
-      auto u    = id;
-      auto v    = *curr++;
-      auto w    = *next++;
+      UnionFind<Index> uf( link.begin(), link.end() );
 
-      if( M.hasEdge(u,v) )
+      for( ; curr != link.end(); )
       {
-        if( M.hasEdge(v,w) )
-          uf.merge(v,w);
+        if( next == link.end() )
+          next = link.begin();
+
+        auto u    = id;
+        auto v    = *curr++;
+        auto w    = *next++;
+
+        if( M.hasEdge(u,v) )
+        {
+          if( M.hasEdge(v,w) )
+            uf.merge(v,w);
+        }
+        else
+          throw std::runtime_error( "Edge to link centre vertex does not exist" );
       }
-      else
-        throw std::runtime_error( "Edge to link centre vertex does not exist" );
-    }
 
-    std::vector<Index> roots;
-    uf.roots( std::back_inserter(roots) );
+      std::vector<Index> roots;
+      uf.roots( std::back_inserter(roots) );
 
-    return roots.size();
+      return roots.size();
+    };
+
+    return std::make_pair( numConnectedComponents( lowerLink ), numConnectedComponents( upperLink ) );
   }
 };
 

@@ -314,6 +314,13 @@ public:
 
   // Mesh queries ------------------------------------------------------
 
+  /** Returns data stored at a certain vertex */
+  Data data( Index id ) const
+  {
+    auto v = this->getVertex( id );
+    return v->data;
+  }
+
   /**
     The star of a vertex is defined as the mesh that contains all the
     triangles and edges of which the vertex is a face.
