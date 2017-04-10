@@ -12,6 +12,8 @@
 #include <unordered_set>
 #include <vector>
 
+#include "topology/UnionFind.hh"
+
 namespace aleph
 {
 
@@ -437,6 +439,30 @@ public:
     auto neighbours = this->getNeighbours( *source );
 
     return std::find( neighbours.begin(), neighbours.end(), target ) != neighbours.end();
+  }
+
+  /** Counts the number of connected components */
+  std::size_t numConnectedComponents() const noexcept
+  {
+    auto&& vertices = this->vertices();
+
+    UnionFind<Index> uf( vertices.begin(), vertices.end() );
+
+    for( auto&& vertex : vertices )
+    {
+      auto&& v      = _vertices.at( vertex );
+      auto&& e      = v->edge;
+      auto&& source = e->source()->id;
+      auto&& target = e->target()->id;
+
+      // Actually, the order does not matter one bit here...
+      uf.merge( target, source );
+    }
+
+    std::vector<Index> roots;
+    uf.roots( std::back_inserter( roots ) );
+
+    return roots.size();
   }
 
 private:
