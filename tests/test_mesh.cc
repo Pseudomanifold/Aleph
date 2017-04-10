@@ -93,6 +93,45 @@ void test2()
   M.addFace( f3.begin(), f3.end() );
   M.addFace( f4.begin(), f4.end() );
 
+  ALEPH_TEST_END();
+}
+
+void test3()
+{
+  ALEPH_TEST_BEGIN( "Simplicial mesh" );
+
+  aleph::topology::Mesh<double> M;
+
+  M.addVertex( 0.0, 0.0, 0.0, 0.0 );
+  M.addVertex( 1.0, 0.0, 0.0, 1.0 );
+  M.addVertex( 2.0, 0.0, 0.0, 0.0 );
+  M.addVertex( 0.0, 1.0, 0.0, 1.0 );
+  M.addVertex( 1.0, 1.0, 0.0, 2.0 );
+  M.addVertex( 2.0, 1.0, 0.0, 1.0 );
+  M.addVertex( 0.0, 2.0, 0.0, 0.0 );
+  M.addVertex( 1.0, 2.0, 0.0, 1.0 );
+  M.addVertex( 2.0, 2.0, 0.0, 0.0 );
+
+  std::vector<unsigned> f1 = { 0, 1, 4 };
+  std::vector<unsigned> f2 = { 0, 4, 3 };
+  std::vector<unsigned> f3 = { 1, 2, 4 };
+  std::vector<unsigned> f4 = { 2, 5, 4 };
+
+  std::vector<unsigned> f5 = { 4, 5, 8 };
+  std::vector<unsigned> f6 = { 4, 8, 7 };
+  std::vector<unsigned> f7 = { 3, 4, 6 };
+  std::vector<unsigned> f8 = { 4, 7, 6 };
+
+  M.addFace( f1.begin(), f1.end() );
+  M.addFace( f2.begin(), f2.end() );
+  M.addFace( f3.begin(), f3.end() );
+  M.addFace( f4.begin(), f4.end() );
+  M.addFace( f5.begin(), f5.end() );
+  M.addFace( f6.begin(), f6.end() );
+  M.addFace( f7.begin(), f7.end() );
+  M.addFace( f8.begin(), f8.end() );
+
+
   aleph::topology::MorseSmaleComplex<decltype(M)> msc;
   msc( M );
 
@@ -103,4 +142,5 @@ int main(int, char**)
 {
   test1();
   test2();
+  test3();
 }
