@@ -63,16 +63,21 @@ public:
   {
     HalfEdgePointer edge;
 
-    /** Collects al vertices of the given face */
-    std::vector<VertexPointer> vertices() const
+    /**
+      Collects all vertices of the given face. Vertex IDs will be
+      returned in the order in which they are traversed along the
+      face.
+    */
+
+    std::vector<Index> vertices() const
     {
-      std::vector<VertexPointer> v;
+      std::vector<Index> v;
 
       auto e = edge;
 
       do
       {
-        v.push_back( e->target );
+        v.push_back( e->target->id );
         e = e->next;
       }
       while( e != edge );
@@ -283,32 +288,15 @@ public:
         vertices.insert( vertices.end(), v.begin(), v.end() );
       }
 
-
       for( auto&& v : vertices )
-      {
-        // FIXME: Need to incorporate information about vertex ID here
-        M.addVertex( 0, 0, 0 );
-      }
+        M.addVertex( v.x, v.y, v.z, v.d, v.id );
     }
 
     for( auto&& f : faces )
     {
       auto&& vertices = f->vertices();
-
-      // FIXME: Refactor interface to obtain ID automatically; I really
-      // do not need the raw pointers here.
-      std::vector<Index> indices;
-      for( auto&& v : vertices )
-        indices.push_back( v->id );
-
-      M.addFace( indices.begin(), indices.end() );
+      M.addFace( vertices.begin(), vertices.end() );
     }
-
-    // TODO:
-    //   - Get all faces
-    //   - Enumerate their vertices
-    //   - Add them to the new mesh
-    //   - Add the faces to the new mesh
 
     return M;
   }
