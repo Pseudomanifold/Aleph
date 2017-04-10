@@ -6,6 +6,8 @@
 #include <algorithm>
 #include <iterator>
 #include <memory>
+#include <stdexcept>
+#include <unordered_map>
 #include <unordered_set>
 #include <vector>
 
@@ -101,10 +103,11 @@ public:
   {
     std::unordered_set<FacePointer> faces;
 
-    for( auto&& vertex : _vertices )
+    for( auto&& pair : _vertices )
     {
-      auto&& edge = vertex->edge;
-      auto&& face = edge->face;
+      auto&& vertex = pair.second;
+      auto&& edge   = vertex->edge;
+      auto&& face   = edge->face;
 
       if( face )
         faces.insert( face );
@@ -116,17 +119,23 @@ public:
   // Mesh modification -------------------------------------------------
 
   /** Adds a new vertex to the mesh */
-  void addVertex( Position x, Position y, Position z, Data data = Data() )
+  void addVertex( Position x, Position y, Position z, Data data = Data(), Index id = Index() )
   {
     Vertex v;
 
-    v.id   = _vertices.size();
+    v.id   = id == Index() ? std::max( _vertices.size(), _largestVertexID ) : id;
     v.x    = x;
     v.y    = y;
     v.z    = z;
     v.data = data;
 
-    _vertices.push_back( std::make_shared<Vertex>( v ) );
+    auto pair = _vertices.insert( std::make_pair( v.id,
+                                  std::make_shared<Vertex>( v ) ) );
+
+    if( !pair.second )
+      throw std::runtime_error( "Vertex ID must be unique" );
+
+    _largestVertexID = std::max( _largestVertexID, v.id );
   }
 
   /**
@@ -216,8 +225,10 @@ public:
     // Traverse all vertices whose paired edges have an empty face. Any
     // of these edges is part of the boundary face.
 
-    for( auto&& vertex : _vertices )
+    for( auto&& pair : _vertices )
     {
+      auto&& vertex = pair.second;
+
       if( !vertex->edge || vertex->edge->pair->face )
         continue;
 
@@ -356,9 +367,6 @@ public:
 
   VertexPointer vertex( Index id ) const
   {
-    // TODO: Improve ID-based query? Currently, ID and index of the
-    // vertex with respect to the vector are the same. I am not sure
-    // whether this is smart.
     return _vertices.at( id );
   }
 
@@ -463,11 +471,19 @@ private:
   }
 
   /**
+   Stores largest vertex ID. This is required in order to ensure
+   that vertex IDs are not assigned multiple times when the user
+   adds vertices one after the other.
+  */
+
+  Index _largestVertexID = Index();
+
+  /**
     Stores all vertex pointers. This is sufficient to store the
     complete mesh.
   */
 
-  std::vector<VertexPointer> _vertices;
+  std::unordered_map<Index, VertexPointer> _vertices;
 };
 
 } // namespace topology
