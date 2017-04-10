@@ -77,7 +77,7 @@ public:
 
       do
       {
-        v.push_back( e->target->id );
+        v.push_back( e->target()->id );
         e = e->next;
       }
       while( e != edge );
@@ -190,6 +190,9 @@ public:
 
         if( !target->edge )
           target->edge = pair;
+
+        if( !face->edge )
+          face->edge = edge;
       }
 
       assert( !edge->face );
