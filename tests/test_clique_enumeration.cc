@@ -31,6 +31,7 @@ template <class Data, class Vertex> void triangles()
   // Expected cliques: {0,1,2}, {0,3,1}
   std::vector<Simplex> trianglesConnected
     = {
+        {0}, {1}, {2}, {3},
         {0,1}, {0,2}, {0,3}, {1,2}, {1,3},
         {0,1,2}, {0,1,3}
     };
@@ -44,6 +45,7 @@ template <class Data, class Vertex> void triangles()
   // Expected cliques: {0,3}, {0,1,2}, {3,4,5}
   std::vector<Simplex> trianglesDisconnected
     = {
+        {0}, {1}, {2}, {3}, {4}, {5},
         {0,1}, {0,2}, {0,3}, {1,2}, {3,4}, {3,5}, {4,5},
         {0,1,2}, {3,4,5}
     };
