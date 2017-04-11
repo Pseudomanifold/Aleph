@@ -1,3 +1,9 @@
+# Optimizes for a useful debugging experience. While the test cases
+# might run slightly faster if "real" optimizations were enabled, I
+# like this flag for debugging.
+ENABLE_IF_SUPPORTED( CMAKE_CXX_FLAGS "-Og" )
+ENABLE_IF_SUPPORTED( CMAKE_CXX_FLAGS "-g" )
+
 #
 # The tests should always have these nasty flags enabled. What's the
 # use of the test without them?
