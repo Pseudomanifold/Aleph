@@ -77,7 +77,6 @@ public:
   SimplicialComplex( std::initializer_list<Simplex> simplices )
     : _simplices( simplices.begin(), simplices.end() )
   {
-    this->checkAndRestoreValidity();
   }
 
   /**
@@ -92,7 +91,6 @@ public:
   template <class InputIterator> SimplicialComplex( InputIterator begin, InputIterator end )
     : _simplices( begin, end )
   {
-    this->checkAndRestoreValidity();
   }
 
   // simplex container modification ------------------------------------
@@ -115,26 +113,6 @@ public:
   {
     _simplices.insert( _simplices.end(),
                        begin, end );
-
-    this->checkAndRestoreValidity();
-  }
-
-  /**
-    Given a range of simplices represented by two arbitrary input iterators,
-    inserts the simplices into the simplicial complex \i without performing any
-    validation.
-
-    The same caveats as for the function push_back_without_validation() apply.
-
-    @param begin Iterator to begin of input range
-    @param end   Iterator to end of input range
-  */
-
-  template <class InputIterator> void insert_without_validation( InputIterator begin,
-                                                                 InputIterator end )
-  {
-    _simplices.insert( _simplices.end(),
-                       begin, end );
   }
 
   /**
@@ -149,32 +127,6 @@ public:
   */
 
   void push_back( const Simplex& simplex )
-  {
-    _simplices.push_back( simplex );
-
-    this->checkAndRestoreValidity( simplex );
-  }
-
-  /**
-    Inserts a new simplex into the simplicial complex \i without performing a
-    validity check. By calling this function, a reduced simplicial complex that
-    does not contain \i all subsets of every simplex can be created.
-
-    Technically, the resulting simplicial complex ceases to be an abstract
-    simplicial complex because it does not contain all possible faces. Note
-    that the simplex is appended to the current filtration order, so the
-    simplicial complex should be sorted again afterwards.
-
-    @warning Other operations for modifying the simplicial complex might
-    perform a validity check, thereby adding simplices (which you presumably
-    want to avoid by calling this function). In order to avoid this problem,
-    make sure to use this function \i exclusively for changing the simplicial
-    complex.
-
-    @param simplex Simplex to insert into simplicial complex
-  */
-
-  void push_back_without_validation( const Simplex& simplex )
   {
     _simplices.push_back( simplex );
   }
@@ -679,6 +631,24 @@ public:
     return !this->operator==( other );
   }
 
+  /**
+    Creates missing faces for the simplicial complex. The function ensures
+    that the simplicial complex contains every face of every simplex. Note
+    that this may noticeably increase the size of the complex.
+  */
+
+  void createMissingFaces()
+  {
+    // If I encounter a face that is not stored in the simplicial complex, I
+    // create the corresponding simplex and add it. This ensures that it is
+    // possible to construct a simplicial complex from "partial" ranges of
+    // simplices, e.g. a list of high-dimensional simplices whose faces need to
+    // be calculated manually, for example.
+
+    for( auto itSimplex = this->begin(); itSimplex != this->end(); itSimplex++ )
+      this->checkAndRestoreValidity( *itSimplex );
+  }
+
   // debug -------------------------------------------------------------
 
   /**
@@ -695,24 +665,6 @@ public:
                                                              const SimplicialComplex< Simplex_ >& S );
 
 private:
-
-  /**
-    Checks and restores validity of the simplicial complex. A simplicial
-    complex is deemed valid if for every simplex s, it contains every face f of
-    s.
-  */
-
-  void checkAndRestoreValidity()
-  {
-    // If I encounter a face that is not stored in the simplicial complex, I
-    // create the corresponding simplex and add it. This ensures that it is
-    // possible to construct a simplicial complex from "partial" ranges of
-    // simplices, e.g. a list of high-dimensional simplices whose faces need to
-    // be calculated manually, for example.
-
-    for( auto itSimplex = this->begin(); itSimplex != this->end(); itSimplex++ )
-      this->checkAndRestoreValidity( *itSimplex );
-  }
 
   /**
     Checks and restores validity of the simplicial complex after adding a

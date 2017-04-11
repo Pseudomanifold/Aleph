@@ -102,10 +102,7 @@ public:
         s.setData( w );
       }
 
-      // TODO: Not sure whether this is the best way of solving it;
-      // should I expect a generic simplicial complex to have this
-      // function?
-      S.push_back_without_validation( s );
+      S.push_back( s );
     }
 
     return S;
@@ -129,11 +126,7 @@ public:
         data = std::max( data, dataValues[v] );
 
       s.setData( data );
-
-      // TODO: Not sure whether this is the best way of solving it;
-      // should I expect a generic simplicial complex to have this
-      // function?
-      S.push_back_without_validation( s );
+      S.push_back( s );
     }
 
     return S;

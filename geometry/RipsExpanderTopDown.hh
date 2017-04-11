@@ -109,7 +109,7 @@ public:
     }
 
     SimplicialComplex S;
-    S.insert_without_validation( simplices.begin(), simplices.end() );
+    S.insert( simplices.begin(), simplices.end() );
     return S;
   }
 
@@ -137,7 +137,7 @@ public:
       // 1-simplices, for example.
       if( s.dimension() < dimension )
       {
-        R.push_back_without_validation( s );
+        R.push_back( s );
         continue;
       }
 
@@ -152,7 +152,7 @@ public:
       while( detail::next_combination( vertices.begin(), vertices.begin() + dimension + 1, vertices.end() ) );
 
       s.setData( weight );
-      R.push_back_without_validation( s );
+      R.push_back( s );
     }
 
     return R;
