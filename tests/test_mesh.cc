@@ -131,6 +131,21 @@ void test3()
   M.addFace( f7.begin(), f7.end() );
   M.addFace( f8.begin(), f8.end() );
 
+  {
+    auto l1 = M.link(1);
+    auto l3 = M.link(3);
+    auto l5 = M.link(5);
+    auto l7 = M.link(7);
+
+    ALEPH_ASSERT_EQUAL( l1.size(), 3 );
+    ALEPH_ASSERT_EQUAL( l1.size(), l3.size() );
+    ALEPH_ASSERT_EQUAL( l1.size(), l5.size() );
+    ALEPH_ASSERT_EQUAL( l1.size(), l7.size() );
+
+    auto l4 = M.link(4);
+
+    ALEPH_ASSERT_EQUAL( l4.size(), 8 );
+  }
 
   aleph::topology::MorseSmaleComplex<decltype(M)> msc;
   msc( M );
