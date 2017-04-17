@@ -10,35 +10,31 @@
 #include <algorithm>
 #include <limits>
 #include <stdexcept>
+#include <vector>
 
 namespace aleph
 {
 
-
-#include "distances/Infinity.hh"
-#include "persistenceDiagrams/PersistenceDiagram.hh"
-
-#include "detail/Munkres.hh"
-#include "detail/Orthogonal.hh"
-
-#include <algorithm>
-#include <limits>
-#include <stdexcept>
-
-#include <cmath>
-
-namespace aleph
+namespace detail
 {
 
-namespace distances
+// Auxiliary structure for describing a pairing between persistence
+// diagrams.
+struct Pairing
 {
+  using IndexType = std::size_t;
+  using Pair      = std::pair<IndexType, IndexType>;
+
+  double cost;
+  std::vector<Pair> pairs;
+};
 
 template <
   class DataType,
   class Distance = InfinityDistance<DataType>
-> DataType optimalPairing( const PersistenceDiagram<DataType>& D1,
-                           const PersistenceDiagram<DataType>& D2,
-                           DataType power = DataType( 1 ) )
+> Pairing optimalPairing( const PersistenceDiagram<DataType>& D1,
+                          const PersistenceDiagram<DataType>& D2,
+                          DataType power = DataType( 1 ) )
 {
   if( D1.dimension() != D2.dimension() )
     throw std::runtime_error( "Dimensions do not coincide" );
@@ -138,23 +134,25 @@ template <
   auto M              = solver();
   DataType totalCosts = DataType();
 
+  Pairing pairing;
+
   for( row = IndexType(); row < M.n(); row++ )
   {
     for( col = IndexType(); col < M.n(); col++ )
     {
       if( M( row, col ) == IndexType() )
+      {
+        pairing.pairs.push_back( std::make_pair( row, col ) );
         totalCosts += costs( row, col );
+      }
     }
   }
 
-  return std::pow( totalCosts, 1 / power );
+  pairing.cost = totalCosts;
+  return pairing;
 }
 
-}
-
-}
-
-#endif
+} // namespace detail
 
 } // namespace aleph
 
