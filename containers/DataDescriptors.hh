@@ -69,6 +69,8 @@ template <class Distance, class Container> std::vector<double> eccentricities( c
 
     if( order > 0 )
     {
+      std::sort( distances.begin(), distances.end() );
+
       eccentricity = std::accumulate( distances.begin(), distances.end(), 0.0 );
       eccentricity = std::pow( eccentricity, 1.0 / order );
     }

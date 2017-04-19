@@ -96,7 +96,7 @@ template <class D> void eccentricityTest()
   std::sort( e2Sorted.begin(), e2Sorted.end() );
 
   std::sort( e0.begin(), e0.end() );
-  std::sort( e2.begin(), e2.begin() );
+  std::sort( e2.begin(), e2.end() );
 
   ALEPH_ASSERT_THROW( e0 == e0Sorted );
   ALEPH_ASSERT_THROW( e2 == e2Sorted );
