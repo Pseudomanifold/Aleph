@@ -89,6 +89,9 @@ template <class D> void eccentricityTest()
   auto e0Sorted = eccentricities<D>( pcSorted, 0 );
   auto e2Sorted = eccentricities<D>( pcSorted, 2 );
 
+  ALEPH_ASSERT_EQUAL( pc.size(),      pcSorted.size()      );
+  ALEPH_ASSERT_EQUAL( pc.dimension(), pcSorted.dimension() );
+
   std::sort( e0Sorted.begin(), e0Sorted.end() );
   std::sort( e2Sorted.begin(), e2Sorted.end() );
 
