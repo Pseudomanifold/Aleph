@@ -85,6 +85,19 @@ template <class D> void eccentricityTest()
     ALEPH_ASSERT_THROW( moreOrLessEqual( e2.begin(), e2.end(), eccentricities2Euclidean.begin(), eccentricities2Euclidean.end() ) );
   }
 
+  auto pcSorted = load<double>( CMAKE_SOURCE_DIR + std::string( "/tests/input/Iris_comma_separated_sorted.txt" ) );
+  auto e0Sorted = eccentricities<D>( pcSorted, 0 );
+  auto e2Sorted = eccentricities<D>( pcSorted, 2 );
+
+  std::sort( e0Sorted.begin(), e0Sorted.end() );
+  std::sort( e2Sorted.begin(), e2Sorted.end() );
+
+  std::sort( e0.begin(), e0.end() );
+  std::sort( e2.begin(), e2.begin() );
+
+  ALEPH_ASSERT_THROW( e0 == e0Sorted );
+  ALEPH_ASSERT_THROW( e2 == e2Sorted );
+
   ALEPH_TEST_END();
 }
 
