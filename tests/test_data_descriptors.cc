@@ -38,7 +38,7 @@ template <class InputIterator1, class InputIterator2> bool moreOrLessEqual( Inpu
   {
     // TODO: This precision is sufficient for me, but maybe it makes sense to
     // change it?
-    if( std::abs( *it1 - *it2 ) >= 1e-4 )
+    if( std::abs( *it1 - *it2 ) >= 1e-10 )
       return false;
   }
 
@@ -98,8 +98,8 @@ template <class D> void eccentricityTest()
   std::sort( e0.begin(), e0.end() );
   std::sort( e2.begin(), e2.end() );
 
-  ALEPH_ASSERT_THROW( e0 == e0Sorted );
-  ALEPH_ASSERT_THROW( e2 == e2Sorted );
+  ALEPH_ASSERT_THROW( moreOrLessEqual( e0.begin(), e0.end(), e0Sorted.begin(), e0Sorted.end() ) );
+  ALEPH_ASSERT_THROW( moreOrLessEqual( e2.begin(), e2.end(), e2Sorted.begin(), e2Sorted.end() ) );
 
   ALEPH_TEST_END();
 }
