@@ -85,7 +85,8 @@ int main( int argc, char** argv )
   auto K
     = buildVietorisRipsComplex( flannWrapper,
                                 epsilon,
-                                unsigned( dimension ) );
+                                unsigned( dimension ),
+                                eccentricity.begin(), eccentricity.end() );
 
 #endif
 
