@@ -58,6 +58,23 @@ void truncatedGaussianTest()
   ALEPH_ASSERT_THROW( g2.size() == pc.size() );
   ALEPH_ASSERT_THROW( g3.size() == pc.size() );
 
+  auto pcSorted = load<double>( CMAKE_SOURCE_DIR + std::string( "/tests/input/Iris_comma_separated_sorted.txt" ) );
+  auto g1Sorted = estimateDensityTruncatedGaussian( pc, 0.1 );
+  auto g2Sorted = estimateDensityTruncatedGaussian( pc, 0.2 );
+  auto g3Sorted = estimateDensityTruncatedGaussian( pc, 1.0 );
+
+  std::sort( g1.begin(), g1.end() );
+  std::sort( g2.begin(), g2.end() );
+  std::sort( g3.begin(), g3.end() );
+
+  std::sort( g1Sorted.begin(), g1Sorted.end() );
+  std::sort( g2Sorted.begin(), g2Sorted.end() );
+  std::sort( g3Sorted.begin(), g3Sorted.end() );
+
+  ALEPH_ASSERT_THROW( moreOrLessEqual( g1.begin(), g1.end(), g1Sorted.begin(), g1Sorted.end() ) );
+  ALEPH_ASSERT_THROW( moreOrLessEqual( g2.begin(), g2.end(), g2Sorted.begin(), g2Sorted.end() ) );
+  ALEPH_ASSERT_THROW( moreOrLessEqual( g3.begin(), g3.end(), g3Sorted.begin(), g3Sorted.end() ) );
+
   ALEPH_TEST_END();
 }
 
@@ -87,18 +104,22 @@ template <class D> void eccentricityTest()
 
   auto pcSorted = load<double>( CMAKE_SOURCE_DIR + std::string( "/tests/input/Iris_comma_separated_sorted.txt" ) );
   auto e0Sorted = eccentricities<D>( pcSorted, 0 );
+  auto e1Sorted = eccentricities<D>( pcSorted, 1 );
   auto e2Sorted = eccentricities<D>( pcSorted, 2 );
 
   ALEPH_ASSERT_EQUAL( pc.size(),      pcSorted.size()      );
   ALEPH_ASSERT_EQUAL( pc.dimension(), pcSorted.dimension() );
 
   std::sort( e0Sorted.begin(), e0Sorted.end() );
+  std::sort( e1Sorted.begin(), e1Sorted.end() );
   std::sort( e2Sorted.begin(), e2Sorted.end() );
 
   std::sort( e0.begin(), e0.end() );
+  std::sort( e1.begin(), e1.end() );
   std::sort( e2.begin(), e2.end() );
 
   ALEPH_ASSERT_THROW( moreOrLessEqual( e0.begin(), e0.end(), e0Sorted.begin(), e0Sorted.end() ) );
+  ALEPH_ASSERT_THROW( moreOrLessEqual( e1.begin(), e1.end(), e1Sorted.begin(), e1Sorted.end() ) );
   ALEPH_ASSERT_THROW( moreOrLessEqual( e2.begin(), e2.end(), e2Sorted.begin(), e2Sorted.end() ) );
 
   ALEPH_TEST_END();
@@ -116,6 +137,23 @@ template <class D> void distanceToMeasureTest()
   ALEPH_ASSERT_THROW( e1.empty() == false );
   ALEPH_ASSERT_THROW( e1.size()  == pc.size() );
   ALEPH_ASSERT_THROW( e1.size()  == e2.size() );
+
+  auto pcSorted = load<double>( CMAKE_SOURCE_DIR + std::string( "/tests/input/Iris_comma_separated_sorted.txt" ) );
+  auto e1Sorted = estimateDensityDistanceToMeasure<D>( pcSorted,  1 );
+  auto e2Sorted = estimateDensityDistanceToMeasure<D>( pcSorted,  5 );
+  auto e3Sorted = estimateDensityDistanceToMeasure<D>( pcSorted, 10 );
+
+  std::sort( e1Sorted.begin(), e1Sorted.end() );
+  std::sort( e2Sorted.begin(), e2Sorted.end() );
+  std::sort( e3Sorted.begin(), e3Sorted.end() );
+
+  std::sort( e1.begin(), e1.end() );
+  std::sort( e2.begin(), e2.end() );
+  std::sort( e3.begin(), e3.end() );
+
+  ALEPH_ASSERT_THROW( moreOrLessEqual( e1.begin(), e1.end(), e1Sorted.begin(), e1Sorted.end() ) );
+  ALEPH_ASSERT_THROW( moreOrLessEqual( e2.begin(), e2.end(), e2Sorted.begin(), e2Sorted.end() ) );
+  ALEPH_ASSERT_THROW( moreOrLessEqual( e3.begin(), e3.end(), e3Sorted.begin(), e3Sorted.end() ) );
 
   ALEPH_TEST_END();
 }
