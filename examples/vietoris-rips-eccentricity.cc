@@ -52,11 +52,13 @@ int main( int argc, char** argv )
 
   {
     auto minmax = std::minmax_element( eccentricity.begin(), eccentricity.end() );
+    auto min    = *minmax.first;
+    auto max    = *minmax.second;
 
     std::transform( eccentricity.begin(), eccentricity.end(), eccentricity.begin(),
-                    [&minmax] ( double v )
+                    [&min, &max] ( double v )
                     {
-                      return ( *minmax.second - v ) / ( *minmax.second - *minmax.first );
+                      return ( max - v ) / ( max - min );
                     } );
   }
 
