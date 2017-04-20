@@ -4,7 +4,6 @@
 #include <cmath>
 
 #include <algorithm>
-#include <numeric>
 #include <vector>
 
 #include "distances/Euclidean.hh"
@@ -12,6 +11,8 @@
 
 #include "geometry/BruteForce.hh"
 #include "geometry/NearestNeighbours.hh"
+
+#include "math/KahanSummation.hh"
 
 namespace aleph
 {
@@ -69,9 +70,7 @@ template <class Distance, class Container> std::vector<double> eccentricities( c
 
     if( order > 0 )
     {
-      std::sort( distances.begin(), distances.end() );
-
-      eccentricity = std::accumulate( distances.begin(), distances.end(), 0.0 );
+      eccentricity = aleph::math::accumulate_kahan( distances.begin(), distances.end(), 0.0 );
       eccentricity = std::pow( eccentricity, 1.0 / order );
     }
     else
@@ -103,8 +102,8 @@ template <class Container> std::vector<double> estimateDensityTruncatedGaussian(
 
   for( decltype(n) i = 0; i < n; i++ )
   {
-    auto p       = container[i];
-    auto density = 0.0;
+    auto p                                      = container[i];
+    aleph::math::KahanSummation<double> density = 0.0;
 
     for( decltype(n) j = 0; j < n; j++ )
     {
@@ -155,8 +154,7 @@ template <
 
   for( decltype(n) i = 0; i < n; i++ )
   {
-
-    double density  = std::accumulate( distances[i].begin(), distances[i].end(), 0.0 );
+    double density  = aleph::math::accumulate_kahan( distances[i].begin(), distances[i].end(), 0.0 );
     density         = -density;
     density        /= static_cast<double>( n );
 
@@ -165,7 +163,6 @@ template <
 
   return densities;
 }
-
 
 } // namespace aleph
 
