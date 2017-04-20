@@ -69,6 +69,21 @@ template <class InputIterator, class T> T accumulate_kahan( InputIterator first,
 {
   KahanSummation<T> sum = init;
 
+  for( auto it = first; it != last; ++it )
+    sum += *it;
+
+  return sum;
+}
+
+/**
+  Kahan summation with sorted values. This further increases the precision
+  of the summation algorithm but incurs a higher run-time complexity.
+*/
+
+template <class InputIterator, class T> T accumulate_kahan_sorted( InputIterator first, InputIterator last, T init )
+{
+  KahanSummation<T> sum = init;
+
   std::vector<T> values( first, last );
   std::sort( values.begin(), values.end() );
 
