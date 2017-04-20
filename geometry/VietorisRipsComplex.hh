@@ -57,8 +57,8 @@ template <class NearestNeighbours> auto buildVietorisRipsComplex(
 }
 
 /**
-  Convenience function for building a Vietoris--Rips complex from
-  unstructured data with additional values.
+  Convenience function for building a Vietoris--Rips complex from data
+  with additional values.
 
   The additional values are assumed to be specified as a generic range
   of input iterators. The order of values is assumed to be the same as
