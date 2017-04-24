@@ -1,5 +1,7 @@
 #include "tests/Base.hh"
 
+#include "distances/Wasserstein.hh"
+
 #include "persistenceDiagrams/MultiScaleKernel.hh"
 #include "persistenceDiagrams/PersistenceDiagram.hh"
 
@@ -40,9 +42,20 @@ template <class T> void testMultiScaleKernel()
 
   auto d1 = aleph::multiScalePseudoMetric( D1, D2, 1.0 );
   auto d2 = aleph::multiScalePseudoMetric( D1, D2, 2.0 );
+  auto d3 = aleph::distances::wassersteinDistance( D1, D2, T(1) );
 
+  // Non-negativity
   ALEPH_ASSERT_THROW( d1 > 0.0 );
   ALEPH_ASSERT_THROW( d2 > 0.0 );
+  ALEPH_ASSERT_THROW( d3 > 0.0 );
+
+  // Symmetry
+  ALEPH_ASSERT_EQUAL( aleph::multiScalePseudoMetric(D1, D1, 1.0), aleph::multiScalePseudoMetric(D2, D2, 1.0) );
+  ALEPH_ASSERT_EQUAL( aleph::multiScalePseudoMetric(D1, D1, 1.0), 0.0 );
+
+  // Stability
+  ALEPH_ASSERT_THROW( d1 < 1.0 / ( 1.0 / ( 1.0 * std::sqrt( 8.0 * M_PI ) ) * d3 ) );
+  ALEPH_ASSERT_THROW( d2 < 1.0 / ( 1.0 / ( 2.0 * std::sqrt( 8.0 * M_PI ) ) * d3 ) );
 
   ALEPH_TEST_END();
 }
