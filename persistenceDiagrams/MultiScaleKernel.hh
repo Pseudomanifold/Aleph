@@ -1,6 +1,8 @@
 #ifndef ALEPH_MULTI_SCALE_KERNEL_HH__
 #define ALEPH_MULTI_SCALE_KERNEL_HH__
 
+#include "math/KahanSummation.hh"
+
 #include "persistenceDiagrams/PersistenceDiagram.hh"
 
 #include <algorithm>
@@ -27,7 +29,7 @@ template <class Point> double squaredEuclideanDistance( const Point& p,
   auto x0 = p.x();
   auto y0 = p.y();
   auto x1 = q.x();
-  auto x2 = q.y();
+  auto y1 = q.y();
 
   if( mirror )
     std::swap( x1, y1 );
@@ -47,7 +49,7 @@ template <class T> double multiScaleKernel( const PersistenceDiagram<T>& D1,
                                             const PersistenceDiagram<T>& D2,
                                             double sigma )
 {
-  SKahanSummation<double> sum = 0.0;
+  aleph::math::KahanSummation<double> sum = 0.0;
 
   for( auto&& p : D1 )
   {
@@ -67,11 +69,11 @@ template <class T> double multiScaleKernel( const PersistenceDiagram<T>& D1,
 template <class T> double multiScaleFeatureMap( const PersistenceDiagram<T>& D,
                                                 double sigma )
 {
-  SKahanSummation<double> result = 0.0;
+  aleph::math::KahanSummation<double> result = 0.0;
 
-  for( auto&& p : pairing )
+  for( auto&& p : D )
   {
-    for( auto&& q : pairing )
+    for( auto&& q : D )
     {
       auto d1 = detail::squaredEuclideanDistance( p, q );
       auto d2 = detail::squaredEuclideanDistance( p, q, true );
