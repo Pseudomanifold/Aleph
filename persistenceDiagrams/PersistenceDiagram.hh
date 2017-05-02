@@ -10,9 +10,15 @@
 namespace aleph
 {
 
-template <class DataType> class PersistenceDiagram
+template <class T> class PersistenceDiagram
 {
 public:
+
+  // Exporting the data type of the underlying persistence diagrams
+  // makes it easier for client code to specify the desired type in
+  // advanced. Else, I would require `decltype` or related concepts
+  // that make the code harder to read.
+  using DataType = T;
 
   class Point
   {
