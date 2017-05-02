@@ -5,10 +5,14 @@
 #include "distances/detail/Munkres.hh"
 #include "distances/detail/Orthogonal.hh"
 
+#include "math/KahanSummation.hh"
+
 #include "persistenceDiagrams/PersistenceDiagram.hh"
 
 #include <algorithm>
+#include <iterator>
 #include <limits>
+#include <random>
 #include <stdexcept>
 #include <vector>
 
@@ -154,6 +158,78 @@ template <
 }
 
 } // namespace detail
+
+template <class InputIterator> auto mean( InputIterator begin, InputIterator end ) -> typename std::iterator_traits<InputIterator>::value_type
+{
+  using PersistenceDiagram = typename std::iterator_traits<InputIterator>::value_type;
+  using DataType           = typename PersistenceDiagram::DataType;
+
+  std::vector<PersistenceDiagram> persistenceDiagrams( begin, end );
+  PersistenceDiagram Y;
+
+  {
+    std::random_device rd;
+    std::default_random_engine rng( rd() );
+    std::uniform_int_distribution<decltype( persistenceDiagrams.size() )> distribution( 0, persistenceDiagrams.size() - 1 );
+
+    Y = persistenceDiagrams.at( distribution( rng ) );
+  }
+
+  bool stop = false;
+  while( !stop )
+  {
+    Y.removeDiagonal();
+
+
+    std::vector<detail::Pairing> pairings;
+    pairings.reserve( std::distance( begin, end ) );
+
+    for( auto it = begin; it != end; ++it )
+      pairings.emplace_back( detail::optimalPairing( Y, *it ) );
+
+    PersistenceDiagram Z;
+
+    auto k = Y.size();
+    for( decltype(k) i = 0; i < k; i++ )
+    {
+      aleph::math::KahanSummation<DataType> x = DataType();
+      aleph::math::KahanSummation<DataType> y = DataType();
+
+      std::size_t index = 0;
+      for( auto&& pairing : pairings )
+      {
+        // TODO: Need to ensure that the point is assigned the correct
+        // index with respect to the pairing above.
+
+        auto&& diagram = *( std::next( begin, index ) );
+
+        // For now, only handle the non-diagonal assignment. Else,
+        // I also need the projection onto the diagonal.
+        if( pairing.pairs.at(i).second < diagram.size() )
+        {
+          auto&& point = *( std::next( diagram.begin(), pairing.pairs.at(i).second ) );
+
+          x += point.x();
+          y += point.y();
+        }
+
+        ++index;
+      }
+
+      x /= DataType( pairings.size() );
+      y /= DataType( pairings.size() );
+
+      Z.add( x,y );
+    }
+
+    // FIXME: Check iterative criterion here...
+    stop = true;
+    Y    = Z;
+  }
+
+  return Y;
+}
+
 
 } // namespace aleph
 
