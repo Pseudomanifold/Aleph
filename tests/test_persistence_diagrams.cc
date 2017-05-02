@@ -2,11 +2,13 @@
 
 #include "distances/Wasserstein.hh"
 
+#include "persistenceDiagrams/Mean.hh"
 #include "persistenceDiagrams/MultiScaleKernel.hh"
 #include "persistenceDiagrams/PersistenceDiagram.hh"
 
 #include <limits>
 #include <random>
+#include <vector>
 
 #include <cmath>
 
@@ -56,6 +58,23 @@ template <class T> void testMultiScaleKernel()
   // Stability
   ALEPH_ASSERT_THROW( d1 < 1.0 / ( 1.0 / ( 1.0 * std::sqrt( 8.0 * M_PI ) ) * d3 ) );
   ALEPH_ASSERT_THROW( d2 < 1.0 / ( 1.0 / ( 2.0 * std::sqrt( 8.0 * M_PI ) ) * d3 ) );
+
+  ALEPH_TEST_END();
+}
+
+template <class T> void testFrechetMean()
+{
+  using PersistenceDiagram = aleph::PersistenceDiagram<T>;
+
+  ALEPH_TEST_BEGIN( "Persistence diagram mean");
+
+  unsigned n = 20;
+
+  std::vector<PersistenceDiagram> diagrams;
+  diagrams.reserve( n );
+
+  for( decltype(n) i = 0; i < n; i++ )
+    diagrams.emplace_back( createRandomPersistenceDiagram<T>( 50 ) );
 
   ALEPH_TEST_END();
 }

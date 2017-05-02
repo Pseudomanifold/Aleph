@@ -31,17 +31,18 @@ struct Pairing
 
 template <
   class DataType,
-  class Distance = InfinityDistance<DataType>
+  class Distance = aleph::distances::InfinityDistance<DataType>
 > Pairing optimalPairing( const PersistenceDiagram<DataType>& D1,
                           const PersistenceDiagram<DataType>& D2,
                           DataType power = DataType( 1 ) )
 {
+
   if( D1.dimension() != D2.dimension() )
     throw std::runtime_error( "Dimensions do not coincide" );
 
   auto size = D1.size() + D2.size();
 
-  detail::Matrix<DataType> costs( size );
+  distances::detail::Matrix<DataType> costs( size );
 
   using IndexType = decltype( costs.n() );
 
@@ -89,7 +90,7 @@ template <
       DataType d = DataType();
 
       if( p1 == p2 )
-        d = std::pow( detail::orthogonalDistance<Distance>( p1 ), power );
+        d = std::pow( distances::detail::orthogonalDistance<Distance>( p1 ), power );
       else
         d = std::numeric_limits<DataType>::max();
 
@@ -115,7 +116,7 @@ template <
       DataType d = DataType();
 
       if( p1 == p2 )
-        d = std::pow( detail::orthogonalDistance<Distance>( p1 ), power );
+        d = std::pow( distances::detail::orthogonalDistance<Distance>( p1 ), power );
       else
         d = std::numeric_limits<DataType>::max();
 
@@ -129,7 +130,7 @@ template <
 
   // Assignment problem solving ----------------------------------------
 
-  detail::Munkres<DataType> solver( costs );
+  distances::detail::Munkres<DataType> solver( costs );
 
   auto M              = solver();
   DataType totalCosts = DataType();
