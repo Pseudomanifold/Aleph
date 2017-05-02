@@ -147,6 +147,8 @@ template <
     {
       if( M( row, col ) == IndexType() )
       {
+        // This ensures that pairs are returned in the order dictated by
+        // the first persistence diagram.
         pairing.pairs.push_back( std::make_pair( row, col ) );
         totalCosts += costs( row, col );
       }
@@ -198,9 +200,6 @@ template <class InputIterator> auto mean( InputIterator begin, InputIterator end
       std::size_t index = 0;
       for( auto&& pairing : pairings )
       {
-        // TODO: Need to ensure that the point is assigned the correct
-        // index with respect to the pairing above.
-
         auto&& diagram = *( std::next( begin, index ) );
 
         // For now, only handle the non-diagonal assignment. Else,
@@ -211,6 +210,15 @@ template <class InputIterator> auto mean( InputIterator begin, InputIterator end
 
           x += point.x();
           y += point.y();
+        }
+        else
+        {
+          auto point = *std::next( Y.begin(), i );
+
+          // The orthogonal projection is given by 0.5*(x+y). I am using
+          // a slightly different notation to prevent converting values.
+          x += ( point.x() + point.y() ) / 2;
+          y += ( point.x() + point.y() ) / 2;
         }
 
         ++index;
