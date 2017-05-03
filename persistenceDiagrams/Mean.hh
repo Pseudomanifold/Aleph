@@ -186,7 +186,7 @@ template <class InputIterator> auto mean( InputIterator begin, InputIterator end
   aleph::math::KahanSummation<double> cost = 0.0;
 
   std::vector<detail::Pairing> pairings;
-  pairings.reserve( std::distance( begin, end ) );
+  pairings.reserve( decltype(pairings)::size_type( std::distance( begin, end ) ) );
 
   for( auto it = begin; it != end; ++it )
   {
@@ -243,7 +243,7 @@ template <class InputIterator> auto mean( InputIterator begin, InputIterator end
 
     {
       std::vector<detail::Pairing> newPairings;
-      newPairings.reserve( std::distance( begin, end ) );
+      newPairings.reserve( decltype(newPairings)::size_type( std::distance( begin, end ) ) );
 
       aleph::math::KahanSummation<double> newCost = 0.0;
 
