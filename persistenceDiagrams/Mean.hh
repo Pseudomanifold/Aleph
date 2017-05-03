@@ -205,7 +205,9 @@ template <class InputIterator> auto mean( InputIterator begin, InputIterator end
       aleph::math::KahanSummation<DataType> x = DataType();
       aleph::math::KahanSummation<DataType> y = DataType();
 
-      std::size_t index = 0;
+      using DifferenceType = typename std::iterator_traits<InputIterator>::difference_type;
+      DifferenceType index = 0;
+
       for( auto&& pairing : pairings )
       {
         auto&& diagram = *( std::next( begin, index ) );
@@ -214,14 +216,14 @@ template <class InputIterator> auto mean( InputIterator begin, InputIterator end
         // I also need the projection onto the diagonal.
         if( pairing.pairs.at(i).second < diagram.size() )
         {
-          auto&& point = *( std::next( diagram.begin(), pairing.pairs.at(i).second ) );
+          auto&& point = *( std::next( diagram.begin(), DifferenceType( pairing.pairs.at(i).second ) ) );
 
           x += point.x();
           y += point.y();
         }
         else
         {
-          auto point = *std::next( Y.begin(), i );
+          auto point = *std::next( Y.begin(), DifferenceType( i ) );
 
           // The orthogonal projection is given by 0.5*(x+y). I am using
           // a slightly different notation to prevent converting values.
