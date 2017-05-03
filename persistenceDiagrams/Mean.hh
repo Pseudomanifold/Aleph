@@ -29,6 +29,11 @@ struct Pairing
   using IndexType = std::size_t;
   using Pair      = std::pair<IndexType, IndexType>;
 
+  bool operator==( const Pairing& other ) const noexcept
+  {
+    return cost == other.cost;
+  }
+
   double cost;
   std::vector<Pair> pairs;
 };
@@ -175,20 +180,23 @@ template <class InputIterator> auto mean( InputIterator begin, InputIterator end
     std::uniform_int_distribution<decltype( persistenceDiagrams.size() )> distribution( 0, persistenceDiagrams.size() - 1 );
 
     Y = persistenceDiagrams.at( distribution( rng ) );
+    Y.removeDiagonal();
+  }
+
+  aleph::math::KahanSummation<double> cost = 0.0;
+
+  std::vector<detail::Pairing> pairings;
+  pairings.reserve( std::distance( begin, end ) );
+
+  for( auto it = begin; it != end; ++it )
+  {
+    pairings.emplace_back( detail::optimalPairing( Y, *it ) );
+    cost += pairings.back().cost;
   }
 
   bool stop = false;
   while( !stop )
   {
-    Y.removeDiagonal();
-
-
-    std::vector<detail::Pairing> pairings;
-    pairings.reserve( std::distance( begin, end ) );
-
-    for( auto it = begin; it != end; ++it )
-      pairings.emplace_back( detail::optimalPairing( Y, *it ) );
-
     PersistenceDiagram Z;
 
     auto k = Y.size();
@@ -230,9 +238,32 @@ template <class InputIterator> auto mean( InputIterator begin, InputIterator end
       Z.add( x,y );
     }
 
-    // FIXME: Check iterative criterion here...
-    stop = true;
-    Y    = Z;
+    Y = Z;
+    Y.removeDiagonal();
+
+    {
+      std::vector<detail::Pairing> newPairings;
+      newPairings.reserve( std::distance( begin, end ) );
+
+      aleph::math::KahanSummation<double> newCost = 0.0;
+
+      for( auto it = begin; it != end; ++it )
+      {
+        newPairings.emplace_back( detail::optimalPairing( Y, *it ) );
+        newCost += newPairings.back().cost;
+      }
+
+      // TODO: Check correctness of pairing: I am currently chickening
+      // out after some iterations. This behaviour is not described in
+      // the paper.
+      if( newPairings == pairings || std::abs( newCost - cost ) < 1e-2 )
+        stop = true;
+      else
+      {
+        pairings.swap( newPairings );
+        cost = newCost;
+      }
+    }
   }
 
   return Y;
