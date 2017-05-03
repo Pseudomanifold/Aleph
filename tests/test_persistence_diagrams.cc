@@ -76,6 +76,12 @@ template <class T> void testFrechetMean()
   for( decltype(n) i = 0; i < n; i++ )
     diagrams.emplace_back( createRandomPersistenceDiagram<T>( 50 ) );
 
+  auto D = aleph::mean( diagrams.begin(), diagrams.end() );
+
+  ALEPH_ASSERT_THROW( D.size() > 0 );
+
+  std::cerr << D << "\n";
+
   ALEPH_TEST_END();
 }
 
@@ -83,4 +89,7 @@ int main(int, char**)
 {
   testMultiScaleKernel<float> ();
   testMultiScaleKernel<double>();
+
+  testFrechetMean<float> ();
+  testFrechetMean<double>();
 }
