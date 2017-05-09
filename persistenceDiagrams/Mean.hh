@@ -186,12 +186,18 @@ template <class InputIterator> auto mean( InputIterator begin, InputIterator end
   aleph::math::KahanSummation<double> cost = 0.0;
 
   std::vector<detail::Pairing> pairings;
-  pairings.reserve( decltype(pairings)::size_type( std::distance( begin, end ) ) );
+  pairings.resize( decltype(pairings)::size_type( std::distance( begin, end ) ) );
 
-  for( auto it = begin; it != end; ++it )
+  #pragma omp parallel for
+  for( auto it = begin; it < end; ++it )
   {
-    pairings.emplace_back( detail::optimalPairing( Y, *it ) );
-    cost += pairings.back().cost;
+    auto i      = decltype(pairings)::size_type( std::distance( begin, it ) );
+    pairings[i] = detail::optimalPairing( Y, *it );
+
+    #pragma omp critical
+    {
+      cost += pairings.back().cost;
+    }
   }
 
   bool stop = false;
@@ -252,14 +258,20 @@ template <class InputIterator> auto mean( InputIterator begin, InputIterator end
 
     {
       std::vector<detail::Pairing> newPairings;
-      newPairings.reserve( decltype(newPairings)::size_type( std::distance( begin, end ) ) );
+      newPairings.resize( decltype(newPairings)::size_type( std::distance( begin, end ) ) );
 
       aleph::math::KahanSummation<double> newCost = 0.0;
 
-      for( auto it = begin; it != end; ++it )
+      #pragma omp parallel for
+      for( auto it = begin; it < end; ++it )
       {
-        newPairings.emplace_back( detail::optimalPairing( Y, *it ) );
-        newCost += newPairings.back().cost;
+        auto i         = decltype(newPairings)::size_type( std::distance( begin, it ) );
+        newPairings[i] = detail::optimalPairing( Y, *it );
+
+        #pragma omp critical
+        {
+          newCost += newPairings.back().cost;
+        }
       }
 
       if( newPairings == pairings )

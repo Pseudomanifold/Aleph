@@ -41,6 +41,18 @@ ENABLE_IF_SUPPORTED( CMAKE_CXX_FLAGS "-pedantic" )
 # Additional packages
 #
 
+FIND_PACKAGE( OpenMP )
+
+# This is somewhat brute-force: I am adding OpenMP flags regardless of
+# the target. However, this makes it easier to use code for which this
+# framework may or may not be used.
+#
+# I do not want to have too many of these declarations for different
+# targets flying around.
+IF( OPENMP_FOUND )
+  ADD_FLAGS( CMAKE_CXX_FLAGS ${OpenMP_CXX_FLAGS} )
+ENDIF()
+
 FIND_PACKAGE( FLANN )
 
 IF( FLANN_FOUND )
