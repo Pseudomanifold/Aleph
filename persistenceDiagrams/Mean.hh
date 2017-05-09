@@ -43,7 +43,7 @@ template <
   class Distance = aleph::distances::InfinityDistance<DataType>
 > Pairing optimalPairing( const PersistenceDiagram<DataType>& D1,
                           const PersistenceDiagram<DataType>& D2,
-                          DataType power = DataType( 1 ) )
+                          DataType power = DataType( 2 ) )
 {
 
   if( D1.dimension() != D2.dimension() )
@@ -141,8 +141,8 @@ template <
 
   distances::detail::Munkres<DataType> solver( costs );
 
-  auto M              = solver();
-  DataType totalCosts = DataType();
+  auto M                                           = solver();
+  aleph::math::KahanSummation<DataType> totalCosts = DataType();
 
   Pairing pairing;
 
