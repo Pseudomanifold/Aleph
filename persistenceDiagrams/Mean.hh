@@ -202,40 +202,47 @@ template <class InputIterator> auto mean( InputIterator begin, InputIterator end
     auto k = Y.size();
     for( decltype(k) i = 0; i < k; i++ )
     {
-      aleph::math::KahanSummation<DataType> x = DataType();
-      aleph::math::KahanSummation<DataType> y = DataType();
+      aleph::math::KahanSummation<DataType> x0 = DataType(); // off-diagonal
+      aleph::math::KahanSummation<DataType> y0 = DataType(); // off-diagonal
+      aleph::math::KahanSummation<DataType> x1 = DataType();
+      aleph::math::KahanSummation<DataType> y1 = DataType();
 
       using DifferenceType = typename std::iterator_traits<InputIterator>::difference_type;
       DifferenceType index = 0;
+
+      {
+        auto point = *std::next( Y.begin(), DifferenceType( i ) );
+
+        // The orthogonal projection is given by 0.5*(x+y). I am using
+        // a different calculation to prevent implicit conversions.
+        x1 = ( point.x() + point.y() ) / 2;
+        y1 = ( point.x() + point.y() ) / 2;
+      }
+
+      // Counting the number of off-diagonal points is required in order
+      // to ensure that the arithmetical mean is weighted correctly.
+      unsigned numOffDiagonalPoints = 0;
 
       for( auto&& pairing : pairings )
       {
         auto&& diagram = *( std::next( begin, index ) );
 
-        // For now, only handle the non-diagonal assignment. Else,
-        // I also need the projection onto the diagonal.
+        // Off-diagonal assignment
         if( pairing.pairs.at(i).second < diagram.size() )
         {
           auto&& point = *( std::next( diagram.begin(), DifferenceType( pairing.pairs.at(i).second ) ) );
 
-          x += point.x();
-          y += point.y();
-        }
-        else
-        {
-          auto point = *std::next( Y.begin(), DifferenceType( i ) );
+          x0 += point.x();
+          y0 += point.y();
 
-          // The orthogonal projection is given by 0.5*(x+y). I am using
-          // a slightly different notation to prevent converting values.
-          x += ( point.x() + point.y() ) / 2;
-          y += ( point.x() + point.y() ) / 2;
+          numOffDiagonalPoints++;
         }
 
         ++index;
       }
 
-      x /= DataType( pairings.size() );
-      y /= DataType( pairings.size() );
+      auto x = ( x0 + ( DataType( persistenceDiagrams.size() - numOffDiagonalPoints ) ) * x1 ) / DataType( pairings.size() );
+      auto y = ( y0 + ( DataType( persistenceDiagrams.size() - numOffDiagonalPoints ) ) * y1 ) / DataType( pairings.size() );
 
       Z.add( x,y );
     }
@@ -255,10 +262,7 @@ template <class InputIterator> auto mean( InputIterator begin, InputIterator end
         newCost += newPairings.back().cost;
       }
 
-      // TODO: Check correctness of pairing: I am currently chickening
-      // out after some iterations. This behaviour is not described in
-      // the paper.
-      if( newPairings == pairings || std::abs( newCost - cost ) < 1e-2 )
+      if( newPairings == pairings )
         stop = true;
       else
       {
