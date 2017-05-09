@@ -68,7 +68,7 @@ template <class T> void testFrechetMean()
 
   ALEPH_TEST_BEGIN( "Persistence diagram mean");
 
-  unsigned n = 20;
+  unsigned n = 10;
 
   std::vector<PersistenceDiagram> diagrams;
   diagrams.reserve( n );
