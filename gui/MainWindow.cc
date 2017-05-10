@@ -66,12 +66,22 @@ void MainWindow::loadPersistenceDiagram()
       QString( "Loaded persistence diagram with %1 entries" ).arg( _persistenceDiagram.size() )
     );
 
-    auto subWindow = _mdiArea->addSubWindow(
-      new PersistenceDiagram( _persistenceDiagram )
-    );
+    auto pd        = new PersistenceDiagram( _persistenceDiagram );
+    auto subWindow = _mdiArea->addSubWindow( pd );
 
+    this->connect( pd, SIGNAL( clicked( QPointF ) ),
+                   this, SLOT( handlePersistenceDiagramClick( QPointF ) ) );
+
+    subWindow->resize( 300, 300 );
     subWindow->show();
   }
+}
+
+void MainWindow::handlePersistenceDiagramClick( const QPointF& point )
+{
+  this->statusBar()->showMessage(
+    QString( "Selected point: (%1,%2)" ).arg( point.x() ).arg( point.y() )
+  );
 }
 
 } // namespace gui

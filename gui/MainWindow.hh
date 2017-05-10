@@ -27,6 +27,8 @@ private:
 private slots:
   void loadPersistenceDiagram();
 
+  void handlePersistenceDiagramClick( const QPointF& point );
+
 private:
 
   // Widgets -----------------------------------------------------------
