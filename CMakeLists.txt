@@ -80,6 +80,7 @@ INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR} )
 # subdirectory of the repository.
 ENABLE_TESTING()
 
+ADD_SUBDIRECTORY( gui )
 ADD_SUBDIRECTORY( examples )
 ADD_SUBDIRECTORY( tests )
 ADD_SUBDIRECTORY( tools )

@@ -1,0 +1,8 @@
+SET( CMAKE_AUTOMOC ON )
+
+FIND_PACKAGE( Qt5 COMPONENTS Core Widgets )
+
+IF( Qt5_FOUND )
+  ADD_EXECUTABLE( Perdita Perdita.cc )
+  TARGET_LINK_LIBRARIES( Perdita Qt5::Widgets )
+ENDIF()
