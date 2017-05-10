@@ -2,6 +2,7 @@
 #define ALEPH_GUI_MAIN_WINDOW_HH__
 
 #include <QMainWindow>
+#include <QMdiArea>
 
 #include "persistenceDiagrams/PersistenceDiagram.hh"
 
@@ -27,6 +28,12 @@ private slots:
   void loadPersistenceDiagram();
 
 private:
+
+  // Widgets -----------------------------------------------------------
+
+  QMdiArea* _mdiArea;
+
+  // Data --------------------------------------------------------------
 
   using DataType = double;
 
