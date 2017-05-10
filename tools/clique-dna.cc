@@ -10,9 +10,10 @@
 
 #include <getopt.h>
 
-#include "persistenceDiagrams/IO.hh"
 #include "persistenceDiagrams/PersistenceDiagram.hh"
 #include "persistenceDiagrams/PersistenceIndicatorFunction.hh"
+
+#include "persistenceDiagrams/io/Raw.hh"
 
 using DataType           = double;
 using PersistenceDiagram = aleph::PersistenceDiagram<DataType>;
@@ -92,7 +93,7 @@ int main( int argc, char** argv )
     std::cerr << "* Processing '" << argv[i] << "'...";
 
     PersistenceDiagram persistenceDiagram
-        = aleph::load<DataType>( filenames.back() );
+        = aleph::io::load<DataType>( filenames.back() );
 
     persistenceDiagram.removeDiagonal();
     persistenceDiagram.removeUnpaired();

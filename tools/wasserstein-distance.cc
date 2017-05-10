@@ -4,8 +4,8 @@
 
 #include "distances/Wasserstein.hh"
 
-#include "persistenceDiagrams/IO.hh"
 #include "persistenceDiagrams/PersistenceDiagram.hh"
+#include "persistenceDiagrams/io/Raw.hh"
 
 using DataType           = double;
 using PersistenceDiagram = aleph::PersistenceDiagram<DataType>;
@@ -31,7 +31,7 @@ int main( int argc, char** argv )
   {
     std::cerr << "* Processing '" << filename << "'...";
 
-    PersistenceDiagram persistenceDiagram = aleph::load<DataType>( filename );
+    PersistenceDiagram persistenceDiagram = aleph::io::load<DataType>( filename );
     persistenceDiagrams.push_back( persistenceDiagram );
 
     std::cerr << "finished\n";

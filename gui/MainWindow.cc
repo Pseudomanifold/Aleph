@@ -1,7 +1,7 @@
 #include "gui/MainWindow.hh"
 #include "gui/PersistenceDiagram.hh"
 
-#include "persistenceDiagrams/IO.hh"
+#include "persistenceDiagrams/io/Raw.hh"
 
 #include <QAction>
 #include <QFileDialog>
@@ -60,7 +60,7 @@ void MainWindow::loadPersistenceDiagram()
   auto fileName = QFileDialog::getOpenFileName( this );
   if( !fileName.isEmpty() )
   {
-    _persistenceDiagram = aleph::load<DataType>( fileName.toStdString() );
+    _persistenceDiagram = aleph::io::load<DataType>( fileName.toStdString() );
 
     this->statusBar()->showMessage(
       QString( "Loaded persistence diagram with %1 entries" ).arg( _persistenceDiagram.size() )

@@ -14,9 +14,10 @@
 
 #include "distances/Wasserstein.hh"
 
-#include "persistenceDiagrams/IO.hh"
 #include "persistenceDiagrams/PersistenceDiagram.hh"
 #include "persistenceDiagrams/PersistenceIndicatorFunction.hh"
+
+#include "persistenceDiagrams/io/Raw.hh"
 
 #include "utilities/Filesystem.hh"
 
@@ -221,7 +222,7 @@ int main( int argc, char** argv )
     {
       std::cerr << "* Processing '" << dataSet.filename << "'...";
 
-      dataSet.persistenceDiagram = aleph::load<DataType>( dataSet.filename );
+      dataSet.persistenceDiagram = aleph::io::load<DataType>( dataSet.filename );
 
       // FIXME: This is only required in order to ensure that the
       // persistence indicator function has a finite integral; it

@@ -1,5 +1,5 @@
-#ifndef ALEPH_PERSISTENCE_DIAGRAMS_IO_HH__
-#define ALEPH_PERSISTENCE_DIAGRAMS_IO_HH__
+#ifndef ALEPH_PERSISTENCE_DIAGRAMS_IO_RAW_HH__
+#define ALEPH_PERSISTENCE_DIAGRAMS_IO_RAW_HH__
 
 #include "persistenceDiagrams/PersistenceDiagram.hh"
 #include "utilities/String.hh"
@@ -10,6 +10,9 @@
 #include <vector>
 
 namespace aleph
+{
+
+namespace io
 {
 
 /**
@@ -56,6 +59,8 @@ template <class T> PersistenceDiagram<T> load( const std::string& filename )
 
   return persistenceDiagram;
 }
+
+} // namespace io
 
 } // namespace aleph
 

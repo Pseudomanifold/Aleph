@@ -1,6 +1,7 @@
-#include "persistenceDiagrams/IO.hh"
 #include "persistenceDiagrams/Norms.hh"
 #include "persistenceDiagrams/PersistenceDiagram.hh"
+
+#include "persistenceDiagrams/io/Raw.hh"
 
 #include <iostream>
 #include <string>
@@ -28,7 +29,7 @@ int main( int argc, char** argv )
 
     Input input = {
       filename,
-      aleph::load<DataType>( filename )
+      aleph::io::load<DataType>( filename )
     };
 
     inputs.push_back( input );
