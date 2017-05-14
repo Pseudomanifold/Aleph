@@ -4,6 +4,7 @@ ADD_EXECUTABLE( clique-persistence-diagram              clique-persistence-diagr
 ADD_EXECUTABLE( persistence-diagram-norms               persistence-diagram-norms.cc )
 ADD_EXECUTABLE( persistence-indicator-function          persistence-indicator-function.cc )
 ADD_EXECUTABLE( persistence-indicator-function-distance persistence-indicator-function-distance.cc )
+ADD_EXECUTABLE( topological-kernels                     topological-kernels.cc )
 ADD_EXECUTABLE( wasserstein-distance                    wasserstein-distance.cc )
 
 ENABLE_IF_SUPPORTED( CMAKE_CXX_FLAGS "-O3" )
