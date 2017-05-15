@@ -168,7 +168,7 @@ int main( int argc, char** argv )
 
   // TODO: Make this regular expression more, well, 'expressive' and
   // support more methods of specifying a dimension.
-  std::regex reDataSetPrefix( "(.*)_k([[:digit:]]+)\\.txt" );
+  std::regex reDataSetPrefix( "(.*)_[dk]([[:digit:]]+)\\.txt" );
   std::smatch matches;
 
   // Get filenames & prefixes ------------------------------------------
