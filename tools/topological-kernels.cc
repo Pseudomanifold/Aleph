@@ -65,7 +65,7 @@ void storeMatrix( const std::vector< std::vector<double> >& M, std::ostream& out
 // Calculates the distance between two data sets. This requires enumerating all
 // dimensions, and finding the corresponding persistence indicator function. If
 // no such function exists, the function uses the norm of the function.
-double distance( const std::vector<DataSet>& dataSet1, const std::vector<DataSet>& dataSet2, unsigned minDimension, unsigned maxDimension )
+double distance( const std::vector<DataSet>& dataSet1, const std::vector<DataSet>& dataSet2, unsigned minDimension, unsigned maxDimension, double power )
 {
   auto getPersistenceIndicatorFunction = [] ( const std::vector<DataSet>& dataSet, unsigned dimension )
   {
@@ -89,7 +89,7 @@ double distance( const std::vector<DataSet>& dataSet1, const std::vector<DataSet
     auto g = getPersistenceIndicatorFunction( dataSet2, dimension );
 
     g = g * (-1.0);
-    d = d + (f+g).abs().integral();
+    d = d + (f+g).abs().integral_p( power );
   }
 
   return d;
@@ -265,7 +265,7 @@ int main( int argc, char** argv )
       if( useWassersteinDistance )
         d = wassersteinDistance( *it1, *it2, minDimension, maxDimension, power );
       else
-        d = distance( *it1, *it2, minDimension, maxDimension );
+        d = distance( *it1, *it2, minDimension, maxDimension, power );
 
       d = -d; // for kernel usage
       if( useExp )
