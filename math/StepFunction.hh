@@ -81,9 +81,17 @@ public:
       return this->a() <= x && x <= this->b();
     }
 
+    /** Standard (signed) integral */
     I integral() const noexcept
     {
       return this->y() * static_cast<I>( ( this->b() - this->a() ) );
+    }
+
+    /** Unsigned integral raised to a certain power */
+    I integral_p( I p ) const noexcept
+    {
+      auto value  = std::abs( this->integral() );
+      return std::pow( value, p );
     }
 
     I operator()( D x ) const noexcept
@@ -243,6 +251,20 @@ public:
       value += f.integral();
 
     return value;
+  }
+
+  /** Calculates the unsigned integral raised to a certain power */
+  I integral_p( I p ) const noexcept
+  {
+    if( _indicatorFunctions.empty() )
+      return I();
+
+    I value = I();
+
+    for( auto&& f : _indicatorFunctions )
+      value += f.integral_p( p );
+
+    return std::pow( value, 1/p );
   }
 
   /** Calculates the absolute value of the function */
