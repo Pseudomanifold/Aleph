@@ -151,6 +151,35 @@ template <class T> void testStepFunctionAddition()
   ALEPH_TEST_END();
 }
 
+template <class T> void testStepFunctionNegation()
+{
+  ALEPH_TEST_BEGIN( "Step function: Negation" );
+
+  StepFunction<T> f;
+  f.add( 0, 1, 1 );
+  f.add( 2, 3, 1 );
+  f.add( 3, 4, 2 );
+
+  auto g =  f * -1;
+  auto h = -f;
+
+  ALEPH_ASSERT_EQUAL( g(0)  , -1 );
+  ALEPH_ASSERT_EQUAL( g(1)  , -1 );
+  ALEPH_ASSERT_EQUAL( g(1.5), -0 );
+  ALEPH_ASSERT_EQUAL( g(2)  , -1 );
+  ALEPH_ASSERT_EQUAL( g(3)  , -2 );
+  ALEPH_ASSERT_EQUAL( g(3.5), -2 );
+  ALEPH_ASSERT_EQUAL( g(4.0), -2);
+
+  ALEPH_ASSERT_EQUAL( g(0)  , h(0)   );
+  ALEPH_ASSERT_EQUAL( g(1)  , h(1)   );
+  ALEPH_ASSERT_EQUAL( g(1.5), h(1.5) );
+  ALEPH_ASSERT_EQUAL( g(2)  , h(2)   );
+  ALEPH_ASSERT_EQUAL( g(3)  , h(3)   );
+  ALEPH_ASSERT_EQUAL( g(3.5), h(3.5) );
+  ALEPH_ASSERT_EQUAL( g(4.0), h(4.0) );
+}
+
 template <class T> void testPersistenceIndicatorFunction()
 {
   using PersistenceDiagram = aleph::PersistenceDiagram<T>;
@@ -204,6 +233,9 @@ int main()
 
   testStepFunctionAddition<double>();
   testStepFunctionAddition<float> ();
+
+  testStepFunctionNegation<double>();
+  testStepFunctionNegation<float> ();
 
   testPersistenceIndicatorFunction<double>();
   testPersistenceIndicatorFunction<float>();

@@ -221,6 +221,17 @@ public:
     return h;
   }
 
+  /** Unary minus: negates all values in the image of the step function */
+  StepFunction operator-() const noexcept
+  {
+    StepFunction f;
+
+    for( auto&& indicatorFunction : _indicatorFunctions )
+      f.add( indicatorFunction.a(), indicatorFunction.b(), -indicatorFunction.y() );
+
+    return f;
+  }
+
   /** Multiplies the given step function with a scalar value */
   StepFunction operator*( I lambda ) const noexcept
   {
