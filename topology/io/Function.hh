@@ -170,7 +170,7 @@ template <class SimplicialComplex, class Functor> std::vector<SimplicialComplex>
     VertexType vertex = VertexType();
 
     for( auto&& value : functionValues )
-      K.push_back( Simplex( ++vertex, value ) );
+      K.push_back( Simplex( vertex++, value ) );
 
     vertex = VertexType();
     for( auto it = functionValues.begin(); it != functionValues.end(); ++it )
