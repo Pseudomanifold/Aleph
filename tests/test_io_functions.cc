@@ -1,5 +1,10 @@
 #include "config/Base.hh"
 
+#include "filtrations/Data.hh"
+
+#include "persistentHomology/Calculation.hh"
+#include "persistenceDiagrams/PersistenceDiagram.hh"
+
 #include "tests/Base.hh"
 
 #include "topology/Simplex.hh"
@@ -8,6 +13,15 @@
 #include "topology/io/Function.hh"
 
 #include <set>
+
+template <class SimplicialComplex> aleph::PersistenceDiagram<typename SimplicialComplex::ValueType::DataType> calculatePersistenceDiagram( const SimplicialComplex& K )
+{
+  auto diagrams = aleph::calculatePersistenceDiagrams( K );
+
+  ALEPH_ASSERT_EQUAL( diagrams.size(), 1 );
+
+  return diagrams.front();
+}
 
 template <class D, class V> void test( const std::string& filename )
 {
@@ -24,9 +38,27 @@ template <class D, class V> void test( const std::string& filename )
   auto K = complexes.at(0);
   auto L = complexes.at(1);
 
+  using SublevelSetFiltration   = aleph::filtrations::Data<Simplex>;
+  using SuperlevelSetFiltration = aleph::filtrations::Data<Simplex, std::greater<D> >;
+
   ALEPH_ASSERT_EQUAL( K.size(), L.size() );
   ALEPH_ASSERT_THROW( K == L ); // modulo weights, both complexes should contain
                                 // the same simplices
+
+  K.sort( SublevelSetFiltration() );
+  L.sort( SublevelSetFiltration() );
+
+  // After sorting, the complexes must be in a different order, even
+  // though their persistence pairs coincide.
+  ALEPH_ASSERT_THROW( K != L );
+
+  if( K.size() <= 9 )
+  {
+    auto D1 = calculatePersistenceDiagram( K );
+    auto D2 = calculatePersistenceDiagram( L );
+
+    ALEPH_ASSERT_THROW( D1 == D2 );
+  }
 
   complexes
     = aleph::topology::io::loadFunctions<SimplicialComplex>(
@@ -45,6 +77,21 @@ template <class D, class V> void test( const std::string& filename )
   ALEPH_ASSERT_EQUAL( K.size(), L.size() );
   ALEPH_ASSERT_THROW( K == L ); // modulo weights, both complexes should contain
                                 // the same simplices
+
+  if( K.size() > 9 )
+  {
+    K.sort( SuperlevelSetFiltration() );
+    L.sort( SuperlevelSetFiltration() );
+
+    auto D1 = calculatePersistenceDiagram( K );
+    auto D2 = calculatePersistenceDiagram( L );
+
+    ALEPH_ASSERT_THROW( D1 == D2 );
+
+    // After sorting, the complexes must be in a different order, even
+    // though their persistence pairs coincide.
+    ALEPH_ASSERT_THROW( K != L );
+  }
 
   ALEPH_TEST_END();
 }
