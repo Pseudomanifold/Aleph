@@ -138,7 +138,8 @@ template <
   The preceding block describes two functions with 4 vertices.
 */
 
-template <class SimplicialComplex> std::vector<SimplicialComplex> loadFunctions( const std::string& filename )
+template <class SimplicialComplex, class Functor> std::vector<SimplicialComplex> loadFunctions( const std::string& filename,
+                                                                                                Functor f )
 {
   std::ifstream in( filename );
   if( !in )
@@ -147,6 +148,9 @@ template <class SimplicialComplex> std::vector<SimplicialComplex> loadFunctions(
   using Simplex    = typename SimplicialComplex::ValueType;
   using DataType   = typename Simplex::DataType;
   using VertexType = typename Simplex::VertexType;
+
+  static_assert( std::is_same<DataType, decltype( f(DataType(), DataType() ) )>::value,
+                 "Functor return type must be compatible with simplex data type" );
 
   std::vector<SimplicialComplex> complexes;
 
@@ -177,7 +181,7 @@ template <class SimplicialComplex> std::vector<SimplicialComplex> loadFunctions(
 
       auto&& a = *it;
       auto&& b = *next;
-      auto   w = std::max(a,b);
+      auto   w = f(a,b);
 
       // This is an edge that connects two adjacent simplices; the
       // weight is set according to their maximum by default.
@@ -190,6 +194,14 @@ template <class SimplicialComplex> std::vector<SimplicialComplex> loadFunctions(
   }
 
   return complexes;
+}
+
+template <class SimplicialComplex> std::vector<SimplicialComplex> loadFunctions( const std::string& filename )
+{
+  using Simplex    = typename SimplicialComplex::ValueType;
+  using DataType   = typename Simplex::DataType;
+
+  return loadFunctions<SimplicialComplex>( filename, [] ( DataType a, DataType b ) { return std::max(a,b); } );
 }
 
 } // namespace io

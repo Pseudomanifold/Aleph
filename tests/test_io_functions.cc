@@ -28,6 +28,24 @@ template <class D, class V> void test( const std::string& filename )
   ALEPH_ASSERT_THROW( K == L ); // modulo weights, both complexes should contain
                                 // the same simplices
 
+  complexes
+    = aleph::topology::io::loadFunctions<SimplicialComplex>(
+      filename,
+      [] ( D x, D y )
+      {
+        return std::min(x,y);
+      }
+  );
+
+  ALEPH_ASSERT_EQUAL( complexes.size(), 2 );
+
+  K = complexes.at(0);
+  L = complexes.at(1);
+
+  ALEPH_ASSERT_EQUAL( K.size(), L.size() );
+  ALEPH_ASSERT_THROW( K == L ); // modulo weights, both complexes should contain
+                                // the same simplices
+
   ALEPH_TEST_END();
 }
 
