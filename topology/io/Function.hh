@@ -7,9 +7,12 @@
 #include <fstream>
 #include <iterator>
 #include <numeric>
+#include <sstream>
 #include <string>
 #include <unordered_map>
 #include <vector>
+
+#include <iostream>
 
 namespace aleph
 {
@@ -119,6 +122,74 @@ template <
 
     functionValues.swap( newFunctionValues );
   }
+}
+
+/**
+  Loads a set of 1D functions from a file and converts them to
+  simplicial complexes. The file format is simple and consists
+  of a number of function values per line. A line break starts
+  a new function. For example:
+
+  \verbatim
+  0 1 2 3
+  3 1 6 4
+  \endverbatim
+
+  The preceding block describes two functions with 4 vertices.
+*/
+
+template <class SimplicialComplex> std::vector<SimplicialComplex> loadFunctions( const std::string& filename )
+{
+  std::ifstream in( filename );
+  if( !in )
+    throw std::runtime_error( "Unable to read input file" );
+
+  using Simplex    = typename SimplicialComplex::ValueType;
+  using DataType   = typename Simplex::DataType;
+  using VertexType = typename Simplex::VertexType;
+
+  std::vector<SimplicialComplex> complexes;
+
+  std::string line;
+  while( std::getline( in, line ) )
+  {
+    std::vector<DataType> functionValues;
+
+    std::istringstream stream( line );
+
+    std::copy( std::istream_iterator<DataType>( stream ),
+               std::istream_iterator<DataType>(),
+               std::back_inserter( functionValues ) );
+
+    SimplicialComplex K;
+
+    VertexType vertex = VertexType();
+
+    for( auto&& value : functionValues )
+      K.push_back( Simplex( ++vertex, value ) );
+
+    vertex = VertexType();
+    for( auto it = functionValues.begin(); it != functionValues.end(); ++it )
+    {
+      auto next = std::next( it );
+      if( next == functionValues.end() )
+        break;
+
+      auto&& a = *it;
+      auto&& b = *next;
+      auto   w = std::max(a,b);
+
+      // This is an edge that connects two adjacent simplices; the
+      // weight is set according to their maximum by default.
+      K.push_back( Simplex( {vertex, VertexType( vertex+1 ) }, w ) );
+
+      ++vertex;
+    }
+
+    complexes.push_back( K );
+  }
+
+  return complexes;
 }
 
 } // namespace io
