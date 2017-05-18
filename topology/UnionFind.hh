@@ -39,6 +39,12 @@ public:
       _parent[ this->find( u ) ] = this->find( v );
   }
 
+  /** Checks whether a given vertex is contained in the data structure */
+  bool contains( Vertex u ) const noexcept
+  {
+    return _parent.find( u ) != _parent.end();
+  }
+
   /**
     Finds the parent of a given vertex. Performs path collapse operations, if
     necessary. The function will throw if it encounters an unknown vertex.
