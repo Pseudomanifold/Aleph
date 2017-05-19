@@ -65,9 +65,18 @@ std::pair<boost::bimap<typename Simplex::VertexType, SizeType>, AdjacencyGraph> 
     {
       auto&& edge = *it;
 
-      boost::add_edge( vdm.at( *( edge.begin() ) ),
-                       vdm.at( *( edge.begin() + 1 ) ),
-                       adjacencyGraph );
+      auto u = *( edge.begin()     );
+      auto v = *( edge.begin() + 1 );
+
+      // It is possible that the simplicial complex, being a _part_ of
+      // a larger filtration, contains edges for which no vertices are
+      // available.
+      if( S.contains(u) && S.contains(v) )
+      {
+        boost::add_edge( vdm.at(u),
+                         vdm.at(v),
+                         adjacencyGraph );
+      }
     }
   }
 
@@ -138,9 +147,8 @@ public:
     topology::UnionFind<Vertex>
     //SDisjointSetForest<Vertex>
   >
-    makeConstrainedLevelSet( typename Simplex::DataType lower,
-                             typename Simplex::DataType upper,
-                             const SimplicialComplex& S )
+    makeInterlevelSet( typename Simplex::DataType lower, typename Simplex::DataType upper,
+                       const SimplicialComplex& S )
   {
     if( lower > upper )
       std::swap( lower, upper );
@@ -251,8 +259,8 @@ public:
 
       // Prepare component destruction -------------------------------
 
-      Vertex u = *( simplex.begin() );
-      Vertex v = *( simplex.begin() + 1 );
+      auto u = *( simplex.begin() );
+      auto v = *( simplex.begin() + 1 );
 
       // Ensure that the younger component is _always_ the first
       // component. A component is younger if its representative
@@ -265,13 +273,15 @@ public:
       if( youngerComponent == olderComponent )
         continue;
 
-      auto index1 = S.index( Simplex(youngerComponent) );
-      auto index2 = S.index( Simplex(olderComponent)   );
+      {
+        auto index1 = S.index( Simplex(youngerComponent) );
+        auto index2 = S.index( Simplex(olderComponent)   );
 
-      // The younger component has the _larger_ index as it is born _later_
-      // in the filtration.
-      if( index1 < index2 )
-        std::swap( youngerComponent, olderComponent );
+        // The younger component has the _larger_ index as it is born _later_
+        // in the filtration.
+        if( index1 < index2 )
+          std::swap( youngerComponent, olderComponent );
+      }
 
       // Prepare information about creator & cascades ----------------
 
@@ -323,7 +333,7 @@ public:
                     << "1st creator  : " << critical2.data() << "\n";
 
           auto clsPair
-            = makeConstrainedLevelSet(
+            = makeInterlevelSet(
                 critical2.data(),
                 simplex.data(),
                 S );
@@ -334,15 +344,13 @@ public:
 
           bool inSameComponent = false;
 
-          {
-            //auto inSameComponent
-            //  = clsPair.second.inSameComponent( *critical2.begin(), *critical1.begin() );
+          //auto inSameComponent
+          //  = clsPair.second.inSameComponent( *critical2.begin(), *critical1.begin() );
 
-            auto c1 = uf.find( *critical2.begin() );
-            auto c2 = uf.find( *critical1.begin() );
-
-            inSameComponent = c1 == c2;
-          }
+          inSameComponent =  clsPair.second.contains( *critical2.begin() )
+                          && clsPair.second.contains( *critical1.begin() )
+                          && clsPair.second.find( *critical2.begin() )
+                          && clsPair.second.find( *critical1.begin() );
 
           std::cout << "Connected?\n"
                     << "  " << inSameComponent << "\n";
@@ -424,19 +432,15 @@ public:
           auto upper = simplex.data();
 
           auto clsPair
-            = makeConstrainedLevelSet(
+            = makeInterlevelSet(
                 lower, upper,
                 S );
 
           bool inSameComponent
-            = false;
-
-          {
-            auto c1 = uf.find( *critical2.begin() );
-            auto c2 = uf.find( *critical1.begin() );
-
-            inSameComponent = c1 == c2;
-          }
+            =    clsPair.second.contains( *critical2.begin() )
+              && clsPair.second.contains( *critical1.begin() )
+              && clsPair.second.find( *critical2.begin() )
+              && clsPair.second.find( *critical1.begin() );
 
           //auto inSameComponent
           //  = clsPair.second.inSameComponent( *critical2.begin(), *critical1.begin() );
