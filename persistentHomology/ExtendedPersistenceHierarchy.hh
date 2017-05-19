@@ -238,7 +238,6 @@ public:
     S.vertices( std::inserter( vertices,
                                vertices.begin() ) );
 
-    topology::UnionFind<Vertex> uf( vertices.begin(), vertices.end() );
     SimplexPairing pairing;
 
     Edges edges;
@@ -251,17 +250,21 @@ public:
     for( auto&& vertex : vertices )
       criticalPointsUF[vertex] = vertex;
 
+    // Required in order to obtain persistence pairs along with the
+    // edges of the persistence hierarchy.
+    topology::UnionFind<Vertex> uf( vertices.begin(), vertices.end() );
+
     for( auto&& simplex : S )
     {
       // Only edges can destroy a component
       if( simplex.dimension() != 1 )
         continue;
 
-      // Prepare component destruction -------------------------------
-
       auto u = *( simplex.begin() );
       auto v = *( simplex.begin() + 1 );
 
+      // ---------------------------------------------------------------
+      //
       // Ensure that the younger component is _always_ the first
       // component. A component is younger if its representative
       // vertex precedes the other vertex in the filtration.
@@ -283,28 +286,22 @@ public:
           std::swap( youngerComponent, olderComponent );
       }
 
-      // Prepare information about creator & cascades ----------------
-
+      // Prepare information about creators ----------------------------
+      //
       // Creator simplex for the simplex pairing below. I know that this
       // simplex must exist in the complex so I don't check for iterator
       // validity here.
-      //
-      // Ditto for parent.
-      Simplex creator = *( S.find( Simplex( youngerComponent ) ) );
-      Simplex parent  = *( S.find( Simplex( olderComponent ) ) );
-
-      auto critical1 = *( S.find( Simplex( criticalPointsUF[youngerComponent] ) ) );
-      auto critical2 = *( S.find( Simplex( criticalPointsUF[olderComponent]   ) ) );
+      auto youngerCreator         = *( S.find( Simplex( youngerComponent ) ) );
+      auto olderCreator           = *( S.find( Simplex( olderComponent ) ) );
+      auto youngerCriticalSimplex = *( S.find( Simplex( criticalPointsUF[youngerComponent] ) ) );
+      auto olderCriticalSimplex   = *( S.find( Simplex( criticalPointsUF[olderComponent]   ) ) );
 
       // Zero-persistence information; assign critical point of the
       // older component directly. This ensures that we are able to
       // obtain a proper decomposition.
-      if( creator.data() == simplex.data() )
+      if( youngerCreator.data() == simplex.data() )
         criticalPointsUF[youngerComponent] = olderComponent;
-
-      // Only update the creator information if there is a non-zero
-      // persistence for the critical point.
-      if( creator.data() != simplex.data() )
+      else
       {
         bool case1 =    criticalPointsUF[youngerComponent] == youngerComponent
                      && criticalPointsUF[olderComponent  ] == olderComponent;
@@ -322,28 +319,22 @@ public:
         else if( case3 )
           std::cout << "CASE 3\n";
 
-        std::cout << "[" << simplex.data() << "]\n"
-                  << "  UPDATING CRITICAL POINT:\n"
-                  << "    CRIT(" << parent.data() << ") = " << critical1.data() << "\n";
+        // Ensures that the oldest, highest/lowest critical simplex is
+        // being used to calculate the interlevel set. Else, it may be
+        // impossible for a critical point to be reached.
+        if( S.index( youngerCriticalSimplex ) < S.index( olderCriticalSimplex ) )
+          std::swap( youngerCriticalSimplex, olderCriticalSimplex );
 
         if( !case3 )
         {
-          // FIXME: Need to check whether this information is sufficient to
-          // perform a proper merge and keep the hierarchy intact.
-          std::cout << "2nd destroyer: " << simplex.data() << "\n"
-                    << "1st creator  : " << critical2.data() << "\n";
-
-
-          std::cout << "ILS: " << simplex.data() << "," << ( S.index( critical2 ) < S.index( critical1 ) ? critical2.data() : critical1.data() ) << "\n";
-
           auto clsPair
             = makeInterlevelSet(
-                S.index( critical2 ) < S.index( critical1 ) ? critical2.data() : critical1.data(),
+                olderCriticalSimplex.data(),
                 simplex.data(),
                 S );
 
-          std::cout << critical1 << "\n"
-                    << critical2 << "\n"
+          std::cout << youngerCriticalSimplex << "\n"
+                    << olderCriticalSimplex << "\n"
                     << simplex << "\n";
 
           bool inSameComponent = false;
@@ -351,10 +342,8 @@ public:
           //auto inSameComponent
           //  = clsPair.second.inSameComponent( *critical2.begin(), *critical1.begin() );
 
-          inSameComponent =  clsPair.second.contains( *critical2.begin() )
-                          && clsPair.second.contains( *critical1.begin() )
-                          && clsPair.second.find( *critical2.begin() )
-                          && clsPair.second.find( *critical1.begin() );
+          inSameComponent = ( clsPair.second.contains( *olderCriticalSimplex.begin() ) && clsPair.second.contains( *youngerCriticalSimplex.begin() ) )
+                         && ( clsPair.second.find( *olderCriticalSimplex.begin() ) == clsPair.second.find( *youngerCriticalSimplex.begin() ) );
 
           std::cout << "Connected?\n"
                     << "  " << inSameComponent << "\n";
@@ -370,8 +359,8 @@ public:
 
             std::vector<V> p( boost::num_vertices( G ) );
 
-            auto u = vim.left.at( *critical2.begin() );
-            auto v = vim.left.at( *critical1.begin() );
+            auto u = vim.left.at( *olderCriticalSimplex.begin() );
+            auto v = vim.left.at( *youngerCriticalSimplex.begin() );
             p[u]   = u;
 
             boost::breadth_first_search( G,
@@ -429,22 +418,19 @@ public:
         // Case 3: Two critical points converge in one branch...
         else
         {
-          std::cout << "- Critical simplex 1 (younger): " << critical1 << "\n"
-                    << "- Critical simplex 2 (older)  : " << critical2 << "\n";
+          throw "NYI";
 
-          auto lower = std::max( critical1.data(), critical2.data() );
-          auto upper = simplex.data();
+          std::cout << "- Critical simplex 1 (younger): " << youngerCriticalSimplex << "\n"
+                    << "- Critical simplex 2 (older)  : " << olderCriticalSimplex << "\n";
 
           auto clsPair
             = makeInterlevelSet(
-                lower, upper,
+                olderCriticalSimplex.data(), simplex.data(),
                 S );
 
           bool inSameComponent
-            =    clsPair.second.contains( *critical2.begin() )
-              && clsPair.second.contains( *critical1.begin() )
-              && clsPair.second.find( *critical2.begin() )
-              && clsPair.second.find( *critical1.begin() );
+            =  ( clsPair.second.contains( *olderCriticalSimplex.begin() ) && clsPair.second.contains( *youngerCriticalSimplex.begin() ) )
+            && ( clsPair.second.find( *olderCriticalSimplex.begin() ) == clsPair.second.find( *youngerCriticalSimplex.begin() ) );
 
           //auto inSameComponent
           //  = clsPair.second.inSameComponent( *critical2.begin(), *critical1.begin() );
