@@ -41,6 +41,7 @@ ENABLE_IF_SUPPORTED( CMAKE_CXX_FLAGS "-pedantic" )
 # Additional packages
 #
 
+FIND_PACKAGE( Boost REQUIRED )
 FIND_PACKAGE( OpenMP )
 
 # This is somewhat brute-force: I am adding OpenMP flags regardless of
@@ -70,7 +71,10 @@ CONFIGURE_FILE( ${CMAKE_SOURCE_DIR}/config/FLANN.hh.in ${CMAKE_SOURCE_DIR}/confi
 # Include directories
 #
 
-INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR} )
+INCLUDE_DIRECTORIES(
+  ${Boost_INCLUDE_DIR}
+  ${CMAKE_SOURCE_DIR}
+)
 
 #
 # Tests
