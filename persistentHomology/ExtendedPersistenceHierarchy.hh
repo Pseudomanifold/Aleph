@@ -17,9 +17,6 @@
 #include "topology/SimplicialComplex.hh"
 #include "topology/UnionFind.hh"
 
-// FIXME: remove after debugging
-#include <iostream>
-
 namespace aleph
 {
 
@@ -86,7 +83,22 @@ std::pair<boost::bimap<typename Simplex::VertexType, SizeType>, AdjacencyGraph> 
 
 } // namespace detail
 
-/** Functor for calculating the extended persistence hierarchy */
+/**
+  @class ExtendedPersistenceHierarchy
+  @brief Functor for calculating the extended persistence hierarchy
+
+  This class is a functor that calculates the extended persistence
+  hierarchy of a given simplicial complex. The complex is supposed
+  to be in filtration order. Currently, only features in dimension
+  zero are supported by this functor.
+
+  For more information, please refer to the paper
+
+    Hierarchies and Ranks for Persistence Pairs
+    Bastian Rieck, Heike Leitte, and Filip Sadlo
+    Proceedings of TopoInVis 2017, Japan
+*/
+
 template <class Simplex> class ExtendedPersistenceHierarchy
 {
 public:
@@ -96,6 +108,8 @@ public:
 
   using EdgeType          = std::pair<Vertex, Vertex>;
   using Edges             = std::vector<EdgeType>;
+
+private:
 
   /**
     Helper function for 'tagging' all edges in the simplicial complex
@@ -218,6 +232,15 @@ public:
 
     return std::make_pair( K, uf );
   }
+
+public:
+
+  /**
+    Given a simplicial complex, calculates its 0-dimensional persistent
+    homology and the corresponding extended persistence hierarchy. As a
+    result, this will return a simplex pairing and all the edges of the
+    pairing. Edges refer to indices in the original simplicial complex.
+  */
 
   std::pair<SimplexPairing, Edges> operator()( const SimplicialComplex& simplicialComplex )
   {
@@ -461,6 +484,8 @@ public:
       uf.merge( youngerComponent,
                 olderComponent );
     }
+
+    // Add features of infinite persistence to the pairing -------------
 
     std::set<Vertex> roots;
     uf.roots( std::inserter( roots, roots.begin() ) );
