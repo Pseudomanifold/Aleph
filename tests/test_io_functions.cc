@@ -3,6 +3,7 @@
 #include "filtrations/Data.hh"
 
 #include "persistentHomology/Calculation.hh"
+#include "persistentHomology/ExtendedPersistenceHierarchy.hh"
 #include "persistenceDiagrams/PersistenceDiagram.hh"
 
 #include "tests/Base.hh"
@@ -58,6 +59,12 @@ template <class D, class V> void test( const std::string& filename )
     auto D2 = calculatePersistenceDiagram( L );
 
     ALEPH_ASSERT_THROW( D1 == D2 );
+
+    aleph::ExtendedPersistenceHierarchy<Simplex> eph;
+    auto edgesK = eph(K).second;
+    auto edgesL = eph(L).second;
+
+    ALEPH_ASSERT_THROW( edgesK != edgesL );
   }
 
   complexes
@@ -91,6 +98,12 @@ template <class D, class V> void test( const std::string& filename )
     // After sorting, the complexes must be in a different order, even
     // though their persistence pairs coincide.
     ALEPH_ASSERT_THROW( K != L );
+
+    aleph::ExtendedPersistenceHierarchy<Simplex> eph;
+    auto edgesK = eph(K).second;
+    auto edgesL = eph(L).second;
+
+    ALEPH_ASSERT_THROW( edgesK != edgesL );
   }
 
   ALEPH_TEST_END();
