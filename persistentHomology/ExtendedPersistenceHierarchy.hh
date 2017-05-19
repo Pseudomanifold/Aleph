@@ -219,7 +219,7 @@ public:
     return std::make_pair( K, uf );
   }
 
-  Edges operator()( const SimplicialComplex& simplicialComplex )
+  std::pair<SimplexPairing, Edges> operator()( const SimplicialComplex& simplicialComplex )
   {
     using namespace detail;
 
@@ -245,9 +245,12 @@ public:
     S.vertices( std::inserter( vertices,
                                vertices.begin() ) );
 
-    SimplexPairing pairing;
-
     Edges edges;
+
+    // Pairs indices of critical vertices. This may be used later on to
+    // obtain a persistence diagram. Using a pairing is advantageous as
+    // it does not operate on weights but on indices, which are unique.
+    SimplexPairing pairing;
 
     // This map contains a simple decomposition of the domain in terms
     // of the 'next' critical point.
@@ -255,7 +258,6 @@ public:
     // In a proper---and faster---implementation, Morse--Smale complex
     // calculations could be used.
     auto edgeToCriticalPoint = tagEdges( S );
-
 
     // Keeps track of the critical points that are created along with
     // hierarchy. This is the key difference to the regular hierarchy
@@ -453,15 +455,8 @@ public:
         vertexToCriticalPoint[olderComponent] = youngerComponent;
       }
 
-      // Store information in simplex pairing ------------------------
-
-      #if 0
-      pairing.add( Pair( creator,
-                         cascade,
-                         simplex ) );
-      #endif
-
-      // Actual merge ------------------------------------------------
+      pairing.add( Vertex( S.index( Simplex( youngerCreator ) ) ),
+                   Vertex( S.index( simplex ) ) );
 
       uf.merge( youngerComponent,
                 olderComponent );
@@ -471,24 +466,9 @@ public:
     uf.roots( std::inserter( roots, roots.begin() ) );
 
     for( auto&& root : roots )
-    {
-      std::cout << "TRAVERSING ROOT " << root << "...\n"
-                << "  CRITICAL POINT: " << vertexToCriticalPoint[root] << "\n"
-                << "  EDGE          : " << root << " <-- " << vertexToCriticalPoint[root] << "\n";
+      pairing.add( Vertex( S.index( root ) ) );
 
-      // TODO: What about this?
-      //edges.push_back( std::make_pair(
-      //  root,
-      //  uf.getCritical( root ) )
-      //);
-
-      #if 0
-      pairing.add( Pair( *S.find( root ) ) );
-      #endif
-    }
-
-    //return std::make_pair( pairing, edges );
-    return edges;
+    return std::make_pair( pairing, edges );
   }
 };
 
