@@ -119,12 +119,7 @@ public:
       auto youngerComponent = u;
       auto olderComponent   = v;
 
-      if( youngerComponent == olderComponent )
-      {
-        criticalPointMapSimplices[ simplex ] = criticalPointMapVertices[ olderComponent ];
-        continue;
-      }
-      else
+      if( youngerComponent != olderComponent )
       {
         auto index1 = S.index( Simplex(youngerComponent) );
         auto index2 = S.index( Simplex(olderComponent)   );
@@ -136,18 +131,24 @@ public:
 
         if( creator.data() == simplex.data() )
           criticalPointMapVertices[ youngerComponent ] = criticalPointMapVertices[ olderComponent ];
-
-        criticalPointMapSimplices[ simplex ] = criticalPointMapVertices[ olderComponent ];
       }
+
+      criticalPointMapSimplices[ simplex ] = criticalPointMapVertices[ olderComponent ];
     }
 
     return criticalPointMapSimplices;
   }
 
-  std::pair<SimplicialComplex,
-    topology::UnionFind<Vertex>
-    //SDisjointSetForest<Vertex>
-  >
+  /**
+    Calculates the interlevel set of a given simplicial complex. This
+    means extracting a subset in which the assigned weight of  _each_
+    simplex lies between the upper and lower value.
+
+    The function will return the interlevel set as a simplicial complex,
+    as well as a Union--Find data structure for connectivity queries.
+  */
+
+  std::pair< SimplicialComplex, topology::UnionFind<Vertex> >
     makeInterlevelSet( typename Simplex::DataType lower, typename Simplex::DataType upper,
                        const SimplicialComplex& S )
   {
@@ -166,18 +167,21 @@ public:
     SimplicialComplex K = SimplicialComplex( simplices.begin(),
                                              simplices.end() );
 
+    // -----------------------------------------------------------------
+    //
+    // Find all 'proper' vertices in the simplicial complex. It is
+    // possible that not all of them exist as 0-simplices, though.
+
     std::set<Vertex> vertices;
 
-    // FIXME: Need a better way of finding "proper" vertices in the simplicial
-    // complex...
     for( auto&& simplex : simplices )
     {
       if( simplex.dimension() == 0 )
         vertices.insert( *simplex.begin() );
     }
 
-    // FIXME: do I need this?
-    //SDisjointSetForest<Vertex> uf( vertices.begin(), vertices.end() );
+    // Traversal -------------------------------------------------------
+
     topology::UnionFind<Vertex> uf( vertices.begin(), vertices.end()  );
 
     for( auto&& simplex : K )
@@ -196,11 +200,8 @@ public:
         if( youngerComponent == olderComponent )
           continue;
 
-        auto index1 = std::distance( S.begin(),
-                                     S.find( Simplex( youngerComponent ) ) );
-
-        auto index2 = std::distance( S.begin(),
-                                     S.find( Simplex( olderComponent ) ) );
+        auto index1 = S.index( Simplex( youngerComponent ) );
+        auto index2 = S.index( Simplex( olderComponent ) );
 
         if( index1 < index2 )
           std::swap( youngerComponent, olderComponent );
@@ -234,7 +235,6 @@ public:
 
     // Persistence calculation -----------------------------------------
 
-    // Get number of vertices stored in simplicial complex
     std::set<Vertex> vertices;
     S.vertices( std::inserter( vertices,
                                vertices.begin() ) );
