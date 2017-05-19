@@ -316,24 +316,12 @@ public:
         {
           auto clsPair
             = makeInterlevelSet(
-                olderCriticalSimplex.data(),
-                simplex.data(),
+                olderCriticalSimplex.data(), simplex.data(),
                 S );
 
-          std::cout << youngerCriticalSimplex << "\n"
-                    << olderCriticalSimplex << "\n"
-                    << simplex << "\n";
-
-          bool inSameComponent = false;
-
-          //auto inSameComponent
-          //  = clsPair.second.inSameComponent( *critical2.begin(), *critical1.begin() );
-
-          inSameComponent = ( clsPair.second.contains( *olderCriticalSimplex.begin() ) && clsPair.second.contains( *youngerCriticalSimplex.begin() ) )
-                         && ( clsPair.second.find( *olderCriticalSimplex.begin() ) == clsPair.second.find( *youngerCriticalSimplex.begin() ) );
-
-          std::cout << "Connected?\n"
-                    << "  " << inSameComponent << "\n";
+          bool inSameComponent
+            =   ( clsPair.second.contains( *olderCriticalSimplex.begin() ) && clsPair.second.contains( *youngerCriticalSimplex.begin() ) )
+             && ( clsPair.second.find( *olderCriticalSimplex.begin() ) == clsPair.second.find( *youngerCriticalSimplex.begin() ) );
 
           if( inSameComponent )
           {
@@ -342,7 +330,8 @@ public:
             boost::bimap<Vertex, SizeType> vim;
             AdjacencyGraph G;
 
-            std::tie( vim, G ) = extractZeroDimensionalAdjacencyGraph( clsPair.first );
+            std::tie( vim, G )
+              = extractZeroDimensionalAdjacencyGraph( clsPair.first );
 
             std::vector<V> p( boost::num_vertices( G ) );
 
@@ -371,29 +360,32 @@ public:
               criticalPoints.insert( criticalPointMap.at( s ) );
             }
 
-            for( auto&& cp : criticalPoints )
-              std::cout << cp << " ";
-
+            // Exactly two critical points (i.e. the ones we were
+            // looking for); hence, insert younger component as a
+            // child of the youngest critical point.
             if( criticalPoints.size() == 2 )
             {
-              std::cout << "# Edge: " << youngerComponent << " --> " << criticalPointsUF[olderComponent] << "\n";
               edges.push_back( std::make_pair(
                 criticalPointsUF[olderComponent],
                 youngerComponent )
               );
             }
+
+            // More critical points; connect the critical points
+            // according to the usual persistence hierarchy.
             else
             {
-              std::cout << "# Edge: " << youngerComponent << " --> " << olderComponent << "\n";
               edges.push_back( std::make_pair(
                 olderComponent,
                 youngerComponent )
               );
             }
           }
+
+          // Not in the same component; connect the critical points
+          // according to the usual persistence hierarchy.
           else
           {
-            std::cout << "# Edge: " << youngerComponent << " --> " << olderComponent << "\n";
             edges.push_back( std::make_pair(
               olderComponent,
               youngerComponent )
