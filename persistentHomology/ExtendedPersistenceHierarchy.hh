@@ -3,6 +3,7 @@
 
 #include <algorithm>
 #include <map>
+#include <stdexcept>
 #include <set>
 #include <vector>
 
@@ -303,29 +304,15 @@ public:
         criticalPointsUF[youngerComponent] = olderComponent;
       else
       {
-        bool case1 =    criticalPointsUF[youngerComponent] == youngerComponent
-                     && criticalPointsUF[olderComponent  ] == olderComponent;
-
-        bool case2 =    criticalPointsUF[youngerComponent] != youngerComponent
-                     || criticalPointsUF[olderComponent  ] != olderComponent;
-
-        bool case3 =    criticalPointsUF[youngerComponent] != youngerComponent
-                     && criticalPointsUF[olderComponent  ] != olderComponent;
-
-        if( case1 )
-          std::cout << "CASE 1\n";
-        else if( case2 && !case3 )
-          std::cout << "CASE 2\n";
-        else if( case3 )
-          std::cout << "CASE 3\n";
-
         // Ensures that the oldest, highest/lowest critical simplex is
         // being used to calculate the interlevel set. Else, it may be
         // impossible for a critical point to be reached.
         if( S.index( youngerCriticalSimplex ) < S.index( olderCriticalSimplex ) )
           std::swap( youngerCriticalSimplex, olderCriticalSimplex );
 
-        if( !case3 )
+        // At least one of the critical points of the two connected
+        // components is trivial.
+        if( !( criticalPointsUF[youngerComponent] != youngerComponent && criticalPointsUF[olderComponent] != olderComponent ) )
         {
           auto clsPair
             = makeInterlevelSet(
@@ -418,8 +405,11 @@ public:
         // Case 3: Two critical points converge in one branch...
         else
         {
-          throw "NYI";
+          throw std::runtime_error( "Not yet implemented" );
 
+          // This code is old & dangerously untested. I am not even sure
+          // whether this case can occur in data sets...
+          #if 0
           std::cout << "- Critical simplex 1 (younger): " << youngerCriticalSimplex << "\n"
                     << "- Critical simplex 2 (older)  : " << olderCriticalSimplex << "\n";
 
@@ -447,11 +437,12 @@ public:
 
             std::cout << "# Edge: " << youngerComponent << " --> " << olderComponent << "\n";
           }
+          #endif
         }
 
+        // The youngest critical point along the current connected
+        // component has been changed.
         criticalPointsUF[olderComponent] = youngerComponent;
-
-        std::cout << "\n";
       }
 
       // Store information in simplex pairing ------------------------
