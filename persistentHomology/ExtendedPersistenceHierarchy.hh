@@ -97,13 +97,19 @@ public:
   using EdgeType          = std::pair<Vertex, Vertex>;
   using Edges             = std::vector<EdgeType>;
 
-  std::map<Simplex, Vertex> decomposeEdges( const SimplicialComplex& S )
+  /**
+    Helper function for 'tagging' all edges in the simplicial complex
+    with the next critical point. This is a very slow---but simple---
+    way of decomposing the domain.
+  */
+
+  std::map<Simplex, Vertex> tagEdges( const SimplicialComplex& S )
   {
     std::set<Vertex> vertices;
     S.vertices( std::inserter( vertices, vertices.begin() ) );
 
     std::map<Vertex, Vertex>  criticalPointMapVertices;  // critical point map kept along with Union--Find structure
-    std::map<Simplex, Vertex> criticalPointMapSimplices; // critical point map on simplex basis (return value)
+    std::map<Simplex, Vertex> criticalPointMapSimplices; // critical point map on edge (simplex) basis (return value)
 
     for( auto&& vertex : vertices )
       criticalPointMapVertices[vertex] = vertex;
@@ -243,13 +249,21 @@ public:
 
     Edges edges;
 
-    auto criticalPointMap = decomposeEdges( S );
+    // This map contains a simple decomposition of the domain in terms
+    // of the 'next' critical point.
+    //
+    // In a proper---and faster---implementation, Morse--Smale complex
+    // calculations could be used.
+    auto edgeToCriticalPoint = tagEdges( S );
 
-    // FIXME: is this map really required? The information given by the
-    // critical point map seems to be the same...
-    std::map<Vertex, Vertex> criticalPointsUF;
+
+    // Keeps track of the critical points that are created along with
+    // hierarchy. This is the key difference to the regular hierarchy
+    // and permits the hierarchy to distinguish data sets even though
+    // their persistence diagram coincides.
+    std::map<Vertex, Vertex> vertexToCriticalPoint;
     for( auto&& vertex : vertices )
-      criticalPointsUF[vertex] = vertex;
+      vertexToCriticalPoint[vertex] = vertex;
 
     // Required in order to obtain persistence pairs along with the
     // edges of the persistence hierarchy.
@@ -294,14 +308,14 @@ public:
       // validity here.
       auto youngerCreator         = *( S.find( Simplex( youngerComponent ) ) );
       auto olderCreator           = *( S.find( Simplex( olderComponent ) ) );
-      auto youngerCriticalSimplex = *( S.find( Simplex( criticalPointsUF[youngerComponent] ) ) );
-      auto olderCriticalSimplex   = *( S.find( Simplex( criticalPointsUF[olderComponent]   ) ) );
+      auto youngerCriticalSimplex = *( S.find( Simplex( vertexToCriticalPoint[youngerComponent] ) ) );
+      auto olderCriticalSimplex   = *( S.find( Simplex( vertexToCriticalPoint[olderComponent]   ) ) );
 
       // Zero-persistence information; assign critical point of the
       // older component directly. This ensures that we are able to
       // obtain a proper decomposition.
       if( youngerCreator.data() == simplex.data() )
-        criticalPointsUF[youngerComponent] = olderComponent;
+        vertexToCriticalPoint[youngerComponent] = olderComponent;
       else
       {
         // Ensures that the oldest, highest/lowest critical simplex is
@@ -312,7 +326,7 @@ public:
 
         // At least one of the critical points of the two connected
         // components is trivial.
-        if( !( criticalPointsUF[youngerComponent] != youngerComponent && criticalPointsUF[olderComponent] != olderComponent ) )
+        if( !( vertexToCriticalPoint[youngerComponent] != youngerComponent && vertexToCriticalPoint[olderComponent] != olderComponent ) )
         {
           auto clsPair
             = makeInterlevelSet(
@@ -357,7 +371,9 @@ public:
 
               v = parent;
 
-              criticalPoints.insert( criticalPointMap.at( s ) );
+              // Find out which critical point the identified edge
+              // belongs to.
+              criticalPoints.insert( edgeToCriticalPoint.at( s ) );
             }
 
             // Exactly two critical points (i.e. the ones we were
@@ -366,7 +382,7 @@ public:
             if( criticalPoints.size() == 2 )
             {
               edges.push_back( std::make_pair(
-                criticalPointsUF[olderComponent],
+                vertexToCriticalPoint[olderComponent],
                 youngerComponent )
               );
             }
@@ -434,7 +450,7 @@ public:
 
         // The youngest critical point along the current connected
         // component has been changed.
-        criticalPointsUF[olderComponent] = youngerComponent;
+        vertexToCriticalPoint[olderComponent] = youngerComponent;
       }
 
       // Store information in simplex pairing ------------------------
@@ -457,8 +473,8 @@ public:
     for( auto&& root : roots )
     {
       std::cout << "TRAVERSING ROOT " << root << "...\n"
-                << "  CRITICAL POINT: " << criticalPointsUF[root] << "\n"
-                << "  EDGE          : " << root << " <-- " << criticalPointsUF[root] << "\n";
+                << "  CRITICAL POINT: " << vertexToCriticalPoint[root] << "\n"
+                << "  EDGE          : " << root << " <-- " << vertexToCriticalPoint[root] << "\n";
 
       // TODO: What about this?
       //edges.push_back( std::make_pair(
