@@ -322,7 +322,8 @@ public:
         else if( case3 )
           std::cout << "CASE 3\n";
 
-        std::cout << "  UPDATING CRITICAL POINT:\n"
+        std::cout << "[" << simplex.data() << "]\n"
+                  << "  UPDATING CRITICAL POINT:\n"
                   << "    CRIT(" << parent.data() << ") = " << critical1.data() << "\n";
 
         if( !case3 )
@@ -332,9 +333,12 @@ public:
           std::cout << "2nd destroyer: " << simplex.data() << "\n"
                     << "1st creator  : " << critical2.data() << "\n";
 
+
+          std::cout << "ILS: " << simplex.data() << "," << ( S.index( critical2 ) < S.index( critical1 ) ? critical2.data() : critical1.data() ) << "\n";
+
           auto clsPair
             = makeInterlevelSet(
-                critical2.data(),
+                S.index( critical2 ) < S.index( critical1 ) ? critical2.data() : critical1.data(),
                 simplex.data(),
                 S );
 
