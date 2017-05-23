@@ -1,11 +1,17 @@
 #include "config/Base.hh"
 
+#include "filtrations/Data.hh"
+
+#include "persistentHomology/ConnectedComponents.hh"
+
 #include "tests/Base.hh"
 
 #include "topology/Simplex.hh"
 #include "topology/SimplicialComplex.hh"
 
 #include "topology/io/VTK.hh"
+
+#include <algorithm>
 
 template <class D, class V> void test()
 {
@@ -18,7 +24,27 @@ template <class D, class V> void test()
 
   aleph::topology::io::VTKStructuredGridReader reader;
   reader( CMAKE_SOURCE_DIR + std::string( "/tests/input/Simple.vtk" ),
-          K );
+          K,
+          [] ( D a, D b ) { return std::min(a,b); } );
+
+  K.sort( aleph::filtrations::Data<Simplex, std::greater<D> >() );
+
+  auto n0 = std::count_if( K.begin(), K.end(), [] ( const Simplex& s ) { return s.dimension() == 0; } );
+  auto n1 = std::count_if( K.begin(), K.end(), [] ( const Simplex& s ) { return s.dimension() == 1; } );
+  auto n2 = std::count_if( K.begin(), K.end(), [] ( const Simplex& s ) { return s.dimension() == 2; } );
+
+  ALEPH_ASSERT_EQUAL( n0,  5000 );
+  ALEPH_ASSERT_EQUAL( n1, 12300 ); // TODO: check whether this is correct
+  ALEPH_ASSERT_EQUAL( n2,     0 );
+
+  // TODO:
+  //  - Count number of 'regular' vertices
+  //  - Count number of 'irregular' vertices (392 = 2*(2*nx+2*ny-4))
+
+  auto pdpp = aleph::calculateZeroDimensionalPersistenceDiagram( K );
+  auto pd   = std::get<0>( pdpp );
+
+  ALEPH_ASSERT_EQUAL( pd.size(), 3 );
 
   ALEPH_TEST_END();
 }
