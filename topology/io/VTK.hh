@@ -156,37 +156,10 @@ public:
 
     // Create topology -------------------------------------------------
     //
-    // The first dimension (x) is increasing fastest. We first need some
-    // mapping functions that assign indices based on x,y,z offsets.
-    //
-    // nx = 3
-    // ny = 3
-    // nz = 3
-    //
-    // [0,0,0] [1,0,0] [2,0,0] |  0, 1, 2
-    // [0,1,0] [1,1,0] [2,1,0] |  3, 4, 5
-    // [0,2,0] [1,2,0] [2,2,0] |  6, 7, 8
-    // [0,0,1] [1,0,1] [2,0,1] |  9,10,11
-    // [0,1,1] [1,1,1] [2,1,1] | 12,13,14
-    // [0,2,1] [1,2,1] [2,2,1] | 15,16,17
-    // [0,0,2] [1,0,2] [2,0,2] | 18,19,20
-    // [0,1,2] [1,1,2] [2,1,2] | 21,22,23
-    // [0,2,2] [1,2,2] [2,2,2] | 24,25,26
-    //
-    // nx = 1
-    // ny = 2
-    // nz = 3
-    //
-    // [0,0,0] [0,1,0] | 0,1
-    // [0,0,1] [0,1,1] | 2,3
-    // [0,0,2] [0,1,2] | 4,5
-    //
-    // [0,0,0] | 0
-    // [0,1,0] | 1
-    // [0,0,1] | 2
-    // [0,1,1] | 3
-    // [0,0,2] | 4
-    // [0,1,2] | 5
+    // Notice that this class only adds 0-simplices and 1-simplices to
+    // the simplicial complex for now. While it is possible to include
+    // triangles (i.e. 2-simplices), their creation order is not clear
+    // and may subtly influence calculations.
 
     std::vector<Simplex> simplices;
 
@@ -226,24 +199,25 @@ public:
     }
 
     K = SimplicialComplex( simplices.begin(), simplices.end() );
-
-#if 0
-    auto indexToCoordinates = [nx,ny] ( std::size_t i, std::size_t& x, std::size_t& y, std::size_t& z )
-    {
-      x = i % nx;
-      y = static_cast<std::size_t>( i / (nx)    ) % ny;
-      z = static_cast<std::size_t>( i / (nx*ny) );
-    };
-
-    auto coordinatesToIndex = [nx,ny] ( std::size_t x, std::size_t y, std::size_t z )
-    {
-      return z * nx*ny + x % nx + y * nx;
-    };
-#endif
-
   }
 
 private:
+
+  /**
+    Converts an index in the array of values to the corresponding set of
+    coordinates.
+  */
+
+  static void indexToCoordinates ( const std::size_t nx, const std::size_t ny,
+                                   const std::size_t i,
+                                   std::size_t& x,      // out: x
+                                   std::size_t& y,      // out: y
+                                   std::size_t& z )     // out: z
+  {
+    x = i % nx;
+    y = static_cast<std::size_t>( i / (nx)    ) % ny;
+    z = static_cast<std::size_t>( i / (nx*ny) );
+  };
 
   /**
     Converts x,y,z coordinates to the corresponding index in the array
