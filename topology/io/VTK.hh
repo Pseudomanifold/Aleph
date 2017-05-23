@@ -72,16 +72,69 @@ public:
     // dutifully ignored for now, and attributes. For now, point-based
     // attributes are supported.
 
-    std::vector<DataType> values;
-    values.reserve( n );
+    std::regex rePointData( "POINT_DATA[[:space:]]+([[:digit:]]+)" );
+    std::regex reScalars( "SCALARS[[:space:]]+([[:alnum:]]+)[[:space:]]+([[:alnum:]]+)[[:space:]]*([[:digit:]]*)" );
+    std::regex reLookupTable( "LOOKUP_TABLE[[:space:]]+([[:alnum:]]+)" );
+
+    std::vector<DataType> coordinates;
+    coordinates.reserve( n*3 );
 
     while( std::getline( in, line ) )
     {
       line         = trim( line );
       auto strings = split( line );
 
-      for( auto&& value : strings )
-        values.push_back( convert<DataType>( value ) );
+      for( auto&& coordinate : strings )
+        coordinates.push_back( convert<DataType>( coordinate ) );
+
+      if( coordinates.size() == n*3 )
+        break;
+    }
+
+    std::vector<DataType> values;
+    values.reserve( n );
+
+    {
+      std::smatch matches;
+
+      while( std::getline( in, line ) )
+      {
+        if( std::regex_match( line, matches, rePointData ) )
+        {
+          auto sn = matches[1];
+          if( static_cast<std::size_t>( std::stoull( sn ) ) != n )
+            throw std::runtime_error( "Format error: number of point data attributes does not match number of points" );
+        }
+        else if( std::regex_match( line, matches, reScalars ) )
+        {
+          auto name       = matches[1];
+          auto type       = matches[2];
+          auto components = matches[3];
+
+          // TODO:
+          //  - Use name
+          //  - Check type
+          //  - Check number of components (if present)
+
+          (void) name;
+          (void) type;
+          (void) components;
+        }
+        else if( std::regex_match( line, matches, reLookupTable ) )
+        {
+          auto name = matches[1];
+          if( name != "default" )
+            throw std::runtime_error( "Handling non-default lookup tables is not yet implemented" );
+        }
+        else
+        {
+          line         = trim( line );
+          auto strings = split( line );
+
+          for( auto&& value : strings )
+            values.push_back( convert<DataType>( value ) );
+        }
+      }
     }
 
     VertexType v;
