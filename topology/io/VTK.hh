@@ -3,6 +3,7 @@
 
 #include <cstddef>
 
+#include <algorithm>
 #include <fstream>
 #include <regex>
 #include <stdexcept>
@@ -36,14 +37,30 @@ class VTKStructuredGridReader
 public:
   template <class SimplicialComplex> void operator()( const std::string& filename, SimplicialComplex& K )
   {
+    using Simplex    = typename SimplicialComplex::ValueType;
+    using DataType   = typename Simplex::DataType;
+
+    this->operator()( filename, K, [] ( DataType a, DataType b ) { return std::max(a,b); } );
+  }
+
+  template <class SimplicialComplex, class Functor> void operator()( const std::string& filename, SimplicialComplex& K, Functor f )
+  {
     std::ifstream in( filename );
     if( !in )
       throw std::runtime_error( "Unable to read input file" );
 
-    this->operator()( in, K );
+    this->operator()( in, K, f );
   }
 
-  template <class SimplicialComplex> void operator()( std::ifstream& in, SimplicialComplex& /* K */ )
+  template <class SimplicialComplex> void operator()( std::ifstream& in, SimplicialComplex& K )
+  {
+    using Simplex    = typename SimplicialComplex::ValueType;
+    using DataType   = typename Simplex::DataType;
+
+    this->operator()( in, K, [] ( DataType a, DataType b ) { return std::max(a,b); } );
+  }
+
+  template <class SimplicialComplex, class Functor> void operator()( std::ifstream& in, SimplicialComplex& K, Functor f )
   {
     using namespace aleph::utilities;
 
@@ -137,9 +154,6 @@ public:
       }
     }
 
-    VertexType v;
-    (void) v;
-
     // Create topology -------------------------------------------------
     //
     // The first dimension (x) is increasing fastest. We first need some
@@ -173,6 +187,45 @@ public:
     // [0,1,1] | 3
     // [0,0,2] | 4
     // [0,1,2] | 5
+
+    std::vector<Simplex> simplices;
+
+    // Create 0-simplices ----------------------------------------------
+
+    {
+      VertexType v = VertexType();
+
+      for( auto&& value : values )
+        simplices.push_back( Simplex(v, value) );
+    }
+
+    // Create 1-simplices ----------------------------------------------
+
+    for( std::size_t z = 0; z < nz; z++ )
+    {
+      for( std::size_t y = 0; y < ny; y++ )
+      {
+        for( std::size_t x = 0; x < nx; x++ )
+        {
+          auto i = coordinatesToIndex(nx,ny,x,y,z);
+          auto N = neighbours(nx,ny,nz,x,y,z);
+
+          for( auto&& j : N )
+          {
+            auto wi = simplices.at(i).data();
+            auto wj = simplices.at(j).data();
+
+            // Use the functor specified by the client in order to
+            // assign a weight for the new simplex.
+            auto w  = f(wi, wj);
+
+            simplices.push_back( Simplex( {i,j}, w ) );
+          }
+        }
+      }
+    }
+
+    K = SimplicialComplex( simplices.begin(), simplices.end() );
 
 #if 0
     auto indexToCoordinates = [nx,ny] ( std::size_t i, std::size_t& x, std::size_t& y, std::size_t& z )
