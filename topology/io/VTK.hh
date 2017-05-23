@@ -169,7 +169,7 @@ public:
       VertexType v = VertexType();
 
       for( auto&& value : values )
-        simplices.push_back( Simplex(v, value) );
+        simplices.push_back( Simplex(v++, value) );
     }
 
     // Create 1-simplices ----------------------------------------------
