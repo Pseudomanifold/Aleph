@@ -8,6 +8,7 @@
 #include <stdexcept>
 #include <sstream>
 #include <string>
+#include <vector>
 
 #include "utilities/String.hh"
 
@@ -54,11 +55,11 @@ public:
 
     // Parse header first ----------------------------------------------
 
-    std::size_t x, y, z,
+    std::size_t nx, ny, nz,
                 n,
                 s;
 
-    bool parsedHeader = this->parseHeader( in, x, y, z, n, s );
+    bool parsedHeader = this->parseHeader( in, nx, ny, nz, n, s );
     if( !parsedHeader )
       return;
 
@@ -81,9 +82,106 @@ public:
 
     VertexType v;
     (void) v;
+
+    // Create topology -------------------------------------------------
+    //
+    // The first dimension (x) is increasing fastest. We first need some
+    // mapping functions that assign indices based on x,y,z offsets.
+    //
+    // nx = 3
+    // ny = 3
+    // nz = 3
+    //
+    // [0,0,0] [1,0,0] [2,0,0] |  0, 1, 2
+    // [0,1,0] [1,1,0] [2,1,0] |  3, 4, 5
+    // [0,2,0] [1,2,0] [2,2,0] |  6, 7, 8
+    // [0,0,1] [1,0,1] [2,0,1] |  9,10,11
+    // [0,1,1] [1,1,1] [2,1,1] | 12,13,14
+    // [0,2,1] [1,2,1] [2,2,1] | 15,16,17
+    // [0,0,2] [1,0,2] [2,0,2] | 18,19,20
+    // [0,1,2] [1,1,2] [2,1,2] | 21,22,23
+    // [0,2,2] [1,2,2] [2,2,2] | 24,25,26
+    //
+    // nx = 1
+    // ny = 2
+    // nz = 3
+    //
+    // [0,0,0] [0,1,0] | 0,1
+    // [0,0,1] [0,1,1] | 2,3
+    // [0,0,2] [0,1,2] | 4,5
+    //
+    // [0,0,0] | 0
+    // [0,1,0] | 1
+    // [0,0,1] | 2
+    // [0,1,1] | 3
+    // [0,0,2] | 4
+    // [0,1,2] | 5
+
+#if 0
+    auto indexToCoordinates = [nx,ny] ( std::size_t i, std::size_t& x, std::size_t& y, std::size_t& z )
+    {
+      x = i % nx;
+      y = static_cast<std::size_t>( i / (nx)    ) % ny;
+      z = static_cast<std::size_t>( i / (nx*ny) );
+    };
+
+    auto coordinatesToIndex = [nx,ny] ( std::size_t x, std::size_t y, std::size_t z )
+    {
+      return z * nx*ny + x % nx + y * nx;
+    };
+#endif
+
   }
 
 private:
+
+  /**
+    Converts x,y,z coordinates to the corresponding index in the array
+    of values.
+  */
+
+  static std::size_t coordinatesToIndex( const std::size_t nx, const std::size_t ny,
+                                         const std::size_t x , const std::size_t  y, const std::size_t z ) noexcept
+  {
+   return z * nx*ny + x % nx + y * nx;
+  }
+
+  /**
+    Enumerates all valid neighbours of a vertex and returns their
+    indices. A valid neighbour is a neighbour whose index doesn't
+    exceed the bounds of the grid. At present, the diagonal isn't
+    used.
+  */
+
+  static std::vector<std::size_t> neighbours( const std::size_t nx, const std::size_t ny, const std::size_t nz,
+                                              std::size_t x, std::size_t y, std::size_t z )
+  {
+    std::vector<std::size_t> neighbours;
+    neighbours.reserve( 6 );
+
+    // left
+    if( x > 0 )
+      neighbours.push_back( coordinatesToIndex(nx, ny, x-1, y, z) );
+    // right
+    else if( x+1 < nx )
+      neighbours.push_back( coordinatesToIndex(nx, ny, x+1, y, z) );
+
+    // bottom
+    if( y > 0 )
+      neighbours.push_back( coordinatesToIndex(nx, ny, x, y-1, z) );
+    // top
+    else if( y+1 < ny )
+      neighbours.push_back( coordinatesToIndex(nx, ny, x, y+1, z) );
+
+    // back
+    if( z > 0 )
+      neighbours.push_back( coordinatesToIndex(nx, ny, x, y, z-1) );
+    // front
+    else if( z+1 < nz )
+      neighbours.push_back( coordinatesToIndex(nx, ny, x, y, z+1) );
+
+    return neighbours;
+  }
 
   /**
     Attempts parsing the header of a structured VTK file. If successful,
