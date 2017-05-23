@@ -67,6 +67,10 @@ public:
     // issues such as insufficient storage space
 
     // Parse body ------------------------------------------------------
+    //
+    // The body contains coordinates for each of the points, which are
+    // dutifully ignored for now, and attributes. For now, point-based
+    // attributes are supported.
 
     std::vector<DataType> values;
     values.reserve( n );
@@ -208,7 +212,7 @@ private:
     std::string format;     // e.g. 'ASCII'
     std::string structure;  // e.g. 'DATASET STRUCTURED_GRID'
     std::string dimensions; // e.g. 'DIMENSIONS 100 10 1'
-    std::string attributes; // e.g. 'POINT_DATA 1000 float'
+    std::string points;     // e.g. 'POINTS 1000 float'
 
     std::getline( in, identifier );
     std::getline( in, header );
@@ -233,14 +237,14 @@ private:
 
     std::getline( in, structure );
     std::getline( in, dimensions );
-    std::getline( in, attributes );
+    std::getline( in, points );
 
     if( !in )
       return false;
 
     structure  = trim( structure );
     dimensions = trim( dimensions );
-    attributes = trim( attributes );
+    points     = trim( points );
 
     std::regex reStructure( "DATASET[[:space:]]+STRUCTURED_GRID" );
     if( !std::regex_match( structure, reStructure ) )
@@ -260,8 +264,8 @@ private:
     y = std::size_t( std::stoull( sy ) );
     z = std::size_t( std::stoull( sz ) );
 
-    std::regex reAttributes( "POINTS[[:space:]]+([[:digit:]]+)[[:space:]]+([[:alpha:]]+)" );
-    if( !std::regex_match( attributes, matches, reAttributes ) )
+    std::regex rePoints( "POINTS[[:space:]]+([[:digit:]]+)[[:space:]]+([[:alpha:]]+)" );
+    if( !std::regex_match( points, matches, rePoints ) )
       return false;
 
     auto sn = matches[1];
