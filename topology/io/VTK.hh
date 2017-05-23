@@ -185,6 +185,9 @@ public:
 
           for( auto&& j : N )
           {
+            if( j > i )
+              continue;
+
             auto wi = simplices.at(i).data();
             auto wj = simplices.at(j).data();
 
