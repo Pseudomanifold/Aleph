@@ -250,21 +250,21 @@ private:
     if( x > 0 )
       neighbours.push_back( coordinatesToIndex(nx, ny, x-1, y, z) );
     // right
-    else if( x+1 < nx )
+    if( x+1 < nx )
       neighbours.push_back( coordinatesToIndex(nx, ny, x+1, y, z) );
 
     // bottom
     if( y > 0 )
       neighbours.push_back( coordinatesToIndex(nx, ny, x, y-1, z) );
     // top
-    else if( y+1 < ny )
+    if( y+1 < ny )
       neighbours.push_back( coordinatesToIndex(nx, ny, x, y+1, z) );
 
     // back
     if( z > 0 )
       neighbours.push_back( coordinatesToIndex(nx, ny, x, y, z-1) );
     // front
-    else if( z+1 < nz )
+    if( z+1 < nz )
       neighbours.push_back( coordinatesToIndex(nx, ny, x, y, z+1) );
 
     return neighbours;
