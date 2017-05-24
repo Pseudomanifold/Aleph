@@ -1,6 +1,9 @@
+#include "filtrations/Data.hh"
+
 #include "persistenceDiagrams/PersistenceDiagram.hh"
 
 #include "persistentHomology/ExtendedPersistenceHierarchy.hh"
+#include "persistentHomology/PersistencePairing.hh"
 
 #include "topology/Simplex.hh"
 #include "topology/SimplicialComplex.hh"
@@ -57,16 +60,37 @@ int main( int argc, char** argv )
       aleph::topology::io::VTKStructuredGridReader reader;
       reader( filename, K );
 
+      K.sort( aleph::filtrations::Data<Simplex>() );
+
       simplicialComplexes.emplace_back( K );
     }
     else
     {
       auto complexes = aleph::topology::io::loadFunctions<SimplicialComplex>( filename );
 
+      for( auto&& K : complexes )
+        K.sort( aleph::filtrations::Data<Simplex>() );
+
       simplicialComplexes.insert( simplicialComplexes.end(),
                                   complexes.begin(), complexes.end() );
     }
 
     std::cerr << "finished\n";
+  }
+
+  for( auto&& K : simplicialComplexes )
+  {
+    aleph::ExtendedPersistenceHierarchy<Simplex> eph;
+    auto ppe                = eph( K );   // persistence pairing & edges
+    auto persistencePairing = ppe.first;  // persistence pairing
+    auto edges              = ppe.second; // edges
+
+    // TODO:
+    //  - Improve output
+    //  - Calculate tree-based matching
+    //  - Calculate ranks
+
+    for( auto&& edge : edges )
+      std::cerr << edge.first << "--" << edge.second << "\n";
   }
 }
