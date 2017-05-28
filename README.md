@@ -30,7 +30,11 @@ in the main directory of the repository for more details.
   * `Boost.Functional`
   * `Boost.Iterator`
   * `Boost.MultiIndex` 
-* [`FLANN`](https://github.com/mariusmuja/flann) for nearest-neighbour queries
+
+# Optional dependencies
+
+* [`FLANN`](https://github.com/mariusmuja/flann) for fast nearest-neighbour queries
+* Qt 5, for the GUI
 
 # Building Aleph
 
