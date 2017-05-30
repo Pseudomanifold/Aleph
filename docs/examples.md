@@ -8,4 +8,5 @@ for an absolute novice would be the Vietoris&mdash;Rips calculation example.
 
 | Name | Description |
 |------|-------------|
+| [vietoris_rips](https://github.com/Submanifold/Aleph/blob/master/examples/vietoris-rips.cc) | Calculating a Vietoris&mdash;Rips complex of point clouds |
 | [vtk](https://github.com/Submanifold/Aleph/blob/master/examples/vtk.cc) | Calculating persistent homology of structured grids in VTK legacy format |
