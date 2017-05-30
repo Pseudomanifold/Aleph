@@ -19,6 +19,7 @@
 
 #include <vector>
 
+using namespace aleph::containers;
 using namespace aleph::geometry;
 using namespace aleph::topology;
 using namespace aleph;

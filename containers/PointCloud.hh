@@ -15,6 +15,9 @@
 namespace aleph
 {
 
+namespace containers
+{
+
 template <class T> class PointCloud
 {
 public:
@@ -235,6 +238,8 @@ template<class T> PointCloud<T> load( const std::string& filename )
   return pointCloud;
 }
 
-}
+} // namespace containers
+
+} // namespace aleph
 
 #endif

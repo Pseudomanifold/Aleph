@@ -17,6 +17,7 @@
 #include <cassert>
 
 using namespace aleph::geometry;
+using namespace aleph::containers;
 using namespace aleph;
 
 template <class Wrapper, class PointCloud> void testInternal( const PointCloud& pointCloud )

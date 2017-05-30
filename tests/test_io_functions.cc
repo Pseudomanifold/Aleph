@@ -104,6 +104,23 @@ template <class D, class V> void test( const std::string& filename )
     auto edgesL = eph(L).second;
 
     ALEPH_ASSERT_THROW( edgesK != edgesL );
+
+    std::cerr << "K:\n";
+
+    for( auto&& edge : edgesK )
+    {
+      std::cerr << edge.first << "," << edge.second << "\n";
+      std::cerr << *K.find( Simplex(edge.first) ) << "," << *K.find( Simplex(edge.second) ) << "\n";
+    }
+
+    std::cerr << "L:\n";
+
+    for( auto&& edge : edgesL )
+    {
+      std::cerr << edge.first << "," << edge.second << "\n";
+      std::cerr << *L.find( Simplex(edge.first) ) << "," << *L.find( Simplex(edge.second) ) << "\n";
+
+    }
   }
 
   ALEPH_TEST_END();

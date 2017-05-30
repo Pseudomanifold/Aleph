@@ -14,6 +14,7 @@
 #include <algorithm>
 #include <vector>
 
+using namespace aleph::containers;
 using namespace aleph::geometry;
 using namespace aleph;
 

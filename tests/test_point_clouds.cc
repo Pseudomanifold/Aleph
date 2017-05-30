@@ -8,6 +8,7 @@
 #include <string>
 #include <vector>
 
+using namespace aleph::containers;
 using namespace aleph;
 
 template <class T> void testFormats()

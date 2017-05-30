@@ -18,6 +18,7 @@
 #include <string>
 
 using namespace aleph;
+using namespace containers;
 using namespace distances;
 using namespace geometry;
 using namespace utilities;
