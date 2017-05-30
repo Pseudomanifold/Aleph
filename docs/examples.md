@@ -1,0 +1,11 @@
+---
+title: Examples
+---
+
+Here's a list of examples that are present and documented in Aleph. Each example comes with a link
+that leads directly to the corresponding source file, as well as a brief description. A good start
+for an absolute novice would be the Vietoris&mdash;Rips calculation example.
+
+| Name | Description |
+|------|-------------|
+| [vtk](https://github.com/Submanifold/Aleph/blob/master/examples/vtk.cc) | Calculating persistent homology of structured grids in VTK legacy format |
