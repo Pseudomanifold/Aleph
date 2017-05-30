@@ -1,9 +1,10 @@
 <nav>
   <ul>
     {% for navigation in site.data.navigation %}
-    <li>
-      <a href="{{ site.url }}{{ navigation.href }}">{{ navigation.title }}</a>
-    </li>
+    <a href="{{ site.url }}{{ navigation.href }}">{{ navigation.title }}</a>
+      {% if forloop.first == false %}
+      &nbsp;&#10086;&nbsp;
+      {% endif %}
     {% endfor %}
   </ul>
 </nav>
