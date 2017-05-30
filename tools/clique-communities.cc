@@ -12,8 +12,6 @@
 
 #include <cmath>
 
-#include "filtrations/Data.hh"
-
 #include "geometry/RipsExpander.hh"
 
 #include "persistentHomology/ConnectedComponents.hh"
@@ -22,6 +20,8 @@
 #include "topology/ConnectedComponents.hh"
 #include "topology/Simplex.hh"
 #include "topology/SimplicialComplex.hh"
+
+#include "topology/filtrations/Data.hh"
 
 #include "topology/io/EdgeLists.hh"
 #include "topology/io/GML.hh"

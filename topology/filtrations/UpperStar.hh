@@ -1,5 +1,5 @@
-#ifndef ALEPH_UPPER_STAR_HH__
-#define ALEPH_UPPER_STAR_HH__
+#ifndef ALEPH_TOPOLOGY_UPPER_STAR_HH__
+#define ALEPH_TOPOLOGY_UPPER_STAR_HH__
 
 #include <limits>
 #include <vector>

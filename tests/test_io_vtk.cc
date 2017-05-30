@@ -1,13 +1,13 @@
 #include "config/Base.hh"
 
-#include "filtrations/Data.hh"
-
 #include "persistentHomology/ConnectedComponents.hh"
 
 #include "tests/Base.hh"
 
 #include "topology/Simplex.hh"
 #include "topology/SimplicialComplex.hh"
+
+#include "topology/filtrations/Data.hh"
 
 #include "topology/io/VTK.hh"
 

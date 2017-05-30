@@ -1,7 +1,5 @@
 #include "config/Base.hh"
 
-#include "filtrations/Data.hh"
-
 #include "persistentHomology/Calculation.hh"
 #include "persistentHomology/ExtendedPersistenceHierarchy.hh"
 #include "persistenceDiagrams/PersistenceDiagram.hh"
@@ -10,6 +8,8 @@
 
 #include "topology/Simplex.hh"
 #include "topology/SimplicialComplex.hh"
+
+#include "topology/filtrations/Data.hh"
 
 #include "topology/io/Function.hh"
 

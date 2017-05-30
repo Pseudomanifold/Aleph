@@ -22,9 +22,17 @@
   Original author: Bastian Rieck
 */
 
-#include <getopt.h>
+#include "persistenceDiagrams/PersistenceDiagram.hh"
+
+#include "topology/Simplex.hh"
+#include "topology/SimplicialComplex.hh"
+
+#include "topology/io/VTK.hh"
 
 #include <iostream>
+#include <string>
+
+#include <getopt.h>
 
 void usage()
 {

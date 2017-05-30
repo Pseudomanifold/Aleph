@@ -1,11 +1,12 @@
 #ifndef ALEPH_TOPOLOGY_IO_PLY_HH__
 #define ALEPH_TOPOLOGY_IO_PLY_HH__
 
-#include "filtrations/Data.hh"
 #include "utilities/String.hh"
 
 #include "topology/Simplex.hh"
 #include "topology/SimplicialComplex.hh"
+
+#include "topology/filtrations/Data.hh"
 
 #include <cassert>
 

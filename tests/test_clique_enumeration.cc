@@ -1,13 +1,13 @@
 #include "tests/Base.hh"
 
-#include "filtrations/Data.hh"
-
 #include "geometry/RipsExpanderTopDown.hh"
 
 #include "topology/MaximalCliques.hh"
 
 #include "topology/Simplex.hh"
 #include "topology/SimplicialComplex.hh"
+
+#include "topology/filtrations/Data.hh"
 
 #include <algorithm>
 #include <vector>

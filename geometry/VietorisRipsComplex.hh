@@ -4,10 +4,10 @@
 #include "RipsExpander.hh"
 #include "RipsSkeleton.hh"
 
-#include "filtrations/Data.hh"
-
 #include "topology/Simplex.hh"
 #include "topology/SimplicialComplex.hh"
+
+#include "topology/filtrations/Data.hh"
 
 namespace aleph
 {

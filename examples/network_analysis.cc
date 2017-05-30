@@ -1,13 +1,13 @@
 #include "geometry/RipsExpander.hh"
 
-#include "filtrations/Data.hh"
-
 #include "topology/io/EdgeLists.hh"
 
 #include "persistentHomology/Calculation.hh"
 
 #include "topology/Simplex.hh"
 #include "topology/SimplicialComplex.hh"
+
+#include "topology/filtrations/Data.hh"
 
 #include <iostream>
 #include <fstream>

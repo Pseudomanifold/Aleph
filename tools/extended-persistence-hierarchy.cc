@@ -1,4 +1,3 @@
-#include "filtrations/Data.hh"
 
 #include "persistenceDiagrams/PersistenceDiagram.hh"
 
@@ -7,6 +6,8 @@
 
 #include "topology/Simplex.hh"
 #include "topology/SimplicialComplex.hh"
+
+#include "topology/filtrations/Data.hh"
 
 #include "topology/io/Function.hh"
 #include "topology/io/VTK.hh"

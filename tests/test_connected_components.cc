@@ -4,8 +4,6 @@
 
 #include "distances/Euclidean.hh"
 
-#include "filtrations/Data.hh"
-
 #include "geometry/BruteForce.hh"
 #include "geometry/RipsSkeleton.hh"
 
@@ -16,6 +14,8 @@
 
 #include "topology/Simplex.hh"
 #include "topology/SimplicialComplex.hh"
+
+#include "topology/filtrations/Data.hh"
 
 #include <vector>
 

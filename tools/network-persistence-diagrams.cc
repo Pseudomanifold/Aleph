@@ -16,8 +16,6 @@
 // parser interface.
 #include <getopt.h>
 
-#include "filtrations/Data.hh"
-
 #include "geometry/RipsExpander.hh"
 
 #include "persistenceDiagrams/Norms.hh"
@@ -28,6 +26,8 @@
 
 #include "topology/Simplex.hh"
 #include "topology/SimplicialComplex.hh"
+
+#include "topology/filtrations/Data.hh"
 
 #include "topology/io/EdgeLists.hh"
 #include "topology/io/GML.hh"
