@@ -1,8 +1,5 @@
 <nav>
   {% for navigation in site.data.navigation %}
-  <a href="{{ site.url }}{{ navigation.href }}">{{ navigation.title }}</a>
-    {% if forloop.first == false %}
-    &nbsp;&#10086;&nbsp;
-    {% endif %}
+  &nbsp;&#10086;&nbsp; <a href="{{ site.url }}{{ navigation.href }}">{{ navigation.title }}</a><br />
   {% endfor %}
 </nav>
