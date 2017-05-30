@@ -1,5 +1,5 @@
 /*
-  This is an example file shipped by  'Aleph - A Library for Exporing
+  This is an example file shipped by 'Aleph - A Library for Exploring
   Persistent Homology'.
 
   This example demonstrates how to load a VTK structured grid from
