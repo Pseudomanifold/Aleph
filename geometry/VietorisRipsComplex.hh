@@ -51,7 +51,7 @@ template <class NearestNeighbours> auto buildVietorisRipsComplex(
   auto K = ripsExpander( skeleton, dimension );
   K      = ripsExpander.assignMaximumWeight( K );
 
-  K.sort( filtrations::Data<Simplex>() );
+  K.sort( topology::filtrations::Data<Simplex>() );
 
   return K;
 }
@@ -90,7 +90,7 @@ auto buildVietorisRipsComplex(
   auto K = ripsExpander( skeleton, dimension );
   K      = ripsExpander.assignMaximumData( K, begin, end );
 
-  K.sort( filtrations::Data<Simplex>() );
+  K.sort( topology::filtrations::Data<Simplex>() );
 
   return K;
 }

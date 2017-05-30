@@ -50,7 +50,7 @@ int main( int argc, char** argv )
   std::cerr << "* Establishing filtration order...";
 
   K.sort(
-    aleph::filtrations::Data<Simplex>()
+    aleph::topology::filtrations::Data<Simplex>()
   );
 
   std::cerr << "...finished\n";

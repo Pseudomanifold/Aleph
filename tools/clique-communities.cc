@@ -239,7 +239,7 @@ int main( int argc, char** argv )
   K = ripsExpander( K, maxK );
   K = ripsExpander.assignMaximumWeight( K );
 
-  K.sort( aleph::filtrations::Data<Simplex>() );
+  K.sort( aleph::topology::filtrations::Data<Simplex>() );
 
   std::cout << "{\n"
             << "  \"" << threshold << "\": {\n";
@@ -251,7 +251,7 @@ int main( int argc, char** argv )
     auto C
         = aleph::topology::getCliqueGraph( K, k );
 
-    C.sort( aleph::filtrations::Data<Simplex>() );
+    C.sort( aleph::topology::filtrations::Data<Simplex>() );
 
     std::cerr << "finished\n";
 

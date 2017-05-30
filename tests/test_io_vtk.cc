@@ -27,7 +27,7 @@ template <class D, class V> void test()
           K,
           [] ( D a, D b ) { return std::min(a,b); } );
 
-  K.sort( aleph::filtrations::Data<Simplex, std::greater<D> >() );
+  K.sort( aleph::topology::filtrations::Data<Simplex, std::greater<D> >() );
 
   auto n0 = std::count_if( K.begin(), K.end(), [] ( const Simplex& s ) { return s.dimension() == 0; } );
   auto n1 = std::count_if( K.begin(), K.end(), [] ( const Simplex& s ) { return s.dimension() == 1; } );

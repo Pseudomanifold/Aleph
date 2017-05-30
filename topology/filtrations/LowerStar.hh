@@ -7,6 +7,9 @@
 namespace aleph
 {
 
+namespace topology
+{
+
 namespace filtrations
 {
 
@@ -22,7 +25,7 @@ namespace filtrations
 
   \code
 
-    aleph::filtrations::LowerStar<T> functor( functionValues );
+    aleph::topology::filtrations::LowerStar<T> functor( functionValues );
 
     simplicialComplex.sort( std::ref( functor ) );
 
@@ -106,8 +109,10 @@ private:
   std::vector<DataType> _values;
 };
 
-}
+} // namespace filtrations
 
-}
+} // namespace topology
+
+} // namespace aleph
 
 #endif

@@ -7,6 +7,9 @@
 namespace aleph
 {
 
+namespace topology
+{
+
 namespace filtrations
 {
 
@@ -94,8 +97,10 @@ private:
   std::vector<DataType> _values;
 };
 
-}
+} // namespace filtrations
 
-}
+} // namespace topology
+
+} // namespace aleph
 
 #endif

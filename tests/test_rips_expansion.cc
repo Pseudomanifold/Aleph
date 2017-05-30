@@ -146,15 +146,15 @@ template <class Data, class Vertex> void expanderComparison()
   K1 = re.assignMaximumWeight( K1 );
   K2 = retd.assignMaximumWeight( K2, K );
 
-  K1.sort( aleph::filtrations::Data<Simplex>() );
-  K2.sort( aleph::filtrations::Data<Simplex>() );
+  K1.sort( aleph::topology::filtrations::Data<Simplex>() );
+  K2.sort( aleph::topology::filtrations::Data<Simplex>() );
 
   ALEPH_ASSERT_THROW( K1 == K2 );
 
   auto K3 = retd( K, 3, 2 );
   K3 = retd.assignMaximumWeight( K3, K );
 
-  K3.sort( aleph::filtrations::Data<Simplex>() );
+  K3.sort( aleph::topology::filtrations::Data<Simplex>() );
 
   ALEPH_ASSERT_THROW( K3.size() < K2.size() );
 
@@ -166,7 +166,7 @@ template <class Data, class Vertex> void expanderComparison()
 
   auto K4 = retd( K, 3, 2 );
   K4 = retd.assignMaximumWeight( K4, K );
-  K4.sort( aleph::filtrations::Data<Simplex>() );
+  K4.sort( aleph::topology::filtrations::Data<Simplex>() );
 
   ALEPH_ASSERT_EQUAL( K3.size(), K4.size() );
 

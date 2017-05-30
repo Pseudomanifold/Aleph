@@ -428,7 +428,7 @@ int main( int argc, char** argv )
   std::cerr << "finished\n"
             << "* Expanded simplicial complex has " << K.size() << " simplices\n";
 
-  K.sort( aleph::filtrations::Data<Simplex>() );
+  K.sort( aleph::topology::filtrations::Data<Simplex>() );
 
   // Stores the accumulated persistence of vertices. Persistence
   // accumulates if a vertex participates in a clique community.
@@ -455,7 +455,7 @@ int main( int argc, char** argv )
     auto C
         = aleph::topology::getCliqueGraph( K, k );
 
-    C.sort( aleph::filtrations::Data<Simplex>() );
+    C.sort( aleph::topology::filtrations::Data<Simplex>() );
 
     std::cerr << "finished\n";
 

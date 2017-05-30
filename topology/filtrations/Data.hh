@@ -6,6 +6,9 @@
 namespace aleph
 {
 
+namespace topology
+{
+
 namespace filtrations
 {
 
@@ -34,8 +37,10 @@ public:
   }
 };
 
-}
+} // namespace filtrations
 
-}
+} // namespace topology
+
+} // namespace aleph
 
 #endif

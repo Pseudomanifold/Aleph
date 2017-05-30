@@ -81,7 +81,7 @@ auto generateWeightedRandomGraph( unsigned n, double p ) -> SimplicialComplex< S
     }
   }
 
-  std::sort( simplices.begin(), simplices.end(), aleph::filtrations::Data<S>() );
+  std::sort( simplices.begin(), simplices.end(), aleph::topology::filtrations::Data<S>() );
 
   return K( simplices.begin(), simplices.end() );
 

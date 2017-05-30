@@ -195,7 +195,7 @@ int main( int argc, char** argv )
   std::cerr << "finished\n"
             << "* Expanded simplicial complex has " << K.size() << " simplices\n";
 
-  K.sort( aleph::filtrations::Data<Simplex>() );
+  K.sort( aleph::topology::filtrations::Data<Simplex>() );
 
   // Pesistent homology ------------------------------------------------
 

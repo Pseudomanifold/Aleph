@@ -39,8 +39,8 @@ template <class D, class V> void test( const std::string& filename )
   auto K = complexes.at(0);
   auto L = complexes.at(1);
 
-  using SublevelSetFiltration   = aleph::filtrations::Data<Simplex>;
-  using SuperlevelSetFiltration = aleph::filtrations::Data<Simplex, std::greater<D> >;
+  using SublevelSetFiltration   = aleph::topology::filtrations::Data<Simplex>;
+  using SuperlevelSetFiltration = aleph::topology::filtrations::Data<Simplex, std::greater<D> >;
 
   ALEPH_ASSERT_EQUAL( K.size(), L.size() );
   ALEPH_ASSERT_THROW( K == L ); // modulo weights, both complexes should contain

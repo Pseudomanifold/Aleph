@@ -95,9 +95,9 @@ int main( int argc, char** argv )
       reader( filename, K, functor );
 
       if( calculateSuperlevelSets )
-        K.sort( aleph::filtrations::Data<Simplex, std::greater<DataType> >() );
+        K.sort( aleph::topology::filtrations::Data<Simplex, std::greater<DataType> >() );
       else
-        K.sort( aleph::filtrations::Data<Simplex, std::less<DataType> >() );
+        K.sort( aleph::topology::filtrations::Data<Simplex, std::less<DataType> >() );
 
       simplicialComplexes.emplace_back( K );
     }
@@ -110,9 +110,9 @@ int main( int argc, char** argv )
       for( auto&& K : complexes )
       {
         if( calculateSuperlevelSets )
-          K.sort( aleph::filtrations::Data<Simplex, std::less<DataType> >() );
+          K.sort( aleph::topology::filtrations::Data<Simplex, std::less<DataType> >() );
         else
-          K.sort( aleph::filtrations::Data<Simplex, std::greater<DataType> >() );
+          K.sort( aleph::topology::filtrations::Data<Simplex, std::greater<DataType> >() );
       }
 
       simplicialComplexes.insert( simplicialComplexes.end(),

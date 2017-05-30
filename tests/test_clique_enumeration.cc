@@ -89,8 +89,8 @@ template <class Data, class Vertex> void triangles()
   expandedK1 = expander.assignMaximumWeight( expandedK1, K1 );
   expandedK2 = expander.assignMaximumWeight( expandedK2, K2 );
 
-  expandedK1.sort( aleph::filtrations::Data<Simplex>() );
-  expandedK2.sort( aleph::filtrations::Data<Simplex>() );
+  expandedK1.sort( aleph::topology::filtrations::Data<Simplex>() );
+  expandedK2.sort( aleph::topology::filtrations::Data<Simplex>() );
 
   ALEPH_ASSERT_THROW( expandedK1.empty() == false );
   ALEPH_ASSERT_THROW( expandedK2.empty() == false );
