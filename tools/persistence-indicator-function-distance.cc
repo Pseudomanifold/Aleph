@@ -189,29 +189,36 @@ int main( int argc, char** argv )
     {
       filenames.push_back( argv[i] );
 
-      if( std::regex_match( filenames.back(), matches, reDataSetPrefix ) )
-      {
-        auto name = matches[1];
+      auto name = filenames.back();
 
-        if( filenameMap.find( name ) == filenameMap.end() )
-          filenameMap[ name ] = index++;
-      }
+      // Check whether the name contains a recognizable prefix and
+      // suffix
+      if( std::regex_match( filenames.back(), matches, reDataSetPrefix ) )
+        name = matches[1];
+
+      if( filenameMap.find( name ) == filenameMap.end() )
+        filenameMap[ name ] = index++;
     }
 
     dataSets.resize( filenameMap.size() );
 
     for( auto&& filename : filenames )
     {
+      auto name      = filename;
+      auto dimension = 0u;
+
+      // Check if a recognizable prefix and suffix exist so that we may
+      // grab information about the data set and its dimension.
       if( std::regex_match( filename, matches, reDataSetPrefix ) )
       {
-        auto name      = matches[1];
-        auto dimension = unsigned( std::stoul( matches[2] ) );
-
-        dataSets.at( filenameMap[name] ).push_back( { name, filename, dimension, {}, {} } );
-
-        minDimension = std::min( minDimension, dimension );
-        maxDimension = std::max( maxDimension, dimension );
+        name      = matches[1];
+        dimension = unsigned( std::stoul( matches[2] ) );
       }
+
+      dataSets.at( filenameMap[name] ).push_back( { name, filename, dimension, {}, {} } );
+
+      minDimension = std::min( minDimension, dimension );
+      maxDimension = std::max( maxDimension, dimension );
     }
   }
 
