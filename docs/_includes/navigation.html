@@ -2,7 +2,7 @@
   <ul>
     {% for navigation in site.data.navigation %}
     <li>
-      <a href="{{ site.url }}{{ nav.href }}">{{ nav.title }}</a>
+      <a href="{{ site.url }}{{ navigation.href }}">{{ navigation.title }}</a>
     </li>
     {% endfor %}
   </ul>
