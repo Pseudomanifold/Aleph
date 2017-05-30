@@ -24,11 +24,16 @@
 
 #include "persistenceDiagrams/PersistenceDiagram.hh"
 
+#include "persistentHomology/Calculation.hh"
+
 #include "topology/Simplex.hh"
 #include "topology/SimplicialComplex.hh"
 
+#include "topology/filtrations/Data.hh"
+
 #include "topology/io/VTK.hh"
 
+#include <functional>
 #include <iostream>
 #include <string>
 
@@ -80,5 +85,61 @@ int main( int argc, char** argv )
     return -1;
   }
 
+  std::string filename = argv[optind];
 
+  // Since all data types in Aleph are templated, you need to decide
+  // which types to use beforehand---or use more advanced constructs
+  // like a type switch over a list of admissible types.
+  using DataType           = double;
+  using VertexType         = unsigned;
+  using Simplex            = aleph::topology::Simplex<DataType, VertexType>;
+  using SimplicialComplex  = aleph::topology::SimplicialComplex<Simplex>;
+
+  // Select a functor for calculating the weights when reading
+  // a simplicial complex.
+  //
+  // This is an optional argument for the main operator of the
+  // structured grid reader class. It is used to determine the
+  // weight of an edge.
+  //
+  // Since sublevel sets 'grow' from small to large weights, a
+  // correct assignment uses the `max()` function. Analogously
+  // the `min()` function is used for superlevel sets.
+  //
+  // If you do not specify this functor, sublevel sets will be
+  // calculated by default.
+  auto functor = calculateSuperlevelSets
+               ? [] ( DataType a, DataType b ) { return std::min(a,b); }
+               : [] ( DataType a, DataType b ) { return std::max(a,b); };
+
+  std::cerr << "* Loading '" << filename << "'...";
+
+  SimplicialComplex K;
+  aleph::topology::io::VTKStructuredGridReader reader;
+
+  reader( filename, K, functor );
+
+  std::cerr << "finished\n";
+
+  std::cerr << "* Calculating persistent homology...";
+
+  // Sort superlevel sets from largest to smallest weight...
+  if( calculateSuperlevelSets )
+    K.sort( aleph::topology::filtrations::Data<Simplex, std::greater<DataType> >() );
+  // ...and sublevel sets from smallest to largest.
+  else
+    K.sort( aleph::topology::filtrations::Data<Simplex, std::less<DataType> >() );
+
+  auto persistenceDiagrams = aleph::calculatePersistenceDiagrams( K );
+
+  std::cerr << "finished\n";
+
+  for( auto&& D : persistenceDiagrams )
+  {
+    // Remove all features with a persistence of zero. This is not
+    // strictly required but it helps unclutter the diagram.
+    D.removeDiagonal();
+
+    std::cout << D << "\n";
+  }
 }
