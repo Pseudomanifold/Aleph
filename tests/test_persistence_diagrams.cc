@@ -74,7 +74,7 @@ template <class T> void testFrechetMean()
   diagrams.reserve( n );
 
   for( decltype(n) i = 0; i < n; i++ )
-    diagrams.emplace_back( createRandomPersistenceDiagram<T>( 50 ) );
+    diagrams.emplace_back( createRandomPersistenceDiagram<T>( 25 ) );
 
   auto D = aleph::mean( diagrams.begin(), diagrams.end() );
 
