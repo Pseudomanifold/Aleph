@@ -6,6 +6,5 @@ ADD_EXECUTABLE( network-persistence-diagrams            network-persistence-diag
 ADD_EXECUTABLE( persistence-diagram-norms               persistence-diagram-norms.cc )
 ADD_EXECUTABLE( persistence-indicator-function          persistence-indicator-function.cc )
 ADD_EXECUTABLE( topological_distance                    topological_distance.cc )
-ADD_EXECUTABLE( topological-kernels                     topological-kernels.cc )
 
 ENABLE_IF_SUPPORTED( CMAKE_CXX_FLAGS "-O3" )
