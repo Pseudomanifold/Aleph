@@ -1,6 +1,3 @@
-#include "distances/Hausdorff.hh"
-#include "distances/NearestNeighbour.hh"
-
 #include "persistenceDiagrams/PersistenceDiagram.hh"
 #include "persistenceDiagrams/Norms.hh"
 
