@@ -169,23 +169,30 @@ int main( int argc, char** argv )
   static option commandLineOptions[] =
   {
     { "power"      , required_argument, nullptr, 'p' },
+    { "exp"        , no_argument      , nullptr, 'e' },
     { "hausdorff"  , no_argument      , nullptr, 'h' },
     { "indicator"  , no_argument      , nullptr, 'i' },
+    { "kernel"     , no_argument      , nullptr, 'k' },
     { "wasserstein", no_argument      , nullptr, 'w' },
     { nullptr      , 0                , nullptr,  0  }
   };
 
   double power                      = 2.0;
+  bool useExponentialFunction       = false;
   bool useIndicatorFunctionDistance = false;
+  bool calculateKernel              = false;
   bool useWassersteinDistance       = false;
 
   int option = 0;
-  while( ( option = getopt_long( argc, argv, "p:hiw", commandLineOptions, nullptr ) ) != -1 )
+  while( ( option = getopt_long( argc, argv, "p:ehikw", commandLineOptions, nullptr ) ) != -1 )
   {
     switch( option )
     {
     case 'p':
       power = std::stod( optarg );
+      break;
+    case 'e':
+      useExponentialFunction = true;
       break;
     case 'h':
       useWassersteinDistance       = false;
@@ -194,6 +201,9 @@ int main( int argc, char** argv )
     case 'i':
       useIndicatorFunctionDistance = true;
       useWassersteinDistance       = false;
+      break;
+    case 'k':
+      calculateKernel = true;
       break;
     case 'w':
       useIndicatorFunctionDistance = false;
@@ -331,6 +341,13 @@ int main( int argc, char** argv )
         d = distancePIF( dataSets.at(row), dataSets.at(col), minDimension, maxDimension, power );
       else
         d = persistenceDiagramDistance( dataSets.at(row), dataSets.at(col), minDimension, maxDimension, power, functor );
+
+      if( calculateKernel )
+      {
+        d = -d;
+        if( useExponentialFunction )
+          d = std::exp( d );
+      }
 
       distances[row][col] = d;
       distances[col][row] = d;
