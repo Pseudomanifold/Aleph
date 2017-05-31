@@ -252,25 +252,20 @@ int main( int argc, char** argv )
   std::vector< std::vector<double> > distances;
   distances.resize( dataSets.size(), std::vector<double>( dataSets.size() ) );
 
-  std::size_t row = 0;
-
-  for( auto it1 = dataSets.begin(); it1 != dataSets.end(); ++it1, ++row )
+  #pragma omp parallel for collapse(2)
+  for( std::size_t row = 0; row < dataSets.size(); row++ )
   {
-    std::size_t col = 0;
-    for( auto it2 = dataSets.begin(); it2 != dataSets.end(); ++it2, ++col )
+    for( std::size_t col = 0; col < dataSets.size(); col++ )
     {
-      if( it1 == it2 )
-      {
-        distances[row][row] = 0.0;
+      if( row <= col )
         continue;
-      }
 
       double d = 0.0;
 
       if( useWassersteinDistance )
-        d = wassersteinDistance( *it1, *it2, minDimension, maxDimension, power );
+        d = wassersteinDistance( dataSets.at(row), dataSets.at(col), minDimension, maxDimension, power );
       else
-        d = distance( *it1, *it2, minDimension, maxDimension, power );
+        d = distance( dataSets.at(row), dataSets.at(col), minDimension, maxDimension, power );
 
       distances[row][col] = d;
       distances[col][row] = d;
