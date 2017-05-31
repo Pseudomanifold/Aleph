@@ -12,6 +12,14 @@ namespace aleph
 namespace distances
 {
 
+/**
+  Calculates the Hausdorff distance between two persistence diagrams,
+  i.e. the Hausdorff distance between their corresponding point sets
+  treated as 2D sets.
+
+  By default, the infinity distance ($L_\infty$) is used.
+*/
+
 template <
   class DataType,
   class Distance = InfinityDistance<DataType>
@@ -47,8 +55,8 @@ template <
   return std::max( supremum1, supremum2 );
 }
 
-}
+} // namespace distances
 
-}
+} // namespace aleph
 
 #endif
