@@ -49,6 +49,18 @@
 #include <string>
 #include <vector>
 
+void usage()
+{
+  std::cerr << "Usage: network_analysis FILE [DIMENSION]\n"
+            << "\n"
+            << "Loads a weighted network (graph) from FILE, expands it up to\n"
+            << "the specified DIMENSION, and calculates persistence diagrams\n"
+            << "of the weight function of the input.\n"
+            << "\n"
+            << "Diagrams will be written to STDOUT in a gnuplot-like style.\n"
+            << "\n";
+}
+
 int main( int argc, char** argv )
 {
   // We have to specify the required data type and vertex type for the
@@ -67,7 +79,7 @@ int main( int argc, char** argv )
 
   if( argc <= 1 )
   {
-    // TODO: usage
+    usage();
     return -1;
   }
 
@@ -130,9 +142,14 @@ int main( int argc, char** argv )
 
   std::cerr << "* Expanding simplicial complex...";
 
-  // TODO: Make expansion configurable
   aleph::geometry::RipsExpander<SimplicialComplex> ripsExpander;
-  K = ripsExpander( K, 2 );
+  if( argc >= 3 )
+    K = ripsExpander( K, static_cast<unsigned>( std::stoul( argv[2] ) ) );
+
+  // This leaves the simplicial complex untouched. The simplices with
+  // highest dimension are the edges, i.e. the 1-simplices.
+  else
+    K = ripsExpander( K, 1 );
 
   // This tells the expander to use the maximum weight of the faces of
   // a simplex in order to assign the weight of the simplex. Thus, the
@@ -141,6 +158,7 @@ int main( int argc, char** argv )
   K = ripsExpander.assignMaximumWeight( K );
 
   std::cerr << "...finished\n"
+            << "* Expanded complex has dimension " << K.dimension() << "\n"
             << "* Expanded complex has " << K.size() << " simplices\n";
 
   std::cerr << "* Establishing filtration order...";
