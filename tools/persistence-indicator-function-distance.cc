@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <functional>
 #include <iostream>
 #include <limits>
 #include <map>
@@ -12,6 +13,7 @@
 // parser interface.
 #include <getopt.h>
 
+#include "distances/Hausdorff.hh"
 #include "distances/Wasserstein.hh"
 
 #include "persistenceDiagrams/PersistenceDiagram.hh"
@@ -40,6 +42,14 @@ struct DataSet
   PersistenceIndicatorFunction persistenceIndicatorFunction;
 };
 
+/*
+  Stores a matrix in an output stream. The matrix is formatted such that
+  individual values are separated by spaces and each row ends with '\n'.
+
+  This format can be easily parsed by auxiliary programs such as gnuplot
+  or R.
+*/
+
 void storeMatrix( const std::vector< std::vector<double> >& M, std::ostream& out )
 {
   if( M.empty() )
@@ -62,10 +72,18 @@ void storeMatrix( const std::vector< std::vector<double> >& M, std::ostream& out
   }
 }
 
-// Calculates the distance between two data sets. This requires enumerating all
-// dimensions, and finding the corresponding persistence indicator function. If
-// no such function exists, the function uses the norm of the function.
-double distance( const std::vector<DataSet>& dataSet1, const std::vector<DataSet>& dataSet2, unsigned minDimension, unsigned maxDimension, double power )
+/*
+  Calculates the topological distance between two data sets using persistence
+  indicator functions. This requires enumerating all dimensions and finding a
+  corresponding persistence indicator function. If no suitable function could
+  be found, the calculation defaults to calculating the norm.
+*/
+
+double distancePIF( const std::vector<DataSet>& dataSet1,
+                    const std::vector<DataSet>& dataSet2,
+                    unsigned minDimension,
+                    unsigned maxDimension,
+                    double power )
 {
   auto getPersistenceIndicatorFunction = [] ( const std::vector<DataSet>& dataSet, unsigned dimension )
   {
@@ -98,7 +116,24 @@ double distance( const std::vector<DataSet>& dataSet1, const std::vector<DataSet
   return d;
 }
 
-double wassersteinDistance( const std::vector<DataSet>& dataSet1, const std::vector<DataSet>& dataSet2, unsigned minDimension, unsigned maxDimension, double power )
+/*
+  Calculates the topological distance between two data sets, using
+  a standard distance between two persistence diagrams, for example
+  the Hausdorff, Wasserstein, or bottleneck distance.
+
+  By default, the Wasserstein distance is calculated.
+*/
+
+template <class Functor>
+double persistenceDiagramDistance( const std::vector<DataSet>& dataSet1,
+                                   const std::vector<DataSet>& dataSet2,
+                                   unsigned minDimension,
+                                   unsigned maxDimension,
+                                   double power,
+                                   Functor functor = [] ( const PersistenceDiagram& D1, const PersistenceDiagram& D2, double power )
+                                   {
+                                     return aleph::distances::wassersteinDistance( D1, D2, power );
+                                   } )
 {
   auto getPersistenceDiagram = [] ( const std::vector<DataSet>& dataSet, unsigned dimension )
   {
@@ -121,7 +156,7 @@ double wassersteinDistance( const std::vector<DataSet>& dataSet1, const std::vec
     auto D1 = getPersistenceDiagram( dataSet1, dimension );
     auto D2 = getPersistenceDiagram( dataSet2, dimension );
 
-    d += aleph::distances::wassersteinDistance( D1, D2, power );
+    d += functor( D1, D2, power );
   }
 
   d = std::pow( d, 1.0 / power );
@@ -134,23 +169,35 @@ int main( int argc, char** argv )
   static option commandLineOptions[] =
   {
     { "power"      , required_argument, nullptr, 'p' },
+    { "hausdorff"  , no_argument      , nullptr, 'h' },
+    { "indicator"  , no_argument      , nullptr, 'i' },
     { "wasserstein", no_argument      , nullptr, 'w' },
     { nullptr      , 0                , nullptr,  0  }
   };
 
-  double power                = 2.0;
-  bool useWassersteinDistance = false;
+  double power                      = 2.0;
+  bool useIndicatorFunctionDistance = false;
+  bool useWassersteinDistance       = false;
 
   int option = 0;
-  while( ( option = getopt_long( argc, argv, "p:w", commandLineOptions, nullptr ) ) != -1 )
+  while( ( option = getopt_long( argc, argv, "p:hiw", commandLineOptions, nullptr ) ) != -1 )
   {
     switch( option )
     {
     case 'p':
       power = std::stod( optarg );
       break;
+    case 'h':
+      useWassersteinDistance       = false;
+      useIndicatorFunctionDistance = false;
+      break;
+    case 'i':
+      useIndicatorFunctionDistance = true;
+      useWassersteinDistance       = false;
+      break;
     case 'w':
-      useWassersteinDistance = true;
+      useIndicatorFunctionDistance = false;
+      useWassersteinDistance       = true;
       break;
     default:
       break;
@@ -192,7 +239,8 @@ int main( int argc, char** argv )
       auto name = filenames.back();
 
       // Check whether the name contains a recognizable prefix and
-      // suffix
+      // suffix. If not, use the complete filename to identify the
+      // data set.
       if( std::regex_match( filenames.back(), matches, reDataSetPrefix ) )
         name = matches[1];
 
@@ -208,7 +256,8 @@ int main( int argc, char** argv )
       auto dimension = 0u;
 
       // Check if a recognizable prefix and suffix exist so that we may
-      // grab information about the data set and its dimension.
+      // grab information about the data set and its dimension. If not,
+      // use the complete filename to identify the data set.
       if( std::regex_match( filename, matches, reDataSetPrefix ) )
       {
         name      = matches[1];
@@ -247,6 +296,22 @@ int main( int argc, char** argv )
     }
   }
 
+  // Setup distance functor --------------------------------------------
+
+  std::function< double( const PersistenceDiagram&, const PersistenceDiagram&, double ) > functor
+    = !useIndicatorFunctionDistance ? useWassersteinDistance ? [] ( const PersistenceDiagram& D1, const PersistenceDiagram& D2, double p )
+                                                               {
+                                                                 return aleph::distances::wassersteinDistance( D1, D2, p );
+                                                               }
+                                                             : [] ( const PersistenceDiagram& D1, const PersistenceDiagram& D2, double p )
+                                                               {
+                                                                 return std::pow( aleph::distances::hausdorffDistance( D1, D2 ), p );
+                                                               }
+                                    : [] ( const PersistenceDiagram&, const PersistenceDiagram&, double )
+                                    {
+                                      return 0.0;
+                                    };
+
   // Calculate all distances -------------------------------------------
 
   std::vector< std::vector<double> > distances;
@@ -262,10 +327,10 @@ int main( int argc, char** argv )
 
       double d = 0.0;
 
-      if( useWassersteinDistance )
-        d = wassersteinDistance( dataSets.at(row), dataSets.at(col), minDimension, maxDimension, power );
+      if( useIndicatorFunctionDistance )
+        d = distancePIF( dataSets.at(row), dataSets.at(col), minDimension, maxDimension, power );
       else
-        d = distance( dataSets.at(row), dataSets.at(col), minDimension, maxDimension, power );
+        d = persistenceDiagramDistance( dataSets.at(row), dataSets.at(col), minDimension, maxDimension, power, functor );
 
       distances[row][col] = d;
       distances[col][row] = d;
