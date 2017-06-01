@@ -11,7 +11,7 @@
     - aleph::PersistenceDiagram
     - aleph::topology::Simplex
     - aleph::topology::SimplicialComplex
-    - aleph::topology::VTKStructuredGridReader
+    - aleph::topology::io::VTKStructuredGridReader
 
   Demonstrated functions:
 
