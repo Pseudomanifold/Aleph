@@ -20,7 +20,8 @@
     - aleph::calculatePersistenceDiagrams
     - aleph::pNorm
     - aleph::totalPersistence
-    - Persistence diagram pruning
+    - Filtrations of simplicial complexes
+    - Persistence diagram pruning (diagonal & unpaired values)
 
   Original author: Bastian Rieck
 */
@@ -30,6 +31,10 @@
 
 #include "persistentHomology/Calculation.hh"
 
+#include "topology/Simplex.hh"
+#include "topology/SimplicialComplex.hh"
+
+#include "topology/filtrations/Data.hh"
 #include "topology/io/PLY.hh"
 
 #include "utilities/Timer.hh"
@@ -37,9 +42,11 @@
 #include <iostream>
 #include <vector>
 
+#include <getopt.h>
+
 void usage()
 {
-  std::cerr << "Usage: ply FILENAME [PROPERTY]\n"
+  std::cerr << "Usage: ply [--sublevel | --superlevel] FILENAME [PROPERTY]\n"
             << "\n"
             << "Reads a PLY mesh from FILENAME and converts it into a simplicial\n"
             << "complex. If specified, reads PROPERTY for each vertex (a quality\n"
@@ -47,25 +54,59 @@ void usage()
             << "\n"
             << "By default, the reader just uses the z coordinate of vertices in\n"
             << "the mesh because this property is guaranteed to exist.\n"
+            << "\n"
+            << "You may select a filtration for persistent homology calculations\n"
+            << "using '--sublevel' (default) or '--superlevel'. This will change\n"
+            << "the ordering of the simplicial complex, and thus the persistence\n"
+            << "diagram.\n"
+            << "\n"
+            << "Flags:\n"
+            << "  -s: use sublevel set filtration (default)\n"
+            << "  -S: use superlevel set filtration\n"
             << "\n";
 }
 
 int main( int argc, char** argv )
 {
+  static option commandLineOptions[] =
+  {
+    { "sublevel"   , no_argument, nullptr, 's' },
+    { "superlevel" , no_argument, nullptr, 'S' },
+    { nullptr      , 0          , nullptr,  0  }
+  };
+
+  bool useSuperlevelSets = false;
+
+  int option = 0;
+  while( ( option = getopt_long( argc, argv, "sS", commandLineOptions, nullptr ) ) != -1 )
+  {
+    switch( option )
+    {
+    case 's':
+      useSuperlevelSets = false;
+      break;
+    case 'S':
+      useSuperlevelSets = true;
+      break;
+    default:
+      break;
+    }
+  }
+
   std::string filename;
   std::string property;
 
-  if( argc == 1 )
+  if( ( argc - optind ) < 1 )
   {
     usage();
     return -1;
   }
 
-  if( argc >= 2 )
-    filename = argv[1];
+  if( optind < argc )
+    filename = argv[optind++];
 
-  if( argc >= 3 )
-    property = argv[2];
+  if( optind < argc )
+    property = argv[optind++];
 
   // Loading -----------------------------------------------------------
 
@@ -109,9 +150,14 @@ int main( int argc, char** argv )
   // prior to the calculations. By default, the PLY reader sorts
   // the complex from small weights to large weights.
   //
-  // TODO:
-  //   - Expansion (higher-dimensional simplices)
-  //   - Different filtrations (superlevel, sublevel)
+  // If the superlevel set filtration is requested, however, all
+  // weights need to be re-calculated and the proper order needs
+  // to be restored.
+  if( useSuperlevelSets )
+  {
+    K.recalculateWeights( false );
+    K.sort( aleph::topology::filtrations::Data<Simplex>() );
+  }
 
   // This small utility class permits measuring the time of certain
   // operations. Internally, it makes use of `std::chrono` in order
@@ -138,6 +184,11 @@ int main( int argc, char** argv )
 
   for( auto&& D : diagrams )
   {
+    // Remove unpaired simplices of every persistence diagram prior
+    // to calculating its statistics. Else, the norm will always be
+    // infinite.
+    D.removeUnpaired();
+
     // Displays some statistics about the persistence diagrams. The
     // total persistence (with some power $p$) refers to the sum of
     // all persistence values, while the $p$-norm is merely a power
@@ -145,9 +196,11 @@ int main( int argc, char** argv )
     //
     // Both norms are useful for determining the amount of activity
     // within a data set.
-    std::cerr << "* Total degree-1 persistence: " << aleph::totalPersistence( D, 1.0 ) << "\n"
+    std::cerr << "Dimension [" << D.dimension() << "]\n"
+              << "* Total degree-1 persistence: " << aleph::totalPersistence( D, 1.0 ) << "\n"
               << "* Total degree-2 persistence: " << aleph::totalPersistence( D, 2.0 ) << "\n"
               << "* 1-norm:                     " << aleph::pNorm( D, 1.0 ) << "\n"
-              << "* 2-norm:                     " << aleph::pNorm( D, 2.0 ) << "\n";
+              << "* 2-norm:                     " << aleph::pNorm( D, 2.0 ) << "\n"
+              << "\n";
   }
 }
