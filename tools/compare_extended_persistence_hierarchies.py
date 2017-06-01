@@ -97,20 +97,6 @@ def load_hierarchy(filename, scale=False, factor=None):
   assert len(roots) == 1, "Hierarchy must be connected"
   return id_2_pair[roots.pop()]
 
-#A = PersistencePair(6,100).add_child(
-#    PersistencePair(4,3)
-#  ).add_child(
-#    PersistencePair(5,2)
-#  )
-#
-#B = PersistencePair(6,100).add_child(
-#    PersistencePair(4,3).add_child(
-#      PersistencePair(5,2)
-#    )
-#    )
-#
-
-
 A = load_hierarchy(sys.argv[1], scale=True, factor=1000)
 B = load_hierarchy(sys.argv[2], scale=True, factor=1000)
 
