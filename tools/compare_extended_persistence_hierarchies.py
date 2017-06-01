@@ -56,7 +56,7 @@ is required because the zss module currently only supports ints during
 the distance calculations.
 """
 def load_hierarchy(filename, scale=False, factor=None):
-  reNode = r'(\d+):\s+(\d+)\s+(\S+)'
+  reNode = r'(\d+):\s+([\d\.\d]+)\s+(\S+)'
   reEdge = r'(\d+)\s+--\s+(\d+)'
 
   id_2_pair = dict()
@@ -116,5 +116,7 @@ for i in range(n):
 
     M[i,j] = d
     M[j,i] = d
+
+    print(".", file=sys.stderr)
 
 numpy.savetxt("/tmp/M.txt", M)
