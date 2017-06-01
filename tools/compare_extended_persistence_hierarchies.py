@@ -71,7 +71,10 @@ def load_hierarchy(filename, scale=False, factor=None):
 
         if scale and factor:
           creator   = int(creator * factor)
-          destroyer = int(destroyer * factor)
+          if destroyer != float('inf'):
+            destroyer = int(destroyer * factor)
+          else:
+            destroyer = 1e16
 
         id_2_pair[id] = PersistencePair(creator, destroyer)
       else:
@@ -79,16 +82,36 @@ def load_hierarchy(filename, scale=False, factor=None):
         if match:
           edges.append( (int(match.group(1)),int(match.group(2))) )
 
-A = PersistencePair(6,100).add_child(
-    PersistencePair(4,3)
-  ).add_child(
-    PersistencePair(5,2)
-  )
+  for id_u,id_v in edges:
+    u = id_2_pair[id_u]
+    v = id_2_pair[id_v]
 
-B = PersistencePair(6,100).add_child(
-    PersistencePair(4,3).add_child(
-      PersistencePair(5,2)
-    )
-    )
+    u.add_child(v)
+
+  # Find root(s): a root is a node that only appears as the source of an
+  # edge but not as the destination
+  sources = set([u for u,_ in edges])
+  targets = set([v for _,v in edges])
+  roots   = sources.difference(targets)
+
+  assert len(roots) == 1, "Hierarchy must be connected"
+  return id_2_pair[roots.pop()]
+
+#A = PersistencePair(6,100).add_child(
+#    PersistencePair(4,3)
+#  ).add_child(
+#    PersistencePair(5,2)
+#  )
+#
+#B = PersistencePair(6,100).add_child(
+#    PersistencePair(4,3).add_child(
+#      PersistencePair(5,2)
+#    )
+#    )
+#
+
+
+A = load_hierarchy(sys.argv[1], scale=True, factor=1000)
+B = load_hierarchy(sys.argv[2], scale=True, factor=1000)
 
 print(zss.simple_distance(A,B, PersistencePair.get_children, PersistencePair.get_label, PersistencePair.distance))
