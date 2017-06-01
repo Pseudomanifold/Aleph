@@ -513,14 +513,18 @@ public:
   // -------------------------------------------------------------------
 
   /**
-    Recalculates simplex weights by assigning each simplex the maximum weight
-    of its faces.
+    Recalculates simplex weights by assigning each simplex the maximum
+    or minimum weight of its faces. Note that 0-dimensional simplices,
+    i.e. vertices, are _always_ skipped by this function.
+
+    @param useMaximum If set, uses the maximum data assigned to a face of a
+    simplex in order to assign its final weight.
 
     @param skipOneDimensionalSimplices If set, skips both 0-dimensional and
     1-dimensional simplices and accepts their weights as the given truth.
   */
 
-  void recalculateWeights( bool skipOneDimensionalSimplices = false )
+  void recalculateWeights( bool useMaximum = true, bool skipOneDimensionalSimplices = false )
   {
     // Assign weights based on lower-dimensional simplices -------------
 
@@ -534,8 +538,11 @@ public:
         continue;
       }
 
-      typename Simplex::data_type weight
-        = std::numeric_limits<typename Simplex::data_type>::lowest();
+      using DataType = typename Simplex::DataType;
+
+      DataType weight
+        = useMaximum ? std::numeric_limits<DataType>::lowest()
+                     : std::numeric_limits<DataType>::max();
 
       for( auto itBoundary = itSimplex->begin_boundary();
            itBoundary != itSimplex->end_boundary();
@@ -544,8 +551,8 @@ public:
         const_iterator itPos = this->find( *itBoundary );
         if( itPos != this->end() )
         {
-          weight = std::max( weight,
-                             itPos->data() );
+          weight = useMaximum ? std::max( weight, itPos->data() )
+                              : std::min( weight, itPos->data() );
         }
 
         // The if-branch above ignores missing boundaries. This is useful when a
