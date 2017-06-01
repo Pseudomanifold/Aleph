@@ -37,14 +37,27 @@
 #include <iostream>
 #include <vector>
 
+void usage()
+{
+  std::cerr << "Usage: ply FILENAME [PROPERTY]\n"
+            << "\n"
+            << "Reads a PLY mesh from FILENAME and converts it into a simplicial\n"
+            << "complex. If specified, reads PROPERTY for each vertex (a quality\n"
+            << "value, for example), and uses it to assign simplex weights.\n"
+            << "\n"
+            << "By default, the reader just uses the z coordinate of vertices in\n"
+            << "the mesh because this property is guaranteed to exist.\n"
+            << "\n";
+}
+
 int main( int argc, char** argv )
 {
   std::string filename;
-  std::string property = "quality";
+  std::string property;
 
   if( argc == 1 )
   {
-    // TODO: usage
+    usage();
     return -1;
   }
 
@@ -78,7 +91,9 @@ int main( int argc, char** argv )
   // See https://en.wikipedia.org/wiki/PLY_(file_format) for information
   // about the PLY format.
   aleph::topology::io::PLYReader plyReader;
-  plyReader.setDataProperty( property );
+
+  if( !property.empty() )
+    plyReader.setDataProperty( property );
 
   SimplicialComplex K;
   plyReader( filename, K );
