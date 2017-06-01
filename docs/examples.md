@@ -9,6 +9,7 @@ for an absolute novice would be the Vietoris&mdash;Rips calculation example.
 | Name | Description |
 |------|-------------|
 | [network_analysis](https://github.com/Submanifold/Aleph/blob/master/examples/network_anlysis.cc) | Analysing the persistent homology of a weighted network (a graph) |
+| [ply](https://github.com/Submanifold/Aleph/blob/master/examples/ply.cc) | Calculating persistent homology of meshes in ASCII PLY format with different filtrations; includes statistical information about persistence diagrams |
 | [vietoris_rips](https://github.com/Submanifold/Aleph/blob/master/examples/vietoris_rips.cc) | Calculating a Vietoris&mdash;Rips complex of point clouds |
 | [vtk](https://github.com/Submanifold/Aleph/blob/master/examples/vtk.cc) | Calculating persistent homology of structured grids in VTK legacy format |
 
