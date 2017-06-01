@@ -1,3 +1,33 @@
+/*
+  This is a tool shipped by 'Aleph - A Library for Exploring Persistent
+  Homology'.
+
+  It loads VTK files (structured grids) or TXT (1D functions) files and
+  calculates the extended persistence hierarchy described in:
+
+    Hierarchies and Ranks for Persistence Pairs
+    Bastian Rieck, Heike Leitte, and Filip Sadlo
+    Proceedings of TopoInVis 2017, Japan
+
+  The output of the tool is a list of nodes for the hierarchy, followed
+  by a list of edges. Each node is identified by an ID, followed by its
+  corresponding persistence pair entry. An edge consists of two node ID
+  values, connected via "--".
+
+  The following snippet gives a small demonstration:
+
+    0: 0 infty
+    1: 1 2
+    2: 3 4
+
+    0 -- 1
+    0 -- 2
+
+  This output may subsequently be used in an auxiliary Python script in
+  order to analyse and compare different hierarchies.
+
+  TODO: Document this
+*/
 
 #include "persistenceDiagrams/PersistenceDiagram.hh"
 
@@ -129,6 +159,38 @@ int main( int argc, char** argv )
     auto persistencePairing = ppe.first;  // persistence pairing
     auto edges              = ppe.second; // edges
 
+    // Enumerate all vertices in the hierarchy -------------------------
+
+    std::set<VertexType> vertices;
+
+    for( auto edge : edges )
+    {
+      vertices.insert( edge.first );
+      vertices.insert( edge.second );
+    }
+
+    // Display nodes of the hierarchy ----------------------------------
+
+    {
+      unsigned index = 0;
+      for( auto&& vertex : vertices )
+      {
+        auto itCreator = K.find( Simplex(vertex) );
+        if( itCreator != K.end() )
+        {
+          auto itPair         = persistencePairing.find( static_cast<VertexType>( K.index( *itCreator ) ) );
+          auto destroyerIndex = itPair->second;
+
+          if( destroyerIndex < K.size() )
+            std::cout << index << ": " << itCreator->data() << "\t" << K.at( destroyerIndex ).data() << "\n";
+          else
+            std::cout << index << ": " << itCreator->data() << "\t" << std::numeric_limits<DataType>::infinity() << "\n";
+        }
+
+        ++index;
+      }
+    }
+
     // TODO:
     //  - Improve output
     //  - Calculate tree-based matching
@@ -136,5 +198,7 @@ int main( int argc, char** argv )
 
     for( auto&& edge : edges )
       std::cerr << edge.first << "--" << edge.second << "\n";
+
+    std::cout << "\n\n";
   }
 }
