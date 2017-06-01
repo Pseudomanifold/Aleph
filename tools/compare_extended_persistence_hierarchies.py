@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import numpy
 import re
 import sys
 import zss
@@ -97,7 +98,23 @@ def load_hierarchy(filename, scale=False, factor=None):
   assert len(roots) == 1, "Hierarchy must be connected"
   return id_2_pair[roots.pop()]
 
-A = load_hierarchy(sys.argv[1], scale=True, factor=1000)
-B = load_hierarchy(sys.argv[2], scale=True, factor=1000)
+filenames   = sys.argv[1:]
+hierarchies = list()
 
-print(zss.simple_distance(A,B, PersistencePair.get_children, PersistencePair.get_label, PersistencePair.distance))
+for filename in filenames:
+  hierarchies.append( load_hierarchy(filename, scale=True, factor=1000) )
+
+n = len(hierarchies)
+M = numpy.zeros( (n,n) )
+
+for i in range(n):
+  for j in range(i+1,n):
+    d = zss.simple_distance(hierarchies[i], hierarchies[j],
+                            PersistencePair.get_children,
+                            PersistencePair.get_label,
+                            PersistencePair.distance)
+
+    M[i,j] = d
+    M[j,i] = d
+
+numpy.savetxt("/tmp/M.txt", M)
