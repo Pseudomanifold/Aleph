@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 
+import re
+import sys
 import zss
 
 """
@@ -42,6 +44,40 @@ class PersistencePair:
     d1,d2 = u[1],v[1]
 
     return max(abs(c1-c2),abs(d1-d2))
+
+"""
+Reads an extended persistence hierarchy from a file and converts it to
+a sequence of nodes, as specified above. During the conversion process
+the values may optionally be scaled. If 'scale' is set and 'factor' is
+valid, then the 'raw' floating point values read from the file will be
+multiplied by 'factor' and afterwards converted into an int. This step
+is required because the zss module currently only supports ints during
+the distance calculations.
+"""
+def load_hierarchy(filename, scale=False, factor=None):
+  reNode = r'(\d+):\s+(\d+)\s+(\S+)'
+  reEdge = r'(\d+)\s+--\s+(\d+)'
+
+  id_2_pair = dict()
+  edges     = list()
+
+  with open(filename) as f:
+    for line in f:
+      match = re.match(reNode, line)
+      if match:
+        id        = int(match.group(1))
+        creator   = float(match.group(2))
+        destroyer = float(match.group(3))
+
+        if scale and factor:
+          creator   = int(creator * factor)
+          destroyer = int(destroyer * factor)
+
+        id_2_pair[id] = PersistencePair(creator, destroyer)
+      else:
+        match = re.match(reEdge, line)
+        if match:
+          edges.append( (int(match.group(1)),int(match.group(2))) )
 
 A = PersistencePair(6,100).add_child(
     PersistencePair(4,3)
