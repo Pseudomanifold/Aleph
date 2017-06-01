@@ -69,19 +69,42 @@ public:
 
   // Queries -----------------------------------------------------------
 
-  bool contains( Index creator, Index destroyer ) const
+  /**
+    Returns the iterator corresponding to a given pair of indices. If
+    the pairing does not contain the pair the function returns an end
+    iterator.
+  */
+
+  ConstIterator find( Index creator, Index destroyer ) const noexcept
   {
     return std::find( _pairs.begin(), _pairs.end(),
-                      std::make_pair( creator, destroyer ) ) != _pairs.end();
+                      std::make_pair( creator, destroyer ) );
   }
 
-  bool contains( Index creator ) const
+  /**
+    Returns the iterator corresponding to a given creator index. If the
+    creator cannot be found in the pairing, the function returns an end
+    iterator.
+  */
+
+  ConstIterator find( Index creator ) const noexcept
   {
     return std::find_if( _pairs.begin(), _pairs.end(),
                          [this, &creator] ( const ValueType& pair )
                          {
                            return pair.first == creator;
-                         } ) != _pairs.end();
+                         } );
+
+  }
+
+  bool contains( Index creator, Index destroyer ) const
+  {
+    return this->find( creator, destroyer ) != _pairs.end();
+  }
+
+  bool contains( Index creator ) const
+  {
+    return this->find( creator ) != _pairs.end();
   }
 
   std::size_t size() const
