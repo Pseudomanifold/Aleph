@@ -62,7 +62,7 @@ int main( int argc, char** argv )
     }
   }
 
-  if( ( argc - optind ) <= 0 )
+  if( ( argc - optind ) < 1 )
   {
     usage();
     return -1;
@@ -110,9 +110,9 @@ int main( int argc, char** argv )
       for( auto&& K : complexes )
       {
         if( calculateSuperlevelSets )
-          K.sort( aleph::topology::filtrations::Data<Simplex, std::less<DataType> >() );
-        else
           K.sort( aleph::topology::filtrations::Data<Simplex, std::greater<DataType> >() );
+        else
+          K.sort( aleph::topology::filtrations::Data<Simplex, std::less<DataType> >() );
       }
 
       simplicialComplexes.insert( simplicialComplexes.end(),
