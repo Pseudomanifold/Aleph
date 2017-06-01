@@ -12,9 +12,9 @@
 
     - aleph::PersistenceDiagram
     - aleph::geometry::RipsExpander
-    - aleph::topology::EdgeListReader
-    - aleph::topology::GMLReader
-    - aleph::topology::PajekReader
+    - aleph::topology::io::EdgeListReader
+    - aleph::topology::io::GMLReader
+    - aleph::topology::io::PajekReader
     - aleph::topology::Simplex
     - aleph::topology::SimplicialComplex
     - aleph::topology::filtrations::Data
