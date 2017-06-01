@@ -189,15 +189,19 @@ int main( int argc, char** argv )
 
         ++index;
       }
+
+      std::cout << "\n";
     }
 
-    // TODO:
-    //  - Improve output
-    //  - Calculate tree-based matching
-    //  - Calculate ranks
+    // Display edges of the hierarchy ----------------------------------
 
     for( auto&& edge : edges )
-      std::cerr << edge.first << "--" << edge.second << "\n";
+    {
+      auto uIndex = std::distance( vertices.begin(), vertices.find( edge.first ) );
+      auto vIndex = std::distance( vertices.begin(), vertices.find( edge.second ) );
+
+      std::cout << uIndex << " -- " << vIndex << "\n";
+    }
 
     std::cout << "\n\n";
   }
