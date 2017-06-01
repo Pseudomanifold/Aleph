@@ -1,5 +1,5 @@
-#ifndef ALEPH_TIMER_HH__
-#define ALEPH_TIMER_HH__
+#ifndef ALEPH_UTILITIES_TIMER_HH__
+#define ALEPH_UTILITIES_TIMER_HH__
 
 #include <chrono>
 
