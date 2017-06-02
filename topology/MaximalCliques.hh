@@ -3,6 +3,7 @@
 
 #include <iterator>
 #include <set>
+#include <unordered_map>
 #include <unordered_set>
 #include <vector>
 
@@ -30,21 +31,33 @@ template <class Simplex> auto adjacencyMatrix( const SimplicialComplex<Simplex>&
   std::set<VertexType> vertices;
   K.vertices( std::inserter( vertices, vertices.begin() ) );
 
+  // This is required for simplicial complexes in which the vertices do
+  // not start at zero.
+  std::unordered_map<VertexType, VertexType> vertex_to_id;
+
+  {
+    VertexType index = VertexType();
+    for( auto&& vertex : vertices )
+      vertex_to_id[vertex]  = index++;
+  }
+
   Matrix A( VertexType( vertices.size() ) );
 
-  // TODO: This ensures that vertex indices in the simplicial complex
-  // start at zero. Otherwise, I would first have to look up an index
-  // within the set above.
   for( auto itPair = K.range(1); itPair.first != itPair.second; ++itPair.first )
   {
     auto s = *itPair.first;
-    auto u = s[0];
-    auto v = s[1];
+
+    // Map vertices (which may be arbitrary natural numbers) to the
+    // corresponding column/row in the matrix (which are zero-based
+    // and do not have gaps).
+    auto u = vertex_to_id.at( s[0] );
+    auto v = vertex_to_id.at( s[1] );
 
     A.set(u,v);
     A.set(v,u);
   }
 
+  A.setIndices( vertices.begin(), vertices.end() );
   return A;
 }
 
@@ -57,7 +70,11 @@ void enumerateKoch( std::unordered_set<VertexType>& C,
 {
   if( I.empty() && X.empty() )
   {
-    cliques.push_back( std::set<VertexType>( C.begin(), C.end() ) );
+    std::set<VertexType> newClique;
+    for( auto&& c : C )
+      newClique.insert( A.getIndex(c) );
+
+    cliques.push_back( newClique );
     return;
   }
 
@@ -131,7 +148,11 @@ void enumerateBronKerbosch( std::unordered_set<VertexType>& C,
 {
   if( I.empty() && X.empty() )
   {
-    cliques.push_back( std::set<VertexType>( C.begin(), C.end() ) );
+    std::set<VertexType> newClique;
+    for( auto&& c : C )
+      newClique.insert( A.getIndex(c) );
+
+    cliques.push_back( newClique );
     return;
   }
 
