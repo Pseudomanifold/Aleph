@@ -5,6 +5,7 @@
 
 #include <algorithm>
 #include <set>
+#include <stdexcept>
 #include <vector>
 
 namespace aleph
@@ -19,8 +20,8 @@ public:
   using IndexType   = T;
   using ColumnType  = std::set<IndexType>;
   using ColumnsType = std::vector<ColumnType>;
+  using IndexMap    = std::vector<IndexType>;
   using size_type   = typename ColumnType::size_type;
-
 
   SparseBinaryMatrix( IndexType columns )
   {
@@ -59,6 +60,27 @@ public:
     std::copy( c.begin(), c.end(), result );
   }
 
+  /** Sets row/column indices */
+  template <class InputIterator> void setIndices( InputIterator begin, InputIterator end )
+  {
+    _indexMap.assign( begin, end );
+    if( _indexMap.size() != this->numColumns() )
+      throw std::length_error( "Number of indices does not coincide with number of columns" );
+  }
+
+  /**
+    Gets row/class index of a given column. If no foreign indices have
+    been set by the client, this function just returns its input.
+  */
+
+  IndexType getIndex( IndexType column ) const
+  {
+    if( _indexMap.empty() )
+      return column;
+    else
+      return _indexMap.at( column );
+  }
+
   /** Returns number of non-zero entries in a given column */
   std::size_t numEntries( IndexType column ) const
   {
@@ -73,6 +95,10 @@ public:
 
 private:
 
+  // The index map maps a local row/column index in [0..n-1] to another
+  // index that has been specified by the client. This is used whenever
+  // indices occur that may not be contiguous.
+  IndexMap _indexMap;
   ColumnsType _columns;
 };
 
