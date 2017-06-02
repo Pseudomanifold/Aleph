@@ -78,7 +78,7 @@ public:
     if( _indexMap.empty() )
       return column;
     else
-      return _indexMap.at( column );
+      return _indexMap.at( size_type( column ) );
   }
 
   /** Returns number of non-zero entries in a given column */
