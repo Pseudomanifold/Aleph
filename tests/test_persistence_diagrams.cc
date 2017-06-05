@@ -85,11 +85,53 @@ template <class T> void testFrechetMean()
   ALEPH_TEST_END();
 }
 
+template <class T> void testWassersteinDistance()
+{
+  using Diagram = aleph::PersistenceDiagram<T>;
+  using namespace aleph::distances;
+
+  Diagram D1;
+  D1.add( T(0.9), T(1.0) );
+  D1.add( T(1.9), T(2.0) );
+  D1.add( T(2.9), T(3.0) );
+  D1.add( T(3.9), T(4.0) );
+
+  {
+    auto d11 = wassersteinDistance( D1, D1 );
+
+    assert( d11 >= T() );
+    assert( d11 == T() );
+
+    ALEPH_ASSERT_THROW( d11 >= T() );
+    ALEPH_ASSERT_THROW( d11 == T() );
+  }
+
+  Diagram D2;
+  D2.add( T(0.9), T(1.0) );
+  D2.add( T(1.9), T(2.0) );
+  D2.add( T(2.9), T(3.0) );
+  D2.add( T(3.9), T(9.9) );
+
+  {
+    auto d12 = wassersteinDistance( D1, D2 );
+    auto d21 = wassersteinDistance( D2, D1 );
+
+    ALEPH_ASSERT_THROW( d12 > T() );
+    ALEPH_ASSERT_THROW( d21 > T() );
+
+    ALEPH_ASSERT_THROW( d12 == d21 );
+    ALEPH_ASSERT_THROW( std::abs( d12 -  T( 3.05 ) ) < 1e-8 );
+  }
+}
+
 int main(int, char**)
 {
+  testFrechetMean<float> ();
+  testFrechetMean<double>();
+
   testMultiScaleKernel<float> ();
   testMultiScaleKernel<double>();
 
-  testFrechetMean<float> ();
-  testFrechetMean<double>();
+  testWassersteinDistance<float> ();
+  testWassersteinDistance<double>();
 }
