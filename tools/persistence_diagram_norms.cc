@@ -6,6 +6,7 @@
   of persistence diagrams and writes all statistics to STDOUT.
 */
 
+#include "persistenceDiagrams/Extraction.hh"
 #include "persistenceDiagrams/Norms.hh"
 #include "persistenceDiagrams/PersistenceDiagram.hh"
 
@@ -40,6 +41,14 @@ int main( int argc, char** argv )
   std::vector<Input> inputs;
   inputs.reserve( argc - 1 );
 
+  std::vector<std::string> columns = {
+    "file" ,
+    "power",
+    "total_persistence",
+    "total_persistence_weighted",
+    "infinity_norm"
+  };
+
   for( int i = 1; i < argc; i++ )
   {
     std::string filename = argv[i];
@@ -56,12 +65,24 @@ int main( int argc, char** argv )
     std::cerr << "finished\n";
   }
 
+  // TODO: Make configurable
+  double p = 2.0;
+
+  for( auto&& column : columns )
+    std::cout << column << " ";
+
   for( auto&& input : inputs )
   {
-    // TODO: Make $p$ user-selectable
-    std::cout << "# " << input.filename << "\n"
-              << "Total persistence: " << aleph::totalPersistence( input.persistenceDiagram ) << "\n"
-              << "p-norm:            " << aleph::pNorm( input.persistenceDiagram )            << "\n"
-              << "p:                 " << 2.0                                                 << "\n";
+    auto totalPersistence         = aleph::totalPersistence( input.persistenceDiagram, p, false );
+    auto totalPersistenceWeighted = aleph::totalPersistence( input.persistenceDiagram, p, true  );
+    auto infinityNorm             = aleph::infinityNorm( input.persistenceDiagram );
+
+    std::cout << "'" << input.filename    << "'"
+              << " "
+              << p
+              << " "
+              << totalPersistence         << " "
+              << totalPersistenceWeighted << " "
+              << infinityNorm             << "\n";
   }
 }
