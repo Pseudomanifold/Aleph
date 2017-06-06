@@ -29,6 +29,9 @@ template <class DataType> double totalPersistence( const PersistenceDiagram<Data
     std::vector<Point> points;
     points.reserve( D.size() );
 
+    for( auto&& point : D )
+      points.push_back( point );
+
     std::sort( points.begin(), points.end(), [] ( const Point& p, const Point& q )
                                              {
                                                if( p.x() == q.x() )
