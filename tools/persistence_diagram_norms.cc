@@ -1,3 +1,11 @@
+/*
+  This is a tool shipped by 'Aleph - A Library for Exploring Persistent
+  Homology'.
+
+  It analysis various aspects, such as the total persistence, of a set
+  of persistence diagrams and writes all statistics to STDOUT.
+*/
+
 #include "persistenceDiagrams/Norms.hh"
 #include "persistenceDiagrams/PersistenceDiagram.hh"
 
@@ -16,8 +24,19 @@ struct Input
   PersistenceDiagram persistenceDiagram;
 };
 
+void usage()
+{
+  // TODO: not yet implemented
+}
+
 int main( int argc, char** argv )
 {
+  if( argc <= 1 )
+  {
+    usage();
+    return -1;
+  }
+
   std::vector<Input> inputs;
   inputs.reserve( argc - 1 );
 
