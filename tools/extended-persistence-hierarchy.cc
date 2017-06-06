@@ -61,8 +61,19 @@ using PersistenceDiagram = aleph::PersistenceDiagram<DataType>;
 
 void usage()
 {
-  // TODO: Not yet implemented
-  std::cerr << "Usage: extended-persistence-hierarchy [--superlevels] [--sublevels] FILES\n";
+  std::cerr << "Usage: extended-persistence-hierarchy [--superlevels] [--sublevels] FILES\n"
+            << "\n"
+            << "Calculates the extended persistence hierarchy of a set of VTK files or 1D\n"
+            << "functions stored in FILES. By default, a filtration based on the sublevel\n"
+            << "sets is used. This may either be enforced or modified by using one of the\n"
+            << "long options specified above.\n"
+            << "\n"
+            << "The hierarchy is written to STDOUT.\n"
+            << "\n"
+            << "Flags:\n"
+            << "  -s: use sublevel set filtration\n"
+            << "  -S: use superlevel set filtration\n"
+            << "\n";
 }
 
 int main( int argc, char** argv )
