@@ -13,12 +13,53 @@ namespace aleph
 {
 
 template <class DataType> double totalPersistence( const PersistenceDiagram<DataType>& D,
-                                                   double k = 2.0 )
+                                                   double k = 2.0,
+                                                   bool weighted = false )
 {
   double result = 0.0;
 
-  for( auto&& point : D )
-    result = result + std::pow( static_cast<double>( point.persistence() ), k );
+  if( !weighted )
+  {
+    for( auto&& point : D )
+      result = result + std::pow( static_cast<double>( point.persistence() ), k );
+  }
+  else
+  {
+    using Point = typename PersistenceDiagram<DataType>::Point;
+    std::vector<Point> points;
+    points.reserve( D.size() );
+
+    std::sort( points.begin(), points.end(), [] ( const Point& p, const Point& q )
+                                             {
+                                               if( p.x() == q.x() )
+                                                 return p.y() < q.y();
+                                               else
+                                                 return p.x() < q.x();
+                                             } );
+
+    std::vector<Point> uniquePoints;
+
+    std::unique_copy( points.begin(), points.end(),
+                      std::back_inserter( uniquePoints ) );
+
+    std::vector<unsigned> counts;
+    counts.reserve( uniquePoints.size() );
+
+    for( auto&& point : uniquePoints )
+    {
+      auto count = static_cast<unsigned>( std::count( points.begin(), points.end(), point ) );
+      counts.push_back( count );
+    }
+
+    auto itPoint = uniquePoints.begin();
+    auto itCount = counts.begin();
+
+    for( ; itPoint != uniquePoints.end() && itCount != counts.end(); ++itPoint, ++itCount )
+    {
+      double weight = *itCount / static_cast<double>( points.size() );
+      result       += weight * std::pow( static_cast<double>( itPoint->persistence() ), k );
+    }
+  }
 
   return result;
 }
@@ -45,6 +86,6 @@ template <class DataType> DataType infinityNorm( const PersistenceDiagram<DataTy
   return *std::max_element( persistenceValues.begin(), persistenceValues.end() );
 }
 
-}
+} // namespace aleph
 
 #endif
