@@ -1,4 +1,19 @@
 #!/usr/bin/env python3
+#
+# This file is part of 'Aleph - A Library for Exploring Persistent
+# Homology'. It contains code for calculate pairwise distances for
+# a set of extended persistence hierarchies.
+#
+# The file processes _all_ command-line arguments and expects them
+# to be hierarchies. The distance matrix will be stored in the tmp
+# folder as a file 'M.txt'.
+#
+# For more information, please refer to:
+#
+#    Hierarchies and Ranks for Persistence Pairs
+#    Bastian Rieck, Heike Leitte, and Filip Sadlo
+#    Proceedings of TopoInVis 2017, Japan
+
 
 import numpy
 import re
