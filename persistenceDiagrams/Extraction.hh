@@ -59,7 +59,7 @@ void weightedPersistence( const PersistenceDiagram<DataType>& D,
 
   for( auto&& point : uniquePoints )
   {
-    auto count  = std::count( points.begin(), points.ends(), point );
+    auto count  = std::count( points.begin(), points.end(), point );
     auto weight = count / static_cast<double>( points.size() );
 
     *result++ = point.persistence() / weight;

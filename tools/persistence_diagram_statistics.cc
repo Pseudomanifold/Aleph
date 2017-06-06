@@ -13,6 +13,7 @@
 #include "persistenceDiagrams/io/Raw.hh"
 
 #include <iostream>
+#include <numeric>
 #include <string>
 #include <vector>
 
@@ -46,7 +47,8 @@ int main( int argc, char** argv )
     "power",
     "total_persistence",
     "total_persistence_weighted",
-    "infinity_norm"
+    "infinity_norm",
+    "average_persistence"
   };
 
   for( int i = 1; i < argc; i++ )
@@ -68,8 +70,10 @@ int main( int argc, char** argv )
   // TODO: Make configurable
   double p = 2.0;
 
+  // TODO: Add explanatory header with comment symbols?
   for( auto&& column : columns )
     std::cout << column << " ";
+  std::cout << "\n";
 
   for( auto&& input : inputs )
   {
@@ -77,12 +81,22 @@ int main( int argc, char** argv )
     auto totalPersistenceWeighted = aleph::totalPersistence( input.persistenceDiagram, p, true  );
     auto infinityNorm             = aleph::infinityNorm( input.persistenceDiagram );
 
+    std::vector<DataType> persistence;
+    aleph::persistence( input.persistenceDiagram, std::back_inserter( persistence ) );
+
+    std::vector<DataType> weightedPersistence;
+    aleph::weightedPersistence( input.persistenceDiagram, std::back_inserter( weightedPersistence ) );
+
+    auto averagePersistence         = std::accumulate( persistence.begin(), persistence.end(), 0.0 ) / static_cast<double>( input.persistenceDiagram.size() );
+    auto averageWeightedPersistence = std::accumulate( persistence.begin(), persistence.end(), 0.0 ) / static_cast<double>( input.persistenceDiagram.size() );
+
     std::cout << "'" << input.filename    << "'"
               << " "
               << p
               << " "
               << totalPersistence         << " "
               << totalPersistenceWeighted << " "
-              << infinityNorm             << "\n";
+              << infinityNorm             << " "
+              << averagePersistence       << "\n";
   }
 }
