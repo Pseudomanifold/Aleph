@@ -9,6 +9,23 @@
 namespace aleph
 {
 
+/**
+  @class PersistencePairing
+  @brief Container for index-based persistence pairings
+
+  This class is a general-purpose container for pairings based on
+  persistent homology. It consists of pairs of indices that refer
+  to the paired simplices (or critical points) calculated using a
+  persistent homology algorithm, for example.
+
+  The class is purposefully kept simple and represents 'unpaired'
+  simplices using a very large value. More precisely,
+
+      std::numeric_limits<Index>::max()
+
+  is used.
+*/
+
 template <class Index> class PersistencePairing
 {
 public:
@@ -121,6 +138,6 @@ private:
   ContainerType _pairs;
 };
 
-}
+} // namespace aleph
 
 #endif
