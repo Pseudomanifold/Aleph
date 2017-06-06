@@ -68,12 +68,13 @@ template <class DataType> double totalPersistence( const PersistenceDiagram<Data
 }
 
 template <class DataType> double pNorm( const PersistenceDiagram<DataType>& D,
-                                        double p = 2.0 )
+                                        double p = 2.0,
+                                        bool weighted = false )
 {
   if( p == 0.0 )
     throw std::runtime_error( "Power must be non-zero" );
 
-  return std::pow( totalPersistence( D, p ), 1.0 / p );
+  return std::pow( totalPersistence( D, p, weighted ), 1.0 / p );
 }
 
 template <class DataType> DataType infinityNorm( const PersistenceDiagram<DataType>& D )
