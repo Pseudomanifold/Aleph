@@ -48,7 +48,8 @@ int main( int argc, char** argv )
     "total_persistence",
     "total_persistence_weighted",
     "infinity_norm",
-    "average_persistence"
+    "average_persistence",
+    "average_persistence_weighted"
   };
 
   for( int i = 1; i < argc; i++ )
@@ -88,15 +89,14 @@ int main( int argc, char** argv )
     aleph::weightedPersistence( input.persistenceDiagram, std::back_inserter( weightedPersistence ) );
 
     auto averagePersistence         = std::accumulate( persistence.begin(), persistence.end(), 0.0 ) / static_cast<double>( input.persistenceDiagram.size() );
-    auto averageWeightedPersistence = std::accumulate( persistence.begin(), persistence.end(), 0.0 ) / static_cast<double>( input.persistenceDiagram.size() );
+    auto averageWeightedPersistence = std::accumulate( weightedPersistence.begin(), weightedPersistence.end(), 0.0 ) / static_cast<double>( input.persistenceDiagram.size() );
 
-    std::cout << "'" << input.filename    << "'"
-              << " "
-              << p
-              << " "
-              << totalPersistence         << " "
-              << totalPersistenceWeighted << " "
-              << infinityNorm             << " "
-              << averagePersistence       << "\n";
+    std::cout << "'" << input.filename      << "'" << " "
+              << p                          << " "
+              << totalPersistence           << " "
+              << totalPersistenceWeighted   << " "
+              << infinityNorm               << " "
+              << averagePersistence         << " "
+              << averageWeightedPersistence << "\n";
   }
 }
