@@ -8,13 +8,31 @@
 
   Demonstrated classes:
 
+    - aleph::distances::Euclidean
+    - aleph::geometry::BruteForce
     - aleph::PersistenceDiagram
+
+  Demonstrated functions:
+
+    - aleph::calculatePersistenceDiagrams
+    - aleph::geometry::buildVietorisRipsComplex
+    - aleph::geometry::makeTorus
+    - aleph::geometry::torusRejectionSampling
 
   Original author: Bastian Rieck
 */
 
+#include "distances/Euclidean.hh"
+
+#include "geometry/BruteForce.hh"
+#include "geometry/TorusSampling.hh"
+#include "geometry/VietorisRipsComplex.hh"
+
 #include "persistenceDiagrams/PersistenceDiagram.hh"
 
+#include "persistentHomology/Calculation.hh"
+
+#include <iostream>
 #include <iomanip>
 #include <fstream>
 #include <limits>
@@ -26,6 +44,8 @@
 // We first have to specify the data type of the persistence diagram,
 // i.e. the type that is used by its individual points.
 using DataType           = double;
+using Distance           = aleph::distances::Euclidean<DataType>;
+using PointCloud         = aleph::containers::PointCloud<DataType>;
 using PersistenceDiagram = aleph::PersistenceDiagram<DataType>;
 
 /**
@@ -54,6 +74,38 @@ PersistenceDiagram createRandomPersistenceDiagram( unsigned n )
   }
 
   return D;
+}
+
+/**
+  Auxiliary function for creating a random persistence diagram based on
+  random samples from a torus. The torus is described by two radii, one
+  for the outer part, the other for the inner part.
+
+  Due to the sampling technique used, the specified number is merely an
+  upper bound for the number of points that are to be sampled. Moreover
+  the function will automatically handle Vietoris--Rips expansion.
+*/
+
+PersistenceDiagram createRandomTorusPersistenceDiagram( DataType R, DataType r, unsigned n )
+{
+  auto pointCloud = aleph::geometry::makeTorus(
+    aleph::geometry::torusRejectionSampling( R, r, n ),
+    R, r
+  );
+
+  aleph::geometry::BruteForce<PointCloud, Distance> bruteForceWrapper( pointCloud );
+
+  auto K
+    = aleph::geometry::buildVietorisRipsComplex( bruteForceWrapper, r, 2 );
+
+  auto diagrams
+    = aleph::calculatePersistenceDiagrams( K );
+
+  diagrams.at(1).removeDiagonal();
+
+  // We are only interested in the one-dimensional persistent homology
+  // of the samples.
+  return diagrams.at(1);
 }
 
 int main( int, char** )
