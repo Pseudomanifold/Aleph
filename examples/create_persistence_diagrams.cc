@@ -41,6 +41,8 @@
 
 #include <cmath>
 
+#include <getopt.h>
+
 // We first have to specify the data type of the persistence diagram,
 // i.e. the type that is used by its individual points.
 using DataType           = double;
@@ -108,15 +110,63 @@ PersistenceDiagram createRandomTorusPersistenceDiagram( DataType R, DataType r, 
   return diagrams.at(1);
 }
 
-int main( int, char** )
+int main( int argc, char** argv )
 {
-  // TODO: make configurable
-  unsigned n = 50;
-  unsigned m = 50;
+  static option commandLineOptions[] = {
+      { "m"    , required_argument, nullptr, 'm' },
+      { "n"    , required_argument, nullptr, 'n' },
+      { "R"    , required_argument, nullptr, 'R' },
+      { "r"    , required_argument, nullptr, 'r' },
+      { "torus", no_argument      , nullptr, 't' },
+      { nullptr, 0                , nullptr,  0  }
+  };
+
+  unsigned m           = 50;
+  unsigned n           = 50;
+  DataType R           = DataType(0.25);
+  DataType r           = DataType(0.50);
+
+  bool sampleFromTorus = false;
+
+  int option = 0;
+  while( ( option = getopt_long( argc, argv, "m:n:R:r:t", commandLineOptions, nullptr ) ) != -1 )
+  {
+    switch( option )
+    {
+    case 'm':
+      m = static_cast<unsigned>( std::stoul(optarg) );
+      break;
+    case 'n':
+      n = static_cast<unsigned>( std::stoul(optarg) );
+      break;
+    case 'R':
+      R = static_cast<DataType>( std::stod(optarg) );
+      break;
+    case 'r':
+      r = static_cast<DataType>( std::stod(optarg) );
+      break;
+    case 't':
+      sampleFromTorus = true;
+      break;
+    default:
+      break;
+    }
+  }
+
+  std::cerr << "* Sampling " << n << " persistence diagrams\n";
+  if( sampleFromTorus )
+    std::cerr << "* Sampling at most " << m << " points from a torus with R=" << R << " and r=" << r << "\n";
+  else
+    std::cerr << "* Generating " << m << " random points per diagram\n";
 
   for( unsigned i = 0; i < n; i++ )
   {
-    auto&& pd = createRandomPersistenceDiagram(m);
+    PersistenceDiagram pd;
+
+    if( sampleFromTorus )
+      pd = createRandomTorusPersistenceDiagram(R, r, m);
+    else
+      pd = createRandomPersistenceDiagram(m);
 
     std::stringstream stream;
     stream << "/tmp/";
