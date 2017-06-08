@@ -21,6 +21,7 @@
 
 #include "topology/RandomGraph.hh"
 #include "topology/SimplicialComplex.hh"
+#include "topology/io/GML.hh"
 
 #include <fstream>
 #include <iostream>
@@ -28,11 +29,16 @@
 
 #include <getopt.h>
 
-/** Auxiliary function for storing a graph in an output stream. */
+/**
+  Auxiliary function for storing a graph in an output stream. This is
+  required because the graph creation methods return a different type
+  for each of the random graphs.
+*/
+
 template <class SimplicialComplex> void storeGraph(const SimplicialComplex& K, std::ostream& out)
 {
-  // TODO: not yet implemented
-  out << K << "\n";
+  aleph::topology::io::GMLWriter writer;
+  writer(out, K);
 }
 
 int main( int argc, char** argv )
