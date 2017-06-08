@@ -8,6 +8,8 @@ for an absolute novice would be the Vietoris&mdash;Rips calculation example.
 
 | Name | Description |
 |------|-------------|
+| [create_persistence_diagrams](https://github.com/Submanifold/Aleph/blob/master/examples/create_persistence_diagrams.cc) | Creating random persistence diagrams in numerous ways |
+| [create_random_graph](https://github.com/Submanifold/Aleph/blob/master/examples/create_random_graph.cc) | Creating a random graph and storing it as a GML file |
 | [network_analysis](https://github.com/Submanifold/Aleph/blob/master/examples/network_anlysis.cc) | Analysing the persistent homology of a weighted network (a graph) |
 | [ply](https://github.com/Submanifold/Aleph/blob/master/examples/ply.cc) | Calculating persistent homology of meshes in ASCII PLY format with different filtrations; includes statistical information about persistence diagrams |
 | [vietoris_rips](https://github.com/Submanifold/Aleph/blob/master/examples/vietoris_rips.cc) | Calculating a Vietoris&mdash;Rips complex of point clouds |
