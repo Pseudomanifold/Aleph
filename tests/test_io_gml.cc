@@ -38,6 +38,7 @@ int main()
 {
   std::vector<std::string> inputs = {
     CMAKE_SOURCE_DIR + std::string( "/tests/input/Simple.gml" ),
+    CMAKE_SOURCE_DIR + std::string( "/tests/input/Simple_inline.gml" ),
     CMAKE_SOURCE_DIR + std::string( "/tests/input/Simple_with_labels.gml" )
   };
 

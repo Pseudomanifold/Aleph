@@ -94,24 +94,36 @@ public:
 
     while( std::getline( in, line ) )
     {
-      line = trim( line );
+      line        = trim( line );
+      auto tokens = split( line );
 
       // Skip comment lines. This is somewhat wasteful because I am
       // splitting the complete string even though I merely need to
       // know the first token.
-      {
-        auto tokens = split( line );
-        if( tokens.empty() == false && ( tokens.front() == "comment" || tokens.front() == "Creator" ) )
-          continue;
-      }
+      if( tokens.empty() == false && ( tokens.front() == "comment" || tokens.front() == "Creator" ) )
+        continue;
+
+      // A new level may also be opened "inline" by specifying a name
+      // and the opening bracket at the same time.
+      bool newLevel = isLevel( line ) || ( tokens.size() == 2 && tokens.back() == "[" && isLevel( tokens.front() ) );
 
       // Detecting a new level
-      if( isLevel( line ) )
+      if( newLevel )
       {
+        auto level = tokens.size() == 2 ? tokens.front() : line;
+
         if( lastLevel.empty() )
-          lastLevel = line;
+          lastLevel = level;
         else
           throw std::runtime_error( "Encountered incorrectly-nested levels" );
+
+        // Only store the level directly when it has been specified
+        // inline
+        if( tokens.size() == 2 )
+        {
+          currentLevel.push( level );
+          lastLevel = "";
+        }
       }
 
       // Opening a new level
@@ -140,6 +152,9 @@ public:
       // Check for attributes
       else
       {
+        if( currentLevel.empty() )
+          throw std::runtime_error( "Expected a non-empty current level" );
+
         std::smatch matches;
 
         auto* dict = currentLevel.top() == "node" ? &node.dict
