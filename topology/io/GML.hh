@@ -5,6 +5,7 @@
 #include <map>
 #include <set>
 #include <regex>
+#include <sstream>
 #include <stack>
 #include <string>
 #include <vector>
@@ -333,6 +334,71 @@ private:
 
   std::vector<Node> _nodes;
   std::vector<Edge> _edges;
+};
+
+/**
+  @class GMLWriter
+  @brief Writes files in GML (Graph Modeling Language) format
+
+  This is a simple writer for graphs in GML format. It suports a basic
+  subset of the GML specification, viz. the specification of different
+  attributes for nodes, as well as weight specifications for edges.
+
+  Given a simplicial complex, it will store it as a weighted graph.
+
+  Currently, the following attributes will be written:
+
+  * \c id (for nodes)
+  * \c source (for edges)
+  * \c target (for edges)
+  * \c weight (for edges)
+*/
+
+class GMLWriter
+{
+public:
+
+  template <class SimplicialComplex> void operator()( const std::string& filename, SimplicialComplex& K )
+  {
+    std::ofstream out( filename );
+    if( !out )
+      throw std::runtime_error( "Unable to open output file" );
+
+    this->operator()( out, K );
+  }
+
+  template <class SimplicialComplex> void operator()( std::ostream& out, SimplicialComplex& K )
+  {
+    std::ostringstream streamNodes;
+    std::ostringstream streamEdges;
+
+    for( auto&& simplex : K )
+    {
+      if( simplex.dimension() == 0 )
+      {
+        streamNodes << "  node [\n"
+                    << "    id " << *simplex.begin() << "\n"
+                    << "  ]\n";
+      }
+      else if( simplex.dimension() == 1 )
+      {
+        auto u = *( simplex.begin()     );
+        auto v = *( simplex.begin() + 1 );
+
+        streamEdges << "  edge [\n"
+                    << "    source " << u << "\n"
+                    << "    target " << v << "\n"
+                    << "    weight " << simplex.data() << "\n"
+                    << "  ]\n";
+      }
+    }
+
+    out << "graph [\n"
+        << "  directed 0\n"
+        << streamNodes.str() << "\n"
+        << streamEdges.str() << "\n"
+        << "]\n";
+  }
 };
 
 } // namespace io
