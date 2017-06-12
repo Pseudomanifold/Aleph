@@ -29,6 +29,7 @@
   TODO: Document this
 */
 
+#include "persistenceDiagrams/Calculation.hh"
 #include "persistenceDiagrams/PersistenceDiagram.hh"
 
 #include "persistentHomology/ExtendedPersistenceHierarchy.hh"
@@ -36,6 +37,7 @@
 
 #include "topology/Simplex.hh"
 #include "topology/SimplicialComplex.hh"
+#include "topology/UnionFind.hh"
 
 #include "topology/filtrations/Data.hh"
 
@@ -44,8 +46,10 @@
 
 #include "utilities/Filesystem.hh"
 
+#include <algorithm>
 #include <functional>
 #include <iostream>
+#include <numeric>
 #include <string>
 #include <vector>
 
@@ -163,12 +167,33 @@ int main( int argc, char** argv )
     std::cerr << "finished\n";
   }
 
+  std::vector<PersistenceDiagram> persistenceDiagrams;
+  persistenceDiagrams.reserve( simplicialComplexes.size() );
+
   for( auto&& K : simplicialComplexes )
   {
     aleph::ExtendedPersistenceHierarchy<Simplex> eph;
     auto ppe                = eph( K );   // persistence pairing & edges
     auto persistencePairing = ppe.first;  // persistence pairing
     auto edges              = ppe.second; // edges
+
+    // Calculate the corresponding persistence diagram, clean it
+    // perfunctorily, and finally sort it by increasing creation
+    // threshold. Subsequently, we will check which diagrams are
+    // unique.
+    {
+      auto diagrams = aleph::makePersistenceDiagrams( persistencePairing, K );
+      auto diagram  = diagrams.front();
+
+      diagram.removeDiagonal();
+
+      std::sort( diagram.begin(), diagram.end(), [] ( const typename PersistenceDiagram::Point& a, const typename PersistenceDiagram::Point& b )
+                                                 {
+                                                   return a.x() < b.x() || ( a.x() == b.x() && a.y() < b.y() );
+                                                 } );
+
+      persistenceDiagrams.push_back( diagram );
+    }
 
     // Enumerate all vertices in the hierarchy -------------------------
 
@@ -215,5 +240,32 @@ int main( int argc, char** argv )
     }
 
     std::cout << "\n\n";
+  }
+
+  // Determine which persistence diagrams are unique among the
+  // discovered ones...
+  {
+    std::vector<std::size_t> indices( persistenceDiagrams.size() );
+    std::iota( indices.begin(), indices.end(), 0 );
+
+    aleph::topology::UnionFind<std::size_t> uf( indices.begin(), indices.end() );
+
+    for( std::size_t i = 0; i < persistenceDiagrams.size(); i++ )
+    {
+      auto&& D1 = persistenceDiagrams.at(i);
+
+      for( std::size_t j = i+1; j < persistenceDiagrams.size(); j++ )
+      {
+        auto&& D2 = persistenceDiagrams.at(j);
+
+        if( D1 == D2 )
+          uf.merge( j, i );
+      }
+    }
+
+    std::vector<std::size_t> roots;
+    uf.roots( std::back_inserter( roots ) );
+
+    std::cerr << "* Out of " << persistenceDiagrams.size() << " persistence diagrams, there are " << roots.size() << " unique ones\n";
   }
 }
