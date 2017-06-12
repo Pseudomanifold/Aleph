@@ -45,7 +45,7 @@ struct DataSet
 /* Usage information */
 void usage()
 {
-  std::cerr << "Usage: topological_distance [--power=POWER] [--exp] [--kernel]\n"
+  std::cerr << "Usage: topological_distance [--power=POWER] [--kernel] [--exp] [--sigma]\n"
             << "                            [--hausdorff|indicator|wasserstein] FILES\n"
             << "\n"
             << "Calculates distances between a set of persistence diagrams, stored\n"
@@ -70,6 +70,7 @@ void usage()
             << "  -h: calculate Hausdorff distances\n"
             << "  -i: calculate persistence indicator function distances\n"
             << "  -k: calculate kernel values instead of distances\n"
+            << "  -s: use sigma as a scale parameter for the kernel\n"
             << "  -w: calculate Wasserstein distances\n"
             << "\n";
 }
@@ -201,6 +202,7 @@ int main( int argc, char** argv )
   static option commandLineOptions[] =
   {
     { "power"      , required_argument, nullptr, 'p' },
+    { "sigma"      , required_argument, nullptr, 's' },
     { "exp"        , no_argument      , nullptr, 'e' },
     { "hausdorff"  , no_argument      , nullptr, 'h' },
     { "indicator"  , no_argument      , nullptr, 'i' },
@@ -210,18 +212,22 @@ int main( int argc, char** argv )
   };
 
   double power                      = 2.0;
+  double sigma                      = 1.0;
   bool useExponentialFunction       = false;
   bool useIndicatorFunctionDistance = false;
   bool calculateKernel              = false;
   bool useWassersteinDistance       = false;
 
   int option = 0;
-  while( ( option = getopt_long( argc, argv, "p:ehikw", commandLineOptions, nullptr ) ) != -1 )
+  while( ( option = getopt_long( argc, argv, "p:s:ehikw", commandLineOptions, nullptr ) ) != -1 )
   {
     switch( option )
     {
     case 'p':
       power = std::stod( optarg );
+      break;
+    case 's':
+      sigma = std::stod( optarg );
       break;
     case 'e':
       useExponentialFunction = true;
@@ -389,7 +395,7 @@ int main( int argc, char** argv )
       {
         d = -d;
         if( useExponentialFunction )
-          d = std::exp( d );
+          d = std::exp( sigma * d );
       }
 
       distances[row][col] = d;
