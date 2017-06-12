@@ -1,3 +1,4 @@
+ADD_EXECUTABLE( create_functions                        create_functions.cc )
 ADD_EXECUTABLE( clique-communities                      clique-communities.cc )
 ADD_EXECUTABLE( clique-dna                              clique-dna.cc )
 ADD_EXECUTABLE( clique-persistence-diagram              clique-persistence-diagram.cc )
