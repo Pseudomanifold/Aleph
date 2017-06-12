@@ -42,6 +42,38 @@ struct DataSet
   PersistenceIndicatorFunction persistenceIndicatorFunction;
 };
 
+/* Usage information */
+void usage()
+{
+  std::cerr << "Usage: topological_distance [--power=POWER] [--exp] [--kernel]\n"
+            << "                            [--hausdorff|indicator|wasserstein] FILES\n"
+            << "\n"
+            << "Calculates distances between a set of persistence diagrams, stored\n"
+            << "in FILES. By default, this tool calculates Hausdorff distances for\n"
+            << "all diagrams. This can be modified.\n"
+            << "\n"
+            << "If no other value is given, all distances are weighted using $p=2$\n"
+            << "during the construction of a pairwise distance matrix. Furthermore\n"
+            << "this tool can calculate kernels for use in kernel-based methods in\n"
+            << "machine learning.\n"
+            << "\n"
+            << "The distance matrix is written to STDOUT. Rows and columns will be\n"
+            << "separated by whitespace.\n"
+            << "\n"
+            << "This tool tries to be smart and is able to detect whether a set of\n"
+            << "persistence diagrams belongs to the same group. This works only if\n"
+            << "each file contains a suffix with digits that is preceded by either\n"
+            << "a 'd' (for dimension) or a 'k' (for clique dimension).\n"
+            << "\n"
+            << "Flags:\n"
+            << "  -e: use exponential weighting for kernel calculation\n"
+            << "  -h: calculate Hausdorff distances\n"
+            << "  -i: calculate persistence indicator function distances\n"
+            << "  -k: calculate kernel values instead of distances\n"
+            << "  -w: calculate Wasserstein distances\n"
+            << "\n";
+}
+
 /*
   Stores a matrix in an output stream. The matrix is formatted such that
   individual values are separated by spaces and each row ends with '\n'.
@@ -216,7 +248,7 @@ int main( int argc, char** argv )
 
   if( ( argc - optind ) <= 1 )
   {
-    // TODO: Show usage
+    usage();
     return -1;
   }
 
@@ -324,6 +356,17 @@ int main( int argc, char** argv )
 
   // Calculate all distances -------------------------------------------
 
+  {
+    auto name = useIndicatorFunctionDistance ? "persistence indicator function"
+                                             : useWassersteinDistance ? "Wasserstein"
+                                                                      : "Hausdorff";
+
+    auto type = calculateKernel ? "kernel values" : "distances";
+
+    std::cerr << "* Calculating pairwise " << type << " with " << name << " distance\n";
+    std::cerr << "* Calculating pairwise " << type << " with p=" << power << "...";
+  }
+
   std::vector< std::vector<double> > distances;
   distances.resize( dataSets.size(), std::vector<double>( dataSets.size() ) );
 
@@ -353,6 +396,8 @@ int main( int argc, char** argv )
       distances[col][row] = d;
     }
   }
+
+  std::cerr << "finished\n";
 
   std::cerr << "Storing matrix...";
 
