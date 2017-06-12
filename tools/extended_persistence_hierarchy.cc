@@ -48,6 +48,7 @@
 
 #include <algorithm>
 #include <functional>
+#include <fstream>
 #include <iostream>
 #include <numeric>
 #include <string>
@@ -266,6 +267,8 @@ int main( int argc, char** argv )
     std::vector<std::size_t> roots;
     uf.roots( std::back_inserter( roots ) );
 
+    std::ofstream out( "/tmp/classes.txt" );
+
     std::cerr << "* Out of " << persistenceDiagrams.size() << " persistence diagrams, there are " << roots.size() << " unique ones\n";
 
     unsigned C = 0;
@@ -279,6 +282,11 @@ int main( int argc, char** argv )
         std::cerr << "  Class " << C << ": " << indices.size() << "\n";
 
         C++; // ha ha
+
+        for( auto&& index : indices )
+          out << index << " ";
+
+        out << "\n";
       }
     }
   }
