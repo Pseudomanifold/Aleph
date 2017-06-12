@@ -1,5 +1,5 @@
-#ifndef ALEPH_PERSISTENCE_DIAGRAM_CONVERSION_HH__
-#define ALEPH_PERSISTENCE_DIAGRAM_CONVERSION_HH__
+#ifndef ALEPH_PERSISTENCE_DIAGRAM_CALCULATION_HH__
+#define ALEPH_PERSISTENCE_DIAGRAM_CALCULATION_HH__
 
 #include "persistenceDiagrams/PersistenceDiagram.hh"
 #include "persistentHomology/PersistencePairing.hh"
@@ -10,6 +10,13 @@
 
 namespace aleph
 {
+
+/**
+  Calculates a set of persistence diagrams from a persistence pairing
+  and an associated simplicial complex. The simplicial complex serves
+  as a container for looking up the weights for the persistence pairs
+  that are stored in the persistence diagram.
+*/
 
 template <
   class Index,
@@ -63,6 +70,12 @@ std::vector< PersistenceDiagram<typename SimplicialComplex::ValueType::DataType>
   return result;
 }
 
+/**
+  Calculates a persistence diagram from a persistence pairing of a 1D
+  function without requiring a representation as a simplicial complex
+  for looking up function values.
+*/
+
 template <
   class Index,
   class DataType
@@ -86,6 +99,6 @@ PersistenceDiagram<DataType> makePersistenceDiagram( const PersistencePairing<In
   return D;
 }
 
-}
+} // namespace aleph
 
 #endif
