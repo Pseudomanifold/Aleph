@@ -12,7 +12,7 @@ int main(int, char**)
   std::random_device rd;
   std::mt19937 rng( rd() );
 
-  for( unsigned k = 0; k < 50; k++ )
+  for( unsigned k = 0; k < 500; k++ )
   {
     std::vector<unsigned> valuesIn( max );
     std::iota( valuesIn.begin(), valuesIn.end(), min+1 );

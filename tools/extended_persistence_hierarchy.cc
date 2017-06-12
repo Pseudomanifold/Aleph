@@ -267,5 +267,19 @@ int main( int argc, char** argv )
     uf.roots( std::back_inserter( roots ) );
 
     std::cerr << "* Out of " << persistenceDiagrams.size() << " persistence diagrams, there are " << roots.size() << " unique ones\n";
+
+    unsigned C = 0;
+    for( auto&& root : roots )
+    {
+      std::vector<std::size_t> indices;
+      uf.get( root, std::back_inserter( indices ) );
+
+      if( indices.size() > 1 )
+      {
+        std::cerr << "  Class " << C << ": " << indices.size() << "\n";
+
+        C++; // ha ha
+      }
+    }
   }
 }
