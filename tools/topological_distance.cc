@@ -1,3 +1,13 @@
+/*
+  This is a tool shipped by 'Aleph - A Library for Exploring Persistent
+  Homology'.
+
+  Given a set of persistence diagrams, it calculates various topological
+  distances and returns a distance matrix.
+
+  TODO: More documentation...
+*/
+
 #include <algorithm>
 #include <functional>
 #include <iostream>
@@ -70,6 +80,7 @@ void usage()
             << "  -h: calculate Hausdorff distances\n"
             << "  -i: calculate persistence indicator function distances\n"
             << "  -k: calculate kernel values instead of distances\n"
+            << "  -n: normalize the persistence indicator function\n"
             << "  -s: use sigma as a scale parameter for the kernel\n"
             << "  -w: calculate Wasserstein distances\n"
             << "\n";
@@ -116,7 +127,8 @@ double distancePIF( const std::vector<DataSet>& dataSet1,
                     const std::vector<DataSet>& dataSet2,
                     unsigned minDimension,
                     unsigned maxDimension,
-                    double power )
+                    double power,
+                    bool normalize )
 {
   auto getPersistenceIndicatorFunction = [] ( const std::vector<DataSet>& dataSet, unsigned dimension )
   {
@@ -138,6 +150,12 @@ double distancePIF( const std::vector<DataSet>& dataSet1,
   {
     auto f = getPersistenceIndicatorFunction( dataSet1, dimension );
     auto g = getPersistenceIndicatorFunction( dataSet2, dimension );
+
+    if( normalize )
+    {
+      f = aleph::math::normalize( f );
+      g = aleph::math::normalize( g );
+    }
 
     g = -g;
     if( power == 1.0 )
@@ -206,6 +224,7 @@ int main( int argc, char** argv )
     { "exp"        , no_argument      , nullptr, 'e' },
     { "hausdorff"  , no_argument      , nullptr, 'h' },
     { "indicator"  , no_argument      , nullptr, 'i' },
+    { "normalize"  , no_argument      , nullptr, 'n' },
     { "kernel"     , no_argument      , nullptr, 'k' },
     { "wasserstein", no_argument      , nullptr, 'w' },
     { nullptr      , 0                , nullptr,  0  }
@@ -215,6 +234,7 @@ int main( int argc, char** argv )
   double sigma                      = 1.0;
   bool useExponentialFunction       = false;
   bool useIndicatorFunctionDistance = false;
+  bool normalize                    = false;
   bool calculateKernel              = false;
   bool useWassersteinDistance       = false;
 
@@ -242,6 +262,9 @@ int main( int argc, char** argv )
       break;
     case 'k':
       calculateKernel = true;
+      break;
+    case 'n':
+      normalize = true;
       break;
     case 'w':
       useIndicatorFunctionDistance = false;
@@ -387,7 +410,7 @@ int main( int argc, char** argv )
       double d = 0.0;
 
       if( useIndicatorFunctionDistance )
-        d = distancePIF( dataSets.at(row), dataSets.at(col), minDimension, maxDimension, power );
+        d = distancePIF( dataSets.at(row), dataSets.at(col), minDimension, maxDimension, power, normalize );
       else
         d = persistenceDiagramDistance( dataSets.at(row), dataSets.at(col), minDimension, maxDimension, power, functor );
 
