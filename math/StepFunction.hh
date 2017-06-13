@@ -328,6 +328,31 @@ template <class D, class I> std::ostream& operator<<( std::ostream& o, const Ste
   return o;
 }
 
+/**
+  Auxiliary function for normalizing a step function. Given a range
+  spanned by a minimum $a$ and a maximum $b$, the image of the step
+  function will be restricted to $[a,b]$.
+
+  The transformed step function will be returned.
+*/
+
+template <class D, class I> StepFunction<D,I> normalize( const StepFunction<D,I>& f )
+{
+  std::set<I> image;
+  f.image( std::inserter( image, image.end() ) );
+
+  if( image.empty() || image.size() == 1 )
+    return f;
+
+  auto min =  I();
+  auto max = *image.rbegin();
+
+  auto g = f - min;
+  g      = g / ( max - min );
+
+  return g;
+}
+
 } // namespace math
 
 } // namespace aleph

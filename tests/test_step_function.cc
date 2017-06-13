@@ -178,6 +178,38 @@ template <class T> void testStepFunctionNegation()
   ALEPH_ASSERT_EQUAL( g(3)  , h(3)   );
   ALEPH_ASSERT_EQUAL( g(3.5), h(3.5) );
   ALEPH_ASSERT_EQUAL( g(4.0), h(4.0) );
+
+  ALEPH_TEST_END();
+}
+
+template <class T> void testStepFunctionNormalization()
+{
+  ALEPH_TEST_BEGIN( "Step function: Normalization" );
+
+  StepFunction<T> f;
+  f.add( 0, 1, 1 );
+  f.add( 2, 3, 1 );
+  f.add( 3, 4, 2 );
+
+  auto g = normalize( f );
+
+  ALEPH_ASSERT_EQUAL( f(0)  , 1 );
+  ALEPH_ASSERT_EQUAL( f(1)  , 1 );
+  ALEPH_ASSERT_EQUAL( f(1.5), 0 );
+  ALEPH_ASSERT_EQUAL( f(2)  , 1 );
+  ALEPH_ASSERT_EQUAL( f(3)  , 2 );
+  ALEPH_ASSERT_EQUAL( f(3.5), 2 );
+  ALEPH_ASSERT_EQUAL( f(4.0), 2);
+
+  ALEPH_ASSERT_EQUAL( g(0)  , 0.5 );
+  ALEPH_ASSERT_EQUAL( g(1)  , 0.5 );
+  ALEPH_ASSERT_EQUAL( g(1.5), 0.0 );
+  ALEPH_ASSERT_EQUAL( g(2)  , 0.5 );
+  ALEPH_ASSERT_EQUAL( g(3)  , 1.0 );
+  ALEPH_ASSERT_EQUAL( g(3.5), 1.0 );
+  ALEPH_ASSERT_EQUAL( g(4.0), 1.0);
+
+  ALEPH_TEST_END();
 }
 
 template <class T> void testPersistenceIndicatorFunction()
@@ -236,6 +268,9 @@ int main()
 
   testStepFunctionNegation<double>();
   testStepFunctionNegation<float> ();
+
+  testStepFunctionNormalization<double>();
+  testStepFunctionNormalization<float> ();
 
   testPersistenceIndicatorFunction<double>();
   testPersistenceIndicatorFunction<float>();
