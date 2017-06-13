@@ -232,6 +232,23 @@ public:
     return f;
   }
 
+  /** Adds a scalar to all step function values */
+  StepFunction operator+( I lambda ) const noexcept
+  {
+    StepFunction f;
+
+    for( auto&& indicatorFunction : _indicatorFunctions )
+      f.add( indicatorFunction.a(), indicatorFunction.b(), lambda + indicatorFunction.y() );
+
+    return f;
+  }
+
+  /** Subtracts a scalar from all step function values */
+  StepFunction operator-( I lambda ) const noexcept
+  {
+    return this->operator+( -lambda );
+  }
+
   /** Multiplies the given step function with a scalar value */
   StepFunction operator*( I lambda ) const noexcept
   {
