@@ -336,7 +336,9 @@ template <class D, class I> std::ostream& operator<<( std::ostream& o, const Ste
   The transformed step function will be returned.
 */
 
-template <class D, class I> StepFunction<D,I> normalize( const StepFunction<D,I>& f )
+template <class D, class I> StepFunction<D,I> normalize( const StepFunction<D,I>& f,
+                                                         I a = I(),
+                                                         I b = I(1) )
 {
   std::set<I> image;
   f.image( std::inserter( image, image.end() ) );
@@ -344,11 +346,15 @@ template <class D, class I> StepFunction<D,I> normalize( const StepFunction<D,I>
   if( image.empty() || image.size() == 1 )
     return f;
 
+  // The minimum value in the image of the function is zero because this
+  // value is guaranteed to be attained at some point
   auto min =  I();
   auto max = *image.rbegin();
 
   auto g = f - min;
-  g      = g / ( max - min );
+  g      = g / ( max - min ); // now scaled between [0,1  ]
+  g      = g * (   b -   a ); // now scaled between [0,b-a]
+  g      = g + a;             // now scaled between [a,b  ]
 
   return g;
 }

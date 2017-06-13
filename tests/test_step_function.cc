@@ -5,6 +5,7 @@
 
 #include "tests/Base.hh"
 
+#include <iterator>
 #include <set>
 
 #include <cmath>
@@ -191,7 +192,7 @@ template <class T> void testStepFunctionNormalization()
   f.add( 2, 3, 1 );
   f.add( 3, 4, 2 );
 
-  auto g = normalize( f );
+  auto g = normalize( f, T(0), T(10) );
 
   ALEPH_ASSERT_EQUAL( f(0)  , 1 );
   ALEPH_ASSERT_EQUAL( f(1)  , 1 );
@@ -201,13 +202,21 @@ template <class T> void testStepFunctionNormalization()
   ALEPH_ASSERT_EQUAL( f(3.5), 2 );
   ALEPH_ASSERT_EQUAL( f(4.0), 2);
 
-  ALEPH_ASSERT_EQUAL( g(0)  , 0.5 );
-  ALEPH_ASSERT_EQUAL( g(1)  , 0.5 );
-  ALEPH_ASSERT_EQUAL( g(1.5), 0.0 );
-  ALEPH_ASSERT_EQUAL( g(2)  , 0.5 );
-  ALEPH_ASSERT_EQUAL( g(3)  , 1.0 );
-  ALEPH_ASSERT_EQUAL( g(3.5), 1.0 );
-  ALEPH_ASSERT_EQUAL( g(4.0), 1.0);
+  ALEPH_ASSERT_EQUAL( g(0)  ,  5 );
+  ALEPH_ASSERT_EQUAL( g(1)  ,  5 );
+  ALEPH_ASSERT_EQUAL( g(1.5),  0 );
+  ALEPH_ASSERT_EQUAL( g(2)  ,  5 );
+  ALEPH_ASSERT_EQUAL( g(3)  , 10 );
+  ALEPH_ASSERT_EQUAL( g(3.5), 10 );
+  ALEPH_ASSERT_EQUAL( g(4.0), 10);
+
+  {
+    std::set<T> image;
+    g.image( std::inserter( image, image.end() ) );
+
+    ALEPH_ASSERT_THROW( image.empty() == false );
+    ALEPH_ASSERT_EQUAL( *image.rbegin(), T(10) );
+  }
 
   ALEPH_TEST_END();
 }
