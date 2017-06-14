@@ -3,7 +3,7 @@ ADD_EXECUTABLE( clique-communities                      clique-communities.cc )
 ADD_EXECUTABLE( clique-dna                              clique-dna.cc )
 ADD_EXECUTABLE( clique-persistence-diagram              clique-persistence-diagram.cc )
 ADD_EXECUTABLE( extended_persistence_hierarchy          extended_persistence_hierarchy.cc )
-ADD_EXECUTABLE( network-persistence-diagrams            network-persistence-diagrams.cc )
+ADD_EXECUTABLE( network_persistence_diagrams            network_persistence_diagrams.cc )
 
 ADD_EXECUTABLE( persistence_diagram_statistics          persistence_diagram_statistics.cc )
 ADD_EXECUTABLE( persistence_indicator_function          persistence_indicator_function.cc )
