@@ -102,6 +102,37 @@ public:
         return I();
     }
 
+    // Arithmetic ------------------------------------------------------
+
+    IndicatorFunction& operator*=( I lambda ) noexcept
+    {
+      _y *= lambda;
+      return *this;
+    }
+
+    IndicatorFunction operator*( I lambda ) const noexcept
+    {
+      auto f = *this;
+      f *= lambda;
+      return f;
+    }
+
+    IndicatorFunction& operator/=( I lambda )
+    {
+      // Note that I do not have to handle divisions by zero here
+      // because only the step function is using this class.
+      return this->operator/=( 1/lambda );
+    }
+
+    IndicatorFunction operator/( I lambda ) const
+    {
+      auto f = *this;
+      f /= lambda;
+      return f;
+    }
+
+    // Comparison ------------------------------------------------------
+
     bool operator<( const IndicatorFunction& other ) const
     {
       // Permits that intervals intersect in a single point, as this is
@@ -273,21 +304,42 @@ public:
   }
 
   /** Multiplies the given step function with a scalar value */
-  StepFunction operator*( I lambda ) const noexcept
+  StepFunction& operator*=( I lambda ) noexcept
   {
-    StepFunction f;
+    // The set may not be modified inline because this might result in
+    // a changed sorting order. Hence the need for a copy.
+    std::set<IndicatorFunction> indicatorFunctions;
 
     for( auto&& indicatorFunction : _indicatorFunctions )
-      f.add( indicatorFunction.a(), indicatorFunction.b(), lambda * indicatorFunction.y() );
+      indicatorFunctions.insert( indicatorFunction * lambda );
 
+    _indicatorFunctions.swap( indicatorFunctions );
+    return *this;
+  }
+
+  /** Multiplies the given step function with a scalar value */
+  StepFunction operator*( I lambda ) const noexcept
+  {
+    auto f = *this;
+    f *= lambda;
     return f;
+  }
+
+  /** Divides the given step function by a scalar value */
+  StepFunction& operator/=( I lambda )
+  {
+    if( lambda == I() )
+      throw std::runtime_error( "Attempted division by zero" );
+
+    return this->operator*=( 1/lambda );
   }
 
   /** Divides the given step function by a scalar value */
   StepFunction operator/( I lambda ) const
   {
-    // TODO: What about division by zero?
-    return this->operator*( 1/lambda );
+    auto f = *this;
+    f /= lambda;
+    return f;
   }
 
   /** Calculates the integral over the domain of the step function */
