@@ -155,7 +155,7 @@ public:
   }
 
   /** Calculates the sum of this step function with another step function */
-  StepFunction operator+( const StepFunction& other ) const noexcept
+  StepFunction& operator+=( const StepFunction& other ) noexcept
   {
     auto&& f = *this;
     auto&& g = other;
@@ -168,7 +168,7 @@ public:
     StepFunction<D,I> h;
 
     if( domain.empty() )
-      return h;
+      return *this;
 
     auto prev = *domain.begin();
     auto curr = *domain.begin();
@@ -218,7 +218,16 @@ public:
       prev = curr;
     }
 
-    return h;
+    *this = h;
+    return *this;
+  }
+
+  /** Calculates the sum of this step function with another step function */
+  StepFunction operator+( const StepFunction& rhs ) const noexcept
+  {
+    auto lhs = *this;
+    lhs += rhs;
+    return lhs;
   }
 
   /** Unary minus: negates all values in the image of the step function */
