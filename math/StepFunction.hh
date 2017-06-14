@@ -230,6 +230,20 @@ public:
     return lhs;
   }
 
+  /** Calculates the difference of this step function with another step function */
+  StepFunction& operator-=( const StepFunction& other )
+  {
+    return this->operator+=( -other );
+  }
+
+  /** Calculates the difference of this step function with another step function */
+  StepFunction operator-( const StepFunction& rhs ) const noexcept
+  {
+    auto lhs = *this;
+    lhs -= rhs;
+    return lhs;
+  }
+
   /** Unary minus: negates all values in the image of the step function */
   StepFunction operator-() const noexcept
   {
