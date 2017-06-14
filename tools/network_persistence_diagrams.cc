@@ -218,10 +218,10 @@ int main( int argc, char** argv )
     std::transform( pd.begin(), pd.end(), pd.begin(),
         [&maxWeight] ( const PersistenceDiagram::Point& p )
         {
-        if( !std::isfinite( p.y() ) )
-        return PersistenceDiagram::Point( p.x(), 2 * maxWeight );
-        else
-        return PersistenceDiagram::Point( p );
+          if( !std::isfinite( p.y() ) )
+            return PersistenceDiagram::Point( p.x(), 2 * maxWeight );
+          else
+            return PersistenceDiagram::Point( p );
         } );
 
     std::ofstream out( outputFilename );
