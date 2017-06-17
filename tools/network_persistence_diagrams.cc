@@ -1,3 +1,16 @@
+/*
+  This is a tool shipped by 'Aleph - A Library for Exploring Persistent
+  Homology'.
+
+  It reads networks (graphs) in different file formats and approximates
+  their topology using a Vietoris--Rips complex. The tool needs all the
+  networks to contain weights, which are used to filtrate the complex.
+
+  Vietoris--Rips expansion and the usage of the weights is configurable
+  to some extent and may change the output. This tool produces a set of
+  persistence diagrams as output and stores them in "/tmp".
+*/
+
 #include <algorithm>
 #include <fstream>
 #include <iomanip>
