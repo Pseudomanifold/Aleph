@@ -31,7 +31,7 @@ namespace geometry
 template <class T>
 std::vector< std::pair<T, T> > torusRejectionSampling( T R,
                                                        T r,
-                                                       unsigned int n )
+                                                       unsigned n )
 {
   std::random_device rd;
 
@@ -52,7 +52,7 @@ std::vector< std::pair<T, T> > torusRejectionSampling( T R,
   std::uniform_real_distribution<T> xDistribution( T(0), T(2.0 * M_PI) );
   std::uniform_real_distribution<T> yDistribution( T(0), T(1.0 / M_PI) );
 
-  for( unsigned int i = 0; i < n; i++ )
+  for( unsigned i = 0; i < n; i++ )
   {
     xValues.push_back( xDistribution( rngX ) );
     yValues.push_back( yDistribution( rngY ) );
@@ -66,7 +66,7 @@ std::vector< std::pair<T, T> > torusRejectionSampling( T R,
 
   std::uniform_real_distribution<T> psiDistribution( T(0), T(2 * M_PI) );
 
-  for( unsigned int i = 0; i < n; i++ )
+  for( unsigned i = 0; i < n; i++ )
     if( yValues[i] < functionValues[i] )
       angles.push_back( std::make_pair( xValues[i], psiDistribution( rngPsi ) ) );
 
