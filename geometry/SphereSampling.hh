@@ -1,6 +1,8 @@
 #ifndef ALEPH_GEOMETRY_SPHERE_SAMPLING_HH__
 #define ALEPH_GEOMETRY_SPHERE_SAMPLING_HH__
 
+#include "containers/PointCloud.hh"
+
 #include <cmath>
 
 #include <random>
