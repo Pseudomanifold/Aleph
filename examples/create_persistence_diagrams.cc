@@ -16,7 +16,9 @@
 
     - aleph::calculatePersistenceDiagrams
     - aleph::geometry::buildVietorisRipsComplex
+    - aleph::geometry::makeSphere
     - aleph::geometry::makeTorus
+    - aleph::geometry::sphereSampling
     - aleph::geometry::torusRejectionSampling
 
   Original author: Bastian Rieck
@@ -25,6 +27,7 @@
 #include "distances/Euclidean.hh"
 
 #include "geometry/BruteForce.hh"
+#include "geometry/SphereSampling.hh"
 #include "geometry/TorusSampling.hh"
 #include "geometry/VietorisRipsComplex.hh"
 
@@ -110,15 +113,46 @@ PersistenceDiagram createRandomTorusPersistenceDiagram( DataType R, DataType r, 
   return diagrams.at(1);
 }
 
+/**
+  Auxiliary function for creating a random persistence diagram based on
+  random samples from a sphere with a given radius.
+
+  Note that this function automatically handles Vietoris--Rips
+  expansion.
+*/
+
+PersistenceDiagram createRandomSpherePersistenceDiagram( DataType r, unsigned n )
+{
+  auto pointCloud = aleph::geometry::makeSphere(
+    aleph::geometry::sphereSampling<DataType>( n ),
+    r
+  );
+
+  aleph::geometry::BruteForce<PointCloud, Distance> bruteForceWrapper( pointCloud );
+
+  auto K
+    = aleph::geometry::buildVietorisRipsComplex( bruteForceWrapper, r, 2 );
+
+  auto diagrams
+    = aleph::calculatePersistenceDiagrams( K );
+
+  diagrams.at(1).removeDiagonal();
+
+  // We are only interested in the one-dimensional persistent homology
+  // of the samples.
+  return diagrams.at(1);
+}
+
 int main( int argc, char** argv )
 {
   static option commandLineOptions[] = {
-      { "m"    , required_argument, nullptr, 'm' },
-      { "n"    , required_argument, nullptr, 'n' },
-      { "R"    , required_argument, nullptr, 'R' },
-      { "r"    , required_argument, nullptr, 'r' },
-      { "torus", no_argument      , nullptr, 't' },
-      { nullptr, 0                , nullptr,  0  }
+      { "m"     , required_argument, nullptr, 'm' },
+      { "n"     , required_argument, nullptr, 'n' },
+      { "R"     , required_argument, nullptr, 'R' },
+      { "r"     , required_argument, nullptr, 'r' },
+      { "sphere", no_argument      , nullptr, 's' },
+      { "torus" , no_argument      , nullptr, 't' },
+      { nullptr , 0                , nullptr,  0  }
   };
 
   unsigned m           = 50;
@@ -126,7 +160,8 @@ int main( int argc, char** argv )
   DataType R           = DataType(0.25);
   DataType r           = DataType(0.50);
 
-  bool sampleFromTorus = false;
+  bool sampleFromSphere = false;
+  bool sampleFromTorus  = false;
 
   int option = 0;
   while( ( option = getopt_long( argc, argv, "m:n:R:r:t", commandLineOptions, nullptr ) ) != -1 )
@@ -145,8 +180,13 @@ int main( int argc, char** argv )
     case 'r':
       r = static_cast<DataType>( std::stod(optarg) );
       break;
+    case 's':
+      sampleFromSphere = true;
+      sampleFromTorus  = false;
+      break;
     case 't':
-      sampleFromTorus = true;
+      sampleFromSphere = false;
+      sampleFromTorus  = true;
       break;
     default:
       break;
@@ -154,7 +194,9 @@ int main( int argc, char** argv )
   }
 
   std::cerr << "* Sampling " << n << " persistence diagrams\n";
-  if( sampleFromTorus )
+  if( sampleFromSphere )
+    std::cerr << "* Sampling " << m << " points from a sphere with r=" << r << "\n";
+  else if( sampleFromTorus )
     std::cerr << "* Sampling at most " << m << " points from a torus with R=" << R << " and r=" << r << "\n";
   else
     std::cerr << "* Generating " << m << " random points per diagram\n";
@@ -163,7 +205,9 @@ int main( int argc, char** argv )
   {
     PersistenceDiagram pd;
 
-    if( sampleFromTorus )
+    if( sampleFromSphere )
+      pd = createRandomSpherePersistenceDiagram(r, m);
+    else if( sampleFromTorus )
       pd = createRandomTorusPersistenceDiagram(R, r, m);
     else
       pd = createRandomPersistenceDiagram(m);
