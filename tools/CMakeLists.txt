@@ -7,6 +7,7 @@ ADD_EXECUTABLE( network_persistence_diagrams            network_persistence_diag
 
 ADD_EXECUTABLE( persistence_diagram_statistics          persistence_diagram_statistics.cc )
 ADD_EXECUTABLE( persistence_indicator_function          persistence_indicator_function.cc )
+ADD_EXECUTABLE( point_cloud_data_descriptors            point_cloud_data_descriptors.cc )
 ADD_EXECUTABLE( topological_distance                    topological_distance.cc )
 
 ENABLE_IF_SUPPORTED( CMAKE_CXX_FLAGS "-O3" )
