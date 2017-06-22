@@ -2,7 +2,7 @@
   This is a tool shipped by 'Aleph - A Library for Exploring Persistent
   Homology'.
 
-  It analysis various aspects, such as the total persistence, of a set
+  It analyses various aspects, such as the total persistence, of a set
   of persistence diagrams and writes all statistics to STDOUT.
 */
 
