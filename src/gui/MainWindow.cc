@@ -1,7 +1,7 @@
-#include "gui/MainWindow.hh"
-#include "gui/PersistenceDiagram.hh"
+#include "MainWindow.hh"
+#include "PersistenceDiagram.hh"
 
-#include "persistenceDiagrams/io/Raw.hh"
+#include <aleph/persistenceDiagrams/io/Raw.hh>
 
 #include <QAction>
 #include <QFileDialog>

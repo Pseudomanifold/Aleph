@@ -4,7 +4,7 @@
 #include <QMainWindow>
 #include <QMdiArea>
 
-#include "persistenceDiagrams/PersistenceDiagram.hh"
+#include <aleph/persistenceDiagrams/PersistenceDiagram.hh>
 
 namespace aleph
 {

@@ -1,7 +1,7 @@
 #ifndef ALEPH_GUI_PERSISTENCE_DIAGRAM_HH__
 #define ALEPH_GUI_PERSISTENCE_DIAGRAM_HH__
 
-#include "persistenceDiagrams/PersistenceDiagram.hh"
+#include <aleph/persistenceDiagrams/PersistenceDiagram.hh>
 
 #include <QChart>
 #include <QChartView>
