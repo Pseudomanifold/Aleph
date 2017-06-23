@@ -1,5 +1,5 @@
-#include "tests/Base.hh"
-#include "topology/RandomGraph.hh"
+#include <tests/Base.hh>
+#include <aleph/topology/RandomGraph.hh>
 
 #include <algorithm>
 

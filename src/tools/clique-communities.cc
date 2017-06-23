@@ -12,21 +12,21 @@
 
 #include <cmath>
 
-#include "geometry/RipsExpander.hh"
+#include <aleph/geometry/RipsExpander.hh>
 
-#include "persistentHomology/ConnectedComponents.hh"
+#include <aleph/persistentHomology/ConnectedComponents.hh>
 
-#include "topology/CliqueGraph.hh"
-#include "topology/ConnectedComponents.hh"
-#include "topology/Simplex.hh"
-#include "topology/SimplicialComplex.hh"
+#include <aleph/topology/CliqueGraph.hh>
+#include <aleph/topology/ConnectedComponents.hh>
+#include <aleph/topology/Simplex.hh>
+#include <aleph/topology/SimplicialComplex.hh>
 
-#include "topology/filtrations/Data.hh"
+#include <aleph/topology/filtrations/Data.hh>
 
-#include "topology/io/EdgeLists.hh"
-#include "topology/io/GML.hh"
+#include <aleph/topology/io/EdgeLists.hh>
+#include <aleph/topology/io/GML.hh>
 
-#include "utilities/Filesystem.hh"
+#include <aleph/utilities/Filesystem.hh>
 
 using DataType           = double;
 using VertexType         = unsigned;

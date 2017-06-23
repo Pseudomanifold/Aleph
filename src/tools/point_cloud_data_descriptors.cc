@@ -20,17 +20,17 @@
   As of now, only the first mode is implemented.
 */
 
-#include "config/FLANN.hh"
+#include <aleph/config/FLANN.hh>
 
-#include "containers/DataDescriptors.hh"
-#include "containers/PointCloud.hh"
+#include <aleph/containers/DataDescriptors.hh>
+#include <aleph/containers/PointCloud.hh>
 
-#include "distances/Euclidean.hh"
+#include <aleph/distances/Euclidean.hh>
 
-#include "geometry/FLANN.hh"
+#include <aleph/geometry/FLANN.hh>
 
-#include "persistenceDiagrams/Calculation.hh"
-#include "persistenceDiagrams/PersistenceDiagram.hh"
+#include <aleph/persistenceDiagrams/Calculation.hh>
+#include <aleph/persistenceDiagrams/PersistenceDiagram.hh>
 
 
 #include <string>

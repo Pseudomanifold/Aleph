@@ -29,20 +29,20 @@
   Original author: Bastian Rieck
 */
 
-#include "geometry/RipsExpander.hh"
+#include <aleph/geometry/RipsExpander.hh>
 
-#include "topology/io/EdgeLists.hh"
-#include "topology/io/GML.hh"
-#include "topology/io/Pajek.hh"
+#include <aleph/topology/io/EdgeLists.hh>
+#include <aleph/topology/io/GML.hh>
+#include <aleph/topology/io/Pajek.hh>
 
-#include "persistentHomology/Calculation.hh"
+#include <aleph/persistentHomology/Calculation.hh>
 
-#include "topology/Simplex.hh"
-#include "topology/SimplicialComplex.hh"
+#include <aleph/topology/Simplex.hh>
+#include <aleph/topology/SimplicialComplex.hh>
 
-#include "topology/filtrations/Data.hh"
+#include <aleph/topology/filtrations/Data.hh>
 
-#include "utilities/Filesystem.hh"
+#include <aleph/utilities/Filesystem.hh>
 
 #include <iostream>
 #include <fstream>

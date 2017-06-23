@@ -1,15 +1,15 @@
 #ifndef ALEPH_PERSISTENT_HOMOLOGY_CALCULATION_HH__
 #define ALEPH_PERSISTENT_HOMOLOGY_CALCULATION_HH__
 
-#include "config/Defaults.hh"
+#include <aleph/config/Defaults.hh>
 
-#include "persistenceDiagrams/PersistenceDiagram.hh"
-#include "persistenceDiagrams/Calculation.hh"
+#include <aleph/persistenceDiagrams/PersistenceDiagram.hh>
+#include <aleph/persistenceDiagrams/Calculation.hh>
 
-#include "persistentHomology/PersistencePairing.hh"
+#include <aleph/persistentHomology/PersistencePairing.hh>
 
-#include "topology/Conversions.hh"
-#include "topology/SimplicialComplex.hh"
+#include <aleph/topology/Conversions.hh>
+#include <aleph/topology/SimplicialComplex.hh>
 
 #include <algorithm>
 #include <tuple>

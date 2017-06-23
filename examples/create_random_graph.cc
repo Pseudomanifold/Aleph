@@ -19,9 +19,9 @@
   Original author: Bastian Rieck
 */
 
-#include "topology/RandomGraph.hh"
-#include "topology/SimplicialComplex.hh"
-#include "topology/io/GML.hh"
+#include <aleph/topology/RandomGraph.hh>
+#include <aleph/topology/SimplicialComplex.hh>
+#include <aleph/topology/io/GML.hh>
 
 #include <fstream>
 #include <iostream>

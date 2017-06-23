@@ -1,11 +1,11 @@
 #ifndef ALEPH_GEOMETRY_FLANN_HH__
 #define ALEPH_GEOMETRY_FLANN_HH__
 
-#include "config/FLANN.hh"
+#include <aleph/config/FLANN.hh>
 
-#include "distances/Traits.hh"
+#include <aleph/distances/Traits.hh>
 
-#include "geometry/NearestNeighbours.hh"
+#include <aleph/geometry/NearestNeighbours.hh>
 
 #ifdef ALEPH_WITH_FLANN
   #include <flann/flann.hpp>

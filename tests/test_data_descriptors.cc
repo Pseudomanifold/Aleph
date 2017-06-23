@@ -1,12 +1,12 @@
-#include "config/Base.hh"
+#include <aleph/config/Base.hh>
 
-#include "distances/Euclidean.hh"
-#include "distances/Manhattan.hh"
+#include <aleph/distances/Euclidean.hh>
+#include <aleph/distances/Manhattan.hh>
 
-#include "containers/PointCloud.hh"
-#include "containers/DataDescriptors.hh"
+#include <aleph/containers/PointCloud.hh>
+#include <aleph/containers/DataDescriptors.hh>
 
-#include "tests/Base.hh"
+#include <tests/Base.hh>
 
 #include <iostream>
 #include <iterator>

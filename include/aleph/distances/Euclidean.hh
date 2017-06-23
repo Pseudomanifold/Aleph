@@ -1,7 +1,7 @@
 #ifndef ALEPH_DISTANCES_EUCLIDEAN_HH__
 #define ALEPH_DISTANCES_EUCLIDEAN_HH__
 
-#include "distances/Traits.hh"
+#include <aleph/distances/Traits.hh>
 
 #include <cmath>
 #include <cstddef>

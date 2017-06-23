@@ -1,6 +1,6 @@
-#include "tests/Base.hh"
+#include <tests/Base.hh>
 
-#include "utilities/Filesystem.hh"
+#include <aleph/utilities/Filesystem.hh>
 
 int main( int, char** )
 {

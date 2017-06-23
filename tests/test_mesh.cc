@@ -1,7 +1,7 @@
-#include "tests/Base.hh"
+#include <tests/Base.hh>
 
-#include "topology/Mesh.hh"
-#include "topology/MorseSmaleComplex.hh"
+#include <aleph/topology/Mesh.hh>
+#include <aleph/topology/MorseSmaleComplex.hh>
 
 #include <vector>
 

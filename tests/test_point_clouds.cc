@@ -1,8 +1,8 @@
-#include "config/Base.hh"
+#include <aleph/config/Base.hh>
 
-#include "containers/PointCloud.hh"
+#include <aleph/containers/PointCloud.hh>
 
-#include "tests/Base.hh"
+#include <tests/Base.hh>
 
 #include <iostream>
 #include <string>

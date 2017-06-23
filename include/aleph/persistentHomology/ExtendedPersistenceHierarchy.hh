@@ -12,10 +12,10 @@
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/graph/breadth_first_search.hpp>
 
-#include "persistentHomology/PersistencePairing.hh"
+#include <aleph/persistentHomology/PersistencePairing.hh>
 
-#include "topology/SimplicialComplex.hh"
-#include "topology/UnionFind.hh"
+#include <aleph/topology/SimplicialComplex.hh>
+#include <aleph/topology/UnionFind.hh>
 
 namespace aleph
 {

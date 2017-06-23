@@ -1,10 +1,10 @@
-#include "tests/Base.hh"
+#include <tests/Base.hh>
 
-#include "distances/Wasserstein.hh"
+#include <aleph/distances/Wasserstein.hh>
 
-#include "persistenceDiagrams/Mean.hh"
-#include "persistenceDiagrams/MultiScaleKernel.hh"
-#include "persistenceDiagrams/PersistenceDiagram.hh"
+#include <aleph/persistenceDiagrams/Mean.hh>
+#include <aleph/persistenceDiagrams/MultiScaleKernel.hh>
+#include <aleph/persistenceDiagrams/PersistenceDiagram.hh>
 
 #include <limits>
 #include <random>

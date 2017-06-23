@@ -1,15 +1,15 @@
-#include "config/Base.hh"
+#include <aleph/config/Base.hh>
 
-#include "tests/Base.hh"
+#include <tests/Base.hh>
 
-#include "persistentHomology/Calculation.hh"
-#include "persistentHomology/algorithms/Standard.hh"
-#include "persistentHomology/algorithms/Twist.hh"
+#include <aleph/persistentHomology/Calculation.hh>
+#include <aleph/persistentHomology/algorithms/Standard.hh>
+#include <aleph/persistentHomology/algorithms/Twist.hh>
 
-#include "topology/BoundaryMatrix.hh"
+#include <aleph/topology/BoundaryMatrix.hh>
 
-#include "topology/representations/Set.hh"
-#include "topology/representations/Vector.hh"
+#include <aleph/topology/representations/Set.hh>
+#include <aleph/topology/representations/Vector.hh>
 
 #include <vector>
 

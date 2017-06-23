@@ -1,12 +1,12 @@
-#include "geometry/RipsExpander.hh"
-#include "geometry/RipsExpanderTopDown.hh"
+#include <aleph/geometry/RipsExpander.hh>
+#include <aleph/geometry/RipsExpanderTopDown.hh>
 
-#include "tests/Base.hh"
+#include <tests/Base.hh>
 
-#include "topology/Simplex.hh"
-#include "topology/SimplicialComplex.hh"
+#include <aleph/topology/Simplex.hh>
+#include <aleph/topology/SimplicialComplex.hh>
 
-#include "topology/filtrations/Data.hh"
+#include <aleph/topology/filtrations/Data.hh>
 
 #include <algorithm>
 #include <iterator>

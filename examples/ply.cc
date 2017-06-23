@@ -26,18 +26,18 @@
   Original author: Bastian Rieck
 */
 
-#include "persistenceDiagrams/PersistenceDiagram.hh"
-#include "persistenceDiagrams/Norms.hh"
+#include <aleph/persistenceDiagrams/PersistenceDiagram.hh>
+#include <aleph/persistenceDiagrams/Norms.hh>
 
-#include "persistentHomology/Calculation.hh"
+#include <aleph/persistentHomology/Calculation.hh>
 
-#include "topology/Simplex.hh"
-#include "topology/SimplicialComplex.hh"
+#include <aleph/topology/Simplex.hh>
+#include <aleph/topology/SimplicialComplex.hh>
 
-#include "topology/filtrations/Data.hh"
-#include "topology/io/PLY.hh"
+#include <aleph/topology/filtrations/Data.hh>
+#include <aleph/topology/io/PLY.hh>
 
-#include "utilities/Timer.hh"
+#include <aleph/utilities/Timer.hh>
 
 #include <iostream>
 #include <vector>

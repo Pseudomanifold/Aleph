@@ -24,16 +24,16 @@
   Original author: Bastian Rieck
 */
 
-#include "distances/Euclidean.hh"
+#include <aleph/distances/Euclidean.hh>
 
-#include "geometry/BruteForce.hh"
-#include "geometry/SphereSampling.hh"
-#include "geometry/TorusSampling.hh"
-#include "geometry/VietorisRipsComplex.hh"
+#include <aleph/geometry/BruteForce.hh>
+#include <aleph/geometry/SphereSampling.hh>
+#include <aleph/geometry/TorusSampling.hh>
+#include <aleph/geometry/VietorisRipsComplex.hh>
 
-#include "persistenceDiagrams/PersistenceDiagram.hh"
+#include <aleph/persistenceDiagrams/PersistenceDiagram.hh>
 
-#include "persistentHomology/Calculation.hh"
+#include <aleph/persistentHomology/Calculation.hh>
 
 #include <iostream>
 #include <iomanip>

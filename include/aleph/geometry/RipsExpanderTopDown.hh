@@ -6,7 +6,7 @@
 #include <list>
 #include <vector>
 
-#include "topology/MaximalCliques.hh"
+#include <aleph/topology/MaximalCliques.hh>
 
 namespace aleph
 {

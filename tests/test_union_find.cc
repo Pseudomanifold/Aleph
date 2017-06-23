@@ -1,6 +1,6 @@
-#include "tests/Base.hh"
+#include <tests/Base.hh>
 
-#include "topology/UnionFind.hh"
+#include <aleph/topology/UnionFind.hh>
 
 #include <iterator>
 #include <set>

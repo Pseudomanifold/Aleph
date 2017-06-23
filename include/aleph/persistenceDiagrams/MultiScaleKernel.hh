@@ -1,9 +1,9 @@
 #ifndef ALEPH_MULTI_SCALE_KERNEL_HH__
 #define ALEPH_MULTI_SCALE_KERNEL_HH__
 
-#include "math/KahanSummation.hh"
+#include <aleph/math/KahanSummation.hh>
 
-#include "persistenceDiagrams/PersistenceDiagram.hh"
+#include <aleph/persistenceDiagrams/PersistenceDiagram.hh>
 
 #include <algorithm>
 #include <utility>

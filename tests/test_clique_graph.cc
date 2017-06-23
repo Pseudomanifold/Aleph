@@ -1,8 +1,8 @@
-#include "tests/Base.hh"
+#include <tests/Base.hh>
 
-#include "topology/CliqueGraph.hh"
-#include "topology/Simplex.hh"
-#include "topology/SimplicialComplex.hh"
+#include <aleph/topology/CliqueGraph.hh>
+#include <aleph/topology/Simplex.hh>
+#include <aleph/topology/SimplicialComplex.hh>
 
 #include <algorithm>
 #include <vector>

@@ -1,7 +1,7 @@
 #ifndef ALEPH_TOPOLOGY_IO_FUNCTION_HH__
 #define ALEPH_TOPOLOGY_IO_FUNCTION_HH__
 
-#include "topology/BoundaryMatrix.hh"
+#include <aleph/topology/BoundaryMatrix.hh>
 
 #include <algorithm>
 #include <fstream>

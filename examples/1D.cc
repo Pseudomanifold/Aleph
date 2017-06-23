@@ -1,11 +1,11 @@
-#include "config/Defaults.hh"
+#include <aleph/config/Defaults.hh>
 
-#include "persistentHomology/Calculation.hh"
+#include <aleph/persistentHomology/Calculation.hh>
 
 
-#include "topology/BoundaryMatrix.hh"
-#include "topology/io/Function.hh"
-#include "topology/representations/Vector.hh"
+#include <aleph/topology/BoundaryMatrix.hh>
+#include <aleph/topology/io/Function.hh>
+#include <aleph/topology/representations/Vector.hh>
 
 #include <iostream>
 #include <string>

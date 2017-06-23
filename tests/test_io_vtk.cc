@@ -1,15 +1,15 @@
-#include "config/Base.hh"
+#include <aleph/config/Base.hh>
 
-#include "persistentHomology/ConnectedComponents.hh"
+#include <aleph/persistentHomology/ConnectedComponents.hh>
 
-#include "tests/Base.hh"
+#include <tests/Base.hh>
 
-#include "topology/Simplex.hh"
-#include "topology/SimplicialComplex.hh"
+#include <aleph/topology/Simplex.hh>
+#include <aleph/topology/SimplicialComplex.hh>
 
-#include "topology/filtrations/Data.hh"
+#include <aleph/topology/filtrations/Data.hh>
 
-#include "topology/io/VTK.hh"
+#include <aleph/topology/io/VTK.hh>
 
 #include <algorithm>
 

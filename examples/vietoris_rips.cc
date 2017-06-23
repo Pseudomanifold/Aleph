@@ -22,21 +22,21 @@
   Original author: Bastian Rieck
 */
 
-#include "config/FLANN.hh"
+#include <aleph/config/FLANN.hh>
 
-#include "containers/PointCloud.hh"
+#include <aleph/containers/PointCloud.hh>
 
-#include "distances/Euclidean.hh"
+#include <aleph/distances/Euclidean.hh>
 
-#include "geometry/BruteForce.hh"
-#include "geometry/FLANN.hh"
-#include "geometry/VietorisRipsComplex.hh"
+#include <aleph/geometry/BruteForce.hh>
+#include <aleph/geometry/FLANN.hh>
+#include <aleph/geometry/VietorisRipsComplex.hh>
 
-#include "utilities/String.hh"
+#include <aleph/utilities/String.hh>
 
-#include "persistenceDiagrams/PersistenceDiagram.hh"
+#include <aleph/persistenceDiagrams/PersistenceDiagram.hh>
 
-#include "persistentHomology/Calculation.hh"
+#include <aleph/persistentHomology/Calculation.hh>
 
 #include <iostream>
 #include <string>

@@ -2,10 +2,10 @@
 #include <set>
 #include <string>
 
-#include "distances/detail/Matrix.hh"
-#include "distances/detail/Munkres.hh"
+#include <aleph/distances/detail/Matrix.hh>
+#include <aleph/distances/detail/Munkres.hh>
 
-#include "tests/Base.hh"
+#include <tests/Base.hh>
 
 using namespace aleph::distances::detail;
 

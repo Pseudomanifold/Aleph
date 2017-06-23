@@ -1,9 +1,9 @@
 #ifndef ALEPH_GEOMETRY_BRUTE_FORCE_HH__
 #define ALEPH_GEOMETRY_BRUTE_FORCE_HH__
 
-#include "distances/Traits.hh"
+#include <aleph/distances/Traits.hh>
 
-#include "geometry/NearestNeighbours.hh"
+#include <aleph/geometry/NearestNeighbours.hh>
 
 #include <algorithm>
 #include <vector>

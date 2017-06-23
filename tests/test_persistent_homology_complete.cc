@@ -1,25 +1,25 @@
-#include "config/Base.hh"
+#include <aleph/config/Base.hh>
 
-#include "containers/PointCloud.hh"
+#include <aleph/containers/PointCloud.hh>
 
-#include "distances/Euclidean.hh"
+#include <aleph/distances/Euclidean.hh>
 
-#include "geometry/BruteForce.hh"
-#include "geometry/RipsExpander.hh"
-#include "geometry/RipsSkeleton.hh"
+#include <aleph/geometry/BruteForce.hh>
+#include <aleph/geometry/RipsExpander.hh>
+#include <aleph/geometry/RipsSkeleton.hh>
 
-#include "tests/Base.hh"
+#include <tests/Base.hh>
 
-#include "persistentHomology/Calculation.hh"
-#include "persistentHomology/algorithms/Standard.hh"
-#include "persistentHomology/algorithms/Twist.hh"
+#include <aleph/persistentHomology/Calculation.hh>
+#include <aleph/persistentHomology/algorithms/Standard.hh>
+#include <aleph/persistentHomology/algorithms/Twist.hh>
 
-#include "topology/Simplex.hh"
-#include "topology/SimplicialComplex.hh"
+#include <aleph/topology/Simplex.hh>
+#include <aleph/topology/SimplicialComplex.hh>
 
-#include "topology/representations/List.hh"
-#include "topology/representations/Set.hh"
-#include "topology/representations/Vector.hh"
+#include <aleph/topology/representations/List.hh>
+#include <aleph/topology/representations/Set.hh>
+#include <aleph/topology/representations/Vector.hh>
 
 #include <vector>
 

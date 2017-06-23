@@ -1,8 +1,8 @@
 #ifndef ALEPH_GEOMETRY_RIPS_SKELETON_HH__
 #define ALEPH_GEOMETRY_RIPS_SKELETON_HH__
 
-#include "topology/Simplex.hh"
-#include "topology/SimplicialComplex.hh"
+#include <aleph/topology/Simplex.hh>
+#include <aleph/topology/SimplicialComplex.hh>
 
 #include <vector>
 

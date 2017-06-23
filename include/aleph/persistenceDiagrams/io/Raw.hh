@@ -1,8 +1,8 @@
 #ifndef ALEPH_PERSISTENCE_DIAGRAMS_IO_RAW_HH__
 #define ALEPH_PERSISTENCE_DIAGRAMS_IO_RAW_HH__
 
-#include "persistenceDiagrams/PersistenceDiagram.hh"
-#include "utilities/String.hh"
+#include <aleph/persistenceDiagrams/PersistenceDiagram.hh>
+#include <aleph/utilities/String.hh>
 
 #include <fstream>
 #include <string>

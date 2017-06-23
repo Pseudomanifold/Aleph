@@ -1,7 +1,7 @@
 #ifndef ALEPH_DISTANCES_DETAIL_MUNKRES_HH__
 #define ALEPH_DISTANCES_DETAIL_MUNKRES_HH__
 
-#include "Matrix.hh"
+#include <aleph/distances/detail/Matrix.hh>
 
 #include <algorithm>
 #include <limits>

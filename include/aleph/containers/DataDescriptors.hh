@@ -6,13 +6,13 @@
 #include <algorithm>
 #include <vector>
 
-#include "distances/Euclidean.hh"
-#include "distances/Traits.hh"
+#include <aleph/distances/Euclidean.hh>
+#include <aleph/distances/Traits.hh>
 
-#include "geometry/BruteForce.hh"
-#include "geometry/NearestNeighbours.hh"
+#include <aleph/geometry/BruteForce.hh>
+#include <aleph/geometry/NearestNeighbours.hh>
 
-#include "math/KahanSummation.hh"
+#include <aleph/math/KahanSummation.hh>
 
 namespace aleph
 {

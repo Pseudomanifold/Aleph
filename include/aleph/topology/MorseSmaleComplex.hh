@@ -7,7 +7,7 @@
 // TODO: Remove after debugging
 #include <iostream>
 
-#include "topology/UnionFind.hh"
+#include <aleph/topology/UnionFind.hh>
 
 namespace aleph
 {

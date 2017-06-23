@@ -64,8 +64,8 @@ ENDIF()
 # Configuration files
 #
 
-CONFIGURE_FILE( ${CMAKE_SOURCE_DIR}/config/Base.hh.in ${CMAKE_SOURCE_DIR}/config/Base.hh )
-CONFIGURE_FILE( ${CMAKE_SOURCE_DIR}/config/FLANN.hh.in ${CMAKE_SOURCE_DIR}/config/FLANN.hh )
+CONFIGURE_FILE( ${CMAKE_SOURCE_DIR}/include/aleph/config/Base.hh.in ${CMAKE_SOURCE_DIR}/include/aleph/config/Base.hh )
+CONFIGURE_FILE( ${CMAKE_SOURCE_DIR}/include/aleph/config/FLANN.hh.in ${CMAKE_SOURCE_DIR}/include/aleph/config/FLANN.hh )
 
 #
 # Include directories
@@ -74,6 +74,7 @@ CONFIGURE_FILE( ${CMAKE_SOURCE_DIR}/config/FLANN.hh.in ${CMAKE_SOURCE_DIR}/confi
 INCLUDE_DIRECTORIES(
   ${Boost_INCLUDE_DIR}
   ${CMAKE_SOURCE_DIR}
+  ${CMAKE_SOURCE_DIR}/include
 )
 
 #
@@ -84,10 +85,10 @@ INCLUDE_DIRECTORIES(
 # subdirectory of the repository.
 ENABLE_TESTING()
 
-ADD_SUBDIRECTORY( gui )
+ADD_SUBDIRECTORY( include )
+ADD_SUBDIRECTORY( src )
 ADD_SUBDIRECTORY( examples )
 ADD_SUBDIRECTORY( tests )
-ADD_SUBDIRECTORY( tools )
 
 #
 # Place compile commands in the source directory

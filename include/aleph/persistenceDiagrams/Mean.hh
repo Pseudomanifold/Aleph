@@ -1,13 +1,13 @@
 #ifndef ALEPH_PERSISTENCE_DIAGRAMS_MEAN_HH__
 #define ALEPH_PERSISTENCE_DIAGRAMS_MEAN_HH__
 
-#include "distances/Infinity.hh"
-#include "distances/detail/Munkres.hh"
-#include "distances/detail/Orthogonal.hh"
+#include <aleph/distances/Infinity.hh>
+#include <aleph/distances/detail/Munkres.hh>
+#include <aleph/distances/detail/Orthogonal.hh>
 
-#include "math/KahanSummation.hh"
+#include <aleph/math/KahanSummation.hh>
 
-#include "persistenceDiagrams/PersistenceDiagram.hh"
+#include <aleph/persistenceDiagrams/PersistenceDiagram.hh>
 
 #include <algorithm>
 #include <iterator>

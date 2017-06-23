@@ -29,22 +29,22 @@
   TODO: Document this
 */
 
-#include "persistenceDiagrams/Calculation.hh"
-#include "persistenceDiagrams/PersistenceDiagram.hh"
+#include <aleph/persistenceDiagrams/Calculation.hh>
+#include <aleph/persistenceDiagrams/PersistenceDiagram.hh>
 
-#include "persistentHomology/ExtendedPersistenceHierarchy.hh"
-#include "persistentHomology/PersistencePairing.hh"
+#include <aleph/persistentHomology/ExtendedPersistenceHierarchy.hh>
+#include <aleph/persistentHomology/PersistencePairing.hh>
 
-#include "topology/Simplex.hh"
-#include "topology/SimplicialComplex.hh"
-#include "topology/UnionFind.hh"
+#include <aleph/topology/Simplex.hh>
+#include <aleph/topology/SimplicialComplex.hh>
+#include <aleph/topology/UnionFind.hh>
 
-#include "topology/filtrations/Data.hh"
+#include <aleph/topology/filtrations/Data.hh>
 
-#include "topology/io/Function.hh"
-#include "topology/io/VTK.hh"
+#include <aleph/topology/io/Function.hh>
+#include <aleph/topology/io/VTK.hh>
 
-#include "utilities/Filesystem.hh"
+#include <aleph/utilities/Filesystem.hh>
 
 #include <algorithm>
 #include <functional>

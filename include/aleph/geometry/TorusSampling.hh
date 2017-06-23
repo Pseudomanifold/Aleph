@@ -1,7 +1,7 @@
 #ifndef ALEPH_GEOMETRY_TORUS_SAMPLING_HH__
 #define ALEPH_GEOMETRY_TORUS_SAMPLING_HH__
 
-#include "containers/PointCloud.hh"
+#include <aleph/containers/PointCloud.hh>
 
 #include <random>
 #include <vector>

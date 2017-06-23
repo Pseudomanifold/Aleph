@@ -23,15 +23,15 @@
 // parser interface.
 #include <getopt.h>
 
-#include "distances/Hausdorff.hh"
-#include "distances/Wasserstein.hh"
+#include <aleph/distances/Hausdorff.hh>
+#include <aleph/distances/Wasserstein.hh>
 
-#include "persistenceDiagrams/PersistenceDiagram.hh"
-#include "persistenceDiagrams/PersistenceIndicatorFunction.hh"
+#include <aleph/persistenceDiagrams/PersistenceDiagram.hh>
+#include <aleph/persistenceDiagrams/PersistenceIndicatorFunction.hh>
 
-#include "persistenceDiagrams/io/Raw.hh"
+#include <aleph/persistenceDiagrams/io/Raw.hh>
 
-#include "utilities/Filesystem.hh"
+#include <aleph/utilities/Filesystem.hh>
 
 using DataType                     = double;
 using PersistenceDiagram           = aleph::PersistenceDiagram<DataType>;

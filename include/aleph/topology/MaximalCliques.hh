@@ -7,11 +7,11 @@
 #include <unordered_set>
 #include <vector>
 
-#include "math/SparseMatrix.hh"
+#include <aleph/math/SparseMatrix.hh>
 
-#include "utilities/UnorderedSetOperations.hh"
+#include <aleph/utilities/UnorderedSetOperations.hh>
 
-#include "SimplicialComplex.hh"
+#include <aleph/topology/SimplicialComplex.hh>
 
 
 namespace aleph

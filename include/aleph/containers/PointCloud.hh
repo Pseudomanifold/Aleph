@@ -10,7 +10,7 @@
 
 #include <cstddef>
 
-#include <utilities/String.hh>
+#include <aleph/utilities/String.hh>
 
 namespace aleph
 {

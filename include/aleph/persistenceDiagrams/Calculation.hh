@@ -1,8 +1,8 @@
 #ifndef ALEPH_PERSISTENCE_DIAGRAM_CALCULATION_HH__
 #define ALEPH_PERSISTENCE_DIAGRAM_CALCULATION_HH__
 
-#include "persistenceDiagrams/PersistenceDiagram.hh"
-#include "persistentHomology/PersistencePairing.hh"
+#include <aleph/persistenceDiagrams/PersistenceDiagram.hh>
+#include <aleph/persistentHomology/PersistencePairing.hh>
 
 #include <algorithm>
 #include <map>

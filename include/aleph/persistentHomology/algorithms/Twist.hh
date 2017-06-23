@@ -1,7 +1,7 @@
 #ifndef ALEPH_PERSISTENT_HOMOLOGY_ALGORITHMS_TWIST_HH__
 #define ALEPH_PERSISTENT_HOMOLOGY_ALGORITHMS_TWIST_HH__
 
-#include "topology/BoundaryMatrix.hh"
+#include <aleph/topology/BoundaryMatrix.hh>
 
 #include <tuple>
 #include <vector>

@@ -1,7 +1,7 @@
 #ifndef ALEPH_TOPOLOGY_CLIQUE_GRAPH_HH__
 #define ALEPH_TOPOLOGY_CLIQUE_GRAPH_HH__
 
-#include "topology/SimplicialComplex.hh"
+#include <aleph/topology/SimplicialComplex.hh>
 
 #include <iterator>
 #include <list>

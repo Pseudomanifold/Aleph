@@ -1,9 +1,9 @@
 #ifndef ALEPH_PERSISTENCE_DIAGRAMS_PERSISTENCE_INDICATOR_FUNCTION_HH__
 #define ALEPH_PERSISTENCE_DIAGRAMS_PERSISTENCE_INDICATOR_FUNCTION_HH__
 
-#include "math/StepFunction.hh"
+#include <aleph/math/StepFunction.hh>
 
-#include "persistenceDiagrams/PersistenceDiagram.hh"
+#include <aleph/persistenceDiagrams/PersistenceDiagram.hh>
 
 #include <algorithm>
 #include <limits>

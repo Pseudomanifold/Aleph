@@ -1,9 +1,9 @@
 #ifndef ALEPH_DEFAULTS_HH__
 #define ALEPH_DEFAULTS_HH__
 
-#include "persistentHomology/algorithms/Twist.hh"
+#include <aleph/persistentHomology/algorithms/Twist.hh>
 
-#include "topology/representations/Vector.hh"
+#include <aleph/topology/representations/Vector.hh>
 
 namespace aleph
 {

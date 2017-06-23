@@ -12,7 +12,7 @@
 #include <unordered_set>
 #include <vector>
 
-#include "topology/UnionFind.hh"
+#include <aleph/topology/UnionFind.hh>
 
 namespace aleph
 {

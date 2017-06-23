@@ -10,10 +10,10 @@
 
 #include <getopt.h>
 
-#include "persistenceDiagrams/PersistenceDiagram.hh"
-#include "persistenceDiagrams/PersistenceIndicatorFunction.hh"
+#include <aleph/persistenceDiagrams/PersistenceDiagram.hh>
+#include <aleph/persistenceDiagrams/PersistenceIndicatorFunction.hh>
 
-#include "persistenceDiagrams/io/Raw.hh"
+#include <aleph/persistenceDiagrams/io/Raw.hh>
 
 using DataType           = double;
 using PersistenceDiagram = aleph::PersistenceDiagram<DataType>;

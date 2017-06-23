@@ -1,17 +1,17 @@
-#include "config/Base.hh"
+#include <aleph/config/Base.hh>
 
-#include "persistentHomology/Calculation.hh"
-#include "persistentHomology/ExtendedPersistenceHierarchy.hh"
-#include "persistenceDiagrams/PersistenceDiagram.hh"
+#include <aleph/persistentHomology/Calculation.hh>
+#include <aleph/persistentHomology/ExtendedPersistenceHierarchy.hh>
+#include <aleph/persistenceDiagrams/PersistenceDiagram.hh>
 
-#include "tests/Base.hh"
+#include <tests/Base.hh>
 
-#include "topology/Simplex.hh"
-#include "topology/SimplicialComplex.hh"
+#include <aleph/topology/Simplex.hh>
+#include <aleph/topology/SimplicialComplex.hh>
 
-#include "topology/filtrations/Data.hh"
+#include <aleph/topology/filtrations/Data.hh>
 
-#include "topology/io/Function.hh"
+#include <aleph/topology/io/Function.hh>
 
 #include <set>
 

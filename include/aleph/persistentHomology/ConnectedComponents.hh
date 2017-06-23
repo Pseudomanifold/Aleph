@@ -1,14 +1,14 @@
 #ifndef ALEPH_PERSISTENT_HOMOLOGY_CONNECTED_COMPONENTS_HH__
 #define ALEPH_PERSISTENT_HOMOLOGY_CONNECTED_COMPONENTS_HH__
 
-#include "persistenceDiagrams/PersistenceDiagram.hh"
+#include <aleph/persistenceDiagrams/PersistenceDiagram.hh>
 
-#include "persistentHomology/PersistencePairing.hh"
+#include <aleph/persistentHomology/PersistencePairing.hh>
 
-#include "topology/SimplicialComplex.hh"
-#include "topology/UnionFind.hh"
+#include <aleph/topology/SimplicialComplex.hh>
+#include <aleph/topology/UnionFind.hh>
 
-#include "utilities/EmptyFunctor.hh"
+#include <aleph/utilities/EmptyFunctor.hh>
 
 #include <algorithm>
 #include <tuple>

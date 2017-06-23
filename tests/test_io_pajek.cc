@@ -1,11 +1,11 @@
-#include "config/Base.hh"
+#include <aleph/config/Base.hh>
 
-#include "tests/Base.hh"
+#include <tests/Base.hh>
 
-#include "topology/Simplex.hh"
-#include "topology/SimplicialComplex.hh"
+#include <aleph/topology/Simplex.hh>
+#include <aleph/topology/SimplicialComplex.hh>
 
-#include "topology/io/Pajek.hh"
+#include <aleph/topology/io/Pajek.hh>
 
 #include <set>
 

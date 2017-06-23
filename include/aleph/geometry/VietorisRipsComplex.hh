@@ -1,13 +1,13 @@
 #ifndef ALEPH_GEOMETRY_VIETORIS_RIPS_COMPLEX_HH__
 #define ALEPH_GEOMETRY_VIETORIS_RIPS_COMPLEX_HH__
 
-#include "RipsExpander.hh"
-#include "RipsSkeleton.hh"
+#include <aleph/geometry/RipsExpander.hh>
+#include <aleph/geometry/RipsSkeleton.hh>
 
-#include "topology/Simplex.hh"
-#include "topology/SimplicialComplex.hh"
+#include <aleph/topology/Simplex.hh>
+#include <aleph/topology/SimplicialComplex.hh>
 
-#include "topology/filtrations/Data.hh"
+#include <aleph/topology/filtrations/Data.hh>
 
 namespace aleph
 {

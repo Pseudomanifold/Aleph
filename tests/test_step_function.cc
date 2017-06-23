@@ -1,9 +1,9 @@
-#include "math/StepFunction.hh"
+#include <aleph/math/StepFunction.hh>
 
-#include "persistenceDiagrams/PersistenceDiagram.hh"
-#include "persistenceDiagrams/PersistenceIndicatorFunction.hh"
+#include <aleph/persistenceDiagrams/PersistenceDiagram.hh>
+#include <aleph/persistenceDiagrams/PersistenceIndicatorFunction.hh>
 
-#include "tests/Base.hh"
+#include <tests/Base.hh>
 
 #include <iterator>
 #include <set>

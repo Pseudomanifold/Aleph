@@ -1,16 +1,16 @@
 
-#include "config/Base.hh"
-#include "config/FLANN.hh"
+#include <aleph/config/Base.hh>
+#include <aleph/config/FLANN.hh>
 
-#include "containers/PointCloud.hh"
+#include <aleph/containers/PointCloud.hh>
 
-#include "distances/Euclidean.hh"
+#include <aleph/distances/Euclidean.hh>
 
-#include "geometry/BruteForce.hh"
-#include "geometry/FLANN.hh"
-#include "geometry/NearestNeighbours.hh"
+#include <aleph/geometry/BruteForce.hh>
+#include <aleph/geometry/FLANN.hh>
+#include <aleph/geometry/NearestNeighbours.hh>
 
-#include "tests/Base.hh"
+#include <tests/Base.hh>
 
 #include <vector>
 

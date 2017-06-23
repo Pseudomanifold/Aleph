@@ -1,10 +1,10 @@
 #ifndef ALEPH_TOPOLOGY_RANDOM_GRAPH_HH__
 #define ALEPH_TOPOLOGY_RANDOM_GRAPH_HH__
 
-#include "filtrations/Data.hh"
+#include <aleph/topology/filtrations/Data.hh>
 
-#include "Simplex.hh"
-#include "SimplicialComplex.hh"
+#include <aleph/topology/Simplex.hh>
+#include <aleph/topology/SimplicialComplex.hh>
 
 #include <algorithm>
 #include <random>

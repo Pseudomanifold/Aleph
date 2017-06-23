@@ -1,7 +1,7 @@
 #ifndef ALEPH_TOPOLOGY_CONNECTED_COMPONENTS_HH__
 #define ALEPH_TOPOLOGY_CONNECTED_COMPONENTS_HH__
 
-#include "topology/UnionFind.hh"
+#include <aleph/topology/UnionFind.hh>
 
 #include <iterator>
 #include <set>

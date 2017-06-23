@@ -6,11 +6,11 @@
   of persistence diagrams and writes all statistics to STDOUT.
 */
 
-#include "persistenceDiagrams/Extraction.hh"
-#include "persistenceDiagrams/Norms.hh"
-#include "persistenceDiagrams/PersistenceDiagram.hh"
+#include <aleph/persistenceDiagrams/Extraction.hh>
+#include <aleph/persistenceDiagrams/Norms.hh>
+#include <aleph/persistenceDiagrams/PersistenceDiagram.hh>
 
-#include "persistenceDiagrams/io/Raw.hh"
+#include <aleph/persistenceDiagrams/io/Raw.hh>
 
 #include <iostream>
 #include <numeric>

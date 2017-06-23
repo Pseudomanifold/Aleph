@@ -1,8 +1,8 @@
 #ifndef ALEPH_DISTANCES_NEAREST_NEIGHBOUR_HH__
 #define ALEPH_DISTANCES_NEAREST_NEIGHBOUR_HH__
 
-#include "distances/Infinity.hh"
-#include "persistenceDiagrams/PersistenceDiagram.hh"
+#include <aleph/distances/Infinity.h>>
+#include <aleph/persistenceDiagrams/PersistenceDiagram.hh>
 
 #include <algorithm>
 #include <limits>
