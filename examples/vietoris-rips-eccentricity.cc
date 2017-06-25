@@ -1,3 +1,37 @@
+/*
+  This is an example file shipped by 'Aleph - A Library for Exploring
+  Persistent Homology'.
+
+  This example demonstrates how to obtain a Vietoris--Rips complex
+  from an unstructured point cloud (using Euclidean distances) and
+  calculate its persistent homology. However, instead of using the
+  distances as a source of weights, this program calculates a data
+  descriptor based on eccentricities.
+
+  For more information, please refer to the following paper:
+
+    Comparing Dimensionality Reduction Methods Using Data Descriptor Landscapes
+    Bastian Rieck and Heike Leitte
+    Symposium on Visualization in Data Science (VDS) at IEEE VIS 2015.
+
+  Demonstrated classes:
+
+    - aleph::PersistenceDiagram
+    - aleph::containers::PointCloud
+    - aleph::geometry::FLANN
+    - aleph::geometry::BruteForce
+
+  Demonstrated functions:
+
+    - aleph::geometry::buildVietorisRipsComplex
+    - aleph::calculatePersistenceDiagrams
+    - aleph::utilities::convert
+
+  Original author: Bastian Rieck
+
+  TODO: Update
+*/
+
 #include <aleph/config/FLANN.hh>
 
 #include <aleph/containers/DataDescriptors.hh>
