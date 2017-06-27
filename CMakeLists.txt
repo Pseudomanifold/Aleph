@@ -77,6 +77,10 @@ INCLUDE_DIRECTORIES(
   ${CMAKE_SOURCE_DIR}/include
 )
 
+ADD_SUBDIRECTORY( include )
+ADD_SUBDIRECTORY( src )
+ADD_SUBDIRECTORY( examples )
+
 #
 # Tests
 #
@@ -85,9 +89,6 @@ INCLUDE_DIRECTORIES(
 # subdirectory of the repository.
 ENABLE_TESTING()
 
-ADD_SUBDIRECTORY( include )
-ADD_SUBDIRECTORY( src )
-ADD_SUBDIRECTORY( examples )
 ADD_SUBDIRECTORY( tests )
 
 #
