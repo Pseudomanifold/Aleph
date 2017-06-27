@@ -3,6 +3,7 @@
 #include <aleph/distances/Wasserstein.hh>
 
 #include <aleph/persistenceDiagrams/Mean.hh>
+#include <aleph/persistenceDiagrams/Norms.hh>
 #include <aleph/persistenceDiagrams/MultiScaleKernel.hh>
 #include <aleph/persistenceDiagrams/PersistenceDiagram.hh>
 
@@ -77,10 +78,12 @@ template <class T> void testFrechetMean()
     diagrams.emplace_back( createRandomPersistenceDiagram<T>( 25 ) );
 
   auto D = aleph::mean( diagrams.begin(), diagrams.end() );
+  auto P = aleph::totalPersistence( D );
+  auto p = std::sqrt(25.0) * std::sqrt(0.50); // simple estimate of the mean value
+                                              // for the total persistence
 
   ALEPH_ASSERT_THROW( D.size() > 0 );
-
-  std::cerr << D << "\n";
+  ALEPH_ASSERT_THROW( std::abs( P - p ) < 1.0 );
 
   ALEPH_TEST_END();
 }
