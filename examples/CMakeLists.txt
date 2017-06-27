@@ -5,6 +5,6 @@ ADD_EXECUTABLE( network_analysis            network_analysis.cc            )
 ADD_EXECUTABLE( ply                         ply.cc                         )
 ADD_EXECUTABLE( vtk                         vtk.cc                         )
 ADD_EXECUTABLE( vietoris_rips               vietoris_rips.cc               )
-ADD_EXECUTABLE( vietoris-rips-eccentricity  vietoris-rips-eccentricity.cc  )
+ADD_EXECUTABLE( vietoris_rips-eccentricity  vietoris_rips_eccentricity.cc  )
 
 ENABLE_IF_SUPPORTED( CMAKE_CXX_FLAGS "-O3" )
