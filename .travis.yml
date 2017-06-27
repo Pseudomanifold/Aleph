@@ -4,11 +4,14 @@ os:
   - linux
   - osx
 
+env:
+  global:
+    - MAKEFLAGS="-j 2"
 
 osx_image: xcode8.3
 
 dist: trusty
-sudo: required
+sudo: false
 addons:
   apt:
     sources:
