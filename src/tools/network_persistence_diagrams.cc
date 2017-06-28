@@ -47,6 +47,7 @@
 #include <aleph/topology/io/Pajek.hh>
 
 #include <aleph/utilities/Filesystem.hh>
+#include <aleph/utilities/Format.hh>
 
 using DataType           = double;
 using VertexType         = unsigned;
@@ -224,7 +225,10 @@ int main( int argc, char** argv )
     pd.removeDiagonal();
 
     using namespace aleph::utilities;
-    auto outputFilename = formatOutput( "/tmp/" + stem( basename( filename ) ) + "_d", pd.dimension(), maxK );
+    auto outputFilename = "/tmp/" + stem( basename( filename ) )
+                                  + "_d"
+                                  + format( static_cast<decltype(maxK)>( pd.dimension() ), maxK )
+                                  + ".txt";
 
     std::cerr << "* Storing output in '" << outputFilename << "'...\n";
 
