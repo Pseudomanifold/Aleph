@@ -1,5 +1,5 @@
-#ifndef ALEPH_STRING_HH__
-#define ALEPH_STRING_HH__
+#ifndef ALEPH_UTILITIES_STRING_HH__
+#define ALEPH_UTILITIES_STRING_HH__
 
 #include <algorithm>
 #include <limits>
