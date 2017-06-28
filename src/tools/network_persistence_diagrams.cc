@@ -55,16 +55,6 @@ using Simplex            = aleph::topology::Simplex<DataType, VertexType>;
 using SimplicialComplex  = aleph::topology::SimplicialComplex<Simplex>;
 using PersistenceDiagram = aleph::PersistenceDiagram<DataType>;
 
-std::string formatOutput( const std::string& prefix, unsigned k, unsigned K )
-{
-  std::ostringstream stream;
-  stream << prefix;
-  stream << std::setw( int( std::log10( K ) + 1 ) ) << std::setfill( '0' ) << k;
-  stream << ".txt";
-
-  return stream.str();
-}
-
 std::string formatLabel( const std::string label )
 {
   // No whitespace---nothing to do
