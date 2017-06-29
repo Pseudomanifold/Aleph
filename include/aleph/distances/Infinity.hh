@@ -1,8 +1,6 @@
 #ifndef ALEPH_DISTANCES_INFINITY_HH__
 #define ALEPH_DISTANCES_INFINITY_HH__
 
-#include <aleph/persistenceDiagrams/PersistenceDiagram.hh>
-
 #include <algorithm>
 
 namespace aleph
@@ -11,13 +9,16 @@ namespace aleph
 namespace distances
 {
 
+/**
+  Basic functor for calculating the infinity distance between two
+  points. The point class needs to provide coordinate access. The
+  functor is mainly used for persistence diagram distances.
+*/
+
 template <class DataType> class InfinityDistance
 {
 public:
-  using PD    = PersistenceDiagram<DataType>;
-  using Point = typename PD::Point;
-
-  DataType operator()( const Point& p, const Point& q ) const
+  template <class Point> DataType operator()( const Point& p, const Point& q ) const
   {
     // This ensures that the values stay positive, regardless of the
     // underlying data type.
