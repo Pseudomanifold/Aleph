@@ -23,11 +23,11 @@
 // parser interface.
 #include <getopt.h>
 
-#include <aleph/distances/Hausdorff.hh>
-#include <aleph/distances/Wasserstein.hh>
-
 #include <aleph/persistenceDiagrams/PersistenceDiagram.hh>
 #include <aleph/persistenceDiagrams/PersistenceIndicatorFunction.hh>
+
+#include <aleph/persistenceDiagrams/distances/Hausdorff.hh>
+#include <aleph/persistenceDiagrams/distances/Wasserstein.hh>
 
 #include <aleph/persistenceDiagrams/io/Raw.hh>
 

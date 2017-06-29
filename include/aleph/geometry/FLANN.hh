@@ -3,9 +3,8 @@
 
 #include <aleph/config/FLANN.hh>
 
-#include <aleph/distances/Traits.hh>
-
 #include <aleph/geometry/NearestNeighbours.hh>
+#include <aleph/geometry/distances/Traits.hh>
 
 #ifdef ALEPH_WITH_FLANN
   #include <flann/flann.hpp>

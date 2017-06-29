@@ -1,5 +1,5 @@
-#ifndef ALEPH_DISTANCES_MANHATTAN_HH__
-#define ALEPH_DISTANCES_MANHATTAN_HH__
+#ifndef ALEPH_GEOMETRY_DISTANCES_MANHATTAN_HH__
+#define ALEPH_GEOMETRY_DISTANCES_MANHATTAN_HH__
 
 #include <cstddef>
 #include <cmath>
@@ -127,8 +127,8 @@ public:
   }
 };
 
-}
+} // namespace distances
 
-}
+} // namespace aleph
 
 #endif

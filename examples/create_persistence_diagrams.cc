@@ -24,12 +24,12 @@
   Original author: Bastian Rieck
 */
 
-#include <aleph/distances/Euclidean.hh>
-
 #include <aleph/geometry/BruteForce.hh>
 #include <aleph/geometry/SphereSampling.hh>
 #include <aleph/geometry/TorusSampling.hh>
 #include <aleph/geometry/VietorisRipsComplex.hh>
+
+#include <aleph/geometry/distances/Euclidean.hh>
 
 #include <aleph/persistenceDiagrams/PersistenceDiagram.hh>
 

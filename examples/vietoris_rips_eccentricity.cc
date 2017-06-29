@@ -36,11 +36,11 @@
 #include <aleph/containers/DataDescriptors.hh>
 #include <aleph/containers/PointCloud.hh>
 
-#include <aleph/distances/Euclidean.hh>
-
 #include <aleph/geometry/BruteForce.hh>
 #include <aleph/geometry/FLANN.hh>
 #include <aleph/geometry/VietorisRipsComplex.hh>
+
+#include <aleph/geometry/distances/Euclidean.hh>
 
 #include <aleph/utilities/String.hh>
 

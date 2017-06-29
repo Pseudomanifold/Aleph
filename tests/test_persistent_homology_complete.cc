@@ -2,11 +2,11 @@
 
 #include <aleph/containers/PointCloud.hh>
 
-#include <aleph/distances/Euclidean.hh>
-
 #include <aleph/geometry/BruteForce.hh>
 #include <aleph/geometry/RipsExpander.hh>
 #include <aleph/geometry/RipsSkeleton.hh>
+
+#include <aleph/geometry/distances/Euclidean.hh>
 
 #include <tests/Base.hh>
 

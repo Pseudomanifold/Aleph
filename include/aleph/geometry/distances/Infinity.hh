@@ -1,5 +1,5 @@
-#ifndef ALEPH_DISTANCES_INFINITY_HH__
-#define ALEPH_DISTANCES_INFINITY_HH__
+#ifndef ALEPH_GEOMETRY_DISTANCES_INFINITY_HH__
+#define ALEPH_GEOMETRY_DISTANCES_INFINITY_HH__
 
 #include <algorithm>
 
@@ -29,8 +29,8 @@ public:
   }
 };
 
-}
+} // namespace distances
 
-}
+} // namespace aleph
 
 #endif

@@ -1,5 +1,5 @@
-#ifndef ALEPH_DISTANCES_TRAITS_HH__
-#define ALEPH_DISTANCES_TRAITS_HH__
+#ifndef ALEPH_GEOMETRY_DISTANCES_TRAITS_HH__
+#define ALEPH_GEOMETRY_DISTANCES_TRAITS_HH__
 
 namespace aleph
 {
@@ -16,7 +16,7 @@ namespace distances
   expecting the distances to be given in an unmodified form. Hence, every traits
   class provides two methods for converting distances from and to the class.
 */
-  
+
 template <class T> struct Traits
 {
   using ResultType  = typename T::ResultType;
@@ -33,8 +33,8 @@ template <class T> struct Traits
   }
 };
 
-}
+} // namespace distances
 
-}
+} // namespace aleph
 
 #endif

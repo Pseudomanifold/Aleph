@@ -1,7 +1,7 @@
-#ifndef ALEPH_DISTANCES_EUCLIDEAN_HH__
-#define ALEPH_DISTANCES_EUCLIDEAN_HH__
+#ifndef ALEPH_GEOMETRY_DISTANCES_EUCLIDEAN_HH__
+#define ALEPH_GEOMETRY_DISTANCES_EUCLIDEAN_HH__
 
-#include <aleph/distances/Traits.hh>
+#include <aleph/geometry/distances/Traits.hh>
 
 #include <cmath>
 #include <cstddef>
@@ -145,8 +145,8 @@ template <class T> struct Traits< Euclidean<T> >
   }
 };
 
-}
+} // namespace distances
 
-}
+} // namespace aleph
 
 #endif

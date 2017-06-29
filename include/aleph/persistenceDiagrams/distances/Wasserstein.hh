@@ -1,7 +1,7 @@
 #ifndef ALEPH_PERSISTENCE_DIAGRAMS_DISTANCES_WASSERSTEIN_HH__
 #define ALEPH_PERSISTENCE_DIAGRAMS_DISTANCES_WASSERSTEIN_HH__
 
-#include <aleph/distances/Infinity.hh>
+#include <aleph/geometry/distances/Infinity.hh>
 #include <aleph/persistenceDiagrams/PersistenceDiagram.hh>
 
 #include <aleph/persistenceDiagrams/distances/detail/Munkres.hh>

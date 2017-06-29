@@ -1,10 +1,10 @@
 #include <aleph/config/Base.hh>
 
-#include <aleph/distances/Euclidean.hh>
-#include <aleph/distances/Manhattan.hh>
-
 #include <aleph/containers/PointCloud.hh>
 #include <aleph/containers/DataDescriptors.hh>
+
+#include <aleph/geometry/distances/Euclidean.hh>
+#include <aleph/geometry/distances/Manhattan.hh>
 
 #include <tests/Base.hh>
 

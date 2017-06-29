@@ -6,11 +6,11 @@
 #include <algorithm>
 #include <vector>
 
-#include <aleph/distances/Euclidean.hh>
-#include <aleph/distances/Traits.hh>
-
 #include <aleph/geometry/BruteForce.hh>
 #include <aleph/geometry/NearestNeighbours.hh>
+
+#include <aleph/geometry/distances/Euclidean.hh>
+#include <aleph/geometry/distances/Traits.hh>
 
 #include <aleph/math/KahanSummation.hh>
 
