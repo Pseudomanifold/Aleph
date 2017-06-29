@@ -1,5 +1,5 @@
-#ifndef ALEPH_DISTANCES_NEAREST_NEIGHBOUR_HH__
-#define ALEPH_DISTANCES_NEAREST_NEIGHBOUR_HH__
+#ifndef ALEPH_PERSISTENCE_DIAGRAMS_DISTANCES_NEAREST_NEIGHBOUR_HH__
+#define ALEPH_PERSISTENCE_DIAGRAMS_DISTANCES_NEAREST_NEIGHBOUR_HH__
 
 #include <aleph/distances/Infinity.hh>
 #include <aleph/persistenceDiagrams/PersistenceDiagram.hh>
@@ -49,8 +49,8 @@ template <
   return sum / 2;
 }
 
-}
+} // namespace distances
 
-}
+} // namespace aleph
 
 #endif

@@ -1,12 +1,12 @@
 #include <tests/Base.hh>
 
-#include <aleph/distances/NearestNeighbour.hh>
-#include <aleph/distances/Wasserstein.hh>
-
 #include <aleph/persistenceDiagrams/Mean.hh>
 #include <aleph/persistenceDiagrams/Norms.hh>
 #include <aleph/persistenceDiagrams/MultiScaleKernel.hh>
 #include <aleph/persistenceDiagrams/PersistenceDiagram.hh>
+
+#include <aleph/persistenceDiagrams/distances/NearestNeighbour.hh>
+#include <aleph/persistenceDiagrams/distances/Wasserstein.hh>
 
 #include <limits>
 #include <random>

@@ -1,11 +1,11 @@
-#ifndef ALEPH_DISTANCES_WASSERSTEIN_HH__
-#define ALEPH_DISTANCES_WASSERSTEIN_HH__
+#ifndef ALEPH_PERSISTENCE_DIAGRAMS_DISTANCES_WASSERSTEIN_HH__
+#define ALEPH_PERSISTENCE_DIAGRAMS_DISTANCES_WASSERSTEIN_HH__
 
 #include <aleph/distances/Infinity.hh>
 #include <aleph/persistenceDiagrams/PersistenceDiagram.hh>
 
-#include <aleph/distances/detail/Munkres.hh>
-#include <aleph/distances/detail/Orthogonal.hh>
+#include <aleph/persistenceDiagrams/distances/detail/Munkres.hh>
+#include <aleph/persistenceDiagrams/distances/detail/Orthogonal.hh>
 
 #include <algorithm>
 #include <limits>
@@ -136,8 +136,8 @@ template <
   return std::pow( totalCosts, 1 / power );
 }
 
-}
+} // namespace distances
 
-}
+} // namespace aleph
 
 #endif

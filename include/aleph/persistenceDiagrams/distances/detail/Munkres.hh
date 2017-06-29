@@ -1,7 +1,7 @@
-#ifndef ALEPH_DISTANCES_DETAIL_MUNKRES_HH__
-#define ALEPH_DISTANCES_DETAIL_MUNKRES_HH__
+#ifndef ALEPH_PERSISTENCE_DIAGRAMS_DISTANCES_DETAIL_MUNKRES_HH__
+#define ALEPH_PERSISTENCE_DIAGRAMS_DISTANCES_DETAIL_MUNKRES_HH__
 
-#include <aleph/distances/detail/Matrix.hh>
+#include <aleph/persistenceDiagrams/distances/detail/Matrix.hh>
 
 #include <algorithm>
 #include <limits>
@@ -431,10 +431,10 @@ private:
   std::vector<bool> _colMask;
 };
 
-}
+} // namespace detail
 
-}
+} // namespace distances
 
-}
+} // namespace aleph
 
 #endif

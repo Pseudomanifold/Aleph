@@ -2,8 +2,8 @@
 #include <set>
 #include <string>
 
-#include <aleph/distances/detail/Matrix.hh>
-#include <aleph/distances/detail/Munkres.hh>
+#include <aleph/persistenceDiagrams/distances/detail/Matrix.hh>
+#include <aleph/persistenceDiagrams/distances/detail/Munkres.hh>
 
 #include <tests/Base.hh>
 

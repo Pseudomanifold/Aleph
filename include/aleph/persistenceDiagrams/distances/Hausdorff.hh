@@ -1,5 +1,5 @@
-#ifndef ALEPH_DISTANCES_HAUSDORFF_HH__
-#define ALEPH_DISTANCES_HAUSDORFF_HH__
+#ifndef ALEPH_PERSISTENCE_DIAGRAMS_DISTANCES_HAUSDORFF_HH__
+#define ALEPH_PERSISTENCE_DIAGRAMS_DISTANCES_HAUSDORFF_HH__
 
 #include <aleph/distances/Infinity.hh>
 #include <aleph/persistenceDiagrams/PersistenceDiagram.hh>

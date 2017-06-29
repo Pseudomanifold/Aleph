@@ -1,5 +1,5 @@
-#ifndef ALEPH_DISTANCES_DETAIL_MATRIX_HH__
-#define ALEPH_DISTANCES_DETAIL_MATRIX_HH__
+#ifndef ALEPH_PERSISTENCE_DIAGRAMS_DISTANCES_DETAIL_MATRIX_HH__
+#define ALEPH_PERSISTENCE_DIAGRAMS_DISTANCES_DETAIL_MATRIX_HH__
 
 #include <algorithm>
 #include <ostream>
@@ -117,10 +117,10 @@ template <class T> std::ostream& operator<<( std::ostream& o, const Matrix<T>& m
   return o;
 }
 
-}
+} // namespace detail
 
-}
+} // namespace distances
 
-}
+} // namespace aleph
 
 #endif

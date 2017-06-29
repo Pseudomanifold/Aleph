@@ -1,5 +1,5 @@
-#ifndef ALEPH_DISTANCES_DETAIL_ORTHOGONAL_HH__
-#define ALEPH_DISTANCES_DETAIL_ORTHOGONAL_HH__
+#ifndef ALEPH_PERSISTENCE_DIAGRAMS_DISTANCES_DETAIL_ORTHOGONAL_HH__
+#define ALEPH_PERSISTENCE_DIAGRAMS_DISTANCES_DETAIL_ORTHOGONAL_HH__
 
 namespace aleph
 {
@@ -23,10 +23,10 @@ template <class Distance, class Point> auto orthogonalDistance( const Point& p )
   return Distance().operator()( p,q );
 }
 
-}
+} // namespace detail
 
-}
+} // namespace distances
 
-}
+} // namespace aleph
 
 #endif

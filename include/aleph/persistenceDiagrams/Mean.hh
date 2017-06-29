@@ -2,12 +2,13 @@
 #define ALEPH_PERSISTENCE_DIAGRAMS_MEAN_HH__
 
 #include <aleph/distances/Infinity.hh>
-#include <aleph/distances/detail/Munkres.hh>
-#include <aleph/distances/detail/Orthogonal.hh>
 
 #include <aleph/math/KahanSummation.hh>
 
 #include <aleph/persistenceDiagrams/PersistenceDiagram.hh>
+
+#include <aleph/persistenceDiagrams/distances/detail/Munkres.hh>
+#include <aleph/persistenceDiagrams/distances/detail/Orthogonal.hh>
 
 #include <algorithm>
 #include <iterator>
