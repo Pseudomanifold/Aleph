@@ -1,7 +1,7 @@
 #ifndef ALEPH_DISTANCES_NEAREST_NEIGHBOUR_HH__
 #define ALEPH_DISTANCES_NEAREST_NEIGHBOUR_HH__
 
-#include <aleph/distances/Infinity.h>>
+#include <aleph/distances/Infinity.hh>
 #include <aleph/persistenceDiagrams/PersistenceDiagram.hh>
 
 #include <algorithm>
@@ -43,8 +43,10 @@ template <
   auto&& distances1 = oneSidedDistances( D1, D2, d );
   auto&& distances2 = oneSidedDistances( D2, D1, d );
 
-  return std::accumulate( distances1.begin(), distances1.end(), DataType(0) )
-       + std::accumulate( distances2.begin(), distances2.end(), DataType(0) );
+  auto sum =   std::accumulate( distances1.begin(), distances1.end(), DataType(0) )
+             + std::accumulate( distances2.begin(), distances2.end(), DataType(0) );
+
+  return sum / 2;
 }
 
 }
