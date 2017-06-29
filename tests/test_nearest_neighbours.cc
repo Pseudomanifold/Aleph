@@ -34,7 +34,7 @@ template <class Wrapper, class PointCloud> void testInternal( const PointCloud& 
 
   wrapper.radiusSearch( static_cast<ElementType>( 0.0 ), indices, distances );
 
-  ALEPH_ASSERT_THROW( indices.size() == pointCloud.size() );
+  ALEPH_ASSERT_EQUAL( indices.size(), pointCloud.size() );
   for( auto&& i : indices )
     ALEPH_ASSERT_THROW( i.empty() == true );
 
@@ -42,9 +42,34 @@ template <class Wrapper, class PointCloud> void testInternal( const PointCloud& 
 
   wrapper.radiusSearch( static_cast<ElementType>( 8.0 ), indices, distances );
 
-  ALEPH_ASSERT_THROW( indices.size() == pointCloud.size() );
+  ALEPH_ASSERT_EQUAL( indices.size(), pointCloud.size() );
   for( auto&& i : indices )
-    ALEPH_ASSERT_THROW( i.size() == pointCloud.size() );
+    ALEPH_ASSERT_EQUAL( i.size(), pointCloud.size() );
+
+  // Check that a 0-nearest neighbour search returns no neighbours
+
+  wrapper.neighbourSearch( 0, indices, distances );
+
+  ALEPH_ASSERT_EQUAL( indices.size(), pointCloud.size() );
+  for( auto&& i : indices )
+    ALEPH_ASSERT_EQUAL( 0, i.size() );
+
+  // Check that a 5-nearest neighbour search returns 5 neighbours
+
+  wrapper.neighbourSearch( 5, indices, distances );
+
+  ALEPH_ASSERT_EQUAL( indices.size(), pointCloud.size() );
+  for( auto&& i : indices )
+    ALEPH_ASSERT_EQUAL( 5, i.size() );
+
+  // Check that a nearest neighbour search returns all neighbours
+
+  wrapper.neighbourSearch( static_cast<unsigned>( pointCloud.size() ), indices, distances );
+
+  ALEPH_ASSERT_EQUAL( indices.size(), pointCloud.size() );
+  for( auto&& i : indices )
+    ALEPH_ASSERT_EQUAL( pointCloud.size(), i.size() );
+
 }
 
 template <class T> void test()

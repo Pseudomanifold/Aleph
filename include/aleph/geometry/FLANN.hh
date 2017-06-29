@@ -108,6 +108,75 @@ public:
   }
 #endif
 
+#ifdef ALEPH_WITH_FLANN
+  void neighbourSearch( unsigned k,
+                        std::vector< std::vector<IndexType> >& indices,
+                        std::vector< std::vector<ElementType> >& distances ) const
+  {
+    // FLANN does *not* like being queries for no neighbours at all, so
+    // let's play nice.
+    if( k == 0 )
+    {
+      indices.clear();
+      distances.clear();
+
+      indices.resize(   _matrix.rows );
+      distances.resize( _matrix.rows );
+
+      return;
+    }
+
+    flann::SearchParams searchParameters = flann::SearchParams();
+    searchParameters.checks = flann::FLANN_CHECKS_UNLIMITED;
+
+    using ResultType = typename DistanceFunctor::ResultType;
+
+    std::vector< std::vector<int> > internalIndices;
+    std::vector< std::vector<ResultType> > internalDistances;
+
+    _index->knnSearch( _matrix,
+                       internalIndices,
+                       distances,
+                       k,
+                       searchParameters );
+
+    // Perform transformation of indices -------------------------------
+
+    indices.clear();
+    indices.resize( _matrix.rows );
+
+    for( std::size_t i = 0; i < internalIndices.size(); i++ )
+    {
+      indices[i] = std::vector<IndexType>( internalIndices[i].size() );
+
+      std::transform( internalIndices[i].begin(), internalIndices[i].end(),
+                      indices[i].begin(),
+                      [] ( int j )
+                      {
+                        return static_cast<IndexType>( j );
+                      } );
+    }
+
+    // Perform transformation of distances -----------------------------
+
+    for( auto&& D : distances )
+    {
+      std::transform( D.begin(), D.end(), D.begin(),
+                      [this] ( ElementType x )
+                      {
+                        return _traits.from( x );
+                      } );
+    }
+  }
+
+#else
+  void neighbourSearch( unsigned /* k */,
+                        std::vector< std::vector<IndexType> >& /* indices */,
+                        std::vector< std::vector<ElementType> >& /* distances */ ) const
+  {
+  }
+#endif
+
   std::size_t size() const noexcept
   {
     return _container.size();
