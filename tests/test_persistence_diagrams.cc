@@ -1,5 +1,6 @@
 #include <tests/Base.hh>
 
+#include <aleph/distances/NearestNeighbour.hh>
 #include <aleph/distances/Wasserstein.hh>
 
 #include <aleph/persistenceDiagrams/Mean.hh>
@@ -36,6 +37,31 @@ template <class T> aleph::PersistenceDiagram<T> createRandomPersistenceDiagram( 
   return D;
 }
 
+template <class T> void testFrechetMean()
+{
+  using PersistenceDiagram = aleph::PersistenceDiagram<T>;
+
+  ALEPH_TEST_BEGIN( "Persistence diagram mean");
+
+  unsigned n = 10;
+
+  std::vector<PersistenceDiagram> diagrams;
+  diagrams.reserve( n );
+
+  for( decltype(n) i = 0; i < n; i++ )
+    diagrams.emplace_back( createRandomPersistenceDiagram<T>( 25 ) );
+
+  auto D = aleph::mean( diagrams.begin(), diagrams.end() );
+  auto P = aleph::totalPersistence( D );
+  auto p = std::sqrt(25.0) * std::sqrt(0.50); // simple estimate of the mean value
+                                              // for the total persistence
+
+  ALEPH_ASSERT_THROW( D.size() > 0 );
+  ALEPH_ASSERT_THROW( std::abs( P - p ) < 1.0 );
+
+  ALEPH_TEST_END();
+}
+
 template <class T> void testMultiScaleKernel()
 {
   ALEPH_TEST_BEGIN( "Multi-scale kernel" );
@@ -63,30 +89,21 @@ template <class T> void testMultiScaleKernel()
   ALEPH_TEST_END();
 }
 
-template <class T> void testFrechetMean()
+template <class T> void testNearestNeighbourDistance()
 {
-  using PersistenceDiagram = aleph::PersistenceDiagram<T>;
+  ALEPH_TEST_BEGIN( "Nearest neighbour distance" );
 
-  ALEPH_TEST_BEGIN( "Persistence diagram mean");
+  auto D1 = createRandomPersistenceDiagram<T>( 50 );
+  auto D2 = createRandomPersistenceDiagram<T>( 50 );
 
-  unsigned n = 10;
+  auto dNearestNeighbour = aleph::distances::nearestNeighbourDistance( D1, D2 );
+  auto dWasserstein      = aleph::distances::wassersteinDistance( D1, D2, T(1) );
 
-  std::vector<PersistenceDiagram> diagrams;
-  diagrams.reserve( n );
-
-  for( decltype(n) i = 0; i < n; i++ )
-    diagrams.emplace_back( createRandomPersistenceDiagram<T>( 25 ) );
-
-  auto D = aleph::mean( diagrams.begin(), diagrams.end() );
-  auto P = aleph::totalPersistence( D );
-  auto p = std::sqrt(25.0) * std::sqrt(0.50); // simple estimate of the mean value
-                                              // for the total persistence
-
-  ALEPH_ASSERT_THROW( D.size() > 0 );
-  ALEPH_ASSERT_THROW( std::abs( P - p ) < 1.0 );
+  ALEPH_ASSERT_THROW( dNearestNeighbour < dWasserstein );
 
   ALEPH_TEST_END();
 }
+
 
 template <class T> void testWassersteinDistance()
 {
@@ -134,6 +151,9 @@ int main(int, char**)
 
   testMultiScaleKernel<float> ();
   testMultiScaleKernel<double>();
+
+  testNearestNeighbourDistance<float> ();
+  testNearestNeighbourDistance<double>();
 
   testWassersteinDistance<float> ();
   testWassersteinDistance<double>();
