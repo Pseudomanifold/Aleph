@@ -65,6 +65,52 @@ template <class Data, class Vertex> void triangle()
   ALEPH_TEST_END();
 }
 
+template <class Data, class Vertex> void nonContiguousTriangle()
+{
+  ALEPH_TEST_BEGIN( "Triangle (non-contiguous indices)" );
+
+  using Simplex           = Simplex<Data, Vertex>;
+  using SimplicialComplex = SimplicialComplex<Simplex>;
+
+  std::vector<Simplex> simplices
+    = { {1}, {2}, {4}, {1,2}, {1,4}, {2,4} };
+
+  SimplicialComplex K( simplices.begin(), simplices.end() );
+  RipsExpander<SimplicialComplex> ripsExpander;
+
+  auto vr1 = ripsExpander( K, 2 );
+  auto vr2 = ripsExpander( K, 3 );
+
+  ALEPH_ASSERT_THROW( vr1.empty() == false );
+  ALEPH_ASSERT_THROW( vr2.empty() == false );
+  ALEPH_ASSERT_THROW( vr1.size()  == vr2.size() );
+  ALEPH_ASSERT_THROW( vr1.size()  == 7 );
+
+  std::vector<Data> data = {
+    1, 2, 3
+  };
+
+  auto vr3 = ripsExpander.assignMaximumData( vr1, data.begin(), data.end() );
+
+  std::vector<Data> expectedData = {
+    1, // [1]
+    2, // [2]
+    2, // [2,1]
+    3, // [4]
+    3, // [4,2]
+    3, // [4,2,1]
+    3, // [4,1]
+  };
+
+  std::vector<Data> actualData;
+  actualData.reserve( vr3.size() );
+  for( auto&& s : vr3 )
+    actualData.push_back( s.data() );
+
+  ALEPH_ASSERT_THROW( expectedData == actualData );
+  ALEPH_TEST_END();
+}
+
 template <class Data, class Vertex> void quad()
 {
   ALEPH_TEST_BEGIN( "Quad" );
@@ -190,6 +236,11 @@ int main()
   triangle<double, short   >();
   triangle<float,  unsigned>();
   triangle<float,  short   >();
+
+  nonContiguousTriangle<double, unsigned>();
+  nonContiguousTriangle<double, short   >();
+  nonContiguousTriangle<float,  unsigned>();
+  nonContiguousTriangle<float,  short   >();
 
   quad<double, unsigned>();
   quad<double, short   >();
