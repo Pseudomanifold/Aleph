@@ -112,18 +112,37 @@ public:
   {
     SimplicialComplex S;
 
-    using DataType_ = typename std::iterator_traits<InputIterator>::value_type;
-
-    static_assert( std::is_same<DataType, DataType_>::value, "Data types must agree" );
+    {
+      using DataType_ = typename std::iterator_traits<InputIterator>::value_type;
+      static_assert( std::is_same<DataType, DataType_>::value, "Data types must agree" );
+    }
 
     std::vector<DataType> dataValues( begin, end );
+
+    // Extract all vertices and assign them indices based on their
+    // lexicographical ordering in the complex. This is useful for
+    // simplicial complexes that are using a non-contiguous vertex
+    // indexing system.
+
+    using IndexType = typename decltype(dataValues)::size_type;
+    std::unordered_map<VertexType, IndexType> vertexToIndex;
+
+    {
+      std::set<VertexType> vertices;
+      K.vertices( std::inserter( vertices, vertices.begin() ) );
+
+
+      IndexType index = IndexType();
+      for( auto&& vertex : vertices )
+        vertexToIndex[vertex] = index++;
+    }
 
     for( auto s : K )
     {
       DataType data = std::numeric_limits<DataType>::lowest();
 
       for( auto&& v : s )
-        data = std::max( data, dataValues[v] );
+        data = std::max( data, dataValues[ vertexToIndex[v] ] );
 
       s.setData( data );
       S.push_back( s );
