@@ -20,7 +20,7 @@ For more information, please read the [original paper describing
 Since its inception in late 2016, Aleph has been used to support the
 following papers:
 
-- Clique Community Persistence: ATopological Visual Analysis Approach for Complex Networks
+- Clique Community Persistence: A Topological Visual Analysis Approach for Complex Networks
 - Hierarchies and Ranks for Persistence Pairs
 
 If you want to contribute, please see the [contribution
