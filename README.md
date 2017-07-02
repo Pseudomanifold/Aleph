@@ -17,6 +17,12 @@ separate from the implementation.
 For more information, please read the [original paper describing
 `PHAT`](https://people.mpi-inf.mpg.de/~mkerber/bkrw-pphat.pdf).
 
+Since its inception in late 2016, Aleph has been used to support the
+following papers:
+
+- Clique Community Persistence: ATopological Visual Analysis Approach for Complex Networks
+- Hierarchies and Ranks for Persistence Pairs
+
 # License
 
 Aleph uses the MIT license. Please see the file [`LICENSE.md`](LICENSE.md)
