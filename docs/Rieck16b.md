@@ -86,7 +86,7 @@ example, to embed a matrix into 2D using multidimensional scaling:
 
 <script src="https://gist.github.com/Submanifold/2b1490f9447c1435d890f9960782a7fe.js"></script>
 
-As a result, you obtain a 2D point cloud could look like this:
+The resulting 2D point cloud could look like this:
 
 ![Hausdorff distance matrix, embedded]({{ site.baseurl }}/assets/Rieck16b_Hausdorff_embedding.png)
 
