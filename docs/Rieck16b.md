@@ -65,7 +65,7 @@ example:
 
 The resulting file should look somewhat similar to this:
 
-![Hausdorff distance matrix]({{ site.url }}/assets/Rieck16b_Hausdorff.png)
+![Hausdorff distance matrix]({{ site.baseurl }}/assets/Rieck16b_Hausdorff.png)
 
 By varying the command-line options of the `topological_distance` tool,
 other embeddings can be obtained:
