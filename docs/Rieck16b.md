@@ -1,4 +1,6 @@
-# ‘Shall I compare thee to a network?’—Visualizing the Topological Structure of Shakespeare’s Plays
+---
+title: ‘Shall I compare thee to a network?’—Visualizing the Topological Structure of Shakespeare’s Plays
+---
 
 Here, we briefly document how to reproduce the results reported in the paper [‘Shall I compare thee to a network?’—Visualizing the Topological Structure of Shakespeare’s Plays](http://bastian.rieck.ru/research/Vis2016.pdf),
 which was presented at the Workshop on Visualization for the Digital Humanities at IEEE VIS 2016.
@@ -75,3 +77,19 @@ other embeddings can be obtained:
 
 In the final step, we will embed those matrices, i.e. we will assign
 them coordinates.
+
+## Embedding distance matrices
+
+The output format of the previous program is sufficiently generic to
+support using a variety of other scripts. Use the following gist, for
+example, to embed a matrix into 2D using multidimensional scaling:
+
+<script src="https://gist.github.com/Submanifold/2b1490f9447c1435d890f9960782a7fe.js"></script>
+
+As a result, you obtain a 2D point cloud could look like this:
+
+![Hausdorff distance matrix, embedded]({{ site.baseurl }}/assets/Rieck16b_Hausdorff_embedding.png)
+
+The previous embedding was created using the Hausdorff distance.
+Depending on the parameters you use for calculating topological
+distances, yours may look a little different.
