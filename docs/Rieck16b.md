@@ -11,7 +11,7 @@ Aleph's various tools.
 
 First, you need to obtain all the co-occurrence networks. 
 
-## Creating the persistence diagrams
+## Creating persistence diagrams
 
 In order to create the persistence diagrams as described in the paper,
 please use the following script:
@@ -33,3 +33,45 @@ for file in $argv; do
   $SPLIT_OUTPUT_BINARY --prefix=d --digits=1 $OUTPUT_DIR/$OUTPUT
 done
 {% endhighlight %}
+
+Run this script on all networks:
+
+    $ ./make_persistence_diagrams.sh Networks/Speech/*.net
+
+As a result, you will obtain a set of persistence diagrams in the root
+directory of the script.
+
+## Creating distance matrices
+
+The distances between persistence diagrams may now be analysed in order
+to obtain a dissimilarity matrix. To this end, go to your installation
+directory of Aleph and use the `topological_distance` tool on all
+persistence diagrams. The tool is sufficiently smart to group
+persistence diagrams automatically according to their dimension. Let us
+first create a Hausdorff distance matrix:
+
+    $ topological_distance --hausdorff --power=2 *.txt > Matrix_Hausdorff.txt
+
+We can plot the matrix using [gnuplot](https://gnuplot.info), for
+example:
+
+    $ gnuplot
+    gnuplot> unset key
+    gnuplot> unset tics
+    gnuplot> unset border
+    gnuplot> unset colorbox
+    gnuplot> load "/usr/share/gnuplot-colorbrewer/sequential/Blues.plt"
+    gnuplot> plot "Matrix_Hausdorff.txt" using ($1):(-$2):3 matrix with image
+
+The resulting file should look somewhat similar to this:
+
+![Hausdorff distance matrix]({{ site.url }}/assets/Rieck16b_Hausdorff.png)
+
+By varying the command-line options of the `topological_distance` tool,
+other embeddings can be obtained:
+
+    $ topological_distance --wasserstein --power=2 *.txt > Matrix_Wasserstein_2.txt
+    $ topological_distance --wasserstein --power=1 *.txt > Matrix_Wasserstein_1.txt
+
+In the final step, we will embed those matrices, i.e. we will assign
+them coordinates.
