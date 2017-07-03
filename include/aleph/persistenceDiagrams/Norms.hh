@@ -13,6 +13,12 @@
 namespace aleph
 {
 
+/**
+  Calculates the total persistence of a given persistence diagram. All
+  persistence values will be taken to the $k$th power. Kahan summation
+  is used to ensure numerical stability.
+*/
+
 template <class DataType> double totalPersistence( const PersistenceDiagram<DataType>& D,
                                                    double k = 2.0,
                                                    bool weighted = false )
@@ -68,6 +74,7 @@ template <class DataType> double totalPersistence( const PersistenceDiagram<Data
   return result;
 }
 
+/** Calculates the $p$-norm of a given persistence diagram. */
 template <class DataType> double pNorm( const PersistenceDiagram<DataType>& D,
                                         double p = 2.0,
                                         bool weighted = false )
@@ -77,6 +84,13 @@ template <class DataType> double pNorm( const PersistenceDiagram<DataType>& D,
 
   return std::pow( totalPersistence( D, p, weighted ), 1.0 / p );
 }
+
+/**
+  Calculates the infinity norm of a persistence diagram. The infinity
+  norm of a persistence diagram is defined as the maximum persistence
+  value stored in the diagram. This function uses absolute values for
+  calculating persistence because the result needs to be norm.
+*/
 
 template <class DataType> DataType infinityNorm( const PersistenceDiagram<DataType>& D )
 {
