@@ -1,5 +1,11 @@
 - title: "Home"
   href: "/Aleph/"
 
+- title: "Building Aleph"
+  href: "/Aleph/building"
+
+- title: "Publications"
+  href: "/Aleph/publications"
+
 - title: "Examples"
   href: "/Aleph/examples"
