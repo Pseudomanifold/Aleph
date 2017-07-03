@@ -209,6 +209,11 @@ int main( int argc, char** argv )
               << "# Dimension   : " << D.dimension() << "\n"
               << "# Entries     : " << D.size() << "\n"
               << "# Betti number: " << D.betti() << "\n"
-              << D << "\n\n";
+              << D;
+
+    // Use the separator for all but the last persistence diagram. Else,
+    // the output format is inconsistent and results in empty files.
+    if( D != diagrams.back() )
+      std::cout << "\n\n";
   }
 }
