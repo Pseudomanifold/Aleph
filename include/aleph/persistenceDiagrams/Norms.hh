@@ -2,6 +2,7 @@
 #define ALEPH_PERSISTENCE_DIAGRAMS_NORMS_HH__
 
 #include <aleph/persistenceDiagrams/PersistenceDiagram.hh>
+#include <aleph/math/KahanSummation.hh>
 
 #include <algorithm>
 #include <vector>
@@ -16,12 +17,12 @@ template <class DataType> double totalPersistence( const PersistenceDiagram<Data
                                                    double k = 2.0,
                                                    bool weighted = false )
 {
-  double result = 0.0;
+  aleph::math::KahanSummation<double> result = 0.0;
 
   if( !weighted )
   {
     for( auto&& point : D )
-      result = result + std::pow( static_cast<double>( point.persistence() ), k );
+      result += std::pow( static_cast<double>( point.persistence() ), k );
   }
   else
   {
@@ -85,7 +86,7 @@ template <class DataType> DataType infinityNorm( const PersistenceDiagram<DataTy
   std::vector<DataType> persistenceValues;
 
   for( auto&& point : D )
-    persistenceValues.push_back( point.persistence() );
+    persistenceValues.push_back( std::abs( point.persistence() ) );
 
   return *std::max_element( persistenceValues.begin(), persistenceValues.end() );
 }
