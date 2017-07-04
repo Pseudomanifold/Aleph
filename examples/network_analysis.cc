@@ -22,8 +22,12 @@
   Demonstrated functions:
 
     - aleph::calculatePersistenceDiagrams
+    - aleph::utilities::basename
     - aleph::utilities::extension
+    - aleph::utilities::format
+    - aleph::utilities::stem
     - Betti numbers of persistence diagrams
+    - Simplicial complex dimensionality queries
     - Simplicial complex sorting (for filtrations)
 
   Original author: Bastian Rieck
@@ -43,11 +47,19 @@
 #include <aleph/topology/filtrations/Data.hh>
 
 #include <aleph/utilities/Filesystem.hh>
+#include <aleph/utilities/Format.hh>
 
+#include <cmath>
+
+#include <algorithm>
 #include <iostream>
 #include <fstream>
+#include <limits>
+#include <sstream>
 #include <string>
 #include <vector>
+
+#include <getopt.h>
 
 void usage()
 {
@@ -58,6 +70,27 @@ void usage()
             << "of the weight function of the input.\n"
             << "\n"
             << "Diagrams will be written to STDOUT in a gnuplot-like style.\n"
+            << "\n"
+            << "Optional arguments:\n"
+            << "\n"
+            << " --infinity FACTOR: Sets the value to use for unpaired points\n"
+            << "                   in the persistence diagram. By default, a\n"
+            << "                   large number or +inf will be used. If the\n"
+            << "                   specified number is non-zero, it shall be\n"
+            << "                   used as a factor in the weight assignment\n"
+            << "                   of these points.\n"
+            << "\n"
+            << " --invert-weights: If specified, inverts input weights. This\n"
+            << "                   is useful if the original weights measure\n"
+            << "                   the strength of a relationship, and not a\n"
+            << "                   dissimilarity between nodes.\n"
+            << "\n"
+            << " --normalize     : Normalizes all weights to [0,1]. Use this\n"
+            << "                   to compare multiple networks.\n"
+            << "\n"
+            << " --output PATH   : Uses the specified path to store diagrams\n"
+            << "                   instead of writing them to STDOUT.\n"
+            << "\n"
             << "\n";
 }
 
@@ -72,16 +105,58 @@ int main( int argc, char** argv )
   using DataType          = double;
   using VertexType        = unsigned;
 
-  // These are just given for convenience. It makes declaring an
-  // instance of a simplicial complex much easier.
-  using Simplex           = aleph::topology::Simplex<DataType, VertexType>;
-  using SimplicialComplex = aleph::topology::SimplicialComplex<Simplex>;
+  static option commandLineOptions[] =
+  {
+    { "infinity"      , required_argument, nullptr, 'f' },
+    { "invert-weights", no_argument      , nullptr, 'i' },
+    { "normalize"     , no_argument      , nullptr, 'n' },
+    { "output"        , required_argument, nullptr, 'o' },
+    { nullptr         , 0                , nullptr,  0  }
+  };
 
-  if( argc <= 1 )
+  bool invertWeights       = false;
+  bool normalize           = false;
+  DataType infinity        = std::numeric_limits<DataType>::has_infinity ? std::numeric_limits<DataType>::infinity() : std::numeric_limits<DataType>::max();
+  std::string basePath     = std::string();
+
+  {
+    int option = 0;
+    while( ( option = getopt_long( argc, argv, "f:ino:", commandLineOptions, nullptr ) ) != -1 )
+    {
+      switch( option )
+      {
+      case 'f':
+        infinity = static_cast<DataType>( std::stod( optarg ) );
+        break;
+
+      case 'i':
+        invertWeights = true;
+        break;
+
+      case 'n':
+        normalize = true;
+        break;
+
+      case 'o':
+        basePath = optarg;
+        break;
+
+      default:
+        break;
+      }
+    }
+  }
+
+  if( (argc - optind ) < 1 )
   {
     usage();
     return -1;
   }
+
+  // These are just given for convenience. It makes declaring an
+  // instance of a simplicial complex much easier.
+  using Simplex           = aleph::topology::Simplex<DataType, VertexType>;
+  using SimplicialComplex = aleph::topology::SimplicialComplex<Simplex>;
 
   // By convention, simplicial complexes are always called K (or L if
   // you need two of them). This is probably bad style. ;)
@@ -89,7 +164,7 @@ int main( int argc, char** argv )
 
   // Reading -----------------------------------------------------------
 
-  std::string filename = argv[1];
+  std::string filename = argv[optind++];
   std::cerr << "* Reading '" << filename << "'...";
 
   // For supporting different graph formats, Aleph offers different
@@ -124,6 +199,60 @@ int main( int argc, char** argv )
   std::cerr << "finished\n"
             << "* Extracted simplicial complex with " << K.size() << " simplices\n";
 
+  // Pre-processing ----------------------------------------------------
+  //
+  // Determine the minimum and the maximum weight. If desired by the
+  // user, normalize those weights and/or invert them.
+
+  DataType maxWeight = std::numeric_limits<DataType>::lowest();
+  DataType minWeight = std::numeric_limits<DataType>::max();
+  for( auto&& simplex : K )
+  {
+    maxWeight = std::max( maxWeight, simplex.data() );
+    minWeight = std::min( minWeight, simplex.data() );
+  }
+
+  if( normalize && maxWeight != minWeight )
+  {
+    std::cerr << "* Normalizing weights to [0,1]...";
+
+    auto range = maxWeight - minWeight;
+
+    for (auto it = K.begin(); it != K.end(); ++it )
+    {
+      if( it->dimension() == 0 )
+        continue;
+
+      auto s = *it;
+
+      s.setData( ( s.data() - minWeight ) / range );
+      K.replace( it, s );
+    }
+
+    maxWeight = DataType(1);
+    minWeight = DataType(0);
+
+    std::cerr << "finished\n";
+  }
+
+  if( invertWeights )
+  {
+    std::cerr << "* Inverting filtration weights...";
+
+    for( auto it = K.begin(); it != K.end(); ++it )
+    {
+      if( it->dimension() == 0 )
+        continue;
+
+      auto s = *it;
+      s.setData( maxWeight - s.data() );
+
+      K.replace( it, s );
+    }
+
+    std::cerr << "finished\n";
+  }
+
   // Rips expansion ----------------------------------------------------
   //
   // The Rips expander is a generic class for expanding a graph into a
@@ -143,8 +272,8 @@ int main( int argc, char** argv )
   std::cerr << "* Expanding simplicial complex...";
 
   aleph::geometry::RipsExpander<SimplicialComplex> ripsExpander;
-  if( argc >= 3 )
-    K = ripsExpander( K, static_cast<unsigned>( std::stoul( argv[2] ) ) );
+  if( argc - optind > 0 )
+    K = ripsExpander( K, static_cast<unsigned>( std::stoul( argv[optind++] ) ) );
 
   // This leaves the simplicial complex untouched. The simplices with
   // highest dimension are the edges, i.e. the 1-simplices.
@@ -195,6 +324,24 @@ int main( int argc, char** argv )
     // clutter up the diagram.
     D.removeDiagonal();
 
+    if( std::isfinite( infinity ) && infinity != std::numeric_limits<DataType>::max() )
+    {
+      std::cerr << "* Transforming unpaired points in persistence diagram with a factor of " << infinity << "...\n";
+
+      using PersistenceDiagram = aleph::PersistenceDiagram<DataType>;
+
+      std::transform( D.begin(), D.end(), D.begin(),
+          [&maxWeight, &infinity] ( const PersistenceDiagram::Point& p )
+          {
+            if( !std::isfinite( p.y() ) )
+              return PersistenceDiagram::Point( p.x(), infinity * maxWeight );
+            else
+              return PersistenceDiagram::Point( p );
+          } );
+    }
+
+    std::ostringstream stream;
+
     // This 'header' contains some informative entries about the
     // persistence diagram.
     //
@@ -204,16 +351,33 @@ int main( int argc, char** argv )
     // Notice that the diagram has pre-defined output operator;
     // if you do not like the output, you may of course iterate
     // over the points in the diagram yourself.
-    std::cout << "# Persistence diagram <" << filename << ">\n"
-              << "#\n"
-              << "# Dimension   : " << D.dimension() << "\n"
-              << "# Entries     : " << D.size() << "\n"
-              << "# Betti number: " << D.betti() << "\n"
-              << D;
+    stream << "# Persistence diagram <" << filename << ">\n"
+           << "#\n"
+           << "# Dimension   : " << D.dimension() << "\n"
+           << "# Entries     : " << D.size() << "\n"
+           << "# Betti number: " << D.betti() << "\n"
+           << D;
 
     // Use the separator for all but the last persistence diagram. Else,
     // the output format is inconsistent and results in empty files.
     if( D != diagrams.back() )
-      std::cout << "\n\n";
+      stream << "\n\n";
+
+    if( basePath.empty() )
+      std::cout << stream.str();
+    else
+    {
+      using namespace aleph::utilities;
+
+      auto outputFilename = basePath + "/" + stem( basename( filename ) )
+                                     + "_d"
+                                     + format( D.dimension(), K.dimension() )
+                                     + ".txt";
+
+      std::cerr << "* Storing output in '" << outputFilename << "'...\n";
+
+      std::ofstream out( outputFilename );
+      out << stream.str();
+    }
   }
 }
