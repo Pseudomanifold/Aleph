@@ -1,3 +1,20 @@
+/*
+  This is a tool shipped by 'Aleph - A Library for Exploring Persistent
+  Homology'.
+
+  Its purpose is to calculate clique persistence diagrams of a weighted
+  network. To this end, multiple graph formats are being supported; and
+  numerous options for the persistent homology calculation may be used.
+
+  This tool follows the publication:
+
+    Clique Community Persistence: A Topological Visual Analysis Approach for Complex Networks
+    Bastian Rieck, Ulderico Fugacci, Jonas Lukasczyk, Heike Leitte
+    Submitted to IEEE Vis 2017
+
+  TODO: Link to documentation
+*/
+
 #include <algorithm>
 #include <fstream>
 #include <iomanip>
@@ -215,22 +232,32 @@ std::string formatLabel( const std::string label )
 
 void usage()
 {
-  // TODO: This is outdated...
-  std::cerr << "Usage: clique-persistence-diagram [--invert-weights] [--reverse] FILE K\n"
+  std::cerr << "Usage: clique_persistence_diagram [--ignore-empty] [--invert-weights]\n"
+            << "                                  [--min-k] [--normalize] [--reverse]\n"
+            << "                                  FILE K\n"
             << "\n"
             << "Calculates the clique persistence diagram for FILE, which is\n"
             << "supposed to be a weighted graph. The K parameter denotes the\n"
             << "maximum dimension of a simplex for extracting a clique graph\n"
             << "and tracking persistence of clique communities.\n\n"
             << ""
-            << "******************\n"
-            << "Optional arguments\n"
-            << "******************\n"
+            << "Optional arguments:\n"
+            << "\n"
+            << " --ignore-empty  : Ignores empty persistence diagrams. Else,\n"
+            << "                   processing will be aborted as soon as the\n"
+            << "                   first empty persistence diagrams has been\n"
+            << "                   encountered.\n"
             << "\n"
             << " --invert-weights: If specified, inverts input weights. This\n"
             << "                   is useful if the original weights measure\n"
             << "                   the strength of a relationship, and not a\n"
             << "                   dissimilarity.\n"
+            << "\n"
+            << " --min-k         : Start expansion at the given clique order\n"
+            << "                   instead of starting from k=1.\n"
+            << "\n"
+            << " --normalize     : Normalizes all weights to [0,1]. Use this\n"
+            << "                   to compare multiple networks.\n"
             << "\n"
             << " --reverse       : Reverses the enumeration order of cliques\n"
             << "                   by looking for higher-dimensional cliques\n"
