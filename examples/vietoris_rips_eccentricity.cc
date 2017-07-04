@@ -228,6 +228,18 @@ int main( int argc, char** argv )
     // upper star filtration
     case 1:
     {
+      // The weights of the simplicial complex need to be recalculated
+      // if we are to use another filtration.
+      //
+      // There is a nice convenience function for this purpose. To use
+      // it, we specify false as the first argument---this indicates a
+      // re-calculation based on the minimum function value of an edge
+      // or higher-dimensional simplex.
+      //
+      // The second optional parameter of this function can be used to
+      // skip 1-dimensional simplices (edges).
+      K.recalculateWeights( false );
+
       std::cerr << "* Establishing upper-star filtration order...";
 
       // The upper-star filtration is implemented as a sorting
@@ -244,9 +256,12 @@ int main( int argc, char** argv )
       break;
     }
 
-    // lower-star filtration
+    // lower-star filtration; please see the upper-star filtration for
+    // a more thorough discussion
     case 2:
     {
+      K.recalculateWeights( true );
+
       std::cerr << "* Establishing lower-star filtration order...";
 
       aleph::topology::filtrations::LowerStar<Simplex> lowerStarFiltration( eccentricity.begin(), eccentricity.end() );
