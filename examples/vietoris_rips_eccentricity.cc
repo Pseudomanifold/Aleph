@@ -20,6 +20,8 @@
     - aleph::containers::PointCloud
     - aleph::geometry::FLANN
     - aleph::geometry::BruteForce
+    - aleph::topology::filtrations::LowerStar
+    - aleph::topology::filtrations::UpperStar
 
   Demonstrated functions:
 
@@ -46,13 +48,17 @@
 
 #include <aleph/persistentHomology/Calculation.hh>
 
+#include <aleph/topology/filtrations/LowerStar.hh>
+#include <aleph/topology/filtrations/UpperStar.hh>
+
 #include <algorithm>
+#include <functional>
 #include <iostream>
 #include <string>
 
 void usage()
 {
-  std::cerr << "Usage: vietoris_rips_eccentricity FILE EPSILON [DIMENSION] [ORDER]\n"
+  std::cerr << "Usage: vietoris_rips_eccentricity FILE EPSILON [DIMENSION] [ORDER] [U|L]\n"
             << "\n"
             << "Calculates the Vietoris--Rips complex of an unstructured point\n"
             << "cloud, stored in FILE. Euclidean distances are used during the\n"
@@ -107,6 +113,20 @@ int main( int argc, char** argv )
   auto order = 1u;
   if( argc >= 5 )
     order = static_cast<unsigned>( std::stoul( argv[4] ) );
+
+  // 0 == do not use
+  // 1 == upper star
+  // 2 == lower star
+  unsigned short starFiltration  = 0;
+  if( argc >= 6 )
+  {
+    std::string argument = argv[5];
+    argument             = aleph::utilities::trim( argument );
+    if( argument == "u" || argument == "U" )
+      starFiltration = 1;
+    else if( argument == "l" || argument == "L" )
+      starFiltration = 2;
+  }
 
   // Data descriptor ---------------------------------------------------
   //
@@ -196,6 +216,46 @@ int main( int argc, char** argv )
 
   std::cerr << "finished\n"
             << "* Obtained simplicial complex with " << K.size() << " simplices\n";
+
+  switch( starFiltration )
+  {
+    // We pretend that we do not know the simplex type used by the
+    // simplicial complex and get it from its value type instead.
+    using Simplex = typename decltype(K)::ValueType;
+
+    case 0:
+      break;
+    // upper star filtration
+    case 1:
+    {
+      std::cerr << "* Establishing upper-star filtration order...";
+
+      // The upper-star filtration is implemented as a sorting
+      // predicate. It uses the eccentricity values calculated
+      // above and prepares a lookup table for each simplex.
+      aleph::topology::filtrations::UpperStar<Simplex> upperStarFiltration( eccentricity.begin(), eccentricity.end() );
+
+      // Note that for reasons of simplicity, the sorting predicate is
+      // always copied during the sorting. To prevent copies, we hence
+      // use a reference wrapper from the STL.
+      K.sort( std::ref( upperStarFiltration ) );
+
+      std::cerr << "finished\n";
+      break;
+    }
+
+    // lower-star filtration
+    case 2:
+    {
+      std::cerr << "* Establishing lower-star filtration order...";
+
+      aleph::topology::filtrations::LowerStar<Simplex> lowerStarFiltration( eccentricity.begin(), eccentricity.end() );
+      K.sort( std::ref( lowerStarFiltration ) );
+
+      std::cerr << "finished\n";
+      break;
+    }
+  }
 
   // Persistent homology -----------------------------------------------
 
