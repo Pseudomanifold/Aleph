@@ -26,7 +26,10 @@
 #
 # You can use any string as a prefix and specify the number of digits to
 # use for the prefix generation. By default, two digits will be used, as
-# this covers most use-cases.
+# this covers most use-cases. Moreover, you can specify a start value as
+# an index using '--start'.
+#
+# Original author: Bastian Rieck
 
 import argparse
 import os
@@ -36,6 +39,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument('FILE')
 parser.add_argument('--prefix', type=str, default="")
 parser.add_argument('--digits', type=int, default=2)
+parser.add_argument('--start',  type=int, default=0)
 
 arguments = parser.parse_args()
 filename  = arguments.FILE
@@ -48,19 +52,20 @@ index = 0
 
 prefix = arguments.prefix
 digits = arguments.digits
+start  = arguments.start
 
-def make_output_filename(basename, prefix, digits, index):
-  return   basename                          \
-         + "_"                               \
-         + prefix                            \
-         + ("%0" + str(digits) + "d") % index\
+def make_output_filename(basename, prefix, digits, index, start):
+  return   basename                                  \
+         + "_"                                       \
+         + prefix                                    \
+         + ("%0" + str(digits) + "d") % (index+start)\
          + ".txt"
 
 with open(filename) as f:
   basename = os.path.basename(filename)
   basename = os.path.splitext(basename)[0]
 
-  g = open(make_output_filename(basename, prefix, digits, index), "w")
+  g = open(make_output_filename(basename, prefix, digits, index, start), "w")
 
   state = States.Regular
   for line in f:
@@ -75,7 +80,7 @@ with open(filename) as f:
     else:
       g.close()
       index = index + 1
-      g     = open(make_output_filename(basename, prefix, digits, index), "w")
+      g     = open(make_output_filename(basename, prefix, digits, index, start), "w")
       state = States.Regular
 
   g.close()
