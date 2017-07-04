@@ -57,7 +57,7 @@ template <class T> void testFrechetMean()
                                               // for the total persistence
 
   ALEPH_ASSERT_THROW( D.size() > 0 );
-  ALEPH_ASSERT_THROW( std::abs( P - p ) < 1.0 );
+  ALEPH_ASSERT_THROW( std::abs( P - p ) < 2.0 );
 
   ALEPH_TEST_END();
 }
