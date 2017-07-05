@@ -60,6 +60,23 @@ template <class Map> void print( std::ostream& o, const Map& m, unsigned row )
   o << "\n";
 }
 
+void usage()
+{
+  std::cerr << "Usage: persistence_indicator_function_glyph [--max-k=K] BINS FILES\n"
+            << "\n"
+            << "Calculates persistence indicator function glyphs based on a set\n"
+            << "of persistence diagrams. The function uses BINS many bins. More\n"
+            << "than one file may be processed.\n"
+            << "\n"
+            << "Optional arguments:\n"
+            << "\n"
+            << " --max-k: Always use the specified number of glyphs. This makes\n"
+            << "          sure that even if a group of persistence diagrams has\n"
+            << "          an insufficient number of members, its glyph shall be\n"
+            << "          extended. This is useful for group comparison.\n"
+            << "\n\n";
+}
+
 int main( int argc, char** argv )
 {
   static option commandLineOptions[] =
@@ -84,7 +101,7 @@ int main( int argc, char** argv )
 
   if( argc - optind < 2 )
   {
-    // TODO: Show usage
+    usage();
     return -1;
   }
 
