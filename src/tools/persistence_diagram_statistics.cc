@@ -3,7 +3,10 @@
   Homology'.
 
   It analyses various aspects, such as the total persistence, of a set
-  of persistence diagrams and writes all statistics to STDOUT.
+  of persistence diagrams and writes all statistics to STDOUT. Results
+  are formatted as comma-separated values (CSV).
+
+  Original author: Bastian Rieck
 */
 
 #include <aleph/persistenceDiagrams/Extraction.hh>
@@ -13,9 +16,14 @@
 #include <aleph/persistenceDiagrams/io/Raw.hh>
 
 #include <iostream>
+#include <limits>
 #include <numeric>
 #include <string>
 #include <vector>
+
+#include <getopt.h>
+
+#include <cmath>
 
 using DataType           = double;
 using PersistenceDiagram = aleph::PersistenceDiagram<DataType>;
@@ -28,19 +36,65 @@ struct Input
 
 void usage()
 {
-  // TODO: not yet implemented
+  std::cerr << "Usage: persistence_diagram_statistics FILES\n"
+            << "\n"
+            << "Given a set of persistence diagrams, calculates numerous statistics\n"
+            << "and writes them to STDOUT in CSV format.\n"
+            << "\n"
+            << "Currently, the following statistics are calculated:\n"
+            << "  - Average persistence\n"
+            << "  - Infinity norm\n"
+            << "  - Total persistence\n"
+            << "\n"
+            << "Optional arguments:\n"
+            << "\n"
+            << " --invalid: Use the specified value to ignore certain values in every\n"
+            << "            persistence diagram. This is useful if invalid values are\n"
+            << "            encoded in the data.\n"
+            << "\n"
+            << " --power  : Use the specified power as an exponent during persistence\n"
+            << "            calculations. This does not apply to the infinity norm of\n"
+            << "            a persistence diagram.\n"
+            << "\n\n";
 }
 
 int main( int argc, char** argv )
 {
-  if( argc <= 1 )
+  static option commandLineOptions[] =
+  {
+    { "invalid"       , required_argument, nullptr, 'i' },
+    { "power"         , required_argument, nullptr, 'p' },
+    { nullptr         , 0                , nullptr,  0  }
+  };
+
+  DataType invalid = std::numeric_limits<DataType>::has_quiet_NaN ? std::numeric_limits<DataType>::quiet_NaN() : std::numeric_limits<DataType>::max();
+  double p         = 2.0;
+
+  {
+    int option = 0;
+    while( ( option = getopt_long( argc, argv, "i:p:", commandLineOptions, nullptr ) ) != -1 )
+    {
+      switch( option )
+      {
+      case 'i':
+        invalid = static_cast<DataType>( std::stod( optarg ) );
+        break;
+
+      default:
+        p = std::stod( optarg );
+        break;
+      }
+    }
+  }
+
+  if( argc - optind < 1 )
   {
     usage();
     return -1;
   }
 
   std::vector<Input> inputs;
-  inputs.reserve( argc - 1 );
+  inputs.reserve( argc - optind );
 
   std::vector<std::string> columns = {
     "file" ,
@@ -52,7 +106,7 @@ int main( int argc, char** argv )
     "average_persistence_weighted"
   };
 
-  for( int i = 1; i < argc; i++ )
+  for( int i = optind; i < argc; i++ )
   {
     std::string filename = argv[i];
 
@@ -68,16 +122,42 @@ int main( int argc, char** argv )
     std::cerr << "finished\n";
   }
 
-  // TODO: Make configurable
-  double p = 2.0;
+  // Header ------------------------------------------------------------
 
-  // TODO: Add explanatory header with comment symbols?
-  for( auto&& column : columns )
-    std::cout << column << " ";
-  std::cout << "\n";
+  {
+    for( auto&& column : columns )
+    {
+      if( column != columns.front() )
+        std::cout << ",";
+
+      std::cout << column;
+    }
+    std::cout << "\n";
+  }
 
   for( auto&& input : inputs )
   {
+    if( !std::isnan( invalid ) && invalid != std::numeric_limits<DataType>::max() )
+    {
+      std::cerr << "* Filtering all persistence pairs that contain '" << invalid << "'...";
+
+      using Point = typename PersistenceDiagram::Point;
+
+      std::transform( input.persistenceDiagram.begin(), input.persistenceDiagram.end(),
+                      input.persistenceDiagram.begin(),
+                      [&invalid] ( const Point& p )
+                      {
+                        if( p.x() == invalid || p.y() == invalid )
+                          return Point( DataType(), DataType() );
+                        else
+                          return p;
+                      } );
+
+      input.persistenceDiagram.removeDiagonal();
+
+      std::cerr << "\n";
+    }
+
     auto totalPersistence         = aleph::totalPersistence( input.persistenceDiagram, p, false );
     auto totalPersistenceWeighted = aleph::totalPersistence( input.persistenceDiagram, p, true  );
     auto infinityNorm             = aleph::infinityNorm( input.persistenceDiagram );
@@ -91,12 +171,12 @@ int main( int argc, char** argv )
     auto averagePersistence         = std::accumulate( persistence.begin(), persistence.end(), 0.0 ) / static_cast<double>( input.persistenceDiagram.size() );
     auto averageWeightedPersistence = std::accumulate( weightedPersistence.begin(), weightedPersistence.end(), 0.0 ) / static_cast<double>( input.persistenceDiagram.size() );
 
-    std::cout << "'" << input.filename      << "'" << " "
-              << p                          << " "
-              << totalPersistence           << " "
-              << totalPersistenceWeighted   << " "
-              << infinityNorm               << " "
-              << averagePersistence         << " "
+    std::cout << "'" << input.filename      << "'" << ","
+              << p                          << ","
+              << totalPersistence           << ","
+              << totalPersistenceWeighted   << ","
+              << infinityNorm               << ","
+              << averagePersistence         << ","
               << averageWeightedPersistence << "\n";
   }
 }
