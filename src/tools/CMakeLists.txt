@@ -1,10 +1,10 @@
 ADD_EXECUTABLE( create_functions                        create_functions.cc )
 ADD_EXECUTABLE( clique-communities                      clique-communities.cc )
-ADD_EXECUTABLE( clique-dna                              clique-dna.cc )
 ADD_EXECUTABLE( clique_persistence_diagram              clique_persistence_diagram.cc )
 ADD_EXECUTABLE( extended_persistence_hierarchy          extended_persistence_hierarchy.cc )
 ADD_EXECUTABLE( persistence_diagram_statistics          persistence_diagram_statistics.cc )
 ADD_EXECUTABLE( persistence_indicator_function          persistence_indicator_function.cc )
+ADD_EXECUTABLE( persistence_indicator_function_glyph    persistence_indicator_function_glyph.cc )
 ADD_EXECUTABLE( point_cloud_data_descriptors            point_cloud_data_descriptors.cc )
 ADD_EXECUTABLE( topological_distance                    topological_distance.cc )
 
