@@ -67,7 +67,7 @@ public:
 
     _index->radiusSearch( _matrix,
                           internalIndices,
-                          distances,
+                          internalDistances,
                           static_cast<float>( _traits.to( radius ) ),
                           searchParameters );
 
@@ -89,6 +89,20 @@ public:
     }
 
     // Perform transformation of distances -----------------------------
+
+    if( internalDistances.empty() )
+      return;
+
+    distances.clear();
+    distances.resize( internalDistances.size(), std::vector<ElementType>( internalDistances.front().size() ) );
+
+    {
+      using size_type = typename std::vector< std::vector<ElementType> >::size_type;
+
+      for( size_type row = 0; row < distances.size(); row++ )
+        for( size_type col = 0; col < distances[row].size(); col++ )
+          distances[row][col] = static_cast<ElementType>( internalDistances[row][col] );
+    }
 
     for( auto&& D : distances )
     {
@@ -136,7 +150,7 @@ public:
 
     _index->knnSearch( _matrix,
                        internalIndices,
-                       distances,
+                       internalDistances,
                        k,
                        searchParameters );
 
@@ -158,6 +172,20 @@ public:
     }
 
     // Perform transformation of distances -----------------------------
+
+    if( internalDistances.empty() )
+      return;
+
+    distances.clear();
+    distances.resize( internalDistances.size(), std::vector<ElementType>( internalDistances.front().size() ) );
+
+    {
+      using size_type = typename std::vector< std::vector<ElementType> >::size_type;
+
+      for( size_type row = 0; row < distances.size(); row++ )
+        for( size_type col = 0; col < distances[row].size(); col++ )
+          distances[row][col] = static_cast<ElementType>( internalDistances[row][col] );
+    }
 
     for( auto&& D : distances )
     {
