@@ -13,6 +13,9 @@ namespace math
 template <class T> class KahanSummation
 {
 public:
+
+  // This constructor should not be explicit because I need the
+  // automated conversion of variables of type T.
   KahanSummation( T initial = T() )
     : _sum( initial )
     , _c( T() )

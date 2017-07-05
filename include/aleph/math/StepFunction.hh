@@ -54,7 +54,7 @@ public:
   class IndicatorFunction
   {
   public:
-    IndicatorFunction( D a )
+    explicit IndicatorFunction( D a )
       : _a( a    )
       , _b( a    )
       , _y( I(1) )

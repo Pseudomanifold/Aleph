@@ -27,7 +27,7 @@ public:
   using ElementType     = typename Container::ElementType;
   using Traits          = aleph::distances::Traits<DistanceFunctor>;
 
-  FLANN( const Container& container )
+  explicit FLANN( const Container& container )
     : _container( container )
   {
 #ifdef ALEPH_WITH_FLANN

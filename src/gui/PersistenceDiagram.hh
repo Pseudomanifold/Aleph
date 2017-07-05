@@ -25,7 +25,7 @@ class PersistenceDiagram : public QChartView
 
 public:
 
-  template <class T> PersistenceDiagram( const aleph::PersistenceDiagram<T>& persistenceDiagram )
+  template <class T> explicit PersistenceDiagram( const aleph::PersistenceDiagram<T>& persistenceDiagram )
     : QtCharts::QChartView( new QChart )
     , _scatterSeries( new QScatterSeries )
     , _lineSeries( new QLineSeries )

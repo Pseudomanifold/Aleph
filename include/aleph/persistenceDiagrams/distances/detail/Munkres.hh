@@ -79,7 +79,7 @@ public:
 
   // Constructor -------------------------------------------------------
 
-  Munkres( const Matrix<T>& matrix )
+  explicit Munkres( const Matrix<T>& matrix )
     : _matrix( matrix )
     , _stars( matrix.n() )
     , _primes( matrix.n() )

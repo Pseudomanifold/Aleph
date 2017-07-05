@@ -24,7 +24,7 @@ template <class Pairing> class PersistencePairingCalculation
 {
 public:
 
-  PersistencePairingCalculation( Pairing& pairing )
+  explicit PersistencePairingCalculation( Pairing& pairing )
     : _pairing( pairing )
   {
   }
@@ -49,7 +49,7 @@ template <class Pairing> class NoPersistencePairingCalculation
 {
 public:
 
-  NoPersistencePairingCalculation( Pairing& pairing )
+  explicit NoPersistencePairingCalculation( Pairing& pairing )
     : _pairing( pairing )
   {
   }

@@ -31,7 +31,7 @@ public:
   using ElementType     = typename Container::ElementType;
   using Traits          = aleph::distances::Traits<DistanceFunctor>;
 
-  BruteForce( const Container& container )
+  explicit BruteForce( const Container& container )
     : _container( container )
   {
   }
@@ -130,8 +130,8 @@ private:
   Traits _traits;
 };
 
-}
+} // namespace geometry
 
-}
+} // namespace aleph
 
 #endif

@@ -23,7 +23,7 @@ public:
   using IndexMap    = std::vector<IndexType>;
   using size_type   = typename ColumnType::size_type;
 
-  SparseBinaryMatrix( IndexType columns )
+  explicit SparseBinaryMatrix( IndexType columns )
   {
     _columns.resize( size_type( columns ) );
   }

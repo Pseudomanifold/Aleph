@@ -21,7 +21,7 @@ template <class T> class Matrix
 {
 public:
 
-  Matrix( std::size_t n )
+  explicit Matrix( std::size_t n )
     : _n( n )
     , _data( new T*[_n] )
   {

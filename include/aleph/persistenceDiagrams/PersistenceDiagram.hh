@@ -24,7 +24,7 @@ public:
   {
   public:
 
-    Point( DataType x )
+    explicit Point( DataType x )
       : _x( x )
       , _y( std::numeric_limits<DataType>::max() )
     {
