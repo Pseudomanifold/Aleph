@@ -26,6 +26,11 @@ following papers:
 If you want to contribute, please see the [contribution
 guidelines](CONTRIBUTING.md) for more details.
 
+# Documentation
+
+[Documentation](https://submanifold.github.io/Aleph) of the main
+features, including some tutorials, is available on GitHub.
+
 # License
 
 Aleph uses the MIT license. Please see the file [`LICENSE.md`](LICENSE.md)
