@@ -16,9 +16,9 @@ LIST( APPEND CMAKE_MODULE_PATH
 
 SET( CMAKE_EXPORT_COMPILE_COMMANDS ON )
 
-#
+########################################################################
 # Macros and additional flags
-#
+########################################################################
 
 INCLUDE( CheckCXXCompilerFlag )
 
@@ -37,9 +37,9 @@ ENABLE_IF_SUPPORTED( CMAKE_CXX_FLAGS "-Wself-init" )
 ENABLE_IF_SUPPORTED( CMAKE_CXX_FLAGS "-Wunsafe-loop-optimization" )
 ENABLE_IF_SUPPORTED( CMAKE_CXX_FLAGS "-pedantic" )
 
-#
+########################################################################
 # Additional packages
-#
+########################################################################
 
 FIND_PACKAGE( Boost REQUIRED )
 FIND_PACKAGE( OpenMP )
@@ -60,16 +60,16 @@ IF( FLANN_FOUND )
   SET( ALEPH_WITH_FLANN TRUE )
 ENDIF()
 
-#
+########################################################################
 # Configuration files
-#
+########################################################################
 
 CONFIGURE_FILE( ${CMAKE_SOURCE_DIR}/include/aleph/config/Base.hh.in ${CMAKE_SOURCE_DIR}/include/aleph/config/Base.hh )
 CONFIGURE_FILE( ${CMAKE_SOURCE_DIR}/include/aleph/config/FLANN.hh.in ${CMAKE_SOURCE_DIR}/include/aleph/config/FLANN.hh )
 
-#
+########################################################################
 # Include directories
-#
+########################################################################
 
 INCLUDE_DIRECTORIES(
   ${Boost_INCLUDE_DIR}
@@ -81,9 +81,9 @@ ADD_SUBDIRECTORY( include )
 ADD_SUBDIRECTORY( src )
 ADD_SUBDIRECTORY( examples )
 
-#
+########################################################################
 # Tests
-#
+########################################################################
 
 # Enable testing globally. Individual tests may be found in the `tests`
 # subdirectory of the repository.
@@ -91,9 +91,10 @@ ENABLE_TESTING()
 
 ADD_SUBDIRECTORY( tests )
 
-#
+########################################################################
 # Place compile commands in the source directory
-#
+########################################################################
+
 
 IF( EXISTS "${CMAKE_CURRENT_BINARY_DIR}/compile_commands.json" )
   EXECUTE_PROCESS( COMMAND ${CMAKE_COMMAND} -E copy_if_different
@@ -101,3 +102,17 @@ IF( EXISTS "${CMAKE_CURRENT_BINARY_DIR}/compile_commands.json" )
     ${CMAKE_CURRENT_SOURCE_DIR}/compile_commands.json
   )
 ENDIF()
+
+########################################################################
+# Add static analysis targets: `cppcheck`
+########################################################################
+
+ADD_CUSTOM_TARGET( cppcheck
+  COMMAND cppcheck
+            --enable=all
+            --std=c++11
+            --template "{file},{line},{severity},{message}"
+            --verbose
+            --project=${CMAKE_CURRENT_SOURCE_DIR}/compile_commands.json
+             2> /tmp/cppcheck.csv
+)
