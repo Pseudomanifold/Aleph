@@ -150,7 +150,7 @@ int main( int argc, char** argv )
                         if( p.x() == invalid || p.y() == invalid )
                           return Point( DataType(), DataType() );
                         else
-                          return p;
+                          return Point( p );
                       } );
 
       input.persistenceDiagram.removeDiagonal();
