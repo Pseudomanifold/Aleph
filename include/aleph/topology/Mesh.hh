@@ -326,7 +326,7 @@ public:
     triangles and edges of which the vertex is a face.
   */
 
-  Mesh star( Index id ) const noexcept
+  Mesh star( Index id ) const
   {
     Mesh M;
 
