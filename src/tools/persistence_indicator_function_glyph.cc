@@ -1,3 +1,20 @@
+/*
+  This is a tool shipped by 'Aleph - A Library for Exploring Persistent
+  Homology'.
+
+  Given a set of persistence diagrams, the tool calculates a histogram
+  glyph. The glyph uses persistence indicator functions, a summarizing
+  function of a persistence diagram.
+
+  This tool follows the publication:
+
+    Clique Community Persistence: A Topological Visual Analysis Approach for Complex Networks
+    Bastian Rieck, Ulderico Fugacci, Jonas Lukasczyk, Heike Leitte
+    Submitted to IEEE Vis 2017
+
+  TODO: Link to documentation
+*/
+
 #include <algorithm>
 #include <fstream>
 #include <iostream>
@@ -47,24 +64,17 @@ int main( int argc, char** argv )
 {
   static option commandLineOptions[] =
   {
-    { "min-k", required_argument, nullptr, 'k' },
     { "max-k", required_argument, nullptr, 'K' },
     { nullptr, 0                , nullptr,  0  }
   };
 
-  int option = 0;
-
-  unsigned minK = 0;
+  int option    = 0;
   unsigned maxK = 0;
 
-  while( ( option = getopt_long( argc, argv, "k:K:", commandLineOptions, nullptr ) ) != -1 )
+  while( ( option = getopt_long( argc, argv, "K:", commandLineOptions, nullptr ) ) != -1 )
   {
     switch( option )
     {
-    case 'k':
-      minK = unsigned( std::stoul( optarg ) );
-      break;
-    case 'K':
       maxK = unsigned( std::stoul( optarg ) );
       break;
     default:
@@ -208,8 +218,8 @@ int main( int argc, char** argv )
     return static_cast<std::size_t>( ( std::log10( value ) - std::log10( min ) ) / offset );
   };
 
-  std::ofstream linout( "/tmp/DNA_" + std::to_string( n ) + "_lin.txt" );
-  std::ofstream logout( "/tmp/DNA_" + std::to_string( n ) + "_log.txt" );
+  std::ofstream linout( "/tmp/Persistence_indicator_function_glyph_" + std::to_string( n ) + "_lin.txt" );
+  std::ofstream logout( "/tmp/Persistence_indicator_function_glyph_" + std::to_string( n ) + "_log.txt" );
 
   unsigned index = 0;
   for( auto&& pif : persistenceIndicatorFunctions )
