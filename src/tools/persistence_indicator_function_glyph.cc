@@ -92,6 +92,7 @@ int main( int argc, char** argv )
   {
     switch( option )
     {
+    case 'K':
       maxK = unsigned( std::stoul( optarg ) );
       break;
     default:
