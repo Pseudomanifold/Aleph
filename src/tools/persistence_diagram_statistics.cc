@@ -100,10 +100,9 @@ int main( int argc, char** argv )
     "file" ,
     "power",
     "total_persistence",
-    "total_persistence_weighted",
+    "total_persistence_normalized",
     "infinity_norm",
-    "average_persistence",
-    "average_persistence_weighted"
+    "average_persistence"
   };
 
   for( int i = optind; i < argc; i++ )
@@ -158,25 +157,20 @@ int main( int argc, char** argv )
       std::cerr << "\n";
     }
 
-    auto totalPersistence         = aleph::totalPersistence( input.persistenceDiagram, p, false );
-    auto totalPersistenceWeighted = aleph::totalPersistence( input.persistenceDiagram, p, true  );
-    auto infinityNorm             = aleph::infinityNorm( input.persistenceDiagram );
+    auto totalPersistence           = aleph::totalPersistence( input.persistenceDiagram, p, false );
+    auto totalPersistenceNormalized = totalPersistence / static_cast<decltype(totalPersistence)>( input.persistenceDiagram.size() );
+    auto infinityNorm               = aleph::infinityNorm( input.persistenceDiagram );
 
     std::vector<DataType> persistence;
     aleph::persistence( input.persistenceDiagram, std::back_inserter( persistence ) );
 
-    std::vector<DataType> weightedPersistence;
-    aleph::weightedPersistence( input.persistenceDiagram, std::back_inserter( weightedPersistence ) );
-
     auto averagePersistence         = std::accumulate( persistence.begin(), persistence.end(), 0.0 ) / static_cast<double>( input.persistenceDiagram.size() );
-    auto averageWeightedPersistence = std::accumulate( weightedPersistence.begin(), weightedPersistence.end(), 0.0 ) / static_cast<double>( input.persistenceDiagram.size() );
 
     std::cout << "'" << input.filename      << "'" << ","
               << p                          << ","
               << totalPersistence           << ","
-              << totalPersistenceWeighted   << ","
+              << totalPersistenceNormalized << ","
               << infinityNorm               << ","
-              << averagePersistence         << ","
-              << averageWeightedPersistence << "\n";
+              << averagePersistence         << "\n";
   }
 }
