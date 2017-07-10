@@ -12,7 +12,8 @@ namespace gui
 
 void PersistenceDiagram::setup()
 {
-  this->setRubberBand( QChartView::RectangleRubberBand );
+  this->setDragMode( QGraphicsView::RubberBandDrag );
+  this->setRubberBand( QChartView::NoRubberBand );
 
   // TODO: Make configurable/provide elsewhere
   _scatterSeries->setPen( QPen( QColor(196, 30, 58) ) );
