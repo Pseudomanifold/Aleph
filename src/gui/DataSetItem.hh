@@ -21,8 +21,12 @@ public:
 
   void append( DataSetItem* child );
 
-  int children() const;
   int row() const;
+
+  // Following the Qt nomenclature here, even though I do not really
+  // like it.
+  int childCount() const;
+  int columnCount() const;
 
   DataSetItem* parent() const         { return _parent; }
   DataSetItem* child( int row ) const { return _children.value( row ); }
