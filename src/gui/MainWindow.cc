@@ -4,6 +4,7 @@
 #include <aleph/persistenceDiagrams/io/Raw.hh>
 
 #include <QAction>
+#include <QDockWidget>
 #include <QFileDialog>
 #include <QMdiSubWindow>
 #include <QMenuBar>
@@ -19,10 +20,15 @@ namespace gui
 
 MainWindow::MainWindow()
   : _mdiArea( new QMdiArea( this ) )
+  , _dataSetList( new QListView( this ) )
 {
   this->createMenus();
   this->createStatusBar();
   this->createToolBars();
+
+  // Need to be created later on because they modify the menus of the
+  // main window.
+  this->createDockWidgets();
 
   // MDI area ----------------------------------------------------------
 
@@ -32,10 +38,27 @@ MainWindow::MainWindow()
   this->setCentralWidget( _mdiArea );
 }
 
+void MainWindow::createDockWidgets()
+{
+  {
+    QDockWidget* dockWidget = new QDockWidget( tr("Data sets"), this );
+    dockWidget->setAllowedAreas( Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea );
+    dockWidget->setWidget( _dataSetList );
+
+    this->addDockWidget( Qt::LeftDockWidgetArea, dockWidget );
+
+    _showMenu->addAction( dockWidget->toggleViewAction() );
+  }
+}
+
 void MainWindow::createMenus()
 {
   auto menuBar  = this->menuBar();
   auto fileMenu = menuBar->addMenu( tr("&File") );
+  _showMenu     = menuBar->addMenu( tr("&Show") );
+
+  // "Load" menu -------------------------------------------------------
+
   auto loadMenu = fileMenu->addMenu( tr("Load") );
 
   QAction* loadPersistenceDiagram

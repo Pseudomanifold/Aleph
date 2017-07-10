@@ -1,6 +1,7 @@
 #ifndef ALEPH_GUI_MAIN_WINDOW_HH__
 #define ALEPH_GUI_MAIN_WINDOW_HH__
 
+#include <QListView>
 #include <QMainWindow>
 #include <QMdiArea>
 
@@ -20,6 +21,7 @@ public:
   MainWindow();
 
 private:
+  void createDockWidgets();
   void createMenus();
   void createStatusBar();
   void createToolBars();
@@ -34,6 +36,13 @@ private:
   // Widgets -----------------------------------------------------------
 
   QMdiArea* _mdiArea;
+  QListView* _dataSetList;
+
+  // Menus -------------------------------------------------------------
+
+  // Needs to be stored here because different widgets may choose to add
+  // themselves to the menu in order to toggle their visibility.
+  QMenu* _showMenu;
 
   // Data --------------------------------------------------------------
 
