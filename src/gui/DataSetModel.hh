@@ -2,7 +2,9 @@
 #define ALEPH_GUI_DATA_SET_MODEL_HH__
 
 #include <QAbstractItemModel>
+#include <QList>
 #include <QObject>
+#include <QString>
 
 namespace aleph
 {
@@ -26,6 +28,11 @@ public:
   int rowCount( const QModelIndex& parent = QModelIndex() ) const override;
   int columnCount( const QModelIndex& parent = QModelIndex() ) const override;
 
+  /** Returns column names */
+  QVariant headerData( int section,
+                       Qt::Orientation orientation,
+                       int role = Qt::DisplayRole ) const override;
+
   QVariant data( const QModelIndex& index, int role ) const override;
 
   /**
@@ -43,6 +50,11 @@ private:
   // This is the root of all data items. It does *not* contain any
   // additional data and is generally not shown directly.
   DataSetItem* _root = nullptr;
+
+  QList<QString> _columnNames = {
+    tr("Filename"),
+    tr("Size")
+  };
 };
 
 } // namespace gui

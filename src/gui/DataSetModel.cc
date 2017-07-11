@@ -86,6 +86,16 @@ int DataSetModel::columnCount( const QModelIndex& parent ) const
     return _root->columnCount();
 }
 
+QVariant DataSetModel::headerData( int section,
+                                   Qt::Orientation orientation,
+                                   int role ) const
+{
+  if( orientation == Qt::Horizontal && role == Qt::DisplayRole )
+    return _columnNames[section];
+
+  return QVariant();
+}
+
 QVariant DataSetModel::data( const QModelIndex& index, int role ) const
 {
   if( !index.isValid() )
