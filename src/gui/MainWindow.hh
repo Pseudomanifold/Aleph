@@ -41,6 +41,10 @@ private slots:
 
   void onDataSetContextMenuRequested( const QPoint& position );
 
+  // Interaction -------------------------------------------------------
+
+  void onVisualizeDataSet();
+
 private:
 
   // Events ------------------------------------------------------------

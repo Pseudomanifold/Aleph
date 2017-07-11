@@ -155,6 +155,14 @@ void MainWindow::onDataSetContextMenuRequested( const QPoint& position )
     // Individual persistence diagram selected
     if( item->childCount() == 0 )
     {
+      QAction* visualizeDataSetAction = new QAction( tr("Visualize persistence diagram"), contextMenu );
+      visualizeDataSetAction->setData( data );
+
+      this->connect( visualizeDataSetAction,
+                     SIGNAL( triggered() ),
+                     SLOT( onVisualizeDataSet() ) );
+
+      contextMenu->addAction( visualizeDataSetAction );
     }
 
     // Group of persistence diagrams
@@ -170,6 +178,21 @@ void MainWindow::onDataSetContextMenuRequested( const QPoint& position )
   }
 
   contextMenu->popup( QCursor::pos() );
+}
+
+void MainWindow::onVisualizeDataSet()
+{
+  auto action             = qobject_cast<QAction*>( sender() );
+  auto data               = action->data();
+  auto persistenceDiagram = data.value<PersistenceDiagram>();
+  auto view               = new PersistenceDiagramView( persistenceDiagram );
+  auto subWindow          = _mdiArea->addSubWindow( view );
+
+  this->connect( view, SIGNAL( clicked( QPointF ) ),
+                 this, SLOT( handlePersistenceDiagramClick( QPointF ) ) );
+
+  subWindow->resize( 300, 300 );
+  subWindow->show();
 }
 
 void MainWindow::dragEnterEvent( QDragEnterEvent* event )
