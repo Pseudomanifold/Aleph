@@ -14,6 +14,12 @@ namespace gui
 class DataSetItem
 {
 public:
+
+  // Export column names in order to make them usable in the data set
+  // model class. I want to keep them close to this class because the
+  // indices are used for returning certain data.
+  const static QList<QString> columnNames;
+
   explicit DataSetItem( const QString& title,
                         const QVariant& data,
                         DataSetItem* parent = nullptr );

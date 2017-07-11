@@ -91,7 +91,7 @@ QVariant DataSetModel::headerData( int section,
                                    int role ) const
 {
   if( orientation == Qt::Horizontal && role == Qt::DisplayRole )
-    return _columnNames[section];
+    return DataSetItem::columnNames[section];
 
   return QVariant();
 }

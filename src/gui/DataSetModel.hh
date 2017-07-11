@@ -50,11 +50,6 @@ private:
   // This is the root of all data items. It does *not* contain any
   // additional data and is generally not shown directly.
   DataSetItem* _root = nullptr;
-
-  QList<QString> _columnNames = {
-    tr("Filename"),
-    tr("Size")
-  };
 };
 
 } // namespace gui

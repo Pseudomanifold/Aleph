@@ -2,6 +2,12 @@
 #include "MetaTypes.hh"
 
 #include <QDebug>
+#include <QString>
+
+const QList<QString> aleph::gui::DataSetItem::columnNames = {
+  QObject::tr("Filename"),
+  QObject::tr("Size")
+};
 
 namespace aleph
 {
@@ -51,14 +57,36 @@ int DataSetItem::childCount() const
 
 int DataSetItem::columnCount() const
 {
-  // TODO: make configurable?
-  return 2;
+  return DataSetItem::columnNames.count();
 }
 
 QVariant DataSetItem::data( int column ) const
 {
-  if( column == 0 )
+  switch( column )
+  {
+  case 0:
     return _title;
+  case 1:
+    {
+      auto id_PersistenceDiagram = qMetaTypeId<PersistenceDiagram>();
+      auto id_SimplicialComplex  = qMetaTypeId<SimplicialComplex>();
+      auto userType              = _data.userType();
+
+      qulonglong size = 0;
+
+      if( userType == id_PersistenceDiagram )
+        size = _data.value<PersistenceDiagram>().size();
+      else if( userType == id_SimplicialComplex )
+        size = _data.value<SimplicialComplex>().size();
+
+      // Fall back to counting the children of an item if the stored
+      // data set is empty
+      if( size == 0)
+        size = static_cast<qulonglong>( this->childCount() );
+
+      return size;
+    }
+  }
 
   return QVariant();
 }
