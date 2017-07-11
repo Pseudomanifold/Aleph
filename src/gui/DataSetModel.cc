@@ -2,6 +2,7 @@
 #include "DataSetItem.hh"
 
 #include <QDebug>
+#include <QIcon>
 
 namespace aleph
 {
@@ -13,9 +14,14 @@ DataSetModel::DataSetModel( QObject* parent )
   : QAbstractItemModel( parent )
   , _root( new DataSetItem( QString(), QVariant() ) )
 {
-  _root->append( new DataSetItem( tr("Persistence diagrams"), QVariant(), _root ) );
-  _root->append( new DataSetItem( tr("Point clouds")        , QVariant(), _root ) );
-  _root->append( new DataSetItem( tr("Simplicial complexes"), QVariant(), _root ) );
+  QList<DataSetItem*> topLevelItems = {
+      new DataSetItem( tr("Persistence diagrams"), QVariant(), _root ),
+      new DataSetItem( tr("Point clouds")        , QVariant(), _root ),
+      new DataSetItem( tr("Simplicial complexes"), QVariant(), _root )
+  };
+
+  foreach( DataSetItem* item, topLevelItems )
+  _root->append( item );
 }
 
 DataSetModel::~DataSetModel()
@@ -80,11 +86,18 @@ int DataSetModel::columnCount( const QModelIndex& parent ) const
 
 QVariant DataSetModel::data( const QModelIndex& index, int role ) const
 {
-  if( !index.isValid() || role != Qt::DisplayRole )
+  if( !index.isValid() )
     return QVariant();
 
-  DataSetItem* item = static_cast<DataSetItem*>( index.internalPointer() );
-  return item->data( index.column() );
+  if( role == Qt::DisplayRole )
+  {
+    DataSetItem* item = static_cast<DataSetItem*>( index.internalPointer() );
+    return item->data( index.column() );
+  }
+  else if( role == Qt::DecorationRole && index.column() == 0 )
+    return QIcon::fromTheme( "folder" );
+
+  return QVariant();
 }
 
 } // namespace gui
