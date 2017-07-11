@@ -1,6 +1,8 @@
 #include "DataSetModel.hh"
 #include "DataSetItem.hh"
 
+#include <QDebug>
+
 namespace aleph
 {
 
@@ -11,6 +13,9 @@ DataSetModel::DataSetModel( QObject* parent )
   : QAbstractItemModel( parent )
   , _root( new DataSetItem( QString(), QVariant() ) )
 {
+  _root->append( new DataSetItem( tr("Persistence diagrams"), QVariant(), _root ) );
+  _root->append( new DataSetItem( tr("Point clouds")        , QVariant(), _root ) );
+  _root->append( new DataSetItem( tr("Simplicial complexes"), QVariant(), _root ) );
 }
 
 DataSetModel::~DataSetModel()
@@ -75,11 +80,11 @@ int DataSetModel::columnCount( const QModelIndex& parent ) const
 
 QVariant DataSetModel::data( const QModelIndex& index, int role ) const
 {
-  if( index.isValid() || role != Qt::DisplayRole )
+  if( !index.isValid() || role != Qt::DisplayRole )
     return QVariant();
 
   DataSetItem* item = static_cast<DataSetItem*>( index.internalPointer() );
-  return item->data();
+  return item->data( index.column() );
 }
 
 } // namespace gui

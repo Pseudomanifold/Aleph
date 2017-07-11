@@ -5,14 +5,13 @@
 #include <QMdiArea>
 #include <QTreeView>
 
-#include <aleph/persistenceDiagrams/PersistenceDiagram.hh>
+#include "MetaTypes.hh"
 
 namespace aleph
 {
 
 namespace gui
 {
-
 
 class DataSetModel;
 
@@ -49,9 +48,7 @@ private:
 
   // Data --------------------------------------------------------------
 
-  using DataType = double;
-
-  aleph::PersistenceDiagram<DataType> _persistenceDiagram;
+  PersistenceDiagram _persistenceDiagram;
 
   // Model for storing all data sets that are supplied by the user or
   // created by interactions.
