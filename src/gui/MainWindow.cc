@@ -1,5 +1,6 @@
 #include "MainWindow.hh"
 
+#include "DataSetItem.hh"
 #include "DataSetModel.hh"
 #include "PersistenceDiagramView.hh"
 
@@ -11,11 +12,14 @@
 #include <QDropEvent>
 #include <QFileDialog>
 #include <QMdiSubWindow>
+#include <QMenu>
 #include <QMimeData>
 #include <QMenuBar>
 #include <QStatusBar>
 
 #include <limits>
+
+#include <QDebug>
 
 namespace aleph
 {
@@ -29,6 +33,11 @@ MainWindow::MainWindow()
   , _dataSetModel( new DataSetModel( this ) )
 {
   _dataSetView->setModel( _dataSetModel );
+  _dataSetView->setContextMenuPolicy( Qt::CustomContextMenu );
+
+  this->connect( _dataSetView,
+                 SIGNAL( customContextMenuRequested(QPoint) ),
+                 SLOT( onDataSetContextMenuRequested(QPoint) ) );
 
   this->createMenus();
   this->createStatusBar();
@@ -123,6 +132,44 @@ void MainWindow::handlePersistenceDiagramClick( const QPointF& point )
   this->statusBar()->showMessage(
     QString( "Selected point: (%1,%2)" ).arg( point.x() ).arg( point.y() )
   );
+}
+
+void MainWindow::onDataSetContextMenuRequested( const QPoint& position )
+{
+  auto modelIndex = _dataSetView->indexAt( position );
+
+  if( !modelIndex.isValid() || !modelIndex.internalPointer() )
+    return;
+
+  DataSetItem* item = static_cast<DataSetItem*>( modelIndex.internalPointer() );
+  auto data         = item->data();
+
+  int id_PersistenceDiagram = qMetaTypeId<PersistenceDiagram>();
+  int id_SimplicialComplex  = qMetaTypeId<SimplicialComplex>();
+  int userType              = data.userType();
+
+  QMenu* contextMenu = new QMenu( this );
+
+  if( userType == id_PersistenceDiagram )
+  {
+    // Individual persistence diagram selected
+    if( item->childCount() == 0 )
+    {
+    }
+
+    // Group of persistence diagrams
+    else
+    {
+      // TODO:
+      //  - Comparative visualization
+      //  - Distance calculations
+    }
+  }
+  else if( userType == id_SimplicialComplex )
+  {
+  }
+
+  contextMenu->popup( QCursor::pos() );
 }
 
 void MainWindow::dragEnterEvent( QDragEnterEvent* event )

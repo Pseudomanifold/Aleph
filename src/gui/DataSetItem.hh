@@ -53,6 +53,7 @@ public:
   */
 
   QVariant data( int column ) const;
+  QVariant data()             const { return _data; }
 
 private:
   QString  _title;                //< Title of data set (or group)

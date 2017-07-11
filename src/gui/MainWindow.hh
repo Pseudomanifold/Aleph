@@ -33,6 +33,14 @@ private slots:
 
   void handlePersistenceDiagramClick( const QPointF& point );
 
+  /**
+    Custom context menu handler for the data set viewer. Since the
+    action should depend on the selected item, a handler is needed
+    instead of a generic context menu.
+  */
+
+  void onDataSetContextMenuRequested( const QPoint& position );
+
 private:
 
   // Events ------------------------------------------------------------
