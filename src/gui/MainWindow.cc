@@ -1,7 +1,7 @@
 #include "MainWindow.hh"
 
 #include "DataSetModel.hh"
-#include "PersistenceDiagram.hh"
+#include "PersistenceDiagramView.hh"
 
 #include <aleph/persistenceDiagrams/io/Raw.hh>
 
@@ -94,7 +94,7 @@ void MainWindow::loadPersistenceDiagram()
       QString( "Loaded persistence diagram with %1 entries" ).arg( _persistenceDiagram.size() )
     );
 
-    auto pd        = new PersistenceDiagram( _persistenceDiagram );
+    auto pd        = new PersistenceDiagramView( _persistenceDiagram );
     auto subWindow = _mdiArea->addSubWindow( pd );
 
     this->connect( pd, SIGNAL( clicked( QPointF ) ),

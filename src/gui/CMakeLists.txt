@@ -8,7 +8,7 @@ IF( Qt5_FOUND )
     DataSetModel.cc
     MainWindow.cc
     Perdita.cc
-    PersistenceDiagram.cc
+    PersistenceDiagramView.cc
   )
   TARGET_LINK_LIBRARIES( Perdita Qt5::Charts Qt5::Widgets )
 ENDIF()

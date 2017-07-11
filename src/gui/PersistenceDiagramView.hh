@@ -1,5 +1,5 @@
-#ifndef ALEPH_GUI_PERSISTENCE_DIAGRAM_HH__
-#define ALEPH_GUI_PERSISTENCE_DIAGRAM_HH__
+#ifndef ALEPH_GUI_PERSISTENCE_DIAGRAM_VIEW_HH__
+#define ALEPH_GUI_PERSISTENCE_DIAGRAM_VIEW_HH__
 
 #include <aleph/persistenceDiagrams/PersistenceDiagram.hh>
 
@@ -18,14 +18,14 @@ namespace aleph
 namespace gui
 {
 
-class PersistenceDiagram : public QChartView
+class PersistenceDiagramView : public QChartView
 {
 
   Q_OBJECT
 
 public:
 
-  template <class T> explicit PersistenceDiagram( const aleph::PersistenceDiagram<T>& persistenceDiagram )
+  template <class T> explicit PersistenceDiagramView( const aleph::PersistenceDiagram<T>& persistenceDiagram )
     : QtCharts::QChartView( new QChart )
     , _scatterSeries( new QScatterSeries )
     , _lineSeries( new QLineSeries )

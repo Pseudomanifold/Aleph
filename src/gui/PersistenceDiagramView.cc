@@ -1,4 +1,4 @@
-#include "PersistenceDiagram.hh"
+#include "PersistenceDiagramView.hh"
 
 #include <QBrush>
 #include <QColor>
@@ -10,7 +10,7 @@ namespace aleph
 namespace gui
 {
 
-void PersistenceDiagram::setup()
+void PersistenceDiagramView::setup()
 {
   this->setDragMode( QGraphicsView::RubberBandDrag );
   this->setRubberBand( QChartView::NoRubberBand );
