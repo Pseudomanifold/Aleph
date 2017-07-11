@@ -1,4 +1,6 @@
 #include "MainWindow.hh"
+
+#include "DataSetModel.hh"
 #include "PersistenceDiagram.hh"
 
 #include <aleph/persistenceDiagrams/io/Raw.hh>
@@ -20,13 +22,16 @@ namespace gui
 
 MainWindow::MainWindow()
   : _mdiArea( new QMdiArea( this ) )
-  , _dataSetList( new QListView( this ) )
+  , _dataSetView( new QTreeView( this ) )
+  , _dataSetModel( new DataSetModel( this ) )
 {
+  _dataSetView->setModel( _dataSetModel );
+
   this->createMenus();
   this->createStatusBar();
   this->createToolBars();
 
-  // Need to be created later on because they modify the menus of the
+  // Needs to be created later on because they modify the menus of the
   // main window.
   this->createDockWidgets();
 
@@ -43,7 +48,7 @@ void MainWindow::createDockWidgets()
   {
     QDockWidget* dockWidget = new QDockWidget( tr("Data sets"), this );
     dockWidget->setAllowedAreas( Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea );
-    dockWidget->setWidget( _dataSetList );
+    dockWidget->setWidget( _dataSetView );
 
     this->addDockWidget( Qt::LeftDockWidgetArea, dockWidget );
 

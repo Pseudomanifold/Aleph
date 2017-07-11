@@ -73,6 +73,15 @@ int DataSetModel::columnCount( const QModelIndex& parent ) const
     return _root->columnCount();
 }
 
+QVariant DataSetModel::data( const QModelIndex& index, int role ) const
+{
+  if( index.isValid() || role != Qt::DisplayRole )
+    return QVariant();
+
+  DataSetItem* item = static_cast<DataSetItem*>( index.internalPointer() );
+  return item->data();
+}
+
 } // namespace gui
 
 } // namespace aleph

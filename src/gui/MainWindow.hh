@@ -1,9 +1,9 @@
 #ifndef ALEPH_GUI_MAIN_WINDOW_HH__
 #define ALEPH_GUI_MAIN_WINDOW_HH__
 
-#include <QListView>
 #include <QMainWindow>
 #include <QMdiArea>
+#include <QTreeView>
 
 #include <aleph/persistenceDiagrams/PersistenceDiagram.hh>
 
@@ -12,6 +12,9 @@ namespace aleph
 
 namespace gui
 {
+
+
+class DataSetModel;
 
 class MainWindow : public QMainWindow
 {
@@ -36,7 +39,7 @@ private:
   // Widgets -----------------------------------------------------------
 
   QMdiArea* _mdiArea;
-  QListView* _dataSetList;
+  QTreeView* _dataSetView;
 
   // Menus -------------------------------------------------------------
 
@@ -49,6 +52,10 @@ private:
   using DataType = double;
 
   aleph::PersistenceDiagram<DataType> _persistenceDiagram;
+
+  // Model for storing all data sets that are supplied by the user or
+  // created by interactions.
+  DataSetModel* _dataSetModel = nullptr;
 };
 
 } // namespace gui

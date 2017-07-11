@@ -52,6 +52,8 @@ public:
   int rowCount( const QModelIndex& parent = QModelIndex() ) const override;
   int columnCount( const QModelIndex& parent = QModelIndex() ) const override;
 
+  QVariant data( const QModelIndex& index, int role ) const override;
+
 private:
 
   // This is the root of all data items. It does *not* contain any
