@@ -28,6 +28,16 @@ public:
 
   QVariant data( const QModelIndex& index, int role ) const override;
 
+  /**
+    Main entry function for adding new data sets to the model. The model
+    will automatically check the type of the data set and insert it
+    accordingly.
+
+    Unknown data sets will be refused.
+  */
+
+  void add( const QVariant& data );
+
 private:
 
   // This is the root of all data items. It does *not* contain any

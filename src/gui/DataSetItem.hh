@@ -14,19 +14,6 @@ namespace gui
 class DataSetItem
 {
 public:
-
-  enum class Type
-  {
-    PersistenceDiagram,
-    SimplicialComplex,
-    PointCloud,
-    Unspecified
-  };
-
-  explicit DataSetItem( const QString& title,
-                        Type type,
-                        DataSetItem* parent = nullptr );
-
   explicit DataSetItem( const QString& title,
                         const QVariant& data,
                         DataSetItem* parent = nullptr );
@@ -45,6 +32,16 @@ public:
   DataSetItem* child( int row ) const { return _children.value( row ); }
 
   /**
+    Returns data type; this corresponds to one of the registered meta
+    type IDs.
+  */
+
+  int type() const
+  {
+    return _data.userType();
+  }
+
+  /**
     Returns data stored in the item. The result of the query depends on
     the specified column.
   */
@@ -56,11 +53,6 @@ private:
   QVariant _data;                 //< Data (e.g. persistence diagram)
   QList<DataSetItem*> _children;  //< Children (optional)
   DataSetItem* _parent = nullptr; //< Parent item (optional)
-
-  // Specifies the data type used for the data set item. This is
-  // required in order to find the proper item for appending new
-  // items into the model.
-  Type _type = Type::Unspecified;
 };
 
 } // namespace gui

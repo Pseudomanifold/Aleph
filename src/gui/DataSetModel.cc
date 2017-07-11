@@ -1,5 +1,7 @@
 #include "DataSetModel.hh"
+
 #include "DataSetItem.hh"
+#include "MetaTypes.hh"
 
 #include <QDebug>
 #include <QIcon>
@@ -15,8 +17,8 @@ DataSetModel::DataSetModel( QObject* parent )
   , _root( new DataSetItem( QString(), QVariant() ) )
 {
   QList<DataSetItem*> topLevelItems = {
-      new DataSetItem( tr("Persistence diagrams"), QVariant(), _root ),
-      new DataSetItem( tr("Point clouds")        , QVariant(), _root ),
+      new DataSetItem( tr("Persistence diagrams"), QVariant::fromValue( PersistenceDiagram() ), _root ),
+      new DataSetItem( tr("Point clouds")        , QVariant::fromValue( SimplicialComplex()  ), _root ),
       new DataSetItem( tr("Simplicial complexes"), QVariant(), _root )
   };
 
@@ -98,6 +100,19 @@ QVariant DataSetModel::data( const QModelIndex& index, int role ) const
     return QIcon::fromTheme( "folder" );
 
   return QVariant();
+}
+
+void DataSetModel::add( const QVariant& data )
+{
+  int id_PersistenceDiagram = qMetaTypeId<PersistenceDiagram>();
+  int id_SimplicialComplex  = qMetaTypeId<SimplicialComplex>();
+  int userType              = data.userType();
+
+  if( userType != id_PersistenceDiagram && userType != id_SimplicialComplex )
+  {
+    qDebug() << "Ignoring unknown user type";
+    return;
+  }
 }
 
 } // namespace gui

@@ -10,15 +10,6 @@ namespace gui
 {
 
 DataSetItem::DataSetItem( const QString& title,
-                          Type type,
-                          DataSetItem* parent )
-  : _title( title )
-  , _parent( parent )
-  , _type( type )
-{
-}
-
-DataSetItem::DataSetItem( const QString& title,
                           const QVariant& data,
                           DataSetItem* parent )
   : _title( title )
@@ -29,18 +20,10 @@ DataSetItem::DataSetItem( const QString& title,
   auto id_SimplicialComplex  = qMetaTypeId<SimplicialComplex>();
   auto userType              = data.userType();
 
-  _type = Type::Unspecified;
-
   if( userType == id_PersistenceDiagram )
-  {
     qDebug() << "Identified persistence diagram";
-    _type = Type::PersistenceDiagram;
-  }
   else if( userType == id_SimplicialComplex )
-  {
     qDebug() << "Identified simplicial complex";
-    _type = Type::SimplicialComplex;
-  }
 }
 
 DataSetItem::~DataSetItem()
