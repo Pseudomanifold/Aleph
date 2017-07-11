@@ -7,8 +7,11 @@
 
 #include <QAction>
 #include <QDockWidget>
+#include <QDragEnterEvent>
+#include <QDropEvent>
 #include <QFileDialog>
 #include <QMdiSubWindow>
+#include <QMimeData>
 #include <QMenuBar>
 #include <QStatusBar>
 
@@ -34,6 +37,10 @@ MainWindow::MainWindow()
   // Needs to be created later on because they modify the menus of the
   // main window.
   this->createDockWidgets();
+
+  // Permits drag & drop events to be handled. I am using this mainly
+  // for the quick loading of data sets.
+  this->setAcceptDrops( true );
 
   // MDI area ----------------------------------------------------------
 
@@ -116,6 +123,47 @@ void MainWindow::handlePersistenceDiagramClick( const QPointF& point )
   this->statusBar()->showMessage(
     QString( "Selected point: (%1,%2)" ).arg( point.x() ).arg( point.y() )
   );
+}
+
+void MainWindow::dragEnterEvent( QDragEnterEvent* event )
+{
+  if( event->mimeData() && event->mimeData()->hasText() )
+  {
+    event->setDropAction( Qt::CopyAction );
+    event->accept();
+  }
+  else
+    event->ignore();
+}
+
+void MainWindow::dropEvent( QDropEvent* event )
+{
+  auto mimeData = event->mimeData();
+
+  if( mimeData->hasUrls() )
+  {
+    auto urls = mimeData->urls();
+
+    // Ignore an event if multiple URLs are attached to it. We may only handle
+    // a single file.
+    if( urls.size() > 1 )
+    {
+      event->ignore();
+      return;
+    }
+
+    QString file = urls.first().toLocalFile();
+
+    this->statusBar()->showMessage( "File: " + file );
+
+    // TODO:
+    //  - Check data format (if possible)
+    //  - Load it
+    //  - Add it to the model
+  }
+  else
+    event->ignore();
+
 }
 
 } // namespace gui

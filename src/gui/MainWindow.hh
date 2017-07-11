@@ -35,6 +35,11 @@ private slots:
 
 private:
 
+  // Events ------------------------------------------------------------
+
+  void dragEnterEvent( QDragEnterEvent* event );
+  void dropEvent( QDropEvent* event );
+
   // Widgets -----------------------------------------------------------
 
   QMdiArea* _mdiArea;
