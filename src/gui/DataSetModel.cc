@@ -91,18 +91,17 @@ QVariant DataSetModel::data( const QModelIndex& index, int role ) const
   if( !index.isValid() )
     return QVariant();
 
-  if( role == Qt::DisplayRole )
-  {
-    DataSetItem* item = static_cast<DataSetItem*>( index.internalPointer() );
-    return item->data( index.column() );
-  }
-  else if( role == Qt::DecorationRole && index.column() == 0 )
+  DataSetItem* item = static_cast<DataSetItem*>( index.internalPointer() );
+
+  if( role == Qt::DecorationRole && index.column() == 0 && item->parent() == _root )
     return QIcon::fromTheme( "folder" );
+  else if( role == Qt::DisplayRole )
+    return item->data( index.column() );
 
   return QVariant();
 }
 
-void DataSetModel::add( const QVariant& data )
+void DataSetModel::add( const QString& title, const QVariant& data )
 {
   int id_PersistenceDiagram = qMetaTypeId<PersistenceDiagram>();
   int id_SimplicialComplex  = qMetaTypeId<SimplicialComplex>();
@@ -112,6 +111,16 @@ void DataSetModel::add( const QVariant& data )
   {
     qDebug() << "Ignoring unknown user type";
     return;
+  }
+
+  for( int i = 0; i < _root->childCount(); i++ )
+  {
+    auto child = _root->child( i );
+    if( child && child->type() == userType )
+    {
+      qDebug() << "Found proper parent item; adding data";
+      child->append( new DataSetItem( title, data, child ) );
+    }
   }
 }
 

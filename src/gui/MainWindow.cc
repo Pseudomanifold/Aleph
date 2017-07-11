@@ -54,6 +54,12 @@ void MainWindow::createDockWidgets()
 
     _showMenu->addAction( dockWidget->toggleViewAction() );
   }
+
+  //
+  // FIXME: remove after debugging
+  //
+
+  _dataSetModel->add( tr("Iris_dimension_1.txt"), QVariant::fromValue( aleph::io::load<DataType>( "/home/brieck/Projects/Aleph/tests/persistenceDiagrams/Iris_dimension_1.txt" ) ) );
 }
 
 void MainWindow::createMenus()

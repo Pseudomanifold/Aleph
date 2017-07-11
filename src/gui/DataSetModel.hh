@@ -36,7 +36,7 @@ public:
     Unknown data sets will be refused.
   */
 
-  void add( const QVariant& data );
+  void add( const QString& title, const QVariant& data );
 
 private:
 
