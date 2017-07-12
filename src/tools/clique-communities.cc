@@ -1,3 +1,22 @@
+/*
+  This is a tool shipped by 'Aleph - A Library for Exploring Persistent
+  Homology'.
+
+  Its purpose is to calculate clique communities of a weighted network
+  and convert them to JSON. Data will be written to STDOUT so that one
+  can store it directly in a file. An optional threshold parameter can
+  be used to filter cliques. This is useful when calculating auxiliary
+  visualizations of a data set.
+
+  This tool follows the publication:
+
+    Clique Community Persistence: A Topological Visual Analysis Approach for Complex Networks
+    Bastian Rieck, Ulderico Fugacci, Jonas Lukasczyk, Heike Leitte
+    Submitted to IEEE Vis 2017
+
+  TODO: Link to documentation
+*/
+
 #include <algorithm>
 #include <fstream>
 #include <iostream>
@@ -55,7 +74,6 @@ template <class Simplex> std::string formatSimplex( const Simplex& s, bool useLa
 }
 
 
-// FIXME: This is outdated...
 void usage()
 {
   std::cerr << "Usage: clique_communities FILE THRESHOLD K\n"
@@ -67,7 +85,23 @@ void usage()
             << "and the clique community calculation. This does not correspond\n"
             << "to the dimensionality of the clique. Hence, a parameter of K=2\n"
             << "will result in calculating 3-clique communities because all of\n"
-            << "the 2-simplices have 3 vertices.\n\n";
+            << "the 2-simplices have 3 vertices.\n"
+            << "\n"
+            << "Optional arguments:\n"
+            << "\n"
+            << " --label         : Use labels instead of indices to refer to\n"
+            << "                   individual cliques. This is in particular\n"
+            << "                   relevant for applications in which labels\n"
+            << "                   are important, e.g. literature networks.\n"
+            << "\n"
+            << " --invert-weights: If specified, inverts input weights. This\n"
+            << "                   is useful if the original weights measure\n"
+            << "                   the strength of a relationship, and not a\n"
+            << "                   dissimilarity.\n"
+            << "\n"
+            << " --normalize     : Normalizes all weights to [0,1]. Use this\n"
+            << "                   to compare multiple networks.\n"
+            << "\n\n";
 }
 
 int main( int argc, char** argv )
@@ -119,10 +153,6 @@ int main( int argc, char** argv )
   SimplicialComplex K;
 
   // Input -------------------------------------------------------------
-  //
-  // TODO: This is copied from the clique persistence diagram
-  // calculation. It would make sense to share some functions
-  // between the two applications.
 
   // Optional map of node labels. If the graph contains node labels and
   // I am able to read them, this map will be filled.
@@ -139,8 +169,6 @@ int main( int argc, char** argv )
 
     // Note that this assumes that the labels are convertible to
     // numbers.
-    //
-    // TODO: Solve this generically?
     for( auto&& pair : labelMap )
       if( !pair.second.empty() )
         labels[ static_cast<VertexType>( std::stoul( pair.first ) ) ] = pair.second;
@@ -169,7 +197,6 @@ int main( int argc, char** argv )
     minWeight = std::min( minWeight, simplex.data() );
   }
 
-  // TODO: Copied from 'clique-persistence-diagram.cc'
   if( normalize && maxWeight != minWeight )
   {
     std::cerr << "* Normalizing weights to [0,1]...";
@@ -193,7 +220,6 @@ int main( int argc, char** argv )
     std::cerr << "finished\n";
   }
 
-  // TODO: Copied from 'clique-persistence-diagram.cc'
   if( invertWeights )
   {
     std::cerr << "* Inverting filtration weights...";
@@ -211,9 +237,6 @@ int main( int argc, char** argv )
 
     std::cerr << "finished\n";
   }
-
-
-
 
   // Thresholding ------------------------------------------------------
 
