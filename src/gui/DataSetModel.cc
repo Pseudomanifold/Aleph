@@ -18,8 +18,8 @@ DataSetModel::DataSetModel( QObject* parent )
 {
   QList<DataSetItem*> topLevelItems = {
       new DataSetItem( tr("Persistence diagrams"), QVariant::fromValue( PersistenceDiagram() ), _root ),
-      new DataSetItem( tr("Point clouds")        , QVariant::fromValue( SimplicialComplex()  ), _root ),
-      new DataSetItem( tr("Simplicial complexes"), QVariant(), _root )
+      new DataSetItem( tr("Point clouds")        , QVariant(), _root ),
+      new DataSetItem( tr("Simplicial complexes"), QVariant::fromValue( SimplicialComplex()  ), _root )
   };
 
   foreach( DataSetItem* item, topLevelItems )
