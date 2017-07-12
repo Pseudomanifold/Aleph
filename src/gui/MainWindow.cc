@@ -3,6 +3,8 @@
 #include "DataSetItem.hh"
 #include "DataSetModel.hh"
 
+#include "LoadDataSetHelpers.hh"
+
 #include "PersistenceDiagramHelpers.hh"
 #include "PersistenceDiagramNormDialog.hh"
 #include "PersistenceDiagramView.hh"
@@ -254,6 +256,9 @@ void MainWindow::dropEvent( QDropEvent* event )
     }
 
     QString file = urls.first().toLocalFile();
+    auto data    = loadData( file );
+
+    _dataSetModel->add( file, data );
 
     this->statusBar()->showMessage( "File: " + file );
 
@@ -264,7 +269,6 @@ void MainWindow::dropEvent( QDropEvent* event )
   }
   else
     event->ignore();
-
 }
 
 } // namespace gui

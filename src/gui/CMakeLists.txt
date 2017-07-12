@@ -6,6 +6,7 @@ IF( Qt5_FOUND )
   ADD_EXECUTABLE( Perdita
     DataSetItem.cc
     DataSetModel.cc
+    LoadDataSetHelpers.cc
     MainWindow.cc
     Perdita.cc
     PersistenceDiagramHelpers.cc
