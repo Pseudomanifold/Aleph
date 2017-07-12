@@ -1,9 +1,12 @@
 #include "PersistenceDiagramNormDialog.hh"
 
+#include <QDialogButtonBox>
 #include <QDoubleValidator>
 #include <QFormLayout>
 #include <QRadioButton>
 #include <QVBoxLayout>
+
+#include <limits>
 
 namespace aleph
 {
@@ -18,6 +21,7 @@ PersistenceDiagramNormDialog::PersistenceDiagramNormDialog( QWidget* parent )
 {
   QVBoxLayout* radioButtonLayout = new QVBoxLayout;
 
+  int id = 0;
   for( QString s : { tr("Infinity norm"), tr("p-norm"), tr("Total persistence") } )
   {
     QRadioButton* button = new QRadioButton( s );
@@ -25,7 +29,7 @@ PersistenceDiagramNormDialog::PersistenceDiagramNormDialog( QWidget* parent )
 
     radioButtonLayout->addWidget( button );
 
-    _normButtonGroup->addButton( button );
+    _normButtonGroup->addButton( button, id++ );
   }
 
   {
@@ -35,12 +39,49 @@ PersistenceDiagramNormDialog::PersistenceDiagramNormDialog( QWidget* parent )
     _powerEdit->setValidator( validator );
   }
 
-  QFormLayout* layout = new QFormLayout();
+  QFormLayout* layout = new QFormLayout;
 
   layout->addRow( tr("Norm") , radioButtonLayout );
   layout->addRow( tr("Power"), _powerEdit        );
 
-  this->setLayout( layout );
+  QDialogButtonBox* buttonBox
+    = new QDialogButtonBox(  QDialogButtonBox::Ok
+                           | QDialogButtonBox::Cancel );
+
+  QObject::connect( buttonBox, SIGNAL( accepted() ), this, SLOT( accept() ) );
+  QObject::connect( buttonBox, SIGNAL( rejected() ), this, SLOT( reject() ) );
+
+  QVBoxLayout* mainLayout = new QVBoxLayout;
+  mainLayout->addLayout( layout );
+  mainLayout->addWidget( buttonBox );
+
+  this->setLayout( mainLayout );
+}
+
+PersistenceDiagramNormDialog::Norm PersistenceDiagramNormDialog::selectedNorm() const
+{
+  auto selectedButton = _normButtonGroup->checkedId();
+
+  switch( selectedButton )
+  {
+  case 0:
+    return Norm::InfinityNorm;
+  case 1:
+    return Norm::pNorm;
+  case 2:
+    return Norm::TotalPersistence;
+  }
+
+  return Norm::Undefined;
+}
+
+double PersistenceDiagramNormDialog::selectedPower() const
+{
+  double value = std::numeric_limits<double>::quiet_NaN();
+  if( !_powerEdit->text().isEmpty() )
+    value = _powerEdit->text().toDouble();
+
+  return value;
 }
 
 } // namespace gui

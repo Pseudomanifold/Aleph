@@ -18,6 +18,17 @@ class PersistenceDiagramNormDialog : public QDialog
 public:
   PersistenceDiagramNormDialog( QWidget* parent = nullptr );
 
+  enum class Norm
+  {
+    InfinityNorm,
+    pNorm,
+    TotalPersistence,
+    Undefined
+  };
+
+  Norm selectedNorm() const;
+  double selectedPower() const;
+
 private:
   QButtonGroup* _normButtonGroup;
   QLineEdit*    _powerEdit;
