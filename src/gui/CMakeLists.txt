@@ -8,6 +8,7 @@ IF( Qt5_FOUND )
     DataSetModel.cc
     MainWindow.cc
     Perdita.cc
+    PersistenceDiagramHelpers.cc
     PersistenceDiagramView.cc
     PersistenceDiagramNormDialog.cc
   )
