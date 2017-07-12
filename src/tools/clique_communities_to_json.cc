@@ -76,7 +76,7 @@ template <class Simplex> std::string formatSimplex( const Simplex& s, bool useLa
 
 void usage()
 {
-  std::cerr << "Usage: clique_communities FILE THRESHOLD K\n"
+  std::cerr << "Usage: clique_communities_to_json FILE THRESHOLD K\n"
             << "\n"
             << "Extracts clique communities from FILE, which is supposed to be\n"
             << "a weighted graph. In the subsequent calculation, an edge whose\n"

@@ -1,4 +1,4 @@
-ADD_EXECUTABLE( clique-communities                      clique-communities.cc )
+ADD_EXECUTABLE( clique_communities_to_json              clique_communities_to_json.cc )
 ADD_EXECUTABLE( clique_persistence_diagram              clique_persistence_diagram.cc )
 ADD_EXECUTABLE( extended_persistence_hierarchy          extended_persistence_hierarchy.cc )
 ADD_EXECUTABLE( persistence_diagram_statistics          persistence_diagram_statistics.cc )
