@@ -2,6 +2,9 @@
 
 #include "DataSetItem.hh"
 #include "DataSetModel.hh"
+
+#include "PersistenceDiagramHelpers.hh"
+#include "PersistenceDiagramNormDialog.hh"
 #include "PersistenceDiagramView.hh"
 
 #include <aleph/persistenceDiagrams/io/Raw.hh>
@@ -155,14 +158,22 @@ void MainWindow::onDataSetContextMenuRequested( const QPoint& position )
     // Individual persistence diagram selected
     if( item->childCount() == 0 )
     {
+      QAction* calculateNormAction    = new QAction( tr("Calculate norm"), contextMenu );
       QAction* visualizeDataSetAction = new QAction( tr("Visualize persistence diagram"), contextMenu );
-      visualizeDataSetAction->setData( data );
 
-      this->connect( visualizeDataSetAction,
-                     SIGNAL( triggered() ),
-                     SLOT( onVisualizeDataSet() ) );
+      this->connect( calculateNormAction   , SIGNAL( triggered() ), SLOT( onCalculateNorm()    ) );
+      this->connect( visualizeDataSetAction, SIGNAL( triggered() ), SLOT( onVisualizeDataSet() ) );
 
-      contextMenu->addAction( visualizeDataSetAction );
+      QList<QAction*> actions = {
+        calculateNormAction,
+        visualizeDataSetAction
+      };
+
+      foreach( QAction* action, actions )
+      {
+        action->setData( data );
+        contextMenu->addAction( action );
+      }
     }
 
     // Group of persistence diagrams
@@ -178,6 +189,26 @@ void MainWindow::onDataSetContextMenuRequested( const QPoint& position )
   }
 
   contextMenu->popup( QCursor::pos() );
+}
+
+void MainWindow::onCalculateNorm()
+{
+  auto action             = qobject_cast<QAction*>( sender() );
+  auto data               = action->data();
+
+  PersistenceDiagramNormDialog* dialog = new PersistenceDiagramNormDialog( this );
+
+  auto result = dialog->exec();
+  if( result == QDialog::Accepted )
+  {
+    auto norm   = dialog->selectedNorm();
+    auto power  = dialog->selectedPower();
+    auto result = calculateNorm( data, norm, power );
+
+    this->statusBar()->showMessage(
+      QString( "Persistence diagram norm: %1" ).arg( result )
+    );
+  }
 }
 
 void MainWindow::onVisualizeDataSet()

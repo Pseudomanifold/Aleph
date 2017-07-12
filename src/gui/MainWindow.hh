@@ -43,6 +43,7 @@ private slots:
 
   // Interaction -------------------------------------------------------
 
+  void onCalculateNorm();
   void onVisualizeDataSet();
 
 private:
