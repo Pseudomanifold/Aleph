@@ -2,6 +2,7 @@
 
 #include <QDialogButtonBox>
 #include <QDoubleValidator>
+#include <QGroupBox>
 #include <QFormLayout>
 #include <QRadioButton>
 #include <QVBoxLayout>
@@ -19,30 +20,40 @@ PersistenceDiagramNormDialog::PersistenceDiagramNormDialog( QWidget* parent )
   , _normButtonGroup( new QButtonGroup )
   , _powerEdit( new QLineEdit )
 {
-  QVBoxLayout* radioButtonLayout = new QVBoxLayout;
+  // Prepare group box for radio buttons -------------------------------
 
-  int id = 0;
-  for( QString s : { tr("Infinity norm"), tr("p-norm"), tr("Total persistence") } )
+  QGroupBox* radioButtonGroupBox = new QGroupBox( tr("Norm") );
+
   {
-    QRadioButton* button = new QRadioButton( s );
-    button->setChecked( true );
+    QVBoxLayout* layout = new QVBoxLayout;
 
-    radioButtonLayout->addWidget( button );
+    int id = 0;
 
-    _normButtonGroup->addButton( button, id++ );
+    for( QString s : { tr("Infinity norm"), tr("p-norm"), tr("Total persistence") } )
+    {
+      QRadioButton* button = new QRadioButton( s );
+      button->setChecked( true );
+
+      layout->addWidget( button );
+
+      _normButtonGroup->addButton( button, id++ );
+    }
+
+    radioButtonGroupBox->setAlignment( Qt::AlignLeft );
+    radioButtonGroupBox->setLayout( layout );
   }
+
+  // Add input for double value ----------------------------------------
 
   {
     QDoubleValidator* validator = new QDoubleValidator( this );
     validator->setBottom( 0.0 );
 
     _powerEdit->setValidator( validator );
+    _powerEdit->setPlaceholderText( tr("Power") );
   }
 
-  QFormLayout* layout = new QFormLayout;
-
-  layout->addRow( tr("Norm") , radioButtonLayout );
-  layout->addRow( tr("Power"), _powerEdit        );
+  // Dialog button box -------------------------------------------------
 
   QDialogButtonBox* buttonBox
     = new QDialogButtonBox(  QDialogButtonBox::Ok
@@ -51,8 +62,11 @@ PersistenceDiagramNormDialog::PersistenceDiagramNormDialog( QWidget* parent )
   QObject::connect( buttonBox, SIGNAL( accepted() ), this, SLOT( accept() ) );
   QObject::connect( buttonBox, SIGNAL( rejected() ), this, SLOT( reject() ) );
 
-  QVBoxLayout* mainLayout = new QVBoxLayout;
-  mainLayout->addLayout( layout );
+  // Main layout -------------------------------------------------------
+
+  QVBoxLayout* mainLayout = new QVBoxLayout( this );
+  mainLayout->addWidget( radioButtonGroupBox );
+  mainLayout->addWidget( _powerEdit );
   mainLayout->addWidget( buttonBox );
 
   this->setLayout( mainLayout );
