@@ -1,4 +1,3 @@
-ADD_EXECUTABLE( create_functions                        create_functions.cc )
 ADD_EXECUTABLE( clique-communities                      clique-communities.cc )
 ADD_EXECUTABLE( clique_persistence_diagram              clique_persistence_diagram.cc )
 ADD_EXECUTABLE( extended_persistence_hierarchy          extended_persistence_hierarchy.cc )
