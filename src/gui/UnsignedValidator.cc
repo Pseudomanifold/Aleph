@@ -15,7 +15,7 @@ void UnsignedValidator::fixup( QString& string ) const
 {
   int dummy = 0;
   if( this->validate( string, dummy) != QValidator::Acceptable )
-    string = "0";
+    string = "";
 }
 
 QValidator::State UnsignedValidator::validate( QString& input, int& /* pos */ ) const

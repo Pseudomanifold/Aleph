@@ -15,7 +15,6 @@ class UnsignedValidator : public QValidator
 
 public:
 
-  /** Creates a new validator object */
   UnsignedValidator( QObject* parent = 0 );
 
   virtual ~UnsignedValidator()
@@ -24,7 +23,7 @@ public:
 
   /**
     Checks whether the input string is valid. If this is not the case, the
-    string will be replaced by the string containing a zero, i.e. "0".
+    string will be replaced by an empty string.
 
     @param string Input string (will be changed)
   */
