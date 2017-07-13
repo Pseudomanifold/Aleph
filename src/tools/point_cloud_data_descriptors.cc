@@ -36,6 +36,7 @@
 
 #include <aleph/persistentHomology/Calculation.hh>
 
+#include <algorithm>
 #include <iostream>
 #include <string>
 
@@ -50,6 +51,33 @@ using Distance   = aleph::distances::Euclidean<DataType>;
 #else
   using Wrapper = aleph::geometry::BruteForce<PointCloud, Distance>;
 #endif
+
+void normalizeValues( std::vector<DataType>& values )
+{
+  if( values.empty() )
+    return;
+
+  auto minmax = std::minmax_element( values.begin(), values.end() );
+  auto min    = *minmax.first;
+  auto max    = *minmax.second;
+
+  if( min == max )
+    return;
+
+  auto range = max - min;
+  for( auto&& value : values )
+    value = (value - min) / range;
+}
+
+void invertValues( std::vector<DataType>& values )
+{
+  if( values.empty() )
+    return;
+
+  auto max = *std::max_element( values.begin(), values.end() );
+  for( auto&& value : values )
+    value = max - value;
+}
 
 std::vector<DataType> calculateDataDescriptor( const std::string& name, const PointCloud& pointCloud, unsigned k, double h )
 {
@@ -80,6 +108,8 @@ int main( int argc, char** argv )
     { "descriptor"    , required_argument, nullptr, 'd' },
     { "epsilon"       , required_argument, nullptr, 'e' },
     { "k"             , required_argument, nullptr, 'k' },
+    { "invert"        , no_argument      , nullptr, 'i' },
+    { "normalize"     , no_argument      , nullptr, 'n' },
     { nullptr         , 0                , nullptr,  0  }
   };
 
@@ -88,6 +118,9 @@ int main( int argc, char** argv )
   unsigned k             = 10;          // default number of neighbours (density estimator)
   DataType epsilon       = DataType();  // default epsilon (point cloud expansion)
   std::string descriptor = "density";   // default data descriptor
+
+  bool normalizeDataDescriptorValues = false;
+  bool invertDataDescriptorValues    = false;
 
   {
     int option = 0;
@@ -110,6 +143,12 @@ int main( int argc, char** argv )
       case 'k':
         k = static_cast<unsigned>( std::stoul( optarg ) );
         break;
+      case 'i':
+        invertDataDescriptorValues = true;
+        break;
+      case 'n':
+        normalizeDataDescriptorValues = true;
+        break;
       }
     }
   }
@@ -131,10 +170,14 @@ int main( int argc, char** argv )
                                k,
                                h );
 
+  if( invertDataDescriptorValues )
+    invertValues( dataDescriptorValues );
+
+  if( normalizeDataDescriptorValues )
+    normalizeValues( dataDescriptorValues );
+
   // TODO:
-  //   - Data descriptor selection
-  //   - Data descriptor modification according to some (?) criteria
-  //   - Make unpaired simplex removal possible
+  //   - Make unpaired simplex removal possible?
 
   // Expansion ---------------------------------------------------------
 
