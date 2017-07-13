@@ -45,10 +45,24 @@ using DataType   = double;
 using PointCloud = aleph::containers::PointCloud<DataType>;
 using Distance   = aleph::distances::Euclidean<DataType>;
 
+#ifdef ALEPH_WITH_FLANN
+  using Wrapper = aleph::geometry::FLANN<PointCloud, Distance>;
+#else
+  using Wrapper = aleph::geometry::BruteForce<PointCloud, Distance>;
+#endif
+
 std::vector<DataType> calculateDataDescriptor( const std::string& name, const PointCloud& pointCloud, unsigned k, double h )
 {
   if( name == "density" )
-    return aleph::estimateDensityDistanceToMeasure<Distance>( pointCloud, k );
+  {
+    #ifdef ALEPH_WITH_FLANN
+      return aleph::estimateDensityDistanceToMeasure<Distance, PointCloud, Wrapper>( pointCloud, k );
+    #else
+      // The function will automatically fall back to the default
+      // wrapper.
+      return aleph::estimateDensityDistanceToMeasure<Distance>( pointCloud, k );
+    #endif
+  }
   else if( name == "eccentricity" )
     return aleph::eccentricities<Distance>( pointCloud, k );
   else if( name == "gaussian" )
@@ -59,28 +73,31 @@ std::vector<DataType> calculateDataDescriptor( const std::string& name, const Po
 
 int main( int argc, char** argv )
 {
-  #ifdef ALEPH_WITH_FLANN
-    using FLANN = aleph::geometry::FLANN<PointCloud, Distance>;
-  #endif
-
   static option commandLineOptions[] =
   {
+    { "bandwidth"     , required_argument, nullptr, 'b' },
     { "dimension"     , required_argument, nullptr, 'D' },
     { "descriptor"    , required_argument, nullptr, 'd' },
     { "epsilon"       , required_argument, nullptr, 'e' },
+    { "k"             , required_argument, nullptr, 'k' },
     { nullptr         , 0                , nullptr,  0  }
   };
 
-  unsigned dimension     = 0;
-  DataType epsilon       = DataType();
-  std::string descriptor = "density";
+  unsigned dimension     = 0;           // default dimension (point cloud expansion)
+  double h               = 0.01;        // default bandwith (Gaussian estimator)
+  unsigned k             = 10;          // default number of neighbours (density estimator)
+  DataType epsilon       = DataType();  // default epsilon (point cloud expansion)
+  std::string descriptor = "density";   // default data descriptor
 
   {
     int option = 0;
-    while( ( option = getopt_long( argc, argv, "D:d:e:", commandLineOptions, nullptr ) ) != -1 )
+    while( ( option = getopt_long( argc, argv, "b:D:d:e:k:", commandLineOptions, nullptr ) ) != -1 )
     {
       switch( option )
       {
+      case 'b':
+        h = std::stod( optarg );
+        break;
       case 'D':
         dimension = static_cast<unsigned>( std::stoul( optarg ) );
         break;
@@ -89,6 +106,9 @@ int main( int argc, char** argv )
         break;
       case 'e':
         epsilon = static_cast<DataType>( std::stod( optarg ) );
+        break;
+      case 'k':
+        k = static_cast<unsigned>( std::stoul( optarg ) );
         break;
       }
     }
@@ -108,8 +128,8 @@ int main( int argc, char** argv )
   auto dataDescriptorValues
     = calculateDataDescriptor( descriptor,
                                pointCloud,
-                               10,        // TODO: make k configurable
-                               0.1 );     // TODO: make h configurable
+                               k,
+                               h );
 
   // TODO:
   //   - Data descriptor selection
@@ -120,24 +140,13 @@ int main( int argc, char** argv )
 
   std::cerr << "* Expanding point cloud using epsilon=" << epsilon << "...";
 
-  #ifdef ALEPH_WITH_FLANN
-    FLANN flannWrapper( pointCloud );
+  Wrapper wrapper( pointCloud );
 
-    auto K
-      = aleph::geometry::buildVietorisRipsComplex( flannWrapper,
-                                                   epsilon,
-                                                   unsigned( dimension ),
-                                                   dataDescriptorValues.begin(), dataDescriptorValues.end() );
-
-  #else
-    aleph::geometry::BruteForce<PointCloud, Distance> flannWrapper( pointCloud );
-
-    auto K
-      = aleph::geometry::buildVietorisRipsComplex( flannWrapper,
-                                                   epsilon,
-                                                   unsigned( dimension ),
-                                                   dataDescriptorValues.begin(), dataDescriptorValues.end() );
-  #endif
+  auto K
+    = aleph::geometry::buildVietorisRipsComplex( wrapper,
+                                                 epsilon,
+                                                 unsigned( dimension ),
+                                                 dataDescriptorValues.begin(), dataDescriptorValues.end() );
 
   std::cerr << "finished\n"
             << "* Expanded simplicial complex has " << K.size() << " simplices\n";
