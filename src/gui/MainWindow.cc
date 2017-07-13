@@ -3,11 +3,15 @@
 #include "DataSetItem.hh"
 #include "DataSetModel.hh"
 
+#include "ExpandSimplicialComplexDialog.hh"
+
 #include "LoadDataSetHelpers.hh"
 
 #include "PersistenceDiagramHelpers.hh"
 #include "PersistenceDiagramNormDialog.hh"
 #include "PersistenceDiagramView.hh"
+
+#include "SimplicialComplexHelpers.hh"
 
 #include <aleph/persistenceDiagrams/io/Raw.hh>
 
@@ -188,6 +192,27 @@ void MainWindow::onDataSetContextMenuRequested( const QPoint& position )
   }
   else if( userType == id_SimplicialComplex )
   {
+    // Individual simplicial complex selected
+    if( item->childCount() == 0 )
+    {
+      QAction* expandSimplicialComplexAction = new QAction( tr("Expand simplicial complex"), contextMenu );
+      QAction* filterSimplicialComplexAction = new QAction( tr("Filter simplicial complex"), contextMenu );
+
+      this->connect( expandSimplicialComplexAction, SIGNAL( triggered() ), SLOT( onExpandSimplicialComplex() ) );
+      this->connect( filterSimplicialComplexAction, SIGNAL( triggered() ), SLOT( onFilterSimplicialComplex() ) );
+
+      QList<QAction*> actions = {
+        expandSimplicialComplexAction,
+        filterSimplicialComplexAction,
+      };
+
+      foreach( QAction* action, actions )
+      {
+        action->setData( data );
+        contextMenu->addAction( action );
+      }
+    }
+
   }
 
   contextMenu->popup( QCursor::pos() );
@@ -226,6 +251,34 @@ void MainWindow::onVisualizeDataSet()
 
   subWindow->resize( 300, 300 );
   subWindow->show();
+}
+
+void MainWindow::onExpandSimplicialComplex()
+{
+  auto action = qobject_cast<QAction*>( sender() );
+  auto data   = action->data();
+
+  ExpandSimplicialComplexDialog* dialog = new ExpandSimplicialComplexDialog( this );
+
+  auto result = dialog->exec();
+  if( result == QDialog::Accepted )
+  {
+    // TODO: add support for top-down expansion
+    data
+      = expandSimplicialComplex( data,
+                                 dialog->selectedDimension() );
+
+    // TODO: add name
+    _dataSetModel->add( tr(""), data );
+  }
+}
+
+void MainWindow::onFilterSimplicialComplex()
+{
+  auto action = qobject_cast<QAction*>( sender() );
+  auto data   = action->data();
+
+  // FIXME: not yet implemented
 }
 
 void MainWindow::dragEnterEvent( QDragEnterEvent* event )

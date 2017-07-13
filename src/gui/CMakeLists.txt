@@ -13,6 +13,7 @@ IF( Qt5_FOUND )
     PersistenceDiagramHelpers.cc
     PersistenceDiagramView.cc
     PersistenceDiagramNormDialog.cc
+    SimplicialComplexHelpers.cc
     UnsignedValidator.cc
   )
   TARGET_LINK_LIBRARIES( Perdita Qt5::Charts Qt5::Widgets )

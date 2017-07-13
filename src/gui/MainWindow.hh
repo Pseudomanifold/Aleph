@@ -46,6 +46,9 @@ private slots:
   void onCalculateNorm();
   void onVisualizeDataSet();
 
+  void onExpandSimplicialComplex();
+  void onFilterSimplicialComplex();
+
 private:
 
   // Events ------------------------------------------------------------
