@@ -110,6 +110,30 @@ public:
 
   template <class InputIterator> SimplicialComplex assignMaximumData( const SimplicialComplex& K, InputIterator begin, InputIterator end )
   {
+    auto init    = std::numeric_limits<DataType>::lowest();
+    auto functor = [] ( const DataType& a, const DataType& b )
+    {
+      return std::max(a, b);
+    };
+
+    return this->assignData( K, begin, end, init, functor );
+  }
+
+  /**
+    Generic function for assigning data to simplices in the complex.
+    Clients need to specify an initial value, which is normally either
+    the maximum or minimum value of the given data type, as well as
+    functor for determining the value to assign to a given simplex.
+    Usually, this is either \c std::min() or \c std::max().
+  */
+
+  template <class InputIterator,
+            class T,
+            class Functor> SimplicialComplex assignData( const SimplicialComplex& K,
+                                                         InputIterator begin, InputIterator end,
+                                                         T init,
+                                                         Functor functor )
+  {
     SimplicialComplex S;
 
     {
@@ -131,7 +155,6 @@ public:
       std::set<VertexType> vertices;
       K.vertices( std::inserter( vertices, vertices.begin() ) );
 
-
       IndexType index = IndexType();
       for( auto&& vertex : vertices )
         vertexToIndex[vertex] = index++;
@@ -139,10 +162,10 @@ public:
 
     for( auto s : K )
     {
-      DataType data = std::numeric_limits<DataType>::lowest();
+      DataType data = init;
 
       for( auto&& v : s )
-        data = std::max( data, dataValues[ vertexToIndex[v] ] );
+        data = functor( data, dataValues[ vertexToIndex[v] ] );
 
       s.setData( data );
       S.push_back( s );
