@@ -41,12 +41,24 @@
 
 #include <getopt.h>
 
+using DataType   = double;
+using PointCloud = aleph::containers::PointCloud<DataType>;
+using Distance   = aleph::distances::Euclidean<DataType>;
+
+std::vector<DataType> calculateDataDescriptor( const std::string& name, const PointCloud& pointCloud, unsigned k, double h )
+{
+  if( name == "density" )
+    return aleph::estimateDensityDistanceToMeasure<Distance>( pointCloud, k );
+  else if( name == "eccentricity" )
+    return aleph::eccentricities<Distance>( pointCloud, k );
+  else if( name == "gaussian" )
+    return aleph::estimateDensityTruncatedGaussian( pointCloud, h );
+
+  return {};
+}
+
 int main( int argc, char** argv )
 {
-  using DataType   = double;
-  using PointCloud = aleph::containers::PointCloud<DataType>;
-  using Distance   = aleph::distances::Euclidean<DataType>;
-
   #ifdef ALEPH_WITH_FLANN
     using FLANN = aleph::geometry::FLANN<PointCloud, Distance>;
   #endif
@@ -61,7 +73,7 @@ int main( int argc, char** argv )
 
   unsigned dimension     = 0;
   DataType epsilon       = DataType();
-  std::string descriptor = std::string();
+  std::string descriptor = "density";
 
   {
     int option = 0;
@@ -93,7 +105,11 @@ int main( int argc, char** argv )
 
   std::cerr << "* Obtained point cloud of dimension " << pointCloud.dimension() << " with " << pointCloud.size() << " points\n";
 
-  auto dataDescriptorValues = aleph::estimateDensityDistanceToMeasure<Distance, PointCloud>( pointCloud, 10 );
+  auto dataDescriptorValues
+    = calculateDataDescriptor( descriptor,
+                               pointCloud,
+                               10,        // TODO: make k configurable
+                               0.1 );     // TODO: make h configurable
 
   // TODO:
   //   - Data descriptor selection
