@@ -36,10 +36,7 @@ QVariant loadData( const QString& file )
   auto suffix        = fileInfo.suffix();
 
   if( suffixesPersistenceDiagram.contains( suffix ) )
-  {
-    auto persistenceDiagram = aleph::io::load<DataType>( file.toStdString() );
-    data                    = QVariant::fromValue( persistenceDiagram );
-  }
+    data = loadPersistenceDiagram( file );
   else if( suffixesSimplicialComplex.contains( suffix ) )
   {
     SimplicialComplex K;
@@ -67,6 +64,14 @@ QVariant loadData( const QString& file )
 
    data = QVariant::fromValue( K );
   }
+
+  return data;
+}
+
+QVariant loadPersistenceDiagram( const QString& file )
+{
+  auto persistenceDiagram = aleph::io::load<DataType>( file.toStdString() );
+  auto data               = QVariant::fromValue( persistenceDiagram );
 
   return data;
 }

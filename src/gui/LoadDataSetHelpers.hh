@@ -11,6 +11,7 @@ namespace gui
 {
 
 QVariant loadData( const QString& file );
+QVariant loadPersistenceDiagram( const QString& file );
 
 } // namespace gui
 
