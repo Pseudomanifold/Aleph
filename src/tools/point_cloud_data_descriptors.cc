@@ -39,20 +39,59 @@
 #include <iostream>
 #include <string>
 
+#include <getopt.h>
+
 int main( int argc, char** argv )
 {
-  if( argc <= 2 )
-    return -1;
-
   using DataType   = double;
   using PointCloud = aleph::containers::PointCloud<DataType>;
   using Distance   = aleph::distances::Euclidean<DataType>;
-  using FLANN      = aleph::geometry::FLANN<PointCloud, Distance>;
 
-  std::string input = argv[1];
+  #ifdef ALEPH_WITH_FLANN
+    using FLANN = aleph::geometry::FLANN<PointCloud, Distance>;
+  #endif
+
+  static option commandLineOptions[] =
+  {
+    { "dimension"     , required_argument, nullptr, 'D' },
+    { "descriptor"    , required_argument, nullptr, 'd' },
+    { "epsilon"       , required_argument, nullptr, 'e' },
+    { nullptr         , 0                , nullptr,  0  }
+  };
+
+  unsigned dimension     = 0;
+  DataType epsilon       = DataType();
+  std::string descriptor = std::string();
+
+  {
+    int option = 0;
+    while( ( option = getopt_long( argc, argv, "D:d:e:", commandLineOptions, nullptr ) ) != -1 )
+    {
+      switch( option )
+      {
+      case 'D':
+        dimension = static_cast<unsigned>( std::stoul( optarg ) );
+        break;
+      case 'd':
+        descriptor = optarg;
+        break;
+      case 'e':
+        epsilon = static_cast<DataType>( std::stod( optarg ) );
+        break;
+      }
+    }
+  }
+
+  if( argc - optind <= 0 )
+    return -1;
+
+  std::string input = argv[optind++];
   auto pointCloud   = aleph::containers::load<DataType>( input );
-  auto dimension    = pointCloud.dimension() + 1;
-  auto epsilon      = DataType();
+
+  if( dimension == 0 )
+    dimension = static_cast<unsigned>( pointCloud.dimension() ) + 1;
+
+  std::cerr << "* Obtained point cloud of dimension " << pointCloud.dimension() << " with " << pointCloud.size() << " points\n";
 
   auto dataDescriptorValues = aleph::estimateDensityDistanceToMeasure<Distance, PointCloud>( pointCloud, 10 );
 
@@ -60,6 +99,10 @@ int main( int argc, char** argv )
   //   - Data descriptor selection
   //   - Data descriptor modification according to some (?) criteria
   //   - Make unpaired simplex removal possible
+
+  // Expansion ---------------------------------------------------------
+
+  std::cerr << "* Expanding point cloud using epsilon=" << epsilon << "...";
 
   #ifdef ALEPH_WITH_FLANN
     FLANN flannWrapper( pointCloud );
@@ -79,6 +122,11 @@ int main( int argc, char** argv )
                                                    unsigned( dimension ),
                                                    dataDescriptorValues.begin(), dataDescriptorValues.end() );
   #endif
+
+  std::cerr << "finished\n"
+            << "* Expanded simplicial complex has " << K.size() << " simplices\n";
+
+  // Persistence diagram calculation ------------------------------------
 
   auto diagrams
     = aleph::calculatePersistenceDiagrams( K );
