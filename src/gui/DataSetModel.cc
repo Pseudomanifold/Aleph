@@ -128,10 +128,19 @@ void DataSetModel::add( const QString& title, const QVariant& data )
     auto child = _root->child( i );
     if( child && child->type() == userType )
     {
+      auto index = this->index( child->row(), 0, this->index( _root->row(), 0 ) );
+      auto first = child->row() + 1;
+      auto last  = first;
+
+      this->beginInsertRows( index, first, last );
+
       qDebug() << "Found proper parent item; adding data";
       child->append( new DataSetItem( title, data, child ) );
+
+      this->endInsertRows();
     }
   }
+
 }
 
 } // namespace gui
