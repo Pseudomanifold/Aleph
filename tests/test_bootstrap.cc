@@ -52,6 +52,23 @@ void testSimple()
 
   ALEPH_ASSERT_THROW( basicConfidenceInterval.first  >= 37.0 );
   ALEPH_ASSERT_THROW( basicConfidenceInterval.second <= 43.0 );
+
+  // Checking the percentile confidence interval -----------------------
+  //
+  // For laziness reasons, I am using the same upper and lower bounds as
+  // for the basic confidence interval.
+  //
+  // The percentile confidence interval works better when the sample
+  // size is larger.
+
+  auto percentileConfidenceInterval
+    = bootstrap.percentileConfidenceInterval( numBootstrapSamples,
+                                              0.20,
+                                              samples.begin(), samples.end(),
+                                              meanCalculation );
+
+  ALEPH_ASSERT_THROW( percentileConfidenceInterval.first  >= 37.0 );
+  ALEPH_ASSERT_THROW( percentileConfidenceInterval.second <= 43.0 );
 }
 
 int main(int, char**)

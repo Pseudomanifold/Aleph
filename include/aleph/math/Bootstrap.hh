@@ -90,6 +90,32 @@ public:
     return std::make_pair( 2*theta - lowerEstimate, 2*theta - upperEstimate );
   }
 
+  template <class InputIterator, class Functor>
+  auto percentileConfidenceInterval( unsigned numSamples,
+                                     double alpha,
+                                     InputIterator begin, InputIterator end,
+                                     Functor functor ) -> std::pair< decltype( functor(begin, end) ), decltype( functor(begin, end) ) >
+  {
+    using FunctorValueType = decltype( functor( begin, end ) );
+
+    std::vector<FunctorValueType> estimates;
+    estimates.reserve( numSamples );
+
+    this->makeReplicates( numSamples,
+                          begin, end,
+                          functor,
+                          std::back_inserter( estimates ) );
+
+    std::sort( estimates.begin(), estimates.end() );
+
+    auto lowerPercentile = alpha / 2;
+    auto lowerEstimate   = estimates.at( Bootstrap::index( numSamples, lowerPercentile ) );
+    auto upperPercentile = 1 - lowerPercentile;
+    auto upperEstimate   = estimates.at( Bootstrap::index( numSamples, upperPercentile ) );
+
+    return std::make_pair( lowerEstimate, upperEstimate );
+  }
+
 private:
 
   /** Calculates index at a certain percentile of the data */
