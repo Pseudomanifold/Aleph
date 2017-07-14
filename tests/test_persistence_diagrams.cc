@@ -10,6 +10,7 @@
 #include <aleph/persistenceDiagrams/distances/NearestNeighbour.hh>
 #include <aleph/persistenceDiagrams/distances/Wasserstein.hh>
 
+#include <algorithm>
 #include <limits>
 #include <random>
 #include <vector>
@@ -86,8 +87,7 @@ template <class T> void testPersistenceIndicatorFunction()
   for( unsigned i = 0; i < numSamples; i++ )
     indicatorFunctions.emplace_back( aleph::persistenceIndicatorFunction( diagrams.at(i) ) );
 
-  std::cout << "Hausdorf,Wasserstein_1,L_1\n";
-
+  // FIXME: not sure what to do with these values...
   for( unsigned i = 0; i < numSamples; i++ )
   {
     auto&& D1 = diagrams.at(i);
@@ -101,9 +101,41 @@ template <class T> void testPersistenceIndicatorFunction()
       auto h  = aleph::distances::hausdorffDistance( D1, D2 );
       auto w1 = aleph::distances::wassersteinDistance( D1, D2, T(1) );
       auto d1 = (f1-f2).abs().integral();
+      auto p1 = aleph::totalPersistence( D1, 1.0 );
+      auto p2 = aleph::totalPersistence( D2, 1.0 );
 
-      std::cout << h << "," << w1 << "," << d1 << "\n";
+      std::cout << h << "," << w1 << "," << d1 << "," << p1 << "," << p2 << "\n";
     }
+  }
+
+  // Transform persistence diagrams to prove that the bound given by
+  // the maximum of the two persistence values is strict.
+  for( unsigned i = 0; i < numSamples; i++ )
+  {
+    auto&& D1 = diagrams.at(i);
+    auto   D2 = D1;
+
+    T offset = T(10);
+    std::transform( D2.begin(), D2.end(), D2.begin(),
+                    [&offset] ( const typename PersistenceDiagram::Point& p )
+                    {
+                      return typename PersistenceDiagram::Point( p.x() + offset, p.y() + offset );
+                    }
+    );
+
+    auto p1 = aleph::totalPersistence( D1, 1 );
+    auto p2 = aleph::totalPersistence( D2, 1 );
+
+    ALEPH_ASSERT_THROW( std::abs( p1 - p2 ) < 1e-4 );
+
+    auto f = aleph::persistenceIndicatorFunction( D1 );
+    auto g = aleph::persistenceIndicatorFunction( D2 );
+
+    auto d1 = (f-g).abs().integral();
+    auto d2 = (g-f).abs().integral();
+
+    ALEPH_ASSERT_THROW( d1 >= p1+p2 );
+    ALEPH_ASSERT_THROW( d2 >= p1+p2 );
   }
 
   ALEPH_TEST_END();
