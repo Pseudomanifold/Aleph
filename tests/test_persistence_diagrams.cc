@@ -4,7 +4,9 @@
 #include <aleph/persistenceDiagrams/Norms.hh>
 #include <aleph/persistenceDiagrams/MultiScaleKernel.hh>
 #include <aleph/persistenceDiagrams/PersistenceDiagram.hh>
+#include <aleph/persistenceDiagrams/PersistenceIndicatorFunction.hh>
 
+#include <aleph/persistenceDiagrams/distances/Hausdorff.hh>
 #include <aleph/persistenceDiagrams/distances/NearestNeighbour.hh>
 #include <aleph/persistenceDiagrams/distances/Wasserstein.hh>
 
@@ -58,6 +60,51 @@ template <class T> void testFrechetMean()
 
   ALEPH_ASSERT_THROW( D.size() > 0 );
   ALEPH_ASSERT_THROW( std::abs( P - p ) < 2.0 );
+
+  ALEPH_TEST_END();
+}
+
+template <class T> void testPersistenceIndicatorFunction()
+{
+  ALEPH_TEST_BEGIN( "Persistence indicator function" );
+
+  using PersistenceDiagram = aleph::PersistenceDiagram<T>;
+  using StepFunction       = aleph::math::StepFunction<T>;
+
+  unsigned numSamples = 20;
+  unsigned sampleSize = 50;
+
+  std::vector<PersistenceDiagram> diagrams;
+  diagrams.reserve( numSamples );
+
+  for( unsigned i = 0; i < numSamples; i++ )
+    diagrams.emplace_back( createRandomPersistenceDiagram<T>( sampleSize ) );
+
+  std::vector<StepFunction> indicatorFunctions;
+  indicatorFunctions.reserve( numSamples );
+
+  for( unsigned i = 0; i < numSamples; i++ )
+    indicatorFunctions.emplace_back( aleph::persistenceIndicatorFunction( diagrams.at(i) ) );
+
+  std::cout << "Hausdorf,Wasserstein_1,L_1\n";
+
+  for( unsigned i = 0; i < numSamples; i++ )
+  {
+    auto&& D1 = diagrams.at(i);
+    auto&& f1 = indicatorFunctions.at(i);
+
+    for( unsigned j = i+1; j < numSamples; j++ )
+    {
+      auto&& D2 = diagrams.at(j);
+      auto&& f2 = indicatorFunctions.at(j);
+
+      auto h  = aleph::distances::hausdorffDistance( D1, D2 );
+      auto w1 = aleph::distances::wassersteinDistance( D1, D2, T(1) );
+      auto d1 = (f1-f2).abs().integral();
+
+      std::cout << h << "," << w1 << "," << d1 << "\n";
+    }
+  }
 
   ALEPH_TEST_END();
 }
@@ -154,6 +201,9 @@ int main(int, char**)
 
   testNearestNeighbourDistance<float> ();
   testNearestNeighbourDistance<double>();
+
+  testPersistenceIndicatorFunction<float> ();
+  testPersistenceIndicatorFunction<double>();
 
   testWassersteinDistance<float> ();
   testWassersteinDistance<double>();
