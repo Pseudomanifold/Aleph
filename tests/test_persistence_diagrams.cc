@@ -6,6 +6,7 @@
 #include <aleph/persistenceDiagrams/PersistenceDiagram.hh>
 #include <aleph/persistenceDiagrams/PersistenceIndicatorFunction.hh>
 
+#include <aleph/persistenceDiagrams/distances/Bottleneck.hh>
 #include <aleph/persistenceDiagrams/distances/Hausdorff.hh>
 #include <aleph/persistenceDiagrams/distances/NearestNeighbour.hh>
 #include <aleph/persistenceDiagrams/distances/Wasserstein.hh>
@@ -39,6 +40,19 @@ template <class T> aleph::PersistenceDiagram<T> createRandomPersistenceDiagram( 
 
   return D;
 }
+
+template <class T> void testBottleneckDistance()
+{
+  using PersistenceDiagram = aleph::PersistenceDiagram<T>;
+
+  ALEPH_TEST_BEGIN( "Persistence diagram mean");
+
+  PersistenceDiagram pd;
+  (void) pd;
+
+  ALEPH_TEST_END();
+}
+
 
 template <class T> void testFrechetMean()
 {
@@ -183,9 +197,10 @@ template <class T> void testNearestNeighbourDistance()
   ALEPH_TEST_END();
 }
 
-
 template <class T> void testWassersteinDistance()
 {
+  ALEPH_TEST_BEGIN( "Wasserstein distance" );
+
   using Diagram = aleph::PersistenceDiagram<T>;
   using namespace aleph::distances;
 
@@ -221,6 +236,8 @@ template <class T> void testWassersteinDistance()
     ALEPH_ASSERT_THROW( d12 == d21 );
     ALEPH_ASSERT_THROW( std::abs( d12 -  T( 3.05 ) ) < 1e-8 );
   }
+
+  ALEPH_TEST_END();
 }
 
 int main(int, char**)
