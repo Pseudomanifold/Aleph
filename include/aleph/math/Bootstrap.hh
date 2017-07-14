@@ -1,6 +1,7 @@
 #ifndef ALEPH_MATH_BOOTSTRAP_HH__
 #define ALEPH_MATH_BOOTSTRAP_HH__
 
+#include <algorithm>
 #include <iterator>
 #include <random>
 #include <vector>
@@ -34,8 +35,8 @@ public:
                        Functor functor,
                        OutputIterator result )
   {
-    typedef typename std::iterator_traits<InputIterator>::value_type SampleValueType;
-    typedef decltype( functor( begin, end ) ) FunctorValueType;
+    using SampleValueType  = typename std::iterator_traits<InputIterator>::value_type;
+    using FunctorValueType = decltype( functor( begin, end ) );
 
     std::vector<SampleValueType> samples( begin, end );
 
@@ -60,6 +61,45 @@ public:
     }
 
     std::copy( replicates.begin(), replicates.end(), result );
+  }
+
+  template <class InputIterator, class Functor>
+  auto basicConfidenceInterval( unsigned numSamples,
+                                double alpha,
+                                InputIterator begin, InputIterator end,
+                                Functor functor ) -> std::pair< decltype( functor(begin, end) ), decltype( functor(begin, end) ) >
+  {
+    auto theta             = functor( begin, end );
+    using FunctorValueType = decltype( theta );
+
+    std::vector<FunctorValueType> estimates;
+    estimates.reserve( numSamples );
+
+    this->makeReplicates( numSamples,
+                          begin, end,
+                          functor,
+                          std::back_inserter( estimates ) );
+
+    std::sort( estimates.begin(), estimates.end() );
+
+    auto upperPercentile = alpha / 2;
+    auto upperEstimate   = estimates.at( Bootstrap::index( numSamples, upperPercentile ) );
+    auto lowerPercentile = 1 - upperPercentile;
+    auto lowerEstimate   = estimates.at( Bootstrap::index( numSamples, lowerPercentile ) );
+
+    return std::make_pair( 2*theta - lowerEstimate, 2*theta - upperEstimate );
+  }
+
+private:
+
+  /** Calculates index at a certain percentile of the data */
+  static unsigned index( unsigned int samples, double alpha )
+  {
+    // This accounts for rounding and works regardless of whether
+    // the product samples * alpha is an integer or not. Note the
+    // offset of -1. It is required because, say, the 100th value
+    // is at index 99 of the vector.
+    return static_cast<unsigned>( samples * alpha + 0.5 ) - 1;
   }
 };
 
