@@ -78,7 +78,7 @@ template <class T> void testBottleneckDistance()
     ALEPH_ASSERT_THROW( d21 > T() );
 
     ALEPH_ASSERT_EQUAL( d12, d21 );
-    ALEPH_ASSERT_EQUAL( d21, static_cast<T>(5.9) );
+    ALEPH_ASSERT_EQUAL( d21, T(9.9)-T(4.0) );
   }
 
   ALEPH_TEST_END();
