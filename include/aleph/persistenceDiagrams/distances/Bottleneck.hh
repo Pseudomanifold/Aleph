@@ -20,12 +20,12 @@ namespace detail
 
 template <class T> struct Edge
 {
-  unsigned int source;
-  unsigned int target;
+  std::size_t source;
+  std::size_t target;
 
   T weight;
 
-  Edge( unsigned int s, unsigned int t, T w )
+  Edge( std::size_t s, std::size_t t, T w )
     : source( s )
     , target( t )
     , weight( w )
@@ -126,34 +126,34 @@ template <
 > DataType bottleneckDistance( const PersistenceDiagram<DataType>& D1,
                                const PersistenceDiagram<DataType>& D2 )
 {
-#if 0
-  std::size_t n           = pairing1.size();
-  std::size_t m           = pairing2.size();
-  std::size_t maximumSize = n + m;
+  auto n           = D1.size();
+  auto m           = D2.size();
+  auto maximumSize = n + m;
 
-  using Edge = detail::Edge<DataType>;
+  using SizeType = decltype(n);
+  using Edge     = detail::Edge<DataType>;
 
   std::vector<Edge> edges;
 
   // Diagonal edges ----------------------------------------------------
 
-  for( std::size_t i = n; i < maximumSize; i++ )
-    for( std::size_t j = maximumSize + m; j < 2 * maximumSize; j++ )
-      edges.push_back( Edge( i, j, 0.0 ) );
+  for( SizeType i = n; i < maximumSize; i++ )
+    for( SizeType j = maximumSize + m; j < 2 * maximumSize; j++ )
+      edges.push_back( Edge( static_cast<std::size_t>(i), static_cast<std::size_t>(j), DataType() ) );
 
-  std::size_t i = 0;
+  SizeType i = 0;
 
   // Edges between regular points --------------------------------------
 
-  for( auto it1 = pairing1.begin(); it1 != pairing1.end(); ++it1 )
+  for( auto it1 = D1.begin(); it1 != D1.end(); ++it1 )
   {
-    std::size_t j = maximumSize;
+    auto j = maximumSize;
 
-    for( auto it2 = pairing2.begin(); it2 != pairing2.end(); ++it2 )
+    for( auto it2 = D2.begin(); it2 != D2.end(); ++it2 )
     {
-      double weight = it1->distance( *it2 );
+      auto weight = it1->distance( *it2 );
 
-      edges.push_back( Edge( i, j,
+      edges.push_back( Edge( static_cast<std::size_t>(i), static_cast<std::size_t>(j),
                              weight ) );
 
       ++j;
@@ -166,9 +166,9 @@ template <
 
   i = 0;
 
-  for( auto it1 = pairing1.begin(); it1 != pairing1.end(); ++it1 )
+  for( auto it1 = D1.begin(); it1 != D1.end(); ++it1 )
   {
-    edges.push_back( Edge( i, maximumSize + m + i,
+    edges.push_back( Edge( static_cast<std::size_t>(i), static_cast<std::size_t>(maximumSize + m + i),
                            it1->orthogonalDistance( *it1 ) ) );
 
     ++i;
@@ -176,9 +176,9 @@ template <
 
   i = maximumSize;
 
-  for( auto it2 = pairing2.begin(); it2 != pairing2.end(); ++it2 )
+  for( auto it2 = D2.begin(); it2 != D2.end(); ++it2 )
   {
-    edges.push_back( Edge( n + i - maximumSize, i,
+    edges.push_back( Edge( static_cast<std::size_t>(n + i - maximumSize), static_cast<std::size_t>(i),
                            it2->orthogonalDistance( *it2 ) ) );
   }
 
@@ -190,7 +190,7 @@ template <
   // more and more edges to find out the first graph that permits a maximum
   // cardinality matching.
 
-  using EdgeIteratorType     = std::vector<Edge>::const_iterator;
+  using EdgeIteratorType     = typename std::vector<Edge>::const_iterator;
   using CountingIteratorType = boost::counting_iterator<EdgeIteratorType>;
 
   auto itEdge = std::upper_bound( CountingIteratorType( edges.begin() ),
@@ -199,7 +199,6 @@ template <
                                   CheckMatchingCardinality( maximumSize, edges.begin() ) );
 
   return (*itEdge)->weight;
-#endif
 }
 
 } // namespace distances
