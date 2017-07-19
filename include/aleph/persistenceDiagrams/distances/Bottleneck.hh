@@ -2,7 +2,9 @@
 #define ALEPH_PERSISTENCE_DIAGRAMS_DISTANCES_BOTTLENECK_HH__
 
 #include <aleph/geometry/distances/Infinity.hh>
+
 #include <aleph/persistenceDiagrams/PersistenceDiagram.hh>
+#include <aleph/persistenceDiagrams/distances/detail/Orthogonal.hh>
 
 #include <boost/iterator/counting_iterator.hpp>
 
@@ -145,13 +147,15 @@ template <
 
   // Edges between regular points --------------------------------------
 
+  Distance distance;
+
   for( auto it1 = D1.begin(); it1 != D1.end(); ++it1 )
   {
     auto j = maximumSize;
 
     for( auto it2 = D2.begin(); it2 != D2.end(); ++it2 )
     {
-      auto weight = it1->distance( *it2 );
+      auto weight = distance( *it1, *it2 );
 
       edges.push_back( Edge( static_cast<std::size_t>(i), static_cast<std::size_t>(j),
                              weight ) );
@@ -169,7 +173,7 @@ template <
   for( auto it1 = D1.begin(); it1 != D1.end(); ++it1 )
   {
     edges.push_back( Edge( static_cast<std::size_t>(i), static_cast<std::size_t>(maximumSize + m + i),
-                           it1->orthogonalDistance( *it1 ) ) );
+                           aleph::distances::detail::orthogonalDistance<Distance>( *it1 ) ) );
 
     ++i;
   }
@@ -179,7 +183,7 @@ template <
   for( auto it2 = D2.begin(); it2 != D2.end(); ++it2 )
   {
     edges.push_back( Edge( static_cast<std::size_t>(n + i - maximumSize), static_cast<std::size_t>(i),
-                           it2->orthogonalDistance( *it2 ) ) );
+                           aleph::distances::detail::orthogonalDistance<Distance>( *it2 ) ) );
   }
 
   // Identify matchings ------------------------------------------------
@@ -196,7 +200,7 @@ template <
   auto itEdge = std::upper_bound( CountingIteratorType( edges.begin() ),
                                   CountingIteratorType( edges.end() ),
                                   edges.begin(),
-                                  CheckMatchingCardinality( maximumSize, edges.begin() ) );
+                                  detail::CheckMatchingCardinality<DataType>( maximumSize, edges.begin() ) );
 
   return (*itEdge)->weight;
 }
