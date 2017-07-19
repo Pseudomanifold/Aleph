@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/Submanifold/Aleph.svg?branch=master)](https://travis-ci.org/Submanifold/Aleph)
+[![Build Status](https://travis-ci.org/Submanifold/Aleph.svg?branch=master)](https://travis-ci.org/Submanifold/Aleph) [![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/972/badge)](https://bestpractices.coreinfrastructure.org/projects/972)
 
 # Aleph &mdash; *A* *L*ibrary for *E*xploring *P*ersistent *H*omology
 
@@ -15,4 +15,10 @@ separate from the implementation.
 For more information, please read the [original paper describing
 `PHAT`](https://people.mpi-inf.mpg.de/~mkerber/bkrw-pphat.pdf).
 
-- [Building Aleph](building.md)
+## Getting started with Aleph
+
+Aleph is a header-only library. Nonetheless, it ships with numerous
+tests, examples, and tools that require compilation. Coincidentally,
+these files also demonstrate how to use the library in practice.
+
+- [Building & installing Aleph](building.md)
