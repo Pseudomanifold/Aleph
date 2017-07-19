@@ -43,12 +43,43 @@ template <class T> aleph::PersistenceDiagram<T> createRandomPersistenceDiagram( 
 
 template <class T> void testBottleneckDistance()
 {
-  using PersistenceDiagram = aleph::PersistenceDiagram<T>;
+  ALEPH_TEST_BEGIN( "Bottleneck distance" );
 
-  ALEPH_TEST_BEGIN( "Persistence diagram mean");
+  using Diagram = aleph::PersistenceDiagram<T>;
+  using namespace aleph::distances;
 
-  PersistenceDiagram pd;
-  (void) pd;
+  Diagram D1;
+  D1.add( T(0.9), T(1.0) );
+  D1.add( T(1.9), T(2.0) );
+  D1.add( T(2.9), T(3.0) );
+  D1.add( T(3.9), T(4.0) );
+
+  {
+    auto d11 = bottleneckDistance( D1, D1 );
+
+    assert( d11 >= T() );
+    assert( d11 == T() );
+
+    ALEPH_ASSERT_THROW( d11 >= T() );
+    ALEPH_ASSERT_THROW( d11 == T() );
+  }
+
+  Diagram D2;
+  D2.add( T(0.9), T(1.0) );
+  D2.add( T(1.9), T(2.0) );
+  D2.add( T(2.9), T(3.0) );
+  D2.add( T(3.9), T(9.9) );
+
+  {
+    auto d12 = bottleneckDistance( D1, D2 );
+    auto d21 = bottleneckDistance( D2, D1 );
+
+    ALEPH_ASSERT_THROW( d12 > T() );
+    ALEPH_ASSERT_THROW( d21 > T() );
+
+    ALEPH_ASSERT_EQUAL( d12, d21 );
+    ALEPH_ASSERT_EQUAL( d21, static_cast<T>(5.9) );
+  }
 
   ALEPH_TEST_END();
 }
@@ -242,6 +273,9 @@ template <class T> void testWassersteinDistance()
 
 int main(int, char**)
 {
+  testBottleneckDistance<float> ();
+  testBottleneckDistance<double>();
+
   testFrechetMean<float> ();
   testFrechetMean<double>();
 
