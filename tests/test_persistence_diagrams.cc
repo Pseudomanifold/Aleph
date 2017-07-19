@@ -264,7 +264,7 @@ template <class T> void testWassersteinDistance()
     ALEPH_ASSERT_THROW( d12 > T() );
     ALEPH_ASSERT_THROW( d21 > T() );
 
-    ALEPH_ASSERT_THROW( d12 == d21 );
+    ALEPH_ASSERT_EQUAL( d12, d21 );
     ALEPH_ASSERT_THROW( std::abs( d12 -  T( 3.05 ) ) < 1e-8 );
   }
 

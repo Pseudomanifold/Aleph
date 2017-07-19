@@ -140,7 +140,7 @@ template <
   // Diagonal edges ----------------------------------------------------
 
   for( SizeType i = n; i < maximumSize; i++ )
-    for( SizeType j = maximumSize + m; j < 2 * maximumSize; j++ )
+    for( SizeType j = maximumSize + i; j < 2 * maximumSize; j++ )
       edges.push_back( Edge( static_cast<std::size_t>(i), static_cast<std::size_t>(j), DataType() ) );
 
   SizeType i = 0;
