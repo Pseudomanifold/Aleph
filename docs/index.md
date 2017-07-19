@@ -22,3 +22,4 @@ tests, examples, and tools that require compilation. Coincidentally,
 these files also demonstrate how to use the library in practice.
 
 - [Building & installing Aleph](building.md)
+- [Tutorials](tutorials.md)
