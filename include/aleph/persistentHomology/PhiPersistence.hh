@@ -35,8 +35,7 @@ template <class Simplex, class Function> std::pair<topology::SimplicialComplex<S
       L.push_back( simplex );
   }
 
-  if( L.empty() )
-    return {};
+  auto s = L.size();
 
   for( auto&& simplex : K )
   {
@@ -44,7 +43,7 @@ template <class Simplex, class Function> std::pair<topology::SimplicialComplex<S
       L.push_back( simplex );
   }
 
-  return std::make_pair( L, L.size() - 1 );
+  return std::make_pair( L, s );
 }
 
 } // namespace aleph
