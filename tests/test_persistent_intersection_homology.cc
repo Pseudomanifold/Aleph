@@ -1,5 +1,6 @@
 #include <tests/Base.hh>
 
+#include <aleph/persistentHomology/algorithms/Standard.hh>
 #include <aleph/persistentHomology/PhiPersistence.hh>
 
 #include <aleph/topology/Conversions.hh>
@@ -46,8 +47,8 @@ template <class T> void test()
   SimplicialComplex K( simplices.begin(), simplices.end() );
   SimplicialComplex L;
 
-  std::size_t index    = 0;
-  std::tie( L, index ) =
+  std::size_t s    = 0;
+  std::tie( L, s ) =
     aleph::partition( K,
                       [&phi] ( const Simplex& s )
                       {
@@ -56,11 +57,34 @@ template <class T> void test()
 
   ALEPH_ASSERT_EQUAL( K.size(), L.size() );
 
-  auto boundaryMatrix = aleph::topology::makeBoundaryMatrix( L );
+  auto boundaryMatrix = aleph::topology::makeBoundaryMatrix( L, s );
   auto indexA         = L.index( {0,3,4} );
-  auto columnA        = boundaryMatrix.getColumn( static_cast<unsigned>( indexA ) );
+
+  using IndexType     = typename decltype(boundaryMatrix)::Index;
+  auto columnA        = boundaryMatrix.getColumn( static_cast<IndexType>( indexA ) );
 
   ALEPH_ASSERT_EQUAL( columnA.size(), 3 );
+
+  aleph::persistentHomology::algorithms::Standard algorithm;
+  algorithm( boundaryMatrix );
+
+  unsigned numAllowableChains    = 0;
+  unsigned numAllowableTwoChains = 0;
+
+  for( IndexType i = 0; i < boundaryMatrix.getNumColumns(); i++ )
+  {
+    auto lowestOne = boundaryMatrix.getMaximumIndex( i );
+    if( lowestOne.second && lowestOne.first <= s )
+    {
+      ++numAllowableChains;
+
+      if( L.at(i).dimension() == 2 )
+        ++numAllowableTwoChains;
+    }
+  }
+
+  ALEPH_ASSERT_THROW( numAllowableChains >= numAllowableTwoChains );
+  ALEPH_ASSERT_EQUAL( numAllowableTwoChains, 1 );
 
   ALEPH_TEST_END();
 }
