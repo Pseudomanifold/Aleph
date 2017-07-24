@@ -2,6 +2,7 @@
 
 #include <aleph/persistentHomology/PhiPersistence.hh>
 
+#include <aleph/topology/Conversions.hh>
 #include <aleph/topology/Simplex.hh>
 #include <aleph/topology/SimplicialComplex.hh>
 
@@ -43,14 +44,23 @@ template <class T> void test()
   }
 
   SimplicialComplex K( simplices.begin(), simplices.end() );
+  SimplicialComplex L;
 
-  auto L = aleph::partition( K,
-                             [&phi] ( const Simplex& s )
-                             {
-                               return phi.at(s);
-                             } );
+  std::size_t index    = 0;
+  std::tie( L, index ) =
+    aleph::partition( K,
+                      [&phi] ( const Simplex& s )
+                      {
+                        return phi.at(s);
+                      } );
 
   ALEPH_ASSERT_EQUAL( K.size(), L.size() );
+
+  auto boundaryMatrix = aleph::topology::makeBoundaryMatrix( L );
+  auto indexA         = L.index( {0,3,4} );
+  auto columnA        = boundaryMatrix.getColumn( static_cast<unsigned>( indexA ) );
+
+  ALEPH_ASSERT_EQUAL( columnA.size(), 3 );
 
   ALEPH_TEST_END();
 }

@@ -1,7 +1,11 @@
 #ifndef ALEPH_PERSISTENT_HOMOLOGY_PHI_PERSISTENCE_HH__
 #define ALEPH_PERSISTENT_HOMOLOGY_PHI_PERSISTENCE_HH__
 
+
+#include <aleph/topology/Conversions.hh>
 #include <aleph/topology/SimplicialComplex.hh>
+
+#include <utility>
 
 namespace aleph
 {
@@ -21,7 +25,7 @@ namespace aleph
   ones.
 */
 
-template <class Simplex, class Function> topology::SimplicialComplex<Simplex> partition( const topology::SimplicialComplex<Simplex>& K, Function phi )
+template <class Simplex, class Function> std::pair<topology::SimplicialComplex<Simplex>, std::size_t> partition( const topology::SimplicialComplex<Simplex>& K, Function phi )
 {
   topology::SimplicialComplex<Simplex> L;
 
@@ -31,13 +35,16 @@ template <class Simplex, class Function> topology::SimplicialComplex<Simplex> pa
       L.push_back( simplex );
   }
 
+  if( L.empty() )
+    return {};
+
   for( auto&& simplex : K )
   {
     if( !phi(simplex) )
       L.push_back( simplex );
   }
 
-  return L;
+  return std::make_pair( L, L.size() - 1 );
 }
 
 } // namespace aleph
