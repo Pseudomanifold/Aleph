@@ -15,13 +15,29 @@ namespace aleph
     Paul Bendich and John Harer
 
   The function expects a simplicial complex $K$ and a function $\phi$
-  that determines whether a simplex is proper or not.
-
-  TODO: finish documentation; what is a good return type?
+  that determines whether a simplex is proper or not. The function is
+  going to create a new simplicial complex. This complex contains all
+  proper simplices (in their original order) followed by all improper
+  ones.
 */
 
-template <class Simplex, class Function> void partition( const topology::SimplicialComplex<Simplex>& K, Function phi )
+template <class Simplex, class Function> topology::SimplicialComplex<Simplex> partition( const topology::SimplicialComplex<Simplex>& K, Function phi )
 {
+  topology::SimplicialComplex<Simplex> L;
+
+  for( auto&& simplex : K )
+  {
+    if( phi(simplex) )
+      L.push_back( simplex );
+  }
+
+  for( auto&& simplex : K )
+  {
+    if( !phi(simplex) )
+      L.push_back( simplex );
+  }
+
+  return L;
 }
 
 } // namespace aleph
