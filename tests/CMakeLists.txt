@@ -56,6 +56,7 @@ SET_SOURCE_FILES_PROPERTIES(
   PROPERTIES COMPILE_FLAGS "-std=c++14"
 )
 
+ADD_EXECUTABLE( test_barycentric_subdivision          test_barycentric_subdivision.cc )
 ADD_EXECUTABLE( test_bootstrap                        test_bootstrap.cc )
 ADD_EXECUTABLE( test_boundary_matrix_reduction        test_boundary_matrix_reduction.cc )
 ADD_EXECUTABLE( test_clique_enumeration               test_clique_enumeration.cc )
@@ -80,6 +81,7 @@ ADD_EXECUTABLE( test_rips_skeleton                    test_rips_skeleton.cc )
 ADD_EXECUTABLE( test_union_find                       test_union_find.cc )
 ADD_EXECUTABLE( test_step_function                    test_step_function.cc )
 
+ADD_TEST( barycentric_subdivision          test_barycentric_subdivision )
 ADD_TEST( bootstrap                        test_bootstrap )
 ADD_TEST( boundary_matrix_reduction        test_boundary_matrix_reduction )
 ADD_TEST( clique_enumeration               test_clique_enumeration )
