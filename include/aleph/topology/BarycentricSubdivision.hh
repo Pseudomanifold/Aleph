@@ -34,6 +34,12 @@ namespace topology
 class BarycentricSubdivision
 {
 public:
+
+  /**
+    Performs a barycentric subdivision of the given simplicial complex
+    and returns the result.
+  */
+
   template <class SimplicialComplex> SimplicialComplex operator()( const SimplicialComplex& K ) const
   {
     using Simplex    = typename SimplicialComplex::ValueType;
@@ -179,9 +185,13 @@ private:
     }
     while( newSimplices );
 
-
     return { simplices.begin(), simplices.end() };
   }
+
+  /**
+    Overloaded variant of the function above. It permits the collection
+    of all boundaries of a range of simplices.
+  */
 
   template <class InputIterator> static auto collectBoundaries( InputIterator begin, InputIterator end ) -> std::vector<typename std::iterator_traits<InputIterator>::value_type>
   {
@@ -198,7 +208,6 @@ private:
 
     return { simplices.begin(), simplices.end() };
   }
-
 };
 
 } // namespace topology
