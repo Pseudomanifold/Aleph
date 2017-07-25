@@ -145,7 +145,7 @@ template <class Simplex> auto calculateIntersectionHomology( const aleph::topolo
         auto i            = s.dimension();
         auto intersection = aleph::topology::intersect( X.at( d - 1 - k ), s );
         auto dimension    = intersection.empty() ? -1 : static_cast<long>( intersection.rbegin()->dimension() );
-        admissible        = admissible && static_cast<long>( dimension ) <= static_cast<long>( i - k + static_cast<long>( p(k) ) );
+        admissible        = admissible && static_cast<long>( dimension ) <= ( long(i) - long(k) + long( p(k) ) );
       }
 
       phi[s] = admissible;
