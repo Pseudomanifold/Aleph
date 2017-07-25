@@ -470,4 +470,26 @@ std::ostream& operator<<( std::ostream& o, const topology::Simplex<DataType, Ver
 
 } // namespace aleph
 
+namespace std
+{
+
+/**
+  This specialization permits using simplices in std::unordered_map and
+  std::unordered_set. This struct wraps the hash value function defined
+  above.
+*/
+
+template<class DataType, class VertexType> struct hash<aleph::topology::Simplex<DataType, VertexType> >
+{
+  using argument_type = aleph::topology::Simplex<DataType, VertexType>;
+  using result_type   = std::size_t;
+
+  result_type operator()( const argument_type& simplex ) const noexcept
+  {
+    return aleph::topology::hash_value( simplex );
+  }
+};
+
+} // namespace std
+
 #endif
