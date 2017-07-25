@@ -89,8 +89,42 @@ template <class T> void test()
   ALEPH_TEST_END();
 }
 
+template <class T> void testTwoSimplex()
+{
+  ALEPH_TEST_BEGIN( "Persistent intersection homology: simplex" );
+
+  using Simplex           = aleph::topology::Simplex<T>;
+  using SimplicialComplex = aleph::topology::SimplicialComplex<Simplex>;
+
+  SimplicialComplex K = {
+    {0},
+    {1},
+    {2},
+    {0,1}, {0,2},
+    {1,2},
+    {0,1,2}
+  };
+
+  SimplicialComplex X0 = { {0} };
+  SimplicialComplex X1 = K;
+
+  auto D1 = aleph::calculateIntersectionHomology( K, {X0,X1}, aleph::Perversity( { 0,0} ) );
+  auto D2 = aleph::calculateIntersectionHomology( K, {X0,X1}, aleph::Perversity( {-1,0} ) );
+  auto D3 = aleph::calculateIntersectionHomology( K, {X0,X1}, aleph::Perversity( { 1,0} ) );
+
+  std::cerr << D1.front() << "\n"
+            << D2.front() << "\n"
+            << D3.front() << "\n";
+
+
+  ALEPH_TEST_END();
+}
+
 int main(int, char**)
 {
   test<float> ();
   test<double>();
+
+  testTwoSimplex<float> ();
+  testTwoSimplex<double>();
 }
