@@ -122,6 +122,49 @@ public:
 
     return L;
   }
+private:
+
+  /**
+    Collects all boundaries of the given simplex and returns them. This
+    is required in order to update lower-dimensional simplices of cones
+    correctly.
+
+    Note that the algorithm is rather stupid and slow; it iterates over
+    all faces until the set of all simplices remains fixed.
+  */
+
+  template <class Simplex> static std::vector<Simplex> collectBoundaries( const Simplex& s )
+  {
+    std::set<Simplex> simplices;
+
+    for( auto itBoundary = s.begin_boundary(); itBoundary != s.end_boundary(); ++itBoundary )
+      simplices.insert( *itBoundary );
+
+    bool newSimplices = false;
+    do
+    {
+      std::set<Simplex> boundaries;
+
+      for( auto&& s : simplices )
+      {
+        for( auto itBoundary = s.begin_boundary(); itBoundary != s.end_boundary(); ++itBoundary )
+          boundaries.insert( *itBoundary );
+      }
+
+      auto oldSize = simplices.size();
+
+      simplices.insert( boundaries.begin(),
+                        boundaries.end() );
+
+      auto newSize = simplices.size();
+      newSimplices = newSize != oldSize;
+    }
+    while( newSimplices );
+
+
+    return { simplices.begin(), simplices.end() };
+  }
+
 };
 
 } // namespace topology
