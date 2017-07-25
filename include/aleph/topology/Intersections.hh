@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <iterator>
 #include <set>
+#include <type_traits>
 #include <vector>
 
 namespace aleph
@@ -33,6 +34,33 @@ template <class Simplex> Simplex intersect( const Simplex& s, const Simplex& t )
                          std::back_inserter( stVertices ) );
 
   return Simplex( stVertices.begin(), stVertices.end() );
+}
+
+/**
+  Intersects a simplex with a simplicial complex. To this end, the
+  intersection between all simplices in the simplicial complex and
+  the current simplex will be calculated.
+
+  The result of this intersection is a set of simplices.
+*/
+
+template <class SimplicialComplex, class Simplex> std::set<Simplex> intersect( const SimplicialComplex& K, const Simplex& s ) noexcept
+{
+  static_assert( std::is_same<Simplex, typename SimplicialComplex::ValueType>::value,
+                 "Simplex type and simplicial complex value type must coincide" );
+
+  std::set<Simplex> simplices;
+
+  for( auto&& t : K )
+  {
+    auto u = intersect(s,t);
+
+    // Only insert non-empty intersections
+    if( u )
+      simplices.insert( u );
+  }
+
+  return simplices;
 }
 
 } // namespace topology
