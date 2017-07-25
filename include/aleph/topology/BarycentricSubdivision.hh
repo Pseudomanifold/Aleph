@@ -1,6 +1,7 @@
 #ifndef ALEPH_TOPOLOGY_BARYCENTRIC_SUBDIVISION_HH__
 #define ALEPH_TOPOLOGY_BARYCENTRIC_SUBDIVISION_HH__
 
+#include <iterator>
 #include <set>
 #include <stdexcept>
 #include <unordered_map>
@@ -109,6 +110,23 @@ public:
                                       s.data() ) );
         }
 
+       // Cone boundaries; required in order to ensure consistency of
+       // the resulting simplicial complex.
+        std::vector<Simplex> boundaries
+          = collectBoundaries( subdividedBoundary.begin(), subdividedBoundary.end() );
+
+        for( auto&& t : boundaries )
+        {
+          std::vector<VertexType> vertices( t.begin(), t.end() );
+          vertices.push_back( barycentreVertex );
+
+          // The new simplex is directly inserted into the boundary of
+          // the resulting simplicial complex---it will not be used by
+          // any other simplex during the subdivision.
+          L.push_back( Simplex( vertices.begin(), vertices.end(),
+                                s.data() ) );
+        }
+
         subdivision[s] = cone;
 
         // Choose new barycentre vertex for the next simplex. All
@@ -161,6 +179,22 @@ private:
     }
     while( newSimplices );
 
+
+    return { simplices.begin(), simplices.end() };
+  }
+
+  template <class InputIterator> static auto collectBoundaries( InputIterator begin, InputIterator end ) -> std::vector<typename std::iterator_traits<InputIterator>::value_type>
+  {
+    using Simplex = typename std::iterator_traits<InputIterator>::value_type;
+    std::set<Simplex> simplices;
+
+    for( auto it = begin; it != end; ++it )
+    {
+      auto&& boundaries = collectBoundaries( *it );
+
+      simplices.insert( boundaries.begin(),
+                        boundaries.end() );
+    }
 
     return { simplices.begin(), simplices.end() };
   }
