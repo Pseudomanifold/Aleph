@@ -19,10 +19,24 @@
 namespace aleph
 {
 
+/**
+  Given a boundary matrix, reduces it and reads off the resulting
+  persistence pairing. An optional parameter can be used to force
+  the algorithm to stop processing a part of the pairing. This is
+  especially relevant for intersection homology, which sets upper
+  limits for the validity of an index in the matrix.
+
+  @param M   Boundary matrix to reduce
+  @param max Optional maximum index after which simplices are not
+             considered any more. If the pairing of a simplex has
+             an index larger than the maximum one, such simplices
+             will not be considered in the pairing.
+*/
+
 template <
-  class ReductionAlgorithm,
-  class Representation
-> PersistencePairing<typename Representation::Index> calculatePersistencePairing( const topology::BoundaryMatrix<Representation>& M )
+  class ReductionAlgorithm = aleph::defaults::ReductionAlgorithm,
+  class Representation     = aleph::defaults::Representation
+> PersistencePairing<typename Representation::Index> calculatePersistencePairing( const topology::BoundaryMatrix<Representation>& M, typename Representation::Index max = typename Representation::Index() )
 {
   using namespace topology;
 
@@ -36,7 +50,7 @@ template <
 
   PersistencePairing pairing;
 
-  auto numColumns = B.getNumColumns();
+  auto numColumns = max ? max : B.getNumColumns();
 
   std::unordered_set<Index> creators;
 
@@ -62,7 +76,8 @@ template <
         v  = numColumns - 1 - w; // Yes, this is correct!
       }
 
-      pairing.add( u, v );
+      if( !max || i < max )
+        pairing.add( u, v );
     }
 
     // An invalid maximum index indicates that the corresponding column

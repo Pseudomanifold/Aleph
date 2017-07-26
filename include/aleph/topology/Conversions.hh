@@ -32,7 +32,7 @@ template <
   using Index = typename BoundaryMatrix<Representation>::Index;
 
   BoundaryMatrix<Representation> M;
-  M.setNumColumns( static_cast<Index>( K.size() ) );
+  M.setNumColumns( max ? static_cast<Index>( max ) : static_cast<Index>( K.size() ) );
 
   Index j = Index(0);
 
