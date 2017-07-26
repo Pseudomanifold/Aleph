@@ -442,17 +442,22 @@ public:
   /**
     Allows changing the current order of simplices, i.e. applying a certain
     simplicial filtration. This function only requires a simplex comparison
-    function as its input. See the Simplex class for admissable functors.
+    function as its input.
+
+    See the aleph::topology::filtrations namespace for admissible functors.
 
     @param comparison Simplex comparison object (or function)
-
-    @see Simplex<T>::DataComparison
-    @see Simplex<T>::DataDimensionComparison
   */
 
   template <class Comparison> void sort( Comparison&& comparison )
   {
     _simplices.sort( std::ref( comparison ) );
+  }
+
+  /** Sorts simplices according to their builtin comparison function */
+  void sort()
+  {
+    _simplices.sort();
   }
 
   // -------------------------------------------------------------------
