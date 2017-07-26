@@ -3,11 +3,11 @@
 
 #include <aleph/persistenceDiagrams/PersistenceDiagram.hh>
 
+#include <aleph/persistentHomology/Calculation.hh>
+
 #include <aleph/topology/Conversions.hh>
 #include <aleph/topology/Intersections.hh>
 #include <aleph/topology/SimplicialComplex.hh>
-
-#include <aleph/persistentHomology/algorithms/Twist.hh>
 
 #include <initializer_list>
 #include <map>
@@ -138,14 +138,14 @@ template <class Simplex> auto calculateIntersectionHomology( const aleph::topolo
     {
       bool admissible = true;
 
-      for( std::size_t k = 0; k < d; k++ )
+      for( std::size_t k = 1; k <= d; k++ )
       {
         // The notation follows Bendich and Harer, so $i$ is actually
         // referring to a dimension instead of an index. Beware!
         auto i            = s.dimension();
-        auto intersection = aleph::topology::intersect( X.at( d - 1 - k ), s );
+        auto intersection = aleph::topology::intersect( X.at( d - k ), s );
         auto dimension    = intersection.empty() ? -1 : static_cast<long>( intersection.rbegin()->dimension() );
-        admissible        = admissible && static_cast<long>( dimension ) <= ( long(i) - long(k) + long( p(k) ) );
+        admissible        = admissible && intersection.empty() ? true : static_cast<long>( dimension ) <= ( long(i) - long(k) + long( p(k) ) );
       }
 
       phi[s] = admissible;
@@ -165,35 +165,13 @@ template <class Simplex> auto calculateIntersectionHomology( const aleph::topolo
 
   // Calculate persistent intersection homology ------------------------
 
-  auto boundaryMatrix = aleph::topology::makeBoundaryMatrix( L, s );
-  using IndexType     = typename decltype(boundaryMatrix)::Index;
+  auto boundaryMatrix             = aleph::topology::makeBoundaryMatrix( L, s );
+  using IndexType                 = typename decltype(boundaryMatrix)::Index;
+  bool includeAllUnpairedCreators = true;
+  auto pairing                    = aleph::calculatePersistencePairing( boundaryMatrix, includeAllUnpairedCreators, static_cast<IndexType>(s) );
+  auto persistenceDiagrams        = aleph::makePersistenceDiagrams( pairing, L );
 
-  aleph::persistentHomology::algorithms::Twist algorithm;
-  algorithm( boundaryMatrix );
-
-  using DataType = typename Simplex::DataType;
-
-  // FIXME: support more persistence diagrams...
-  aleph::PersistenceDiagram<DataType> diagram;
-
-  for( IndexType i = 0; i < boundaryMatrix.getNumColumns(); i++ )
-  {
-    auto lowestOne = boundaryMatrix.getMaximumIndex( i );
-    if( lowestOne.second && lowestOne.first <= s )
-    {
-      auto&& simplex = L[i];
-      auto&& partner = L[lowestOne.first];
-
-      diagram.add( simplex.data(), partner.data() );
-    }
-    else if( !lowestOne.second )
-    {
-      auto&& simplex = L[i];
-      diagram.add( simplex.data() );
-    }
-  }
-
-  return { diagram };
+  return persistenceDiagrams;
 }
 
 } // namespace aleph
