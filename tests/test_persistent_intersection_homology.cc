@@ -89,9 +89,9 @@ template <class T> void test()
   ALEPH_TEST_END();
 }
 
-template <class T> void testTwoSimplex()
+template <class T> void testWedgeOfTwoCircles()
 {
-  ALEPH_TEST_BEGIN( "Persistent intersection homology: simplex" );
+  ALEPH_TEST_BEGIN( "Persistent intersection homology: wedge of two circles" );
 
   using Simplex           = aleph::topology::Simplex<T>;
   using SimplicialComplex = aleph::topology::SimplicialComplex<Simplex>;
@@ -100,22 +100,33 @@ template <class T> void testTwoSimplex()
     {0},
     {1},
     {2},
-    {0,1}, {0,2},
+    {3},
+    {4},
+    {5},
+    {6},
+    {0,1}, {0,6},
     {1,2},
-    {0,1,2}
+    {2,3}, {2,5}, {2,6},
+    {3,4},
+    {4,5}
   };
 
-  SimplicialComplex X0 = { {0} };
+  SimplicialComplex X0 = { {2} };
   SimplicialComplex X1 = K;
 
-  auto D1 = aleph::calculateIntersectionHomology( K, {X0,X1}, aleph::Perversity( { 0,0} ) );
-  auto D2 = aleph::calculateIntersectionHomology( K, {X0,X1}, aleph::Perversity( {-1,0} ) );
-  auto D3 = aleph::calculateIntersectionHomology( K, {X0,X1}, aleph::Perversity( { 1,0} ) );
+  auto D1 = aleph::calculateIntersectionHomology( K, {X0,X1}, aleph::Perversity( {-1,-1} ) );
+  auto D2 = aleph::calculateIntersectionHomology( K, {X0,X1}, aleph::Perversity( { 0, 0} ) );
 
-  std::cerr << D1.front() << "\n"
-            << D2.front() << "\n"
-            << D3.front() << "\n";
+  ALEPH_ASSERT_EQUAL( D1.size(), 1 );
+  ALEPH_ASSERT_EQUAL( D2.size(), 2 );
 
+  ALEPH_ASSERT_EQUAL( D1[0].betti(), 2 );
+
+  // TODO: is this correct? In his Ph.D. thesis "Analyzing Stratified
+  // Spaces Using Persistent Versions of Intersection and Local
+  // Homology", Bendich states that this should be 0...
+  ALEPH_ASSERT_EQUAL( D2[0].betti(), 1 );
+  ALEPH_ASSERT_EQUAL( D2[1].betti(), 2 );
 
   ALEPH_TEST_END();
 }
@@ -125,6 +136,6 @@ int main(int, char**)
   test<float> ();
   test<double>();
 
-  testTwoSimplex<float> ();
-  testTwoSimplex<double>();
+  testWedgeOfTwoCircles<float> ();
+  testWedgeOfTwoCircles<double>();
 }
