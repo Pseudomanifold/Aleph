@@ -26,17 +26,37 @@ namespace aleph
   especially relevant for intersection homology, which sets upper
   limits for the validity of an index in the matrix.
 
-  @param M   Boundary matrix to reduce
-  @param max Optional maximum index after which simplices are not
-             considered any more. If the pairing of a simplex has
-             an index larger than the maximum one, such simplices
-             will not be considered in the pairing.
+  @param M                          Boundary matrix to reduce
+
+  @param includeAllUnpairedCreators Flag indicating whether all unpaired creators should
+                                    be included (regardless of their dimension). If set,
+                                    this increases the size of the resulting pairing, as
+                                    the highest-dimensional columns of the matrix cannot
+                                    be reduced any more. The flag is useful, however, in
+                                    case one wants to calculate ordinary homology, where
+                                    high-dimensional simplices are used for Betti number
+                                    calculations.
+
+  @param max                        Optional maximum index after which simplices are not
+                                    considered any more. If the pairing of a simplex has
+                                    an index larger than the maximum one, such simplices
+                                    will not be considered in the pairing.
+
+  @tparam ReductionAlgorithm Specifies a reduction algorithm to use for reducing
+                             the input matrix. Aleph provides a default value in
+                             order to simplify the usage of this function.
+
+  @tparam Representation     The representation of the boundary matrix, i.e. how
+                             columns are stored. This parameter is automatically
+                             determined from the input data.
 */
 
 template <
   class ReductionAlgorithm = aleph::defaults::ReductionAlgorithm,
-  class Representation     = aleph::defaults::Representation
-> PersistencePairing<typename Representation::Index> calculatePersistencePairing( const topology::BoundaryMatrix<Representation>& M, typename Representation::Index max = typename Representation::Index() )
+  class Representation
+> PersistencePairing<typename Representation::Index> calculatePersistencePairing( const topology::BoundaryMatrix<Representation>& M,
+                                                                                  bool includeAllUnpairedCreators    = false,
+                                                                                  typename Representation::Index max = typename Representation::Index() )
 {
   using namespace topology;
 
@@ -87,9 +107,11 @@ template <
     {
       // Only add creators that do not belong to the largest dimension
       // of the boundary matrix. Else, there will be a lot of spurious
-      // features that cannot be destroyed due to their dimensions.
+      // features that cannot be destroyed due to their dimensions. If
+      // the client wants to have them, however, we let them.
       if(    ( !B.isDualized() && B.getDimension(j) != B.getDimension() )
-          || (  B.isDualized() && B.getDimension(j) != Index(0) ) )
+          || (  B.isDualized() && B.getDimension(j) != Index(0) )
+          || includeAllUnpairedCreators )
       {
         creators.insert( j );
       }
