@@ -4,6 +4,7 @@
 #include <aleph/persistentHomology/PhiPersistence.hh>
 
 #include <aleph/topology/Conversions.hh>
+#include <aleph/topology/QuotientSpaces.hh>
 #include <aleph/topology/Simplex.hh>
 #include <aleph/topology/SimplicialComplex.hh>
 
@@ -89,6 +90,37 @@ template <class T> void test()
   ALEPH_TEST_END();
 }
 
+template <class T> void testQuotientSpaces()
+{
+  ALEPH_TEST_BEGIN( "Persistent intersection homology: quotient spaces" );
+
+  using Simplex           = aleph::topology::Simplex<T>;
+  using SimplicialComplex = aleph::topology::SimplicialComplex<Simplex>;
+
+  SimplicialComplex K = {
+    {0},
+    {1},
+    {2},
+    {3},
+    {0,1}, {0,2}, {0,3},
+    {1,2}, {1,3},
+    {2,3},
+    {0,1,2}, {0,1,3}, {0,2,3},
+    {1,2,3},
+    {0,1,2,3}
+  };
+
+  auto C = aleph::topology::cone( K );
+  auto S = aleph::topology::suspension( K );
+
+  ALEPH_ASSERT_THROW( C.empty() == false );
+  ALEPH_ASSERT_THROW( S.empty() == false );
+  ALEPH_ASSERT_EQUAL( C.size(), 2 * K.size() + 1);
+  ALEPH_ASSERT_EQUAL( S.size(), 3 * K.size() + 2);
+
+  ALEPH_TEST_END();
+}
+
 template <class T> void testWedgeOfTwoCircles()
 {
   ALEPH_TEST_BEGIN( "Persistent intersection homology: wedge of two circles" );
@@ -135,6 +167,9 @@ int main(int, char**)
 {
   test<float> ();
   test<double>();
+
+  testQuotientSpaces<float> ();
+  testQuotientSpaces<double>();
 
   testWedgeOfTwoCircles<float> ();
   testWedgeOfTwoCircles<double>();
