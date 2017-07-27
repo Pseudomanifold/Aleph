@@ -6,9 +6,13 @@
 #include <algorithm>
 #include <fstream>
 #include <istream>
+#include <iterator>
 #include <regex>
 #include <string>
 #include <stdexcept>
+#include <vector>
+
+#include <cctype>
 
 namespace aleph
 {
@@ -94,7 +98,7 @@ public:
 
       if( isBlockFinished( block ) )
       {
-        // TODO: parse block
+        parseBlock<SimplicialComplex>( block );
       }
     }
 
@@ -115,6 +119,99 @@ private:
     auto numClosingBrackets = std::count( block.begin(), block.end(), ']' );
 
     return numOpeningBrackets == numClosingBrackets;
+  }
+
+  /**
+    Parses a block consisting of a list of simplices. Since the block
+    cannot be easily tokenized at the beginning, this function merely
+    uses a simple lookahead method.
+
+    Upon success, a non-empty simplicial complex is returned.
+  */
+
+  template <class SimplicialComplex> static SimplicialComplex parseBlock( const std::string& block ) noexcept
+  {
+    // Sanity check
+    if( !isBlockFinished( block ) )
+      return {};
+
+    using Simplex    = typename SimplicialComplex::ValueType;
+    using VertexType = typename Simplex::VertexType;
+
+    SimplicialComplex K;
+
+    std::vector<VertexType> vertices; // list of vertices belonging to the current simplex
+    bool parsingSimplex = false;      // flag indicating whether the parser is between two
+                                      // simplices or parsing an individual simplex
+
+    // Remove the opening bracket from the block. It makes the number of
+    // brackets unbalanced but it also simplifies parsing because we may
+    // rely on the fact that every opening bracket starts a new simplex.
+    for( auto it = block.begin() + block.find_first_of( '[' ) + 1; it != block.end(); )
+    {
+      // Either the beginning of a list of simplices, or the very
+      // beginning of the whole block
+      if( *it == '[' )
+      {
+        // Format error: the parser is already parsing a simplex
+        if( parsingSimplex )
+          return {};
+
+        // The parser is now in simplex parsing mode
+        else
+          parsingSimplex = true;
+      }
+
+      // Either the end of a list of simplices, or the very end of the
+      // whole block
+      else if( *it == ']' )
+      {
+        // Add parsed simplex to the simplicial complex and clear the
+        // set of vertices afterwards. Reset the parse mode as well.
+        if( parsingSimplex )
+        {
+          K.push_back( Simplex( vertices.begin(), vertices.end() ) );
+          vertices.clear();
+
+          ++it;
+          parsingSimplex = false;
+        }
+        // Finished parsing the simplicial complex
+        else
+          break;
+      }
+
+      // Just skip all valid characters and try to directly proceed with
+      // the parsing process.
+      if( *it == ',' || std::isspace( *it ) )
+        ++it;
+
+      // Look ahead until the next "]" appears. Tokenize the list of
+      // vertices in between.
+      if( parsingSimplex )
+      {
+        auto offset        = std::distance( block.begin(), it );
+        auto positionBegin = block.find_first_of( '[', offset );
+        auto positionEnd   = block.find_first_of( ']', offset );
+
+        // Format error: the list of simplices requires an opening and
+        // a closing bracket
+        if( positionBegin == std::string::npos || positionEnd == std::string::npos  )
+          return {};
+
+        using namespace aleph::utilities;
+
+        auto list   = trim( block.substr( positionBegin + 1, positionEnd - positionBegin - 1 ) );
+        auto tokens = split( list, std::string(",") );
+
+        for( auto&& token : tokens )
+          vertices.emplace_back( convert<VertexType>( token ) );
+
+        std::advance( it, positionEnd - offset );
+      }
+    }
+
+    return K;
   }
 };
 
