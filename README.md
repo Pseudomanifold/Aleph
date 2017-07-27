@@ -21,7 +21,10 @@ Since its inception in late 2016, Aleph has been used to support the
 following papers:
 
 - Clique Community Persistence: A Topological Visual Analysis Approach for Complex Networks
+- Persistence Concepts for 2D Skeleton Evolution Analysis
 - Hierarchies and Ranks for Persistence Pairs
+- *Shall I compare thee to a network?*&mdash;Visualizing the Topological
+  Structure of Shakespeare&rsquo;s plays
 
 If you want to contribute, please see the [contribution
 guidelines](CONTRIBUTING.md) for more details.
