@@ -142,10 +142,13 @@ private:
     bool parsingSimplex = false;      // flag indicating whether the parser is between two
                                       // simplices or parsing an individual simplex
 
+    using DifferenceType = std::string::difference_type;
+    using SizeType       = std::string::size_type;
+
     // Remove the opening bracket from the block. It makes the number of
     // brackets unbalanced but it also simplifies parsing because we may
     // rely on the fact that every opening bracket starts a new simplex.
-    for( auto it = block.begin() + block.find_first_of( '[' ) + 1; it != block.end(); )
+    for( auto it = block.begin() + DifferenceType( block.find_first_of( '[' ) + 1 ); it != block.end(); )
     {
       // Either the beginning of a list of simplices, or the very
       // beginning of the whole block
@@ -188,7 +191,7 @@ private:
       // vertices in between.
       if( parsingSimplex )
       {
-        auto offset        = std::distance( block.begin(), it );
+        auto offset        = static_cast<SizeType>( std::distance( block.begin(), it ) );
         auto positionBegin = block.find_first_of( '[', offset );
         auto positionEnd   = block.find_first_of( ']', offset );
 
