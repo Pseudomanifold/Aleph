@@ -11,10 +11,11 @@
 template <class T> void test()
 {
   std::stringstream stream;
-  stream << "manifold_2_6_3=[[1,2,3],[1,2,4],[1,3,5],[1,4,5],\n"
+  stream << "manifold_2_6_3=[  [1,2,3],[1,2,4],[1,3,5],[1,4,5],\n"
          << "[2,3,6],\n"
          << "[2,4,6],[3,5,6],[4,5,6]\n"
-         << "]\n";
+         << "]\n\n"
+         << "manifold_simple = [ [1,2,3,] ]\n";
 
   using DataType          = bool;
   using VertexType        = T;
@@ -28,6 +29,17 @@ template <class T> void test()
   // ugly!
   reader.operator()<SimplicialComplex>( stream,
                                         std::back_inserter( simplicialComplexes ) );
+
+  ALEPH_ASSERT_EQUAL( simplicialComplexes.size(), 2 );
+
+  auto&& K = simplicialComplexes.front();
+  auto&& L = simplicialComplexes.back();
+
+  ALEPH_ASSERT_THROW( K.empty() == false );
+  ALEPH_ASSERT_THROW( L.empty() == false );
+
+  ALEPH_ASSERT_EQUAL( K.size(), 8 );
+  ALEPH_ASSERT_EQUAL( L.size(), 1 );
 }
 
 int main(int, char**)
