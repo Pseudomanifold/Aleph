@@ -21,5 +21,13 @@ Aleph is a header-only library. Nonetheless, it ships with numerous
 tests, examples, and tools that require compilation. Coincidentally,
 these files also demonstrate how to use the library in practice.
 
-- [Building & installing Aleph](building.md)
-- [Tutorials](tutorials.md)
+See the following links for more details:
+
+- [Building & installing Aleph](building.md): how to build the library,
+  its tests and associated tools, and install it afterwards
+- [Publications](publications.md): see how Aleph was used in some
+  publications and how to reproduce some results
+- [Examples](examples.md): well-documented & small example programs that
+  demonstrate various functions
+- [Tutorials](tutorials.md): how to solve certain common tasks in
+  topological data analysis with Aleph
