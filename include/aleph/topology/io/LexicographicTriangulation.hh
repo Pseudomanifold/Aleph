@@ -81,10 +81,7 @@ public:
         block.clear();
 
         if( mode != Mode::ParsingBlocks )
-        {
-          // FIXME
-          throw "Mode::ParsingBlocks";
-        }
+          throw std::runtime_error( "Format error; unexpected open block detected" );
 
         mode  = Mode::ParsingList;
         block = block + line.substr(pos+1);
@@ -98,19 +95,20 @@ public:
 
       if( isBlockFinished( block ) )
       {
-        parseBlock<SimplicialComplex>( block );
+        *result++ = parseBlock<SimplicialComplex>( block );
+        mode      = Mode::ParsingBlocks;
+
+        block.clear();
       }
     }
-
-    (void) result;
   }
 
 private:
 
   enum class Mode
   {
-    ParsingBlocks,
-    ParsingList
+    ParsingBlocks,  // Parsing blocks of triangulations
+    ParsingList     // Parsing lists of simplices
   };
 
   static bool isBlockFinished( const std::string& block ) noexcept
