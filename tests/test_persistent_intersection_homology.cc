@@ -1,6 +1,8 @@
 #include <tests/Base.hh>
 
 #include <aleph/persistentHomology/algorithms/Standard.hh>
+
+#include <aleph/persistentHomology/Calculation.hh>
 #include <aleph/persistentHomology/PhiPersistence.hh>
 
 #include <aleph/topology/Conversions.hh>
@@ -106,8 +108,7 @@ template <class T> void testQuotientSpaces()
     {1,2}, {1,3},
     {2,3},
     {0,1,2}, {0,1,3}, {0,2,3},
-    {1,2,3},
-    {0,1,2,3}
+    {1,2,3}
   };
 
   auto C = aleph::topology::cone( K );
@@ -117,6 +118,31 @@ template <class T> void testQuotientSpaces()
   ALEPH_ASSERT_THROW( S.empty() == false );
   ALEPH_ASSERT_EQUAL( C.size(), 2 * K.size() + 1);
   ALEPH_ASSERT_EQUAL( S.size(), 3 * K.size() + 2);
+
+  S.sort();
+
+  bool dualize                    = true;
+  bool includeAllUnpairedCreators = true;
+
+  auto D1 = aleph::calculatePersistenceDiagrams(K, dualize, includeAllUnpairedCreators);
+  auto D2 = aleph::calculatePersistenceDiagrams(S, dualize, includeAllUnpairedCreators);
+
+  ALEPH_ASSERT_EQUAL( D1.size(), 3 );
+  ALEPH_ASSERT_EQUAL( D2.size(), 4 );
+
+  std::vector<std::size_t> expectedBettiNumbersK = {1,0,1};
+  std::vector<std::size_t> expectedBettiNumbersS = {1,0,0,1};
+
+  std::vector<std::size_t> bettiNumbersK;
+  std::vector<std::size_t> bettiNumbersS;
+
+  using PersistenceDiagram = decltype( D1.front() );
+
+  std::transform( D1.begin(), D1.end(), std::back_inserter( bettiNumbersK ), [] ( const PersistenceDiagram& D ) { return D.betti(); } );
+  std::transform( D2.begin(), D2.end(), std::back_inserter( bettiNumbersS ), [] ( const PersistenceDiagram& D ) { return D.betti(); } );
+
+  ALEPH_ASSERT_THROW( bettiNumbersK == expectedBettiNumbersK );
+  ALEPH_ASSERT_THROW( bettiNumbersS == expectedBettiNumbersS );
 
   ALEPH_TEST_END();
 }
