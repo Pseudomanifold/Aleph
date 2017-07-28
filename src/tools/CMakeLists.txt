@@ -6,5 +6,6 @@ ADD_EXECUTABLE( persistence_indicator_function          persistence_indicator_fu
 ADD_EXECUTABLE( persistence_indicator_function_glyph    persistence_indicator_function_glyph.cc )
 ADD_EXECUTABLE( point_cloud_data_descriptors            point_cloud_data_descriptors.cc )
 ADD_EXECUTABLE( topological_distance                    topological_distance.cc )
+ADD_EXECUTABLE( wicked_triangulations                   wicked_triangulations.cc )
 
 ENABLE_IF_SUPPORTED( CMAKE_CXX_FLAGS "-O3" )
