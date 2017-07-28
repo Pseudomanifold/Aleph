@@ -55,6 +55,9 @@ template <class Simplex, class Function> std::pair<topology::SimplicialComplex<S
 }
 
 /**
+  @class Perversity
+  @brief Perversity model in the sense of intersection homology
+
   Models a perversity in the sense of intersection homology. The class
   ensures that all values satisfy
 
@@ -66,10 +69,15 @@ template <class Simplex, class Function> std::pair<topology::SimplicialComplex<S
 class Perversity
 {
 public:
-  Perversity( std::initializer_list<int> values )
-  {
-    _values.assign( values.begin(), values.end() );
 
+  /**
+    Creates a new perversity from a range of values. The values must be
+    at least implicitly convertible to integers.
+  */
+
+  template <class InputIterator> Perversity( InputIterator begin, InputIterator end )
+    : _values( begin, end )
+  {
     for( std::size_t k = 0; k < _values.size(); k++ )
     {
       if( _values[k] < -1 )
@@ -79,6 +87,12 @@ public:
       else if( _values[k] > static_cast<int>( k ) )
         _values[k] = static_cast<int>( k );
     }
+  }
+
+  /** Creates a new perversity from an initializer list of values */
+  Perversity( std::initializer_list<int> values )
+    : Perversity( values.begin(), values.end() )
+  {
   }
 
   /**
