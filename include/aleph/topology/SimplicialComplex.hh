@@ -660,21 +660,6 @@ public:
     return !this->operator==( other );
   }
 
-  // Output ------------------------------------------------------------
-
-  /**
-    Adds information about a simplicial complex to an ostream. This function is
-    useful for debug purposes or intensive logging.
-
-    @param o ostream to add simplicial complex to
-    @param S Simplicial complex to stream to ostream
-
-    @returns ostream with information about simplicial complex
-  */
-
-  template <class Simplex_> friend std::ostream& operator<<( std::ostream& o,
-                                                             const SimplicialComplex< Simplex_ >& S );
-
 private:
 
   /**
@@ -749,6 +734,16 @@ private:
 };
 
 // ---------------------------------------------------------------------
+
+/**
+  Adds information about a simplicial complex to an output stream. This
+  is useful for debugging purposes or intensive logging.
+
+  @param o ostream to add simplicial complex to
+  @param S Simplicial complex to stream to ostream
+
+  @returns ostream with information about simplicial complex
+*/
 
 template <class Simplex> std::ostream& operator<<( std::ostream& o,
                                                    const topology::SimplicialComplex<Simplex>& S )
