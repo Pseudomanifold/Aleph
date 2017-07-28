@@ -44,7 +44,6 @@ public:
        >
   >;
 
-
   using const_iterator                 = typename simplex_container_t::template index<index_t>::type::const_iterator;
   using iterator                       = typename simplex_container_t::template index<index_t>::type::iterator;
 
@@ -61,7 +60,7 @@ public:
   using value_type = Simplex;
   using ValueType  = value_type;
 
-  // constructors ------------------------------------------------------
+  // Constructors ------------------------------------------------------
 
   /** Creates an empty simplicial complex. */
   SimplicialComplex()
@@ -93,7 +92,7 @@ public:
   {
   }
 
-  // simplex container modification ------------------------------------
+  // Simplex container modification ------------------------------------
 
   /** Clears the simplicial complex and removes all its simplices. */
   void clear()
@@ -401,7 +400,7 @@ public:
       throw std::runtime_error( "Unable to query dimensionality of empty simplicial complex" );
   }
 
-  // range queries -----------------------------------------------------
+  // Range queries -----------------------------------------------------
 
   /**
     Given a dimension, extracts all simplices whose dimension matches the
@@ -437,7 +436,7 @@ public:
     return _simplices.template get<dimension_t>().range( lower, upper );
   }
 
-  // filtration modification -------------------------------------------
+  // Filtration modification -------------------------------------------
 
   /**
     Allows changing the current order of simplices, i.e. applying a certain
@@ -609,7 +608,25 @@ public:
     while( foundInvalidSimplex );
   }
 
-  // comparison --------------------------------------------------------
+  /**
+    Creates all missing faces of the current simplicial complex. When
+    this function is finished, all of the faces for all simplices are
+    part of the simplicial complex.
+
+    This function is useful if constructing a simplicial complex from
+    a partial range of simplices. The typical application scenario is
+    the processing of triangulations of manifolds, which are commonly
+    only specified by their top-level simplices. There is no need for
+    clients to calculate these faces manually.
+  */
+
+  void createMissingFaces()
+  {
+    for( auto itSimplex = this->begin(); itSimplex != this->end(); itSimplex++ )
+      this->checkAndRestoreValidity( *itSimplex );
+  }
+
+  // Comparison --------------------------------------------------------
 
   /**
     Checks two simplicial complexes for equality. This operator will
@@ -643,25 +660,7 @@ public:
     return !this->operator==( other );
   }
 
-  /**
-    Creates missing faces for the simplicial complex. The function ensures
-    that the simplicial complex contains every face of every simplex. Note
-    that this may noticeably increase the size of the complex.
-  */
-
-  void createMissingFaces()
-  {
-    // If I encounter a face that is not stored in the simplicial complex, I
-    // create the corresponding simplex and add it. This ensures that it is
-    // possible to construct a simplicial complex from "partial" ranges of
-    // simplices, e.g. a list of high-dimensional simplices whose faces need to
-    // be calculated manually, for example.
-
-    for( auto itSimplex = this->begin(); itSimplex != this->end(); itSimplex++ )
-      this->checkAndRestoreValidity( *itSimplex );
-  }
-
-  // debug -------------------------------------------------------------
+  // Output ------------------------------------------------------------
 
   /**
     Adds information about a simplicial complex to an ostream. This function is
