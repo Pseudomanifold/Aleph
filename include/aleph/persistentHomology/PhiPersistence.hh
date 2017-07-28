@@ -88,8 +88,8 @@ public:
 
   int operator()( std::size_t d ) const noexcept
   {
-    if( d < _values.size() )
-      return _values[d];
+    if( d < _values.size() + 1 )
+      return _values[ static_cast<std::size_t>( d-1 ) ];
     else
       return 0;
   }
@@ -108,23 +108,23 @@ template <class Simplex> auto calculateIntersectionHomology( const aleph::topolo
   // 2. Calculate $phi$-persistence
   // 3. Convert the result into a persistence diagram.
 
-  // Check consistency of strata ---------------------------------------
+  // Check consistency of filtration -----------------------------------
   //
-  // The maximum dimension of the strata has to match the dimension of
-  // the simplicial complex.
+  // The maximum dimension of each complex in the filtration has to
+  // match the dimension of the simplicial complex.
 
   {
     std::size_t minDimension = K.dimension();
     std::size_t maxDimension = 0;
 
-    for( auto&& stratum : X )
+    for( auto&& x : X )
     {
-      minDimension = std::min( minDimension, stratum.dimension() );
-      maxDimension = std::max( maxDimension, stratum.dimension() );
+      minDimension = std::min( minDimension, x.dimension() );
+      maxDimension = std::max( maxDimension, x.dimension() );
     }
 
     if( maxDimension != K.dimension() )
-      throw std::runtime_error( "Invalid stratification" );
+      throw std::runtime_error( "Invalid filtration" );
   }
 
   // Check whether simplex is allowable --------------------------------

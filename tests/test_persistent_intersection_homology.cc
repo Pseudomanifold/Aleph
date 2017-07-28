@@ -172,8 +172,8 @@ template <class T> void testWedgeOfTwoCircles()
   SimplicialComplex X0 = { {2} };
   SimplicialComplex X1 = K;
 
-  auto D1 = aleph::calculateIntersectionHomology( K, {X0,X1}, aleph::Perversity( {-1,-1} ) );
-  auto D2 = aleph::calculateIntersectionHomology( K, {X0,X1}, aleph::Perversity( { 0, 0} ) );
+  auto D1 = aleph::calculateIntersectionHomology( K, {X0,X1}, aleph::Perversity( {-1} ) );
+  auto D2 = aleph::calculateIntersectionHomology( K, {X0,X1}, aleph::Perversity( { 0} ) );
 
   ALEPH_ASSERT_EQUAL( D1.size(), 1 );
   ALEPH_ASSERT_EQUAL( D2.size(), 2 );
