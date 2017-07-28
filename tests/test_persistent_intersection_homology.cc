@@ -147,6 +147,39 @@ template <class T> void testQuotientSpaces()
   ALEPH_TEST_END();
 }
 
+template <class T> void testSphere()
+{
+  ALEPH_TEST_BEGIN( "Persistent intersection homology: sphere triangulation" );
+
+  using Simplex           = aleph::topology::Simplex<T>;
+  using SimplicialComplex = aleph::topology::SimplicialComplex<Simplex>;
+
+  SimplicialComplex K = {
+    {0},
+    {1},
+    {2},
+    {3},
+    {0,1}, {0,2}, {0,3},
+    {1,2}, {1,3},
+    {2,3},
+    {0,1,2}, {0,1,3}, {0,2,3},
+    {1,2,3}
+  };
+
+  SimplicialComplex X0 = { {0}, {1}, {2}, {3} };
+  SimplicialComplex X1 = K;
+
+  auto D1 = aleph::calculateIntersectionHomology( K, {X0,X1}, aleph::Perversity( {0,0} ) );
+
+  // This demonstrates that the triangulation does not have any
+  // allowable vertices. Hence, no intersection homology exists
+  // in dimension 0.
+  ALEPH_ASSERT_EQUAL( D1.size(),              1 );
+  ALEPH_ASSERT_EQUAL( D1.front().dimension(), 2 );
+
+  ALEPH_TEST_END();
+}
+
 template <class T> void testWedgeOfTwoCircles()
 {
   ALEPH_TEST_BEGIN( "Persistent intersection homology: wedge of two circles" );
@@ -172,13 +205,24 @@ template <class T> void testWedgeOfTwoCircles()
   SimplicialComplex X0 = { {2} };
   SimplicialComplex X1 = K;
 
+  // This example demonstrates the dependence on the filtration or
+  // rather the stratification of the complex.
+  //
+  // Using the equal perversity as for the previous example, a new
+  // component is being created.
+  SimplicialComplex Y0 = { {0}, {2} };
+  SimplicialComplex Y1 = K;
+
   auto D1 = aleph::calculateIntersectionHomology( K, {X0,X1}, aleph::Perversity( {-1} ) );
   auto D2 = aleph::calculateIntersectionHomology( K, {X0,X1}, aleph::Perversity( { 0} ) );
+  auto D3 = aleph::calculateIntersectionHomology( K, {Y0,Y1}, aleph::Perversity( {-1} ) );
 
   ALEPH_ASSERT_EQUAL( D1.size(), 1 );
   ALEPH_ASSERT_EQUAL( D2.size(), 2 );
+  ALEPH_ASSERT_EQUAL( D3.size(), 1 );
 
   ALEPH_ASSERT_EQUAL( D1[0].betti(), 2 );
+  ALEPH_ASSERT_EQUAL( D3[0].betti(), 3 );
 
   // TODO: is this correct? In his Ph.D. thesis "Analyzing Stratified
   // Spaces Using Persistent Versions of Intersection and Local
@@ -196,6 +240,9 @@ int main(int, char**)
 
   testQuotientSpaces<float> ();
   testQuotientSpaces<double>();
+
+  testSphere<float> ();
+  testSphere<double>();
 
   testWedgeOfTwoCircles<float> ();
   testWedgeOfTwoCircles<double>();
