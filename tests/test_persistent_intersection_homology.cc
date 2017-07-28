@@ -5,6 +5,7 @@
 #include <aleph/persistentHomology/Calculation.hh>
 #include <aleph/persistentHomology/PhiPersistence.hh>
 
+#include <aleph/topology/BarycentricSubdivision.hh>
 #include <aleph/topology/Conversions.hh>
 #include <aleph/topology/QuotientSpaces.hh>
 #include <aleph/topology/Simplex.hh>
@@ -176,6 +177,23 @@ template <class T> void testSphere()
   // in dimension 0.
   ALEPH_ASSERT_EQUAL( D1.size(),              1 );
   ALEPH_ASSERT_EQUAL( D1.front().dimension(), 2 );
+
+  SimplicialComplex L = K;
+
+  {
+    aleph::topology::BarycentricSubdivision subdivision;
+    L = subdivision( L );
+    L.sort();
+  }
+
+  auto Y1 = L;
+  auto D2 = aleph::calculateIntersectionHomology( L, {X0,K}, aleph::Perversity( {0,0} ) );
+
+  // This demonstrates that the barycentric subdivision of the space,
+  // i.e. another triangulation, may influence the results.
+  ALEPH_ASSERT_EQUAL( D2.size(),              3 );
+  ALEPH_ASSERT_EQUAL( D2.front().dimension(), 0 );
+  ALEPH_ASSERT_EQUAL( D2.front().betti(),     1 );
 
   ALEPH_TEST_END();
 }
