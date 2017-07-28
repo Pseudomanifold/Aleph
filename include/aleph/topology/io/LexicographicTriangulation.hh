@@ -49,7 +49,7 @@ class LexicographicTriangulationReader
 {
 public:
 
-  template <class SimplicialComplex, class OutputIterator> void operator()( const std::string& filename, OutputIterator result )
+  template <class SimplicialComplex> void operator()( const std::string& filename, std::vector<SimplicialComplex>& result )
   {
     std::ifstream in( filename );
     if( !in )
@@ -58,7 +58,7 @@ public:
     this->operator()( in, result );
   }
 
-  template <class SimplicialComplex, class OutputIterator> void operator()( std::istream& in, OutputIterator result )
+  template <class SimplicialComplex> void operator()( std::istream& in, std::vector<SimplicialComplex>& result )
   {
     using namespace aleph::utilities;
 
@@ -66,6 +66,9 @@ public:
     std::string block; // contains _all_ data belonging to the current block
 
     Mode mode = Mode::ParsingBlocks;
+
+    result.clear();
+    result.shrink_to_fit();
 
     while( std::getline( in, line ) )
     {
@@ -95,12 +98,14 @@ public:
 
       if( isBlockFinished( block ) )
       {
-        *result++ = parseBlock<SimplicialComplex>( block );
+        result.emplace_back( parseBlock<SimplicialComplex>( block ) );
         mode      = Mode::ParsingBlocks;
 
         block.clear();
       }
     }
+
+    result.shrink_to_fit();
   }
 
 private:

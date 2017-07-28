@@ -25,10 +25,7 @@ template <class T> void test()
   std::vector<SimplicialComplex> simplicialComplexes;
 
   aleph::topology::io::LexicographicTriangulationReader reader;
-
-  // ugly!
-  reader.operator()<SimplicialComplex>( stream,
-                                        std::back_inserter( simplicialComplexes ) );
+  reader( stream, simplicialComplexes );
 
   ALEPH_ASSERT_EQUAL( simplicialComplexes.size(), 2 );
 
