@@ -8,6 +8,7 @@
 #include <aleph/topology/SimplicialComplex.hh>
 #include <aleph/topology/Skeleton.hh>
 
+#include <algorithm>
 #include <iostream>
 #include <string>
 #include <vector>
@@ -17,6 +18,73 @@ using VertexType        = unsigned short;
 
 using Simplex           = aleph::topology::Simplex<DataType, VertexType>;
 using SimplicialComplex = aleph::topology::SimplicialComplex<Simplex>;
+
+/**
+  Models a signature consisting of Betti numbers, i.e. a set of natural
+  numbers. Signatures are comparable and are ordered lexicographically,
+  i.e. in the manner one would expect.
+*/
+
+class Signature
+{
+public:
+  template <class InputIterator> Signature( InputIterator begin, InputIterator end )
+    : _betti( begin, end )
+  {
+  }
+
+  bool operator<( const Signature& other ) const noexcept
+  {
+    return std::lexicographical_compare( _betti.begin(), _betti.end(),
+                                         other._betti.begin(), other._betti.end() );
+  }
+
+  using const_iterator = typename std::vector<std::size_t>::const_iterator;
+
+  const_iterator begin() const noexcept { return _betti.begin(); }
+  const_iterator end()   const noexcept { return _betti.end() ;  }
+
+private:
+  std::vector<std::size_t> _betti;
+};
+
+std::ostream& operator<<( std::ostream& o, const Signature& s )
+{
+  o << "(";
+
+  for( auto it = s.begin(); it != s.end(); ++it )
+  {
+    if( it != s.begin() )
+      o << ",";
+
+    o << *it;
+  }
+
+  o << ")";
+
+  return o;
+}
+
+/**
+  Converts a vector of persistence diagrams into a Betti signature. The
+  maximum dimension needs to be specified in order to ensure that empty
+  or missing persistence diagrams can still be handled correctly.
+*/
+
+template <class PersistenceDiagram> Signature makeSignature( const std::vector<PersistenceDiagram>& diagrams, std::size_t D )
+{
+  std::vector<std::size_t> bettiNumbers( D+1 );
+
+  for( auto&& diagram : diagrams )
+  {
+    auto d = diagram.dimension();
+    auto b = diagram.betti();
+
+    bettiNumbers.at(d) = b;
+  }
+
+  return Signature( bettiNumbers.begin(), bettiNumbers.end() );
+}
 
 /**
   Enumerates all possible perversities for a given dimension. One could
@@ -162,5 +230,22 @@ int main(int argc, char* argv[])
     aleph::topology::Skeleton skeleton;
     for( std::size_t d = 0; d <= K.dimension(); d++ )
       skeletons.emplace_back( skeleton( d, K ) );
+
+    aleph::topology::BarycentricSubdivision subdivision;
+    auto L = subdivision( K );
+
+    // TODO: this is not optimal because the simplicial complexes may
+    // share the same dimensionality.
+    auto perversities = getPerversities( static_cast<unsigned>( K.dimension() ) );
+
+    for( auto&& perversity : perversities )
+    {
+      auto diagrams  = aleph::calculateIntersectionHomology( L, skeletons, perversity );
+      auto signature = makeSignature( diagrams, K.dimension() );
+
+      std::cout << signature << " " << std::flush;
+    }
+
+    std::cout << "\n";
   }
 }
