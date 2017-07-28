@@ -134,12 +134,12 @@ template <
   class ReductionAlgorithm = defaults::ReductionAlgorithm,
   class Representation     = defaults::Representation,
   class Simplex
-> std::vector< PersistenceDiagram<typename Simplex::DataType> > calculatePersistenceDiagrams( const topology::SimplicialComplex<Simplex>& K, bool dualize = true )
+> std::vector< PersistenceDiagram<typename Simplex::DataType> > calculatePersistenceDiagrams( const topology::SimplicialComplex<Simplex>& K, bool dualize = true, bool includeAllUnpairedCreators = false )
 {
   using namespace topology;
 
   auto boundaryMatrix = makeBoundaryMatrix<Representation>( K );
-  auto pairing        = calculatePersistencePairing<ReductionAlgorithm>( dualize ? boundaryMatrix.dualize() : boundaryMatrix );
+  auto pairing        = calculatePersistencePairing<ReductionAlgorithm>( dualize ? boundaryMatrix.dualize() : boundaryMatrix, includeAllUnpairedCreators );
 
   return makePersistenceDiagrams( pairing, K );
 }
