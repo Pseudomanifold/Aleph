@@ -222,6 +222,9 @@ int main(int argc, char* argv[])
   // As a last step, we iterate over all possible perversities for the
   // given triangulation and calculate their intersection homology.
 
+  std::vector< std::vector<Signature> > allIntersectionHomologySignatures;
+  allIntersectionHomologySignatures.reserve( simplicialComplexes.size() );
+
   for( auto&& K : simplicialComplexes )
   {
     std::vector<SimplicialComplex> skeletons;
@@ -238,13 +241,21 @@ int main(int argc, char* argv[])
     // share the same dimensionality.
     auto perversities = getPerversities( static_cast<unsigned>( K.dimension() ) );
 
+    std::vector<Signature> signatures;
+    signatures.reserve( perversities.size() );
+
     for( auto&& perversity : perversities )
     {
       auto diagrams  = aleph::calculateIntersectionHomology( L, skeletons, perversity );
       auto signature = makeSignature( diagrams, K.dimension() );
 
       std::cout << signature << " " << std::flush;
+
+      signatures.push_back( signature );
     }
+
+    std::sort( signatures.begin(), signatures.end() );
+    allIntersectionHomologySignatures.emplace_back( signatures );
 
     std::cout << "\n";
   }
