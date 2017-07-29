@@ -39,6 +39,20 @@ public:
                                          other._betti.begin(), other._betti.end() );
   }
 
+  long eulerCharacteristic() const noexcept
+  {
+    long chi = 0;
+    bool s   = true;
+
+    for( auto&& betti : _betti )
+    {
+      chi = s ? chi + betti : chi - betti;
+      s   = !s;
+    }
+
+    return chi;
+  }
+
   using const_iterator = typename std::vector<std::size_t>::const_iterator;
 
   const_iterator begin() const noexcept { return _betti.begin(); }
@@ -201,10 +215,10 @@ int main(int argc, char* argv[])
                                             dualize,
                                             includeAllUnpairedCreators );
 
-    for( auto&& D : diagrams )
-      std::cout << D.betti() << " ";
 
-    std::cout << "\n";
+    auto signature = makeSignature( diagrams, K.dimension() );
+
+    std::cout << signature << "\t" << signature.eulerCharacteristic() << "\n";
   }
 
   // Calculate intersection homology -----------------------------------
