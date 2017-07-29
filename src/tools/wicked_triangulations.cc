@@ -205,9 +205,15 @@ int main(int argc, char* argv[])
   // We are only interested in the Betti numbers of the diagrams here as
   // the triangulations are not endowed with any weights or values.
 
+  std::size_t index = 0;
+  std::string level = "  "; // separator to make JSON more readable
+
+  std::cout << "{\n"
+            << level << "\"homology\":" << level << "{\n";
+
   for( auto&& K : simplicialComplexes )
   {
-    std::cout << "{\n";
+    std::cout << level << level << "\"" << index << "\":" << level << "{\n";
 
     bool dualize                    = true;
     bool includeAllUnpairedCreators = true;
@@ -220,11 +226,22 @@ int main(int argc, char* argv[])
 
     auto signature = makeSignature( diagrams, K.dimension() );
 
-    std::cout << "  " << "betti:" << "  " << signature << "\n"
-              << "  " << "euler:" << "  " << signature.eulerCharacteristic() << "\n";
+    std::cout << level << level << level << "\"betti\":" << level << signature << ",\n"
+              << level << level << level << "\"euler\":" << level << signature.eulerCharacteristic() << "\n";
 
-    std::cout << "}\n";
+    std::cout << level << level << "}";
+
+    if( index + 1 < simplicialComplexes.size() )
+         std::cout << ",";
+
+    std::cout << "\n";
+
+    ++index;
   }
+
+  std::cout << level << "},\n"
+            << level << "\"intersection_homology\":" << level << "{\n";
+
 
   // Calculate intersection homology -----------------------------------
   //
@@ -243,6 +260,8 @@ int main(int argc, char* argv[])
 
   std::vector< std::vector<Signature> > allIntersectionHomologySignatures;
   allIntersectionHomologySignatures.reserve( simplicialComplexes.size() );
+
+  index = 0;
 
   for( auto&& K : simplicialComplexes )
   {
@@ -263,19 +282,45 @@ int main(int argc, char* argv[])
     std::vector<Signature> signatures;
     signatures.reserve( perversities.size() );
 
+    std::cout << level << level << "\"" << index << "\":" << level << "{\n";
+
+    std::size_t perversityIndex = 0;
+
     for( auto&& perversity : perversities )
     {
+      std::cout << level << level << level << "\"" << perversityIndex << "\"" << ":" << level << "{\n";
+
       auto diagrams  = aleph::calculateIntersectionHomology( L, skeletons, perversity );
       auto signature = makeSignature( diagrams, K.dimension() );
 
-      std::cout << signature << " " << std::flush;
+      std::cout << level << level << level << level << "\"perversity\":" << "  " << perversity << ",\n"
+                << level << level << level << level << "\"betti\":"      << "  " << signature  << "\n";
+
+      std::cout << level << level << level << "}";
+
+      if( perversityIndex + 1 < perversities.size() )
+        std::cout<< ",";
+
+      std::cout << "\n";
 
       signatures.push_back( signature );
+
+      ++perversityIndex;
     }
 
     std::sort( signatures.begin(), signatures.end() );
     allIntersectionHomologySignatures.emplace_back( signatures );
 
+    std::cout << level << level << "}";
+
+    if( index + 1 < simplicialComplexes.size() )
+         std::cout << ",";
+
     std::cout << "\n";
+
+    ++index;
   }
+
+  std::cout << level << "}\n"
+            << "}\n";
 }
