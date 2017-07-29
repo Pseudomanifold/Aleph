@@ -64,7 +64,7 @@ private:
 
 std::ostream& operator<<( std::ostream& o, const Signature& s )
 {
-  o << "(";
+  o << "[";
 
   for( auto it = s.begin(); it != s.end(); ++it )
   {
@@ -74,7 +74,7 @@ std::ostream& operator<<( std::ostream& o, const Signature& s )
     o << *it;
   }
 
-  o << ")";
+  o << "]";
 
   return o;
 }
@@ -207,6 +207,8 @@ int main(int argc, char* argv[])
 
   for( auto&& K : simplicialComplexes )
   {
+    std::cout << "{\n";
+
     bool dualize                    = true;
     bool includeAllUnpairedCreators = true;
 
@@ -218,7 +220,10 @@ int main(int argc, char* argv[])
 
     auto signature = makeSignature( diagrams, K.dimension() );
 
-    std::cout << signature << "\t" << signature.eulerCharacteristic() << "\n";
+    std::cout << "  " << "betti:" << "  " << signature << "\n"
+              << "  " << "euler:" << "  " << signature.eulerCharacteristic() << "\n";
+
+    std::cout << "}\n";
   }
 
   // Calculate intersection homology -----------------------------------
