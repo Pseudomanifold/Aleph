@@ -11,6 +11,7 @@
 
 #include <initializer_list>
 #include <map>
+#include <ostream>
 #include <stdexcept>
 #include <utility>
 #include <vector>
@@ -108,9 +109,31 @@ public:
       return 0;
   }
 
+  using const_iterator = typename std::vector<int>::const_iterator;
+
+  const_iterator begin() const noexcept { return _values.begin(); }
+  const_iterator end()   const noexcept { return _values.end();   }
+
 private:
   std::vector<int> _values;
 };
+
+std::ostream& operator<<( std::ostream& o, const Perversity p )
+{
+  o << "[";
+
+  for( auto it = p.begin(); it != p.end(); ++it )
+  {
+    if( it != p.begin() )
+      o << ",";
+
+    o << *it;
+  }
+
+  o << "]";
+
+  return o;
+}
 
 template <class Simplex> auto calculateIntersectionHomology( const aleph::topology::SimplicialComplex<Simplex>& K,
                                                              const std::vector< aleph::topology::SimplicialComplex<Simplex> >& X,
