@@ -1,0 +1,15 @@
+SET( PACKAGE_VERSION "@ALEPH_VERSION@" )
+ 
+# Check whether the requested version is compatible with the current
+# package version.
+# 
+# This follows the example provided in the CMake wiki.
+
+IF( "${PACKAGE_VERSION}" VERSION_LESS "${PACKAGE_FIND_VERSION}" )
+  SET( PACKAGE_VERSION_COMPATIBLE FALSE )
+ELSE()
+  SET( PACKAGE_VERSION_COMPATIBLE TRUE )
+  IF( "${PACKAGE_VERSION}" VERSION_EQUAL "${PACKAGE_FIND_VERSION}" )
+    SET( PACKAGE_VERSION_EXACT TRUE )
+  ENDIF()
+ENDIF()

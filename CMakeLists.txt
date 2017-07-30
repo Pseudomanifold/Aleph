@@ -17,6 +17,16 @@ LIST( APPEND CMAKE_MODULE_PATH
 SET( CMAKE_EXPORT_COMPILE_COMMANDS ON )
 
 ########################################################################
+# Versioning
+########################################################################
+
+SET( ALEPH_MAJOR_VERSION 0 )
+SET( ALEPH_MINOR_VERSION 1 )
+SET( ALEPH_PATCH_VERSION 0 )
+
+SET( ALEPH_VERSION ${ALEPH_MAJOR_VERSION}.${ALEPH_MINOR_VERSION}.${ALEPH_PATCH_VERSION} )
+
+########################################################################
 # Macros and additional flags
 ########################################################################
 
@@ -116,3 +126,11 @@ ADD_CUSTOM_TARGET( cppcheck
             --project=${CMAKE_CURRENT_SOURCE_DIR}/compile_commands.json
              2> /tmp/cppcheck.csv
 )
+
+########################################################################
+# Package setup
+########################################################################
+
+EXPORT( PACKAGE Aleph )
+
+CONFIGURE_FILE( cmake/AlephConfigVersion.cmake.in "${PROJECT_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/AlephConfigVersion.cmake" @ONLY )
