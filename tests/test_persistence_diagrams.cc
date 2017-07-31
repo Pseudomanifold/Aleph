@@ -118,9 +118,13 @@ template <class T> void testHausdorffDistance()
   auto pd = createRandomPersistenceDiagram<T>( 25 );
   auto d0 = aleph::distances::hausdorffDistance( pd, pd );
   auto d1 = aleph::distances::hausdorffDistance( PersistenceDiagram(), PersistenceDiagram() );
+  auto d2 = aleph::distances::hausdorffDistance( pd                  , PersistenceDiagram() );
+  auto d3 = aleph::distances::hausdorffDistance( PersistenceDiagram(), pd );
 
   ALEPH_ASSERT_EQUAL( d0, T() );
   ALEPH_ASSERT_EQUAL( d1, T() );
+  ALEPH_ASSERT_EQUAL( d2, d3 );
+  ALEPH_ASSERT_EQUAL( d2, std::numeric_limits<T>::infinity() );
 
   ALEPH_TEST_END();
 }
