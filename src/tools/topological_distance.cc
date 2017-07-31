@@ -29,6 +29,7 @@
 #include <aleph/persistenceDiagrams/distances/Hausdorff.hh>
 #include <aleph/persistenceDiagrams/distances/Wasserstein.hh>
 
+#include <aleph/persistenceDiagrams/io/JSON.hh>
 #include <aleph/persistenceDiagrams/io/Raw.hh>
 
 #include <aleph/utilities/Filesystem.hh>
@@ -376,6 +377,30 @@ int main( int argc, char** argv )
     }
     else if( aleph::utilities::extension( filenames.front() ) == ".json" )
     {
+      dataSets.reserve( filenames.size() );
+
+      for( auto&& filename : filenames )
+      {
+        auto persistenceDiagrams = aleph::io::readJSON<DataType>( filename );
+
+        std::vector<DataSet> dataSet;
+        dataSet.reserve( persistenceDiagrams.size() );
+
+        for( auto&& diagram : persistenceDiagrams )
+        {
+          auto dimension = static_cast<unsigned>( diagram.dimension() );
+          minDimension   = std::min( minDimension, dimension );
+          maxDimension   = std::max( maxDimension, dimension );
+
+          auto name  = aleph::utilities::stem( filename );
+          name      += "_";
+          name      += "d" + std::to_string( diagram.dimension() );
+
+          dataSet.push_back( { name, filename, dimension, diagram, {} } );
+        }
+
+        dataSets.push_back( dataSet );
+      }
     }
   }
 
