@@ -18,6 +18,17 @@ namespace distances
   treated as 2D sets.
 
   By default, the infinity distance ($L_\infty$) is used.
+
+  There are two special cases handled by this function:
+
+  - If both persistence diagrams are empty, a distance of zero will be
+    returned. This is required in order to be consistent with a metric
+    in mathematics.
+
+  - If exactly one persistence diagram is empty, a distance of +inf is
+    returned. This indicates a potentially problematic situation. When
+    a given data type does not support positive infinity, its positive
+    maximum value is returned.
 */
 
 template <
@@ -27,6 +38,16 @@ template <
                               const PersistenceDiagram<DataType>& D2,
                               Distance d = Distance() )
 {
+  if( D1.empty() && D2.empty() )
+    return DataType();
+  else if( D1.empty() ^ D2.empty() )
+  {
+    if( std::numeric_limits<DataType>::has_infinity )
+      return std::numeric_limits<DataType>::infinity();
+    else
+      return std::numeric_limits<DataType>::max();
+  }
+
   using PersistenceDiagram = PersistenceDiagram<DataType>;
   using Point              = typename PersistenceDiagram::Point;
 
