@@ -281,16 +281,7 @@ int main( int argc, char** argv )
     return -1;
   }
 
-  // Maps filenames to indices. I need this to ensure that the internal
-  // ordering of files coincides with the shell's ordering.
-  std::map<std::string, unsigned> filenameMap;
-
   std::vector< std::vector<DataSet> > dataSets;
-
-  // TODO: Make this regular expression more, well, 'expressive' and
-  // support more methods of specifying a dimension.
-  std::regex reDataSetPrefix( "(.*)_[dk]([[:digit:]]+)\\.txt" );
-  std::smatch matches;
 
   // Get filenames & prefixes ------------------------------------------
 
@@ -301,69 +292,90 @@ int main( int argc, char** argv )
     std::vector<std::string> filenames;
     filenames.reserve( argc - 1 );
 
-    unsigned index = 0;
-
     for( int i = optind; i < argc; i++ )
-    {
       filenames.push_back( argv[i] );
 
-      auto name = filenames.back();
+    // This should never happen...
+    if( filenames.empty() )
+      return -1;
 
-      // Check whether the name contains a recognizable prefix and
-      // suffix. If not, use the complete filename to identify the
-      // data set.
-      if( std::regex_match( filenames.back(), matches, reDataSetPrefix ) )
-        name = matches[1];
-
-      if( filenameMap.find( name ) == filenameMap.end() )
-        filenameMap[ name ] = index++;
-    }
-
-    dataSets.resize( filenameMap.size() );
-
-    for( auto&& filename : filenames )
+    // If the first filename is a text file, I am assuming that the rest
+    // of them also are. The program will then read all diagrams, try to
+    // match them to a dimension, and store them.
+    if( aleph::utilities::extension( filenames.front() ) == ".txt" )
     {
-      auto name      = filename;
-      auto dimension = 0u;
+      // TODO: Make this regular expression more, well, 'expressive' and
+      // support more methods of specifying a dimension.
+      std::regex reDataSetPrefix( "(.*)_[dk]([[:digit:]]+)\\.txt" );
+      std::smatch matches;
 
-      // Check if a recognizable prefix and suffix exist so that we may
-      // grab information about the data set and its dimension. If not,
-      // use the complete filename to identify the data set.
-      if( std::regex_match( filename, matches, reDataSetPrefix ) )
+      unsigned index = 0;
+
+      // Maps filenames to indices. I need this to ensure that the internal
+      // ordering of files coincides with the shell's ordering.
+      std::map<std::string, unsigned> filenameMap;
+
+      for( auto&& filename : filenames )
       {
-        name      = matches[1];
-        dimension = unsigned( std::stoul( matches[2] ) );
+        auto name = filename;
+
+        // Check whether the name contains a recognizable prefix and
+        // suffix. If not, use the complete filename to identify the
+        // data set.
+        if( std::regex_match( filename, matches, reDataSetPrefix ) )
+          name = matches[1];
+
+        if( filenameMap.find( name ) == filenameMap.end() )
+          filenameMap[ name ] = index++;
       }
 
-      dataSets.at( filenameMap[name] ).push_back( { name, filename, dimension, {}, {} } );
+      dataSets.resize( filenameMap.size() );
 
-      minDimension = std::min( minDimension, dimension );
-      maxDimension = std::max( maxDimension, dimension );
+      for( auto&& filename : filenames )
+      {
+        auto name      = filename;
+        auto dimension = 0u;
+
+        // Check if a recognizable prefix and suffix exist so that we may
+        // grab information about the data set and its dimension. If not,
+        // use the complete filename to identify the data set.
+        if( std::regex_match( filename, matches, reDataSetPrefix ) )
+        {
+          name      = matches[1];
+          dimension = unsigned( std::stoul( matches[2] ) );
+        }
+
+        dataSets.at( filenameMap[name] ).push_back( { name, filename, dimension, {}, {} } );
+
+        minDimension = std::min( minDimension, dimension );
+        maxDimension = std::max( maxDimension, dimension );
+      }
+
+      // Load persistence diagrams & calculate indicator functions -----
+
+      for( auto&& sets : dataSets )
+      {
+        for( auto&& dataSet : sets )
+        {
+          std::cerr << "* Processing '" << dataSet.filename << "'...";
+
+          dataSet.persistenceDiagram = aleph::io::load<DataType>( dataSet.filename );
+
+          // FIXME: This is only required in order to ensure that the
+          // persistence indicator function has a finite integral; it
+          // can be solved more elegantly by using a special value to
+          // indicate infinite intervals.
+          dataSet.persistenceDiagram.removeUnpaired();
+
+          dataSet.persistenceIndicatorFunction
+             = aleph::persistenceIndicatorFunction( dataSet.persistenceDiagram );
+
+          std::cerr << "finished\n";
+        }
+      }
     }
-  }
-
-  // Load persistence diagrams & calculate indicator functions ---------
-
-  std::vector<PersistenceDiagram> persistenceDiagrams;
-
-  for( auto&& sets : dataSets )
-  {
-    for( auto&& dataSet : sets )
+    else if( aleph::utilities::extension( filenames.front() ) == ".json" )
     {
-      std::cerr << "* Processing '" << dataSet.filename << "'...";
-
-      dataSet.persistenceDiagram = aleph::io::load<DataType>( dataSet.filename );
-
-      // FIXME: This is only required in order to ensure that the
-      // persistence indicator function has a finite integral; it
-      // can be solved more elegantly by using a special value to
-      // indicate infinite intervals.
-      dataSet.persistenceDiagram.removeUnpaired();
-
-      dataSet.persistenceIndicatorFunction
-         = aleph::persistenceIndicatorFunction( dataSet.persistenceDiagram );
-
-      std::cerr << "finished\n";
     }
   }
 
