@@ -26,6 +26,12 @@ following papers:
 - *Shall I compare thee to a network?*&mdash;Visualizing the Topological
   Structure of Shakespeare&rsquo;s plays
 
+Please refer to [the list of
+publications](https://submanifold.github.io/Aleph/publications) in the
+documentation of Aleph for more details. In particular, the
+documentation covers how to reproduce a subset of the results reported
+in the papers above.
+
 If you want to contribute, please see the [contribution
 guidelines](CONTRIBUTING.md) for more details.
 
