@@ -131,6 +131,11 @@ template <class T> std::vector< aleph::PersistenceDiagram<T> > readJSON( std::is
   return persistenceDiagrams;
 
 #else
+
+  // I'm only doing this because the compiler should not complain about
+  // unused parameters.
+  (void) in;
+
   return {};
 #endif
 }
