@@ -1,0 +1,6 @@
+#ifndef ALEPH_CONFIG_RAPID_JSON_HH__
+#define ALEPH_CONFIG_RAPID_JSON_HH__
+
+#cmakedefine ALEPH_WITH_RAPID_JSON
+
+#endif
