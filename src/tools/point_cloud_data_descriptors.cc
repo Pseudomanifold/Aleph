@@ -81,7 +81,7 @@ void invertValues( std::vector<DataType>& values )
     value = max - value;
 }
 
-std::vector<DataType> calculateDataDescriptor( const std::string& name, const PointCloud& pointCloud, unsigned k, double h )
+std::vector<DataType> calculateDataDescriptor( const std::string& name, const PointCloud& pointCloud, unsigned k, double h, unsigned p )
 {
   if( name == "density" )
   {
@@ -94,11 +94,65 @@ std::vector<DataType> calculateDataDescriptor( const std::string& name, const Po
     #endif
   }
   else if( name == "eccentricity" )
-    return aleph::eccentricities<Distance>( pointCloud, k );
+    return aleph::eccentricities<Distance>( pointCloud, p );
   else if( name == "gaussian" )
     return aleph::estimateDensityTruncatedGaussian( pointCloud, h );
 
   return {};
+}
+
+void usage()
+{
+  std::cerr << "Usage: point_cloud_data_descriptors [--bandwidth=H] [--dimension=D]\n"
+            << "                                    [--descriptor=DESC]\n"
+            << "                                    [--epsilon=EPS] [--k=k]\n"
+            << "                                    [--invert] [--normalize]\n"
+            << "                                    [--power=p]\n"
+            << "                                    [--remove-unpaired] FILENAME\n"
+            << "\n"
+            << "Performs Vietoris--Rips expansion on the specified point cloud and\n"
+            << "calculates its persistent homology based on the values of one data\n"
+            << "descriptor. The expansion process uses an epsilon value of EPS and\n"
+            << "a maximum dimension of D\n"
+            << "\n"
+            << "The following data descriptors are available as a name for DESC:\n"
+            << "- density: uses distance to a measure density estimation. Notice\n"
+            << "           that this descriptor queries the k nearest neighbours\n"
+            << "           of a data point. By default, k=10, but this behaviour\n"
+            << "           can be changed.\n"
+            << "\n"
+            << "- eccentricity: calculates eccentricity values for every point;\n"
+            << "                the eccentricity measures the centrality of all\n"
+            << "                points in the point cloud. Every value is taken\n"
+            << "                to the p-th power, with p=2 by default. Specify\n"
+            << "                p=0 in order to calculate maximum eccentricity.\n"
+            << "\n"
+            << "- gaussian: uses a truncated Gaussian density estimator with a\n"
+            << "            bandwidth of h. By default, h=0.01.\n"
+            << "\n"
+            << "Several flags permit some control over the calculations:\n"
+            << "--invert: inverts data descriptor values. This is useful for the\n"
+            << "          eccentricity descriptor, for example, because it uses\n"
+            << "          small values to indicate very central points.\n"
+            << "\n"
+            << "--normalize: normalizes data descriptor values to [0,1]\n"
+            << "\n"
+            << "--remove-unpaired: removes all unpaired simplices, thereby making\n"
+            << "                   sure that all features have finite persistence\n"
+            << "                   values\n"
+            << "\n"
+            << "Abbreviations of the command-line arguments specified above\n"
+            << "are also supported:\n"
+            << "  -b: bandwidth\n"
+            << "  -D: dimension\n"
+            << "  -d: descriptor\n"
+            << "  -e: epsilon\n"
+            << "  -k: number of nearest neighbours\n"
+            << "  -i: invert values (no argument)\n"
+            << "  -n: normalize values (no argument)\n"
+            << "  -p: power for eccentricity calculation\n"
+            << "  -r: remove unpaired simplices (no argument)\n"
+            << "\n";
 }
 
 int main( int argc, char** argv )
@@ -112,6 +166,7 @@ int main( int argc, char** argv )
     { "k"              , required_argument, nullptr, 'k' },
     { "invert"         , no_argument      , nullptr, 'i' },
     { "normalize"      , no_argument      , nullptr, 'n' },
+    { "power"          , required_argument, nullptr, 'p' },
     { "remove-unpaired", no_argument      , nullptr, 'r' },
     { nullptr          , 0                , nullptr,  0  }
   };
@@ -119,6 +174,7 @@ int main( int argc, char** argv )
   unsigned dimension     = 0;           // default dimension (point cloud expansion)
   double h               = 0.01;        // default bandwidth (Gaussian estimator)
   unsigned k             = 10;          // default number of neighbours (density estimator)
+  unsigned p             = 2;           // default power (eccentricity estimator)
   DataType epsilon       = DataType();  // default epsilon (point cloud expansion)
   std::string descriptor = "density";   // default data descriptor
 
@@ -128,7 +184,7 @@ int main( int argc, char** argv )
 
   {
     int option = 0;
-    while( ( option = getopt_long( argc, argv, "b:D:d:e:k:inr", commandLineOptions, nullptr ) ) != -1 )
+    while( ( option = getopt_long( argc, argv, "b:D:d:e:k:inp:r", commandLineOptions, nullptr ) ) != -1 )
     {
       switch( option )
       {
@@ -153,6 +209,9 @@ int main( int argc, char** argv )
       case 'n':
         normalizeDataDescriptorValues = true;
         break;
+      case 'p':
+        p = static_cast<unsigned>( std::stoul( optarg ) );
+        break;
       case 'r':
         removeUnpairedSimplices = true;
         break;
@@ -161,7 +220,10 @@ int main( int argc, char** argv )
   }
 
   if( argc - optind <= 0 )
+  {
+    usage();
     return -1;
+  }
 
   std::string input = argv[optind++];
   auto pointCloud   = aleph::containers::load<DataType>( input );
@@ -175,7 +237,8 @@ int main( int argc, char** argv )
     = calculateDataDescriptor( descriptor,
                                pointCloud,
                                k,
-                               h );
+                               h,
+                               p );
 
   if( invertDataDescriptorValues )
     invertValues( dataDescriptorValues );
