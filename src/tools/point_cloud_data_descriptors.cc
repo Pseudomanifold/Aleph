@@ -103,28 +103,30 @@ int main( int argc, char** argv )
 {
   static option commandLineOptions[] =
   {
-    { "bandwidth"     , required_argument, nullptr, 'b' },
-    { "dimension"     , required_argument, nullptr, 'D' },
-    { "descriptor"    , required_argument, nullptr, 'd' },
-    { "epsilon"       , required_argument, nullptr, 'e' },
-    { "k"             , required_argument, nullptr, 'k' },
-    { "invert"        , no_argument      , nullptr, 'i' },
-    { "normalize"     , no_argument      , nullptr, 'n' },
-    { nullptr         , 0                , nullptr,  0  }
+    { "bandwidth"      , required_argument, nullptr, 'b' },
+    { "dimension"      , required_argument, nullptr, 'D' },
+    { "descriptor"     , required_argument, nullptr, 'd' },
+    { "epsilon"        , required_argument, nullptr, 'e' },
+    { "k"              , required_argument, nullptr, 'k' },
+    { "invert"         , no_argument      , nullptr, 'i' },
+    { "normalize"      , no_argument      , nullptr, 'n' },
+    { "remove-unpaired", no_argument      , nullptr, 'r' },
+    { nullptr          , 0                , nullptr,  0  }
   };
 
   unsigned dimension     = 0;           // default dimension (point cloud expansion)
-  double h               = 0.01;        // default bandwith (Gaussian estimator)
+  double h               = 0.01;        // default bandwidth (Gaussian estimator)
   unsigned k             = 10;          // default number of neighbours (density estimator)
   DataType epsilon       = DataType();  // default epsilon (point cloud expansion)
   std::string descriptor = "density";   // default data descriptor
 
   bool normalizeDataDescriptorValues = false;
   bool invertDataDescriptorValues    = false;
+  bool removeUnpairedSimplices       = false;
 
   {
     int option = 0;
-    while( ( option = getopt_long( argc, argv, "b:D:d:e:k:", commandLineOptions, nullptr ) ) != -1 )
+    while( ( option = getopt_long( argc, argv, "b:D:d:e:k:inr", commandLineOptions, nullptr ) ) != -1 )
     {
       switch( option )
       {
@@ -148,6 +150,9 @@ int main( int argc, char** argv )
         break;
       case 'n':
         normalizeDataDescriptorValues = true;
+        break;
+      case 'r':
+        removeUnpairedSimplices = true;
         break;
       }
     }
@@ -176,9 +181,6 @@ int main( int argc, char** argv )
   if( normalizeDataDescriptorValues )
     normalizeValues( dataDescriptorValues );
 
-  // TODO:
-  //   - Make unpaired simplex removal possible?
-
   // Expansion ---------------------------------------------------------
 
   std::cerr << "* Expanding point cloud using epsilon=" << epsilon << "...";
@@ -205,6 +207,9 @@ int main( int argc, char** argv )
   for( auto&& D : diagrams )
   {
     D.removeDiagonal();
+
+    if( removeUnpairedSimplices )
+      D.removeUnpaired();
 
     std::cout << "# Persistence diagram <" << input << ">\n"
               << "#\n"
