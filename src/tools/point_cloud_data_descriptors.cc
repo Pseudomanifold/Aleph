@@ -206,6 +206,9 @@ int main( int argc, char** argv )
   std::cerr << "finished\n"
             << "* Obtained " << diagrams.size() << " persistence diagrams\n";
 
+  std::cout << "{\n"
+            << "\"diagrams\": " << "[\n";
+
   for( auto it = diagrams.begin(); it != diagrams.end(); ++it )
   {
     if( it != diagrams.begin() )
@@ -221,5 +224,7 @@ int main( int argc, char** argv )
     aleph::io::writeJSON( std::cout, D, input );
   }
 
-  std::cout << "\n";
+  std::cout << "\n"
+            << "  ]\n"
+            << "}\n";
 }

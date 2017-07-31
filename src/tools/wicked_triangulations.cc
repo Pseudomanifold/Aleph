@@ -252,7 +252,7 @@ int main(int argc, char* argv[])
   // always "flag-like" following the paper:
   //
   //   Elementary construction of perverse sheaves
-  //   Robert MacPhersonl and Kari Vilonen
+  //   Robert MacPherson and Kari Vilonen
   //   Inventiones Mathematicae, Volume 84, pp. 403--435, 1986
   //
   // As a last step, we iterate over all possible perversities for the
