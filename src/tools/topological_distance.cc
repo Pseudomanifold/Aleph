@@ -366,10 +366,11 @@ int main( int argc, char** argv )
           // persistence indicator function has a finite integral; it
           // can be solved more elegantly by using a special value to
           // indicate infinite intervals.
-          dataSet.persistenceDiagram.removeUnpaired();
+          auto pd = dataSet.persistenceDiagram;
+          pd.removeUnpaired();
 
           dataSet.persistenceIndicatorFunction
-             = aleph::persistenceIndicatorFunction( dataSet.persistenceDiagram );
+             = aleph::persistenceIndicatorFunction( pd );
 
           std::cerr << "finished\n";
         }
@@ -396,7 +397,18 @@ int main( int argc, char** argv )
           name      += "_";
           name      += "d" + std::to_string( diagram.dimension() );
 
-          dataSet.push_back( { name, filename, dimension, diagram, {} } );
+          // FIXME: This is only required in order to ensure that the
+          // persistence indicator function has a finite integral; it
+          // can be solved more elegantly by using a special value to
+          // indicate infinite intervals.
+          auto pd = diagram;
+          pd.removeUnpaired();
+
+          dataSet.push_back( { name,
+                               filename,
+                               dimension,
+                               diagram,
+                               aleph::persistenceIndicatorFunction( pd ) } );
         }
 
         dataSets.push_back( dataSet );
