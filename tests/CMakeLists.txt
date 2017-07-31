@@ -94,7 +94,13 @@ ADD_TEST( filesystem                       test_filesystem )
 ADD_TEST( graph_generation                 test_graph_generation )
 ADD_TEST( io_functions                     test_io_functions )
 ADD_TEST( io_gml                           test_io_gml )
-ADD_TEST( io_json                          test_io_json )
+
+# The test will build nonetheless, but the results will of course be
+# incorrect if the library is not available.
+IF( ALEPH_WITH_RAPID_JSON )
+  ADD_TEST( io_json                        test_io_json )
+ENDIF()
+
 ADD_TEST( io_lexicographic_triangulation   test_io_lexicographic_triangulation )
 ADD_TEST( io_pajek                         test_io_pajek )
 ADD_TEST( io_vtk                           test_io_vtk )
