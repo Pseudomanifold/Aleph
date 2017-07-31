@@ -5,7 +5,35 @@
   Given a set of persistence diagrams, it calculates various topological
   distances and returns a distance matrix.
 
-  TODO: More documentation...
+  This tool can be helpful in different application scenarios:
+
+  1. You want to determine the dissimilarity between two
+     high-dimensional shapes, filtered by their distance
+     function.
+
+  2. You want to measure how a data descriptor, e.g. any
+     density estimator, is changing over embeddings of a
+     high-dimensional data set.
+
+  3. You want to determine if certain samples of a space
+     have the same characteristics than the original.
+
+  The tool attempts to be smart and groups different inputs according to
+  their common prefix. Currently, it only understands _d and _k as valid
+  suffixes. Hence, the following input files are considered to belong to
+  the same data set:
+
+  - Test_d01
+  - Test_d05
+  - Test_d07
+
+  Likewise:
+
+  - Test_k1
+  - Test_k7
+  - Test_k9
+
+  Please keep this in mind when using the tool.
 */
 
 #include <algorithm>
