@@ -34,6 +34,8 @@
 #include <aleph/persistenceDiagrams/Calculation.hh>
 #include <aleph/persistenceDiagrams/PersistenceDiagram.hh>
 
+#include <aleph/persistenceDiagrams/io/JSON.hh>
+
 #include <aleph/persistentHomology/Calculation.hh>
 
 #include <algorithm>
@@ -204,17 +206,20 @@ int main( int argc, char** argv )
   std::cerr << "finished\n"
             << "* Obtained " << diagrams.size() << " persistence diagrams\n";
 
-  for( auto&& D : diagrams )
+  for( auto it = diagrams.begin(); it != diagrams.end(); ++it )
   {
+    if( it != diagrams.begin() )
+      std::cout << ",\n";
+
+    auto&& D = *it;
+
     D.removeDiagonal();
 
     if( removeUnpairedSimplices )
       D.removeUnpaired();
 
-    std::cout << "# Persistence diagram <" << input << ">\n"
-              << "#\n"
-              << "# Dimension: " << D.dimension() << "\n"
-              << "# Entries  : " << D.size() << "\n"
-              << D << "\n\n";
+    aleph::io::writeJSON( std::cout, D, input );
   }
+
+  std::cout << "\n";
 }

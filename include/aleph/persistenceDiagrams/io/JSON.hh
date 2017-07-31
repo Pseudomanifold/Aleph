@@ -30,7 +30,7 @@ template <class Diagram> void writeJSON( std::ostream& o, const Diagram& D, cons
     << level << "\"dimension\": " << D.dimension() << ",\n";
 
   if( !name.empty() )
-    o << level << "\"name\": " << name << ",\n";
+    o << level << "\"name\": " << "\"" << name << "\",\n";
 
   o << level << "\"size\": "      << D.size()      << ",\n"
     << level << "\"diagram\": "   << "[\n";
@@ -49,7 +49,7 @@ template <class Diagram> void writeJSON( std::ostream& o, const Diagram& D, cons
 
   o << "\n"
     << level << "]\n"
-    << "}\n";
+    << "}";
 }
 
 } // namespace io
