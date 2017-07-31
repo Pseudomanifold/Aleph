@@ -84,7 +84,6 @@ template <class T> void testBottleneckDistance()
   ALEPH_TEST_END();
 }
 
-
 template <class T> void testFrechetMean()
 {
   using PersistenceDiagram = aleph::PersistenceDiagram<T>;
@@ -106,6 +105,22 @@ template <class T> void testFrechetMean()
 
   ALEPH_ASSERT_THROW( D.size() > 0 );
   ALEPH_ASSERT_THROW( std::abs( P - p ) < 2.0 );
+
+  ALEPH_TEST_END();
+}
+
+template <class T> void testHausdorffDistance()
+{
+  using PersistenceDiagram = aleph::PersistenceDiagram<T>;
+
+  ALEPH_TEST_BEGIN( "Hausdorff distance" );
+
+  auto pd = createRandomPersistenceDiagram<T>( 25 );
+  auto d0 = aleph::distances::hausdorffDistance( pd, pd );
+  auto d1 = aleph::distances::hausdorffDistance( PersistenceDiagram(), PersistenceDiagram() );
+
+  ALEPH_ASSERT_EQUAL( d0, T() );
+  ALEPH_ASSERT_EQUAL( d1, T() );
 
   ALEPH_TEST_END();
 }
@@ -278,6 +293,9 @@ int main(int, char**)
 
   testFrechetMean<float> ();
   testFrechetMean<double>();
+
+  testHausdorffDistance<float> ();
+  testHausdorffDistance<double>();
 
   testMultiScaleKernel<float> ();
   testMultiScaleKernel<double>();
