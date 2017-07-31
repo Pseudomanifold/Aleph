@@ -75,11 +75,13 @@ FIND_PACKAGE( PkgConfig )
 IF( PKG_CONFIG_FOUND )
   PKG_SEARCH_MODULE( JSON RapidJSON )
 
-  # RapidJSON is now available in the normal include path, under the
-  # prefix of RapidJSON.
-  INCLUDE_DIRECTORIES( ${JSON_INCLUDE_DIRS} )
+  IF( JSON_FOUND )
+    # RapidJSON is now available in the normal include path, under the
+    # prefix of RapidJSON.
+    INCLUDE_DIRECTORIES( ${JSON_INCLUDE_DIRS} )
 
-  SET( ALEPH_WITH_RAPID_JSON TRUE )
+    SET( ALEPH_WITH_RAPID_JSON TRUE )
+  ENDIF()
 ENDIF()
 
 ########################################################################
