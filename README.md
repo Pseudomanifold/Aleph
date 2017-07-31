@@ -52,6 +52,7 @@ in the main directory of the repository for more details.
 
 * [`FLANN`](https://github.com/mariusmuja/flann) for fast nearest-neighbour queries
 * Qt 5, for the GUI
+* [`RapidJSON`](http://rapidjson.org) for parsing JSON input files
 
 # Building Aleph
 
