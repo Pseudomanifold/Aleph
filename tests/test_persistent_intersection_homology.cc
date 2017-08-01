@@ -93,6 +93,61 @@ template <class T> void test()
   ALEPH_TEST_END();
 }
 
+template <class T> void testCircleWithWhisker()
+{
+  ALEPH_TEST_BEGIN( "Persistent intersection homology: circle plus whisker" );
+
+  using Simplex           = aleph::topology::Simplex<T>;
+  using SimplicialComplex = aleph::topology::SimplicialComplex<Simplex>;
+
+  SimplicialComplex K = {
+    {0},
+    {1},
+    {2},
+    {0,1}, {0,2},
+    {1,2}
+  };
+
+  SimplicialComplex L =
+  {
+    {0},
+    {1},
+    {2},
+    {3},
+    {0,1}, {0,2}, {0,3},
+    {1,2}
+  };
+
+  K.sort();
+  L.sort();
+
+  {
+    auto D1 = aleph::calculatePersistenceDiagrams( K );
+    auto D2 = aleph::calculatePersistenceDiagrams( L );
+
+    ALEPH_ASSERT_EQUAL( D1.size(),          D2.size() );
+    ALEPH_ASSERT_EQUAL( D1.front().betti(), D2.front().betti() );
+  }
+
+  SimplicialComplex X0 = { {0}, {1}, {2} };
+  SimplicialComplex X1 = K;
+
+  SimplicialComplex Y0 = { {0} };
+  SimplicialComplex Y1 = L;
+
+  auto D1 = aleph::calculateIntersectionHomology( K, {X0,X1}, aleph::Perversity( {-1} ) );
+  auto D2 = aleph::calculateIntersectionHomology( L, {Y0,Y1}, aleph::Perversity( {-1} ) );
+
+  ALEPH_ASSERT_THROW( D1.empty() == false );
+  ALEPH_ASSERT_THROW( D2.empty() == false );
+  ALEPH_ASSERT_EQUAL( D1.front().dimension(), 0 );
+  ALEPH_ASSERT_EQUAL( D2.front().dimension(), 0 );
+
+  ALEPH_ASSERT_EQUAL( D1.front().betti(), 1 );
+  ALEPH_ASSERT_EQUAL( D2.front().betti(), 2 );
+
+  ALEPH_TEST_END();
+}
 template <class T> void testQuotientSpaces()
 {
   ALEPH_TEST_BEGIN( "Persistent intersection homology: quotient spaces" );
@@ -255,6 +310,9 @@ int main(int, char**)
 {
   test<float> ();
   test<double>();
+
+  testCircleWithWhisker<float> ();
+  testCircleWithWhisker<double>();
 
   testQuotientSpaces<float> ();
   testQuotientSpaces<double>();
