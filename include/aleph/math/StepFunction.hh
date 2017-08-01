@@ -199,6 +199,26 @@ public:
     return value;
   }
 
+  /** Calculates the maximum (supremum) of the step function */
+  I max() const noexcept
+  {
+    if( _indicatorFunctions.empty() )
+      return I();
+
+    auto max = std::numeric_limits<I>::lowest();
+
+    for( auto&& f : _indicatorFunctions )
+      max = std::max( max, f.y() );
+
+    return max;
+  }
+
+  /** Calculates the supremum (maximum) of the step function */
+  I sup() const noexcept
+  {
+    return this->max();
+  }
+
   /** Calculates the sum of this step function with another step function */
   StepFunction& operator+=( const StepFunction& other ) noexcept
   {
