@@ -250,6 +250,9 @@ public:
     }
 
     *this = h;
+
+    this->clean();
+
     return *this;
   }
 
@@ -385,6 +388,43 @@ public:
   template <class U, class V> friend std::ostream& operator<<( std::ostream&, const StepFunction<U, V>& f );
 
 private:
+
+  /**
+    Performs some cleaning operations of a step function. This involves
+    removing intervals of empty volume, i.e. intervals during which the
+    function value does not change.
+  */
+
+  void clean()
+  {
+    for( auto it = _indicatorFunctions.begin(); it != _indicatorFunctions.end(); )
+    {
+      if( it->a() == it->b() )
+        it = _indicatorFunctions.erase( it );
+      else
+        ++it;
+    }
+
+    if( _indicatorFunctions.empty() )
+      return;
+
+    auto prev = _indicatorFunctions.begin();
+    auto curr = prev;
+
+    std::set<IndicatorFunction> indicatorFunctions;
+
+    for( ; curr != _indicatorFunctions.end(); )
+    {
+      while( curr->y() == prev->y() && curr != _indicatorFunctions.end() )
+        ++curr;
+
+      indicatorFunctions.insert( IndicatorFunction( prev->a(), std::prev( curr )->b(), prev->y() ) );
+
+      prev = curr;
+    }
+
+    _indicatorFunctions.swap( indicatorFunctions );
+  }
 
   /** All indicator functions of the step function */
   std::set<IndicatorFunction> _indicatorFunctions;
