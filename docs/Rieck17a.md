@@ -74,3 +74,42 @@ The file `/tmp/M.txt` should now contain the following output:
     2.000000000000000000e+03 0.000000000000000000e+00
 
 The off-diagonal values indicate that the two hierarchies are different.
+
+## A 2D VTK example
+
+The tool is also capable of reading VTK files&mdash;as long as they
+describe structured grids. To reproduce the 2D examples from the paper,
+we first need to download the [two files stored in this gist](https://gist.github.com/Submanifold/4e247750c342101223cd123bae69dfe7).
+
+To calculate the interlevel set persistence hierarchy for the
+*superlevel* sets of these data, we have to use the following command:
+
+    $ ./interlevel_set_persistence_hierarchy -S 3_peaks_symmetrical.vtk 3_peaks_ridge.vtk
+
+This should result in the following output:
+
+    0: 0.757965     0.556043
+    1: 1.00489      inf
+    2: 0.50947      0.435131
+
+    1 -- 0
+    1 -- 2
+
+
+    0: 1.00334      inf
+    1: 0.76121      0.554819
+    2: 0.50635      0.389117
+
+    0 -- 1
+    1 -- 2
+
+We may now compare the hierarchies with each other again using the
+Python script shown above.
+
+## Conclusion
+
+This concludes the brief demonstration of interlevel set persistence
+hierarchies. Please read the [preprint for more
+information](http://bastian.rieck.ru/research/TopoInVis2017_Hierarchies.pdf),
+and stay tuned for the forthcoming paper&nbsp;(which is still under
+review).
