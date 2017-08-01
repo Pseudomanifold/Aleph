@@ -1,6 +1,7 @@
 #ifndef ALEPH_MATH_STEP_FUNCTION_HH__
 #define ALEPH_MATH_STEP_FUNCTION_HH__
 
+#include <algorithm>
 #include <iterator>
 #include <limits>
 #include <ostream>
@@ -174,11 +175,24 @@ public:
   {
     I value = I();
 
-    for( auto&& f : _indicatorFunctions )
+    auto contains = [&x] ( const IndicatorFunction& f )
+                    {
+                      return f.contains(x);
+                    };
+
+    // Determine the range in which indicator functions have to be
+    // queried. There is no need to query any function outside the
+    // interval below because it will not contain x.
+    auto itStart = std::find_if( _indicatorFunctions.begin(), _indicatorFunctions.end(), contains );
+    auto itEnd   = std::find_if_not( itStart,                 _indicatorFunctions.end(), contains );
+
+    for( auto it = itStart; it != itEnd; ++it )
     {
+      auto&& f = *it;
+
       // TODO: Not sure whether I really want this. The step functions must not
       // overlap anyway...
-      if( f.contains(x) && std::abs( f(x) ) > value )
+      if( std::abs( f(x) ) > value )
         value = f(x);
     }
 
