@@ -3,7 +3,7 @@
   Homology'.
 
   It loads VTK files (structured grids) or TXT (1D functions) files and
-  calculates the extended persistence hierarchy described in:
+  calculates the interlevel set persistence hierarchy described in:
 
     Hierarchies and Ranks for Persistence Pairs
     Bastian Rieck, Heike Leitte, and Filip Sadlo
@@ -26,7 +26,14 @@
   This output may subsequently be used in an auxiliary Python script in
   order to analyse and compare different hierarchies.
 
-  TODO: Document this
+  Please refer to file
+
+    compare_interlevel_set_persistence_hierarchies.py
+
+  for more information.
+
+  Note that the extended persistence hierarchy referred to below is yet
+  another name for the interlevel set persistence hierarchy.
 */
 
 #include <aleph/persistenceDiagrams/Calculation.hh>
