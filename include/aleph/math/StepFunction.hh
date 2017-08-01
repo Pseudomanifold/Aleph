@@ -492,4 +492,9 @@ template <class D, class I> StepFunction<D,I> normalize( const StepFunction<D,I>
 
 } // namespace aleph
 
+template <class D, class I, class T> aleph::math::StepFunction<D, I> operator*( T lambda, const aleph::math::StepFunction<D, I>& f )
+{
+  return f * lambda;
+}
+
 #endif
