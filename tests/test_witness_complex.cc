@@ -3,11 +3,37 @@
 #include <aleph/containers/PointCloud.hh>
 
 #include <aleph/geometry/distances/Euclidean.hh>
+
+#include <aleph/geometry/SphereSampling.hh>
 #include <aleph/geometry/WitnessComplex.hh>
+
+#include <aleph/persistentHomology/Calculation.hh>
+
+#include <aleph/topology/filtrations/Data.hh>
 
 #include <algorithm>
 #include <iterator>
 #include <set>
+#include <vector>
+
+template <class SimplicialComplex> std::vector<std::size_t> bettiNumbers( SimplicialComplex K )
+{
+  using Simplex  = typename SimplicialComplex::ValueType;
+  using DataType = typename Simplex::DataType;
+
+  K.sort( aleph::topology::filtrations::Data<typename SimplicialComplex::ValueType>() );
+  auto diagrams = aleph::calculatePersistenceDiagrams( K );
+
+  std::vector<std::size_t> betti( diagrams.size() );
+
+  std::transform( diagrams.begin(), diagrams.end(), betti.begin(),
+                  [] ( const aleph::PersistenceDiagram<DataType>& diagram )
+                  {
+                    return diagram.betti();
+                  } );
+
+  return betti;
+}
 
 template <class T> void test()
 {
@@ -47,8 +73,44 @@ template <class T> void test()
   ALEPH_ASSERT_EQUAL( numEdges, 4 );
 }
 
+template <class T> void testSphereReconstruction()
+{
+  ALEPH_TEST_BEGIN( "Witness complexes: sphere reconstruction" );
+
+  auto samples = aleph::geometry::sphereSampling<T>( 500 );
+  auto pc      = aleph::geometry::makeSphere( samples, T(1) );
+
+  unsigned trials = 100;
+  unsigned hits   = 0;
+
+  for( unsigned i = 0; i < trials; i++ )
+  {
+    std::vector<std::size_t> indices = {0,1,2,3,4,5,6,7,8,9,10,11};
+
+    using Distance = aleph::distances::Euclidean<T>;
+
+    auto K
+      = aleph::geometry::buildWitnessComplex<Distance>(
+          pc, indices.begin(), indices.end() );
+
+    auto betti = bettiNumbers(K);
+
+    if( betti == std::vector<std::size_t>( {1,0,1} ) )
+      ++hits;
+  }
+
+  // TODO:
+  //  - count number of hits
+  //  - check that reported percentage by de Silva is reached
+
+  ALEPH_TEST_END();
+}
+
 int main(int, char**)
 {
   test<float> ();
   test<double>();
+
+  testSphereReconstruction<float> ();
+  testSphereReconstruction<double>();
 }
