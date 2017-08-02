@@ -1,6 +1,8 @@
 #ifndef ALEPH_GEOMETRY_WITNESS_COMPLEX_HH__
 #define ALEPH_GEOMETRY_WITNESS_COMPLEX_HH__
 
+#include <algorithm>
+#include <limits>
 #include <iterator>
 #include <vector>
 
@@ -57,6 +59,29 @@ template <class Container, class InputIterator, class Distance> auto buildWitnes
       distances.emplace_back( traits.from( dist( landmark.begin(), point.begin(), d ) ) );
     }
   }
+
+  // Records the appearance times of each potential edge in the witness
+  // complex.
+  //
+  // TODO: this should become a symmetric matrix
+  std::vector< std::vector<DataType> > M( n, std::vector<DataType>( n ) );
+
+  for( std::size_t i = 0; i < n; i++ )
+  {
+    for( std::size_t j = i+1; j < n; j++ )
+    {
+      auto min = std::numeric_limits<DataType>::max();
+
+      for( std::size_t k = 0; k < N; k++ )
+        min = std::min( min, std::max( D[i,k], D[j,k] ) );
+
+      M[i][j] = min;
+      M[j][i] = min;
+    }
+  }
+
+  SimplicialComplex K;
+  return K;
 }
 
 } // namespace geometry
