@@ -44,9 +44,49 @@ public:
   }
 
   /**
+    Creates a symmetric matrix as a copy of another symmetric matrix, by
+    simply copying all data values. This function first allocates memory
+    before clearing it, and finally fills it with a copy of the data the
+    other matrix stores. Hence, this function is *not* highly-efficient.
+
+    :param other: Matrix from which to copy data
+  */
+
+  SymmetricMatrix( const SymmetricMatrix& other )
+    : SymmetricMatrix( other._numRows )
+  {
+    std::copy( other._data, other._data + other._size, _data );
+  }
+
+  /** Destroys the symmetric matrix */
+  ~SymmetricMatrix()
+  {
+    delete[] _data;
+  }
+
+  /** Swaps two matrices */
+  void swap( SymmetricMatrix& other )
+  {
+    std::swap( _numRows, other._numRows );
+    std::swap( _size   , other._size    );
+    std::swap( _data   , other._data    );
+  }
+
+  SymmetricMatrix& operator==( SymmetricMatrix other )
+  {
+    this->swap( other );
+    return *this;
+  }
+
+  /**
     Provides element-wise access to the matrix and returns the element
     at the specified position. The function throws if an invalid index
     is encountered.
+
+    :param row:    Desired row for query
+    :param column: Desired column for query
+
+    :returns: Const reference to the desired value
   */
 
   const T& operator()( I row, I column ) const
@@ -68,6 +108,12 @@ public:
   T& operator()( I row, I column )
   {
     return const_cast<T&>( static_cast<const SymmetricMatrix&>( *this )( row, column ) );
+  }
+
+  /** Returns number of rows */
+  I numRows() const noexcept
+  {
+    return _numRows;
   }
 
   /** Returns size of matrix */
