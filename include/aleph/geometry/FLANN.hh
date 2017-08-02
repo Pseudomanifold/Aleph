@@ -59,6 +59,7 @@ public:
   {
     flann::SearchParams searchParameters = flann::SearchParams();
     searchParameters.checks = flann::FLANN_CHECKS_UNLIMITED;
+    searchParameters.sorted = true;
 
     using ResultType = typename DistanceFunctor::ResultType;
 
