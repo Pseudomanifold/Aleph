@@ -17,7 +17,7 @@ namespace aleph
 namespace geometry
 {
 
-template <class Container, class InputIterator, class Distance> auto buildWitnessComplex(
+template <class Distance, class Container, class InputIterator> auto buildWitnessComplex(
   const Container& container,
   InputIterator begin, InputIterator end,
   unsigned nu = 2,
@@ -41,6 +41,7 @@ template <class Container, class InputIterator, class Distance> auto buildWitnes
   // Distance matrix between a set of $n$ landmarks (rows) and $N$ data
   // points.
   std::vector< std::vector<DataType> > D;
+  D.reserve( n );
 
   Distance dist;
   Traits traits;
@@ -58,6 +59,8 @@ template <class Container, class InputIterator, class Distance> auto buildWitnes
 
       distances.emplace_back( traits.from( dist( landmark.begin(), point.begin(), d ) ) );
     }
+
+    D.push_back( distances );
   }
 
   // Records the appearance times of each potential edge in the witness
@@ -73,15 +76,57 @@ template <class Container, class InputIterator, class Distance> auto buildWitnes
       auto min = std::numeric_limits<DataType>::max();
 
       for( std::size_t k = 0; k < N; k++ )
-        min = std::min( min, std::max( D[i,k], D[j,k] ) );
+        min = std::min( min, std::max( D[i][k], D[j][k] ) );
 
       M[i][j] = min;
       M[j][i] = min;
     }
   }
 
-  SimplicialComplex K;
-  return K;
+  // Get smallest entries of the distance matrix. This is required for
+  // deciding whether a specific edge is valid or not, with respect to
+  // the given parameters.
+
+  std::vector<DataType> smallest( N );
+
+  if( nu != 0 )
+  {
+    for( std::size_t col = 0; col < N; col++ )
+    {
+      // FIXME: getting the column like this is extremely wasteful;
+      // would it not be nicer to store the values differently?
+      std::vector<DataType> column( n );
+      for( std::size_t i = 0; i < n; i++ )
+        column[i] = D[i][col];
+
+      std::nth_element( column.begin(), column.begin() + nu - 1, column.end() );
+      smallest[col] = column.at( nu - 1 );
+    }
+  }
+
+  std::vector<Simplex> simplices;
+
+  for( std::size_t i = 0; i < n; i++ )
+  {
+    simplices.push_back( Simplex( static_cast<VertexType>(i) ) );
+
+    for( std::size_t j = i+1; j < n; j++ )
+    {
+      for( std::size_t col = 0; col < N; col++ )
+      {
+        if( M[i][j] <= R + smallest.at(col) )
+        {
+          auto u = static_cast<VertexType>(i);
+          auto v = static_cast<VertexType>(j);
+
+          simplices.push_back( Simplex( {u,v}, M[i][j] ) );
+          break;
+        }
+      }
+    }
+  }
+
+  return SimplicialComplex( simplices.begin(), simplices.end() );
 }
 
 } // namespace geometry
