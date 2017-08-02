@@ -64,6 +64,106 @@ template <
 /**
   Estimates local intrinsic dimensionality of a container using its
   nearest neighbours. No assumptions about the distribution of data
+  points are made. The function uses an iteration over a *range* of
+  nearest neighbours and solves a regression problem.
+
+  Please see the publication
+
+    An evaluation of intrinsic dimensionality estimators
+    Peter J. Verveer and Robert P. W. Duin
+    IEEE Transactions on Pattern Analysis and Machine Intelligence 17.1, pp. 81-86, 1985
+
+  for more details.
+
+  :param container: Container to use for dimensionality estimation
+
+  :param kMin:      Minimum number of nearest neighbours to use in
+                    computing local dimensionality estimates.
+
+  :param kMax:      Maximum number of nearest neighbours to use in
+                    computing local dimensionality estimates. This
+                    parameter influences performance.
+
+  :param distance:  Distance measure
+
+  :returns: Vector of local intrinsic dimensionality estimates that
+            are reported *without* rounding.
+*/
+
+template <
+  class Distance,
+  class Container,
+  class Wrapper
+> std::vector<double> estimateLocalDimensionalityNearestNeighbours( const Container& container,
+                                                                    unsigned kMin,
+                                                                    unsigned kMax,
+                                                                    Distance /* distance */ = Distance() )
+
+{
+  if( kMin > kMax )
+    std::swap( kMin, kMax );
+
+  if( kMax == 0 || kMin == 0 )
+    throw std::runtime_error( "Expecting non-zero number of nearest neighbours" );
+
+  using IndexType = typename Wrapper::IndexType;
+
+  std::vector< std::vector<IndexType> > indices;
+  std::vector< std::vector<double> > distances;
+
+  Wrapper nnWrapper( container );
+  nnWrapper.neighbourSearch( kMax, indices, distances );
+
+  auto n = container.size();
+
+  std::vector<double> estimates;
+  estimates.reserve( n );
+
+  for( decltype(n) i = 0; i < n; i++ )
+  {
+    auto&& nnDistances = distances.at(i);
+
+    std::vector<double> localEstimates;
+    localEstimates.reserve( kMax );
+
+    for( unsigned k = kMin; k < kMax; k++ )
+    {
+      auto r = aleph::math::accumulate_kahan( nnDistances.begin(), nnDistances.begin() + k, 0.0 ) / static_cast<double>(k);
+      localEstimates.emplace_back( r );
+    }
+
+    // The dimensionality estimates consist of two terms. The first term
+    // is similar to the local biased dimensionality estimate.
+
+    std::vector<double> firstTerms;
+    firstTerms.reserve( kMax );
+
+    std::vector<double> secondTerms;
+    secondTerms.reserve( kMax );
+
+    for( unsigned k = kMin; k < kMax - 1; k++ )
+    {
+      auto index = k - kMin;
+      auto r1    = localEstimates.at(index);
+      auto r2    = localEstimates.at(index+1);
+
+      firstTerms.emplace_back ( ( (r2-r1) * r1 ) / k );
+      secondTerms.emplace_back( ( (r2-r1) * (r2-r1) ) );
+    }
+
+    auto s = aleph::math::accumulate_kahan( firstTerms.begin() , firstTerms.end() , 0.0 );
+    auto t = aleph::math::accumulate_kahan( secondTerms.begin(), secondTerms.end(), 0.0 );
+
+    estimates.push_back( s / t );
+  }
+
+  return estimates;
+
+}
+
+/**
+  Estimates local intrinsic dimensionality of a container using its
+  nearest neighbours. No assumptions about the distribution of data
   points are made. The function uses *maximum likelihood estimates*
   for the dimensionality estimates.
 
@@ -163,107 +263,6 @@ template <
 
   return estimates;
 }
-
-/**
-  Estimates local intrinsic dimensionality of a container using its
-  nearest neighbours. No assumptions about the distribution of data
-  points are made. The function uses an iteration over a *range* of
-  nearest neighbours and solves a regression problem.
-
-  Please see the publication
-
-    An evaluation of intrinsic dimensionality estimators
-    Peter J. Verveer and Robert P. W. Duin
-    IEEE Transactions on Pattern Analysis and Machine Intelligence 17.1, pp. 81-86, 1985
-
-  for more details.
-
-  :param container: Container to use for dimensionality estimation
-
-  :param kMin:      Minimum number of nearest neighbours to use in
-                    computing local dimensionality estimates.
-
-  :param kMax:      Maximum number of nearest neighbours to use in
-                    computing local dimensionality estimates. This
-                    parameter influences performance.
-
-  :param distance:  Distance measure
-
-  :returns: Vector of local intrinsic dimensionality estimates that
-            are reported *without* rounding.
-*/
-
-template <
-  class Distance,
-  class Container,
-  class Wrapper
-> std::vector<double> estimateLocalDimensionalityNearestNeighbours( const Container& container,
-                                                                    unsigned kMin,
-                                                                    unsigned kMax,
-                                                                    Distance /* distance */ = Distance() )
-
-{
-  if( kMin > kMax )
-    std::swap( kMin, kMax );
-
-  if( kMax == 0 || kMin == 0 )
-    throw std::runtime_error( "Expecting non-zero number of nearest neighbours" );
-
-  using IndexType = typename Wrapper::IndexType;
-
-  std::vector< std::vector<IndexType> > indices;
-  std::vector< std::vector<double> > distances;
-
-  Wrapper nnWrapper( container );
-  nnWrapper.neighbourSearch( kMax, indices, distances );
-
-  auto n = container.size();
-
-  std::vector<double> estimates;
-  estimates.reserve( n );
-
-  for( decltype(n) i = 0; i < n; i++ )
-  {
-    auto&& nnDistances = distances.at(i);
-
-    std::vector<double> localEstimates;
-    localEstimates.reserve( kMax );
-
-    for( unsigned k = kMin; k < kMax; k++ )
-    {
-      auto r = aleph::math::accumulate_kahan( nnDistances.begin(), nnDistances.begin() + k, 0.0 ) / static_cast<double>(k);
-      localEstimates.emplace_back( r );
-    }
-
-    // The dimensionality estimates consist of two terms. The first term
-    // is similar to the local biased dimensionality estimate.
-
-    std::vector<double> firstTerms;
-    firstTerms.reserve( kMax );
-
-    std::vector<double> secondTerms;
-    secondTerms.reserve( kMax );
-
-    for( unsigned k = kMin; k < kMax - 1; k++ )
-    {
-      auto index = k - kMin;
-      auto r1    = localEstimates.at(index);
-      auto r2    = localEstimates.at(index+1);
-
-      firstTerms.emplace_back ( ( (r2-r1) * r1 ) / k );
-      secondTerms.emplace_back( ( (r2-r1) * (r2-r1) ) );
-    }
-
-    auto s = aleph::math::accumulate_kahan( firstTerms.begin() , firstTerms.end() , 0.0 );
-    auto t = aleph::math::accumulate_kahan( secondTerms.begin(), secondTerms.end(), 0.0 );
-
-    estimates.push_back( s / t );
-  }
-
-  return estimates;
-
-}
-
 
 } // namespace containers
 
