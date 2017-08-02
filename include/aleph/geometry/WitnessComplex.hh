@@ -6,6 +6,8 @@
 #include <iterator>
 #include <vector>
 
+#include <aleph/geometry/RipsExpander.hh>
+
 #include <aleph/geometry/distances/Traits.hh>
 
 #include <aleph/math/SymmetricMatrix.hh>
@@ -131,6 +133,8 @@ template <class Distance, class Container, class InputIterator> auto buildWitnes
           auto u = static_cast<VertexType>(i);
           auto v = static_cast<VertexType>(j);
 
+          // FIXME: this is incorrect; there could be edges with
+          // a smaller weight
           simplices.push_back( Simplex( {u,v}, M(i,j) ) );
           break;
         }
@@ -138,7 +142,13 @@ template <class Distance, class Container, class InputIterator> auto buildWitnes
     }
   }
 
-  return SimplicialComplex( simplices.begin(), simplices.end() );
+  aleph::geometry::RipsExpander<SimplicialComplex> ripsExpander;
+
+  SimplicialComplex K = SimplicialComplex( simplices.begin(), simplices.end() );
+  SimplicialComplex L = ripsExpander( K, static_cast<unsigned>(n) ); // TODO: make dimension configurable?
+  L                   = ripsExpander.assignMaximumWeight( L );
+
+  return L;
 }
 
 } // namespace geometry
