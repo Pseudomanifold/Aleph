@@ -8,6 +8,8 @@
 
 #include <aleph/geometry/distances/Traits.hh>
 
+#include <aleph/math/SymmetricMatrix.hh>
+
 #include <aleph/topology/Simplex.hh>
 #include <aleph/topology/SimplicialComplex.hh>
 
@@ -70,9 +72,8 @@ template <class Distance, class Container, class InputIterator> auto buildWitnes
 
   // Records the appearance times of each potential edge in the witness
   // complex.
-  //
-  // TODO: this should become a symmetric matrix
-  std::vector< std::vector<DataType> > M( n, std::vector<DataType>( n ) );
+
+  aleph::math::SymmetricMatrix<DataType> M( n );
 
   for( std::size_t i = 0; i < n; i++ )
   {
@@ -83,8 +84,7 @@ template <class Distance, class Container, class InputIterator> auto buildWitnes
       for( std::size_t k = 0; k < N; k++ )
         min = std::min( min, std::max( D[i][k], D[j][k] ) );
 
-      M[i][j] = min;
-      M[j][i] = min;
+      M(i,j) = min;
     }
   }
 
@@ -121,17 +121,17 @@ template <class Distance, class Container, class InputIterator> auto buildWitnes
     {
       // Skip pairs that cannot possibly give rise to an edge because of
       // their distance to each other.
-      if( M[i][j] > R + max )
+      if( M(i,j) > R + max )
         continue;
 
       for( std::size_t col = 0; col < N; col++ )
       {
-        if( M[i][j] <= R + smallest.at(col) )
+        if( M(i,j) <= R + smallest.at(col) )
         {
           auto u = static_cast<VertexType>(i);
           auto v = static_cast<VertexType>(j);
 
-          simplices.push_back( Simplex( {u,v}, M[i][j] ) );
+          simplices.push_back( Simplex( {u,v}, M(i,j) ) );
           break;
         }
       }
