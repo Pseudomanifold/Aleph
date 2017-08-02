@@ -38,6 +38,11 @@ template <class Distance, class Container, class InputIterator> auto buildWitnes
   auto N = container.size();
   auto d = container.dimension();
 
+  // Much of the behaviour below will be undefined if we permit such
+  // situations to occur.
+  if( n == 0 || N == 0 )
+    return {};
+
   // Distance matrix between a set of $n$ landmarks (rows) and $N$ data
   // points.
   std::vector< std::vector<DataType> > D;
@@ -104,6 +109,8 @@ template <class Distance, class Container, class InputIterator> auto buildWitnes
     }
   }
 
+  auto max = *std::max_element( smallest.begin(), smallest.end() );
+
   std::vector<Simplex> simplices;
 
   for( std::size_t i = 0; i < n; i++ )
@@ -112,6 +119,11 @@ template <class Distance, class Container, class InputIterator> auto buildWitnes
 
     for( std::size_t j = i+1; j < n; j++ )
     {
+      // Skip pairs that cannot possibly give rise to an edge because of
+      // their distance to each other.
+      if( M[i][j] > R + max )
+        continue;
+
       for( std::size_t col = 0; col < N; col++ )
       {
         if( M[i][j] <= R + smallest.at(col) )
