@@ -231,9 +231,12 @@ template <
 
     for( unsigned k = kMin; k < kMax; k++ )
     {
-      auto r = aleph::math::accumulate_kahan( nnDistances.begin(), nnDistances.end() + k, 0.0 ) / static_cast<double>(k);
+      auto r = aleph::math::accumulate_kahan( nnDistances.begin(), nnDistances.begin() + k, 0.0 ) / static_cast<double>(k);
       localEstimates.emplace_back( r );
     }
+
+    // The dimensionality estimates consist of two terms. The first term
+    // is similar to the local biased dimensionality estimate.
 
     std::vector<double> firstTerms;
     firstTerms.reserve( kMax );
@@ -251,7 +254,10 @@ template <
       secondTerms.emplace_back( ( (r2-r1) * (r2-r1) ) );
     }
 
-    estimates.push_back( aleph::math::accumulate_kahan( localEstimates.begin(), localEstimates.end(), 0.0 ) / (kMax - kMin + 1) );
+    auto s = aleph::math::accumulate_kahan( firstTerms.begin() , firstTerms.end() , 0.0 );
+    auto t = aleph::math::accumulate_kahan( secondTerms.begin(), secondTerms.end(), 0.0 );
+
+    estimates.push_back( s / t );
   }
 
   return estimates;
