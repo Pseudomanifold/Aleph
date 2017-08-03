@@ -147,24 +147,6 @@ template <
     D.push_back( distances );
   }
 
-  // Records the appearance times of each potential edge in the witness
-  // complex.
-
-  aleph::math::SymmetricMatrix<DataType> M( n );
-
-  for( std::size_t i = 0; i < n; i++ )
-  {
-    for( std::size_t j = i+1; j < n; j++ )
-    {
-      auto min = std::numeric_limits<DataType>::max();
-
-      for( std::size_t k = 0; k < N; k++ )
-        min = std::min( min, std::max( D[i][k], D[j][k] ) );
-
-      M(i,j) = min;
-    }
-  }
-
   // Get smallest entries of the distance matrix. This is required for
   // deciding whether a specific edge is valid or not, with respect to
   // the given parameters.
@@ -186,9 +168,14 @@ template <
     }
   }
 
-  auto max = *std::max_element( smallest.begin(), smallest.end() );
+  // -------------------------------------------------------------------
+  //
+  // Records the appearance times of each potential edge in the witness
+  // complex and creates the valid edges.
 
   std::vector<Simplex> simplices;
+
+  aleph::math::SymmetricMatrix<DataType> M( n );
 
   for( std::size_t i = 0; i < n; i++ )
   {
@@ -196,25 +183,20 @@ template <
 
     for( std::size_t j = i+1; j < n; j++ )
     {
-      // Skip pairs that cannot possibly give rise to an edge because of
-      // their distance to each other.
-      if( M(i,j) > R + max )
-        continue;
+      auto min = std::numeric_limits<DataType>::max();
 
-      auto data = std::numeric_limits<DataType>::max();
-
-      for( std::size_t col = 0; col < N; col++ )
+      for( std::size_t k = 0; k < N; k++ )
       {
-        if( M(i,j) <= R + smallest.at(col) )
-          data = std::min( data, M(i,j) );
+        if( std::max( D[i][k], D[j][k] ) <= R + smallest.at(k) )
+          min = std::min( min, std::max( D[i][k], D[j][k] ) );
       }
 
-      if( data != std::numeric_limits<DataType>::max() )
+      if( min != std::numeric_limits<DataType>::max() )
       {
         auto u = static_cast<VertexType>(i);
         auto v = static_cast<VertexType>(j);
 
-        simplices.push_back( Simplex( {u,v}, M(i,j) ) );
+        simplices.push_back( Simplex( {u,v}, min ) );
       }
     }
   }
