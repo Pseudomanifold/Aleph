@@ -191,18 +191,20 @@ template <
       if( M(i,j) > R + max )
         continue;
 
+      auto data = std::numeric_limits<DataType>::max();
+
       for( std::size_t col = 0; col < N; col++ )
       {
         if( M(i,j) <= R + smallest.at(col) )
-        {
-          auto u = static_cast<VertexType>(i);
-          auto v = static_cast<VertexType>(j);
+          data = std::min( data, M(i,j) );
+      }
 
-          // FIXME: this is incorrect; there could be edges with
-          // a smaller weight
-          simplices.push_back( Simplex( {u,v}, M(i,j) ) );
-          break;
-        }
+      if( data != std::numeric_limits<DataType>::max() )
+      {
+        auto u = static_cast<VertexType>(i);
+        auto v = static_cast<VertexType>(j);
+
+        simplices.push_back( Simplex( {u,v}, M(i,j) ) );
       }
     }
   }
