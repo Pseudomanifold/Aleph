@@ -49,6 +49,11 @@ namespace geometry
 
   @param end       Input iterator to end of landmark range
 
+  @param dimension Maximum dimension for expanding the witness complex
+                   after obtaining its edges. The expansion process is
+                   going to use the maximum possible dimension if this
+                   parameter is not specified by the client.
+
   @param nu        \f$\nu\f$-parameter as specified in the paper. This
                    parameter controls which distance threshold is used
                    for creating an edge.\n
@@ -90,6 +95,7 @@ template <
   const Container& container,
   InputIterator begin,
   InputIterator end,
+  unsigned dimension = 0,
   unsigned nu = 2,
   typename Distance::ResultType R = typename Distance::ResultType(),
   Distance /* distance */ = Distance() ) -> topology::SimplicialComplex< topology::Simplex<typename Distance::ResultType, typename std::iterator_traits<InputIterator>::value_type> >
@@ -214,7 +220,7 @@ template <
   aleph::geometry::RipsExpander<SimplicialComplex> ripsExpander;
 
   SimplicialComplex K = SimplicialComplex( simplices.begin(), simplices.end() );
-  SimplicialComplex L = ripsExpander( K, static_cast<unsigned>(n) ); // TODO: make dimension configurable?
+  SimplicialComplex L = ripsExpander( K, dimension == 0 ? static_cast<unsigned>( d + 1 ) : dimension );
   L                   = ripsExpander.assignMaximumWeight( L );
 
   L.sort( aleph::topology::filtrations::Data<Simplex>() );
