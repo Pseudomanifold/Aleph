@@ -148,4 +148,25 @@ ADD_CUSTOM_TARGET( cppcheck
 
 EXPORT( PACKAGE Aleph )
 
-CONFIGURE_FILE( cmake/AlephConfigVersion.cmake.in "${PROJECT_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/AlephConfigVersion.cmake" @ONLY )
+INCLUDE( CMakePackageConfigHelpers )
+
+CONFIGURE_PACKAGE_CONFIG_FILE(
+  ${CMAKE_SOURCE_DIR}/cmake/AlephConfig.cmake.in
+  ${CMAKE_CURRENT_BINARY_DIR}/AlephConfig.cmake
+  INSTALL_DESTINATION lib/cmake/
+)
+
+WRITE_BASIC_PACKAGE_VERSION_FILE( ${CMAKE_CURRENT_BINARY_DIR}/AlephConfigVersion.cmake
+  VERSION       ${ALEPH_VERSION}
+  COMPATIBILITY AnyNewerVersion
+)
+
+INSTALL(
+  FILES
+    ${CMAKE_CURRENT_BINARY_DIR}/AlephConfig.cmake
+    ${CMAKE_CURRENT_BINARY_DIR}/AlephConfigVersion.cmake
+  DESTINATION
+    ${CMAKE_INSTALL_PREFIX}/lib/cmake/
+  COMPONENT
+    library
+)

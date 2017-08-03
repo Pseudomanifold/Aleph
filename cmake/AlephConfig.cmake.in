@@ -1,0 +1,4 @@
+# Provides directives for packaging Aleph. You should not have to change
+# this file as a user.
+
+@PACKAGE_INIT@
