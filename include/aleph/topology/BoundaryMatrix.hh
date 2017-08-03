@@ -136,9 +136,8 @@ public:
 
     auto&& d = this->getDimension();
 
-    // FIXME: Do I need this?
     for( Index j = 0; j < numColumns; j++ )
-      dualDimensions.at( numColumns - 1 - j ) = d - this->getDimension( j ); // FIXME: Change operator later after debugging
+      dualDimensions[ numColumns - 1 - j ] = d - this->getDimension( j );
 
     BoundaryMatrix<Representation> M;
     M.setNumColumns( static_cast<Index>( dualMatrix.size() ) );
@@ -215,8 +214,10 @@ public:
       if( indices.empty() )
         throw std::runtime_error( "Amount of indices in boundary must not be empty" );
 
-      // TODO: This ignores the dimension of the column
-      // TODO: This assumes that the column indices are ordered
+      // Enforcing sorted column indices. His is required by any other
+      // representation of the matrix class.
+      std::sort( indices.begin() + 1, indices.end() );
+
       M.setColumn( curColumn,
                    indices.begin() + 1, indices.end() );
 
