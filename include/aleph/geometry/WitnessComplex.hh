@@ -15,6 +15,8 @@
 #include <aleph/topology/Simplex.hh>
 #include <aleph/topology/SimplicialComplex.hh>
 
+#include <aleph/topology/filtrations/Data.hh>
+
 namespace aleph
 {
 
@@ -215,6 +217,7 @@ template <
   SimplicialComplex L = ripsExpander( K, static_cast<unsigned>(n) ); // TODO: make dimension configurable?
   L                   = ripsExpander.assignMaximumWeight( L );
 
+  L.sort( aleph::topology::filtrations::Data<Simplex>() );
   return L;
 }
 
