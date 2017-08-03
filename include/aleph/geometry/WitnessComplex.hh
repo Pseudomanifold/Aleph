@@ -122,24 +122,25 @@ template <
   if( n == 0 || N == 0 )
     return {};
 
-  // Distance matrix between a set of $n$ landmarks (rows) and $N$ data
-  // points.
+  // Distance matrix between a set of $n$ landmarks (cols) and $N$ data
+  // points (rows). Note that I transposed the matrix because accessing
+  // the columns is faster that way (and will be required later on).
   std::vector< std::vector<DataType> > D;
-  D.reserve( n );
+  D.reserve( N );
 
   Distance dist;
   Traits traits;
 
-  for( std::size_t i = 0; i < n; i++ )
+  for( std::size_t j = 0; j < N; j++ )
   {
     std::vector<DataType> distances;
-    distances.reserve( N );
+    distances.reserve( n );
 
-    auto&& landmark = container[ landmarkIndices.at(i) ];
+    auto&& point = container[j];
 
-    for( std::size_t j = 0; j < N; j++ )
+    for( std::size_t i = 0; i < n; i++ )
     {
-      auto&& point = container[j];
+      auto&& landmark = container[ landmarkIndices.at(i) ];
 
       distances.emplace_back( traits.from( dist( landmark.begin(), point.begin(), d ) ) );
     }
@@ -157,11 +158,7 @@ template <
   {
     for( std::size_t col = 0; col < N; col++ )
     {
-      // FIXME: getting the column like this is extremely wasteful;
-      // would it not be nicer to store the values differently?
-      std::vector<DataType> column( n );
-      for( std::size_t i = 0; i < n; i++ )
-        column[i] = D[i][col];
+      std::vector<DataType> column = D[col];
 
       std::nth_element( column.begin(), column.begin() + nu - 1, column.end() );
       smallest[col] = column.at( nu - 1 );
@@ -187,8 +184,8 @@ template <
 
       for( std::size_t k = 0; k < N; k++ )
       {
-        if( std::max( D[i][k], D[j][k] ) <= R + smallest.at(k) )
-          min = std::min( min, std::max( D[i][k], D[j][k] ) );
+        if( std::max( D[k][i], D[k][j] ) <= R + smallest.at(k) )
+          min = std::min( min, std::max( D[k][i], D[k][j] ) );
       }
 
       if( min != std::numeric_limits<DataType>::max() )
