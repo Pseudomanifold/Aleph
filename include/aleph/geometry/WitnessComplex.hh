@@ -6,6 +6,7 @@
 #include <iterator>
 #include <numeric>
 #include <random>
+#include <stdexcept>
 #include <vector>
 
 #include <aleph/geometry/RipsExpander.hh>
@@ -219,6 +220,60 @@ template <class T, class OutputIterator> void generateRandomLandmarks( T n, T k,
   std::shuffle( indices.begin(), indices.end(), rng );
   std::copy( indices.begin(), indices.begin() + k, result );
 }
+
+template <
+  class Distance,
+  class Container,
+  class OutputIterator
+> void generateMaxMinLandmarks( const Container& container, std::size_t n, OutputIterator result, Distance distance = Distance() )
+{
+  if( n > container.size() )
+    throw std::out_of_range( "Number of landmarks is out of range" );
+
+  using SizeType = decltype( container.size() );
+
+  std::random_device rd;
+  std::mt19937 rng( rd() );
+
+  std::uniform_int_distribution<SizeType> distribution( SizeType(0), container.size() - 1 );
+
+  std::vector<SizeType> indices;
+  indices.reserve( n );
+
+  indices.emplace_back( distribution( rng ) );
+
+  using DataType = typename Distance::ResultType;
+  auto N         = container.size();
+  auto d         = container.dimension();
+
+  while( indices.size() < n )
+  {
+    auto index = SizeType(0);
+    auto max   = std::numeric_limits<DataType>::lowest();
+
+    for( SizeType i = 0; i < N; i++ )
+    {
+      auto min = std::numeric_limits<DataType>::max();
+
+      for( auto&& landmarkIndex : indices )
+      {
+        auto dist = distance( container[i].begin(), container[landmarkIndex].begin(), d );
+        min       = std::min( min, dist );
+      }
+
+      if( min > max )
+      {
+        max   = min;
+        index = i;
+      }
+    }
+
+    indices.push_back( index );
+  }
+
+  std::copy( indices.begin(), indices.end(), result );
+}
+
 
 } // namespace geometry
 
