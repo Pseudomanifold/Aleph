@@ -20,12 +20,12 @@ namespace containers
   that points are locally uniformly distributed uniformly. Use this
   estimator with care when analysing unknown data.
 
-  :param container: Container to use for dimensionality estimation
-  :param k:         Number of nearest neighbours
-  :param distance:  Distance measure
+  @param container Container to use for dimensionality estimation
+  @param k         Number of nearest neighbours
+  @param distance  Distance measure
 
-  :returns: Vector of local intrinsic dimensionality estimates that
-            are reported *without* rounding.
+  @returns Vector of local intrinsic dimensionality estimates. Note
+           that the numbers are reported *without* rounding.
 */
 
 template <
@@ -69,25 +69,25 @@ template <
 
   Please see the publication
 
-    An evaluation of intrinsic dimensionality estimators
-    Peter J. Verveer and Robert P. W. Duin
-    IEEE Transactions on Pattern Analysis and Machine Intelligence 17.1, pp. 81-86, 1985
+    > An evaluation of intrinsic dimensionality estimators\n
+    > Peter J. Verveer and Robert P. W. Duin\n
+    > IEEE Transactions on Pattern Analysis and Machine Intelligence 17.1, pp. 81-86, 1985
 
   for more details.
 
-  :param container: Container to use for dimensionality estimation
+  @param container Container to use for dimensionality estimation
 
-  :param kMin:      Minimum number of nearest neighbours to use in
-                    computing local dimensionality estimates.
+  @param kMin      Minimum number of nearest neighbours to use in
+                   computing local dimensionality estimates.
 
-  :param kMax:      Maximum number of nearest neighbours to use in
-                    computing local dimensionality estimates. This
-                    parameter influences performance.
+  @param kMax      Maximum number of nearest neighbours to use in
+                   computing local dimensionality estimates. This
+                   parameter influences performance.
 
-  :param distance:  Distance measure
+  @param distance  Distance measure
 
-  :returns: Vector of local intrinsic dimensionality estimates that
-            are reported *without* rounding.
+  @returns Vector of local intrinsic dimensionality estimates. Note that
+           the numbers are reported *without* rounding.
 */
 
 template <
@@ -169,25 +169,25 @@ template <
 
   Please see the publication
 
-    Maximum Likelihood Estimation of Intrinsic Dimension
-    Elizaveta Levina and Peter J. Bickel
-    Advances in Neural Information Processing Systems, 2005
+    > Maximum Likelihood Estimation of Intrinsic Dimension\n
+    > Elizaveta Levina and Peter J. Bickel\n
+    > Advances in Neural Information Processing Systems, 2005
 
   for more details.
 
-  :param container: Container to use for dimensionality estimation
+  @param container Container to use for dimensionality estimation
 
-  :param kMin:      Minimum number of nearest neighbours to use in
-                    computing local dimensionality estimates.
+  @param kMin      Minimum number of nearest neighbours to use in
+                   computing local dimensionality estimates.
 
-  :param kMax:      Maximum number of nearest neighbours to use in
-                    computing local dimensionality estimates. This
-                    parameter influences performance.
+  @param kMax      Maximum number of nearest neighbours to use in
+                   computing local dimensionality estimates. This
+                   parameter influences performance.
 
-  :param distance:  Distance measure
+  @param distance  Distance measure
 
-  :returns: Vector of local intrinsic dimensionality estimates that
-            are reported *without* rounding.
+  @returns Vector of local intrinsic dimensionality estimates. Note that
+           the numbers are reported *without* rounding.
 */
 
 template <
