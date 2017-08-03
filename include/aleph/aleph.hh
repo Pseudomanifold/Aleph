@@ -8,10 +8,21 @@
 
 namespace aleph
 {
+  namespace containers
+  {
+
+    /**
+      @namespace aleph::containers
+      @brief     Contains functions and classes for interacting with external data
+    */
+
+  } // namespace containers
+
   namespace geometry
   {
+
     /**
-      @namespace geometry
+      @namespace aleph::geometry
       @brief     Contains functors and classes for geometrical operations
     */
 
@@ -19,9 +30,12 @@ namespace aleph
 
   namespace topology
   {
-    /** @namespace topology
-        @brief     This namespace is reserved for topological concepts, such as simplicial complexes
+
+    /**
+      @namespace aleph::topology
+      @brief     This namespace is reserved for topological concepts, such as simplicial complexes
     */
+
   } // namespace topology
 }
 
