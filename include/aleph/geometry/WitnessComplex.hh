@@ -4,6 +4,8 @@
 #include <algorithm>
 #include <limits>
 #include <iterator>
+#include <numeric>
+#include <random>
 #include <vector>
 
 #include <aleph/geometry/RipsExpander.hh>
@@ -225,6 +227,18 @@ template <
 
   L.sort( aleph::topology::filtrations::Data<Simplex>() );
   return L;
+}
+
+template <class T, class OutputIterator> void generateRandomLandmarks( T n, T k, OutputIterator result )
+{
+  std::random_device rd;
+  std::mt19937 rng( rd() );
+
+  std::vector<T> indices( n );
+
+  std::iota( indices.begin(), indices.end(), T() );
+  std::shuffle( indices.begin(), indices.end(), rng );
+  std::copy( indices.begin(), indices.begin() + k, result );
 }
 
 } // namespace geometry
