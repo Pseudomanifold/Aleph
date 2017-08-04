@@ -2,6 +2,11 @@
 
 #include <aleph/containers/PointCloud.hh>
 
+#include <aleph/geometry/BruteForce.hh>
+#include <aleph/geometry/VietorisRipsComplex.hh>
+
+#include <aleph/geometry/distances/Euclidean.hh>
+
 #include <aleph/persistentHomology/algorithms/Standard.hh>
 
 #include <aleph/persistentHomology/Calculation.hh>
@@ -63,7 +68,7 @@ template <class T> aleph::containers::PointCloud<T> createSpokes( T r, unsigned 
       pc.set( K*i+k, {x1,y1} );
 
       x1 += T(0.05) * x0;
-      y1 += T(0.05) * x0;
+      y1 += T(0.05) * y1;
     }
   }
 
@@ -73,7 +78,7 @@ template <class T> aleph::containers::PointCloud<T> createSpokes( T r, unsigned 
 template <class T> aleph::containers::PointCloud<T> makeDiskWithFlares()
 {
   auto pcDisk   = sampleFromDisk( T(1), 300      );
-  auto pcFlares = createSpokes(   T(1),   3, 100 );
+  auto pcFlares = createSpokes(   T(1),   3, 10 );
 
   ALEPH_ASSERT_EQUAL( pcDisk.dimension(), pcFlares.dimension() );
 
