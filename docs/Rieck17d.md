@@ -39,7 +39,7 @@ After [building Aleph](building.md), we now use the tool
 parameters that we used for the paper&nbsp;(we shall discuss them
 afterwards):
 
-    ./clique-persistence-diagram --ignore-empty --invert-weights lesmis.gml 20
+    ./clique_persistence_diagram --ignore-empty --invert-weights lesmis.gml 20
 
 This should result in the following output:
 
@@ -157,3 +157,14 @@ The final result should look somewhat like this:
   network](assets/Rieck17d_lesmis_combined.png)
 
 Stay tuned for more details and other applications!
+
+## More information
+
+The following tools have been used to calculate and analyse networks in
+the paper:
+
+* [`clique_communities_to_json`](https://github.com/Submanifold/Aleph/blob/master/src/tools/clique_communities_to_json.cc)
+* [`clique_persistence_diagram`](https://github.com/Submanifold/Aleph/blob/master/src/tools/clique_persistence_diagram.cc)
+* [`persistence_indicator_function`](https://github.com/Submanifold/Aleph/blob/master/src/tools/persistence_indicator_function.cc)
+* [`persistence_indicator_function_glyph`](https://github.com/Submanifold/Aleph/blob/master/src/tools/persistence_indicator_function_glyph.cc)
+* [`topological_distance`](https://github.com/Submanifold/Aleph/blob/master/src/tools/topological_distance.cc)
