@@ -85,7 +85,8 @@ template <class T> void testSphereReconstruction()
 
   for( unsigned i = 0; i < trials; i++ )
   {
-    std::vector<std::size_t> indices = {0,1,2,3,4,5,6,7,8,9,10,11};
+    std::vector<std::size_t> indices;
+    aleph::geometry::generateRandomLandmarks( pc.size(), decltype(pc.size())( 12 ), std::back_inserter( indices ) );
 
     using Distance = aleph::distances::Euclidean<T>;
 
@@ -102,6 +103,25 @@ template <class T> void testSphereReconstruction()
   // TODO:
   //  - count number of hits
   //  - check that reported percentage by de Silva is reached
+
+  for( unsigned i = 0; i < trials; i++ )
+  {
+    using Distance = aleph::distances::Euclidean<T>;
+
+    std::vector<std::size_t> indices;
+    aleph::geometry::generateMaxMinLandmarks( pc, 12, std::back_inserter( indices ), Distance() );
+
+    auto K
+      = aleph::geometry::buildWitnessComplex<Distance>(
+          pc, indices.begin(), indices.end() );
+
+    auto betti = bettiNumbers(K);
+
+    if( betti == std::vector<std::size_t>( {1,0,1} ) )
+      ++hits;
+  }
+
+
 
   ALEPH_TEST_END();
 }
