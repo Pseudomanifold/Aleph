@@ -1,5 +1,6 @@
 #include <tests/Base.hh>
 
+#include <aleph/containers/DimensionalityEstimators.hh>
 #include <aleph/containers/PointCloud.hh>
 
 #include <aleph/geometry/BruteForce.hh>
@@ -17,6 +18,8 @@
 #include <aleph/topology/QuotientSpaces.hh>
 #include <aleph/topology/Simplex.hh>
 #include <aleph/topology/SimplicialComplex.hh>
+
+#include <aleph/topology/filtrations/Data.hh>
 
 #include <random>
 #include <unordered_map>
@@ -37,7 +40,7 @@ template <class T> aleph::containers::PointCloud<T> sampleFromDisk( T r, unsigne
   for( unsigned i = 0; i < n; i++ )
   {
     auto phi = phiDistribution( rng );
-    auto r   = rDistribution( rng );
+    auto r   = std::sqrt( rDistribution( rng ) );
     auto x   = r * std::cos( phi );
     auto y   = r * std::sin( phi );
 
@@ -75,10 +78,17 @@ template <class T> aleph::containers::PointCloud<T> createSpokes( T r, unsigned 
   return pc;
 }
 
-template <class T> aleph::containers::PointCloud<T> makeDiskWithFlares()
+template <class T, class OutputIterator> aleph::containers::PointCloud<T> makeDiskWithFlares( OutputIterator result )
 {
   auto pcDisk   = sampleFromDisk( T(1), 300      );
   auto pcFlares = createSpokes(   T(1),   3, 10 );
+
+  *result++ = 300;
+  *result++ = 301;
+  *result++ = 310;
+  *result++ = 311;
+  *result++ = 320;
+  *result++ = 321;
 
   ALEPH_ASSERT_EQUAL( pcDisk.dimension(), pcFlares.dimension() );
 
@@ -231,6 +241,7 @@ template <class T> void testCircleWithWhisker()
 
   ALEPH_ASSERT_THROW( D1.empty() == false );
   ALEPH_ASSERT_THROW( D2.empty() == false );
+
   ALEPH_ASSERT_EQUAL( D1.front().dimension(), 0 );
   ALEPH_ASSERT_EQUAL( D2.front().dimension(), 0 );
 
@@ -244,29 +255,65 @@ template <class T> void testDiskWithFlares()
 {
   ALEPH_TEST_BEGIN( "Persistent intersection homology: disk with flares" );
 
-  using PointCloud = aleph::containers::PointCloud<T>;
-  using Distance   = aleph::distances::Euclidean<T>;
+  using PointCloud        = aleph::containers::PointCloud<T>;
+  using Distance          = aleph::distances::Euclidean<T>;
+  using NearestNeighbours = aleph::geometry::BruteForce<PointCloud, Distance>;
 
-  auto pc = makeDiskWithFlares<T>();
+  std::vector<std::size_t> singularIndices;
+
+  auto pc = makeDiskWithFlares<T>( std::back_inserter( singularIndices ) );
   auto K  = aleph::geometry::buildVietorisRipsComplex(
-    aleph::geometry::BruteForce<PointCloud, Distance>( pc ),
-    T(0.4),
-    2
+    NearestNeighbours( pc ),
+    T(0.225),
+    1
   );
+
+#if 0
+
+  // FIXME: this is horrible...
+  auto dimensionalities
+    = aleph::containers::estimateLocalDimensionalityNearestNeighbours<Distance, PointCloud, NearestNeighbours>( pc,
+         8,
+        Distance() );
+
+#endif
 
   ALEPH_ASSERT_THROW( pc.empty() == false );
   ALEPH_ASSERT_THROW( K.empty() == false );
 
-  auto diagrams
-    = aleph::calculatePersistenceDiagrams( K );
+  using SimplicialComplex = decltype(K);
+  using Simplex           = typename SimplicialComplex::ValueType;
+  using VertexType        = typename Simplex::VertexType;
 
-  for( auto&& diagram : diagrams )
+  SimplicialComplex X0;
+  for( auto&& singularIndex : singularIndices )
+    X0.push_back( Simplex( static_cast<VertexType>( singularIndex ) ) );
+
+  SimplicialComplex X1 = K;
+
   {
-    diagram.removeDiagonal();
-
-    std::cout << diagram.dimension() << ": " << diagram << "\n"
-              << diagram.betti() << "\n";
+    aleph::topology::BarycentricSubdivision subdivision;
+    K = subdivision( K );
+    K.sort( aleph::topology::filtrations::Data<Simplex>() );
   }
+
+  auto diagramsPH   = aleph::calculatePersistenceDiagrams( K );
+  auto diagramsIH_1 = aleph::calculateIntersectionHomology( K, {X0,X1}, aleph::Perversity( {-1} ) );
+  auto diagramsIH_2 = aleph::calculateIntersectionHomology( K, {X0,X1}, aleph::Perversity( { 0} ) );
+
+  ALEPH_ASSERT_THROW( diagramsPH.empty() == false );
+  ALEPH_ASSERT_EQUAL( diagramsPH.front().dimension(), 0 );
+  ALEPH_ASSERT_EQUAL( diagramsPH.front().betti()    , 1 );
+
+  ALEPH_ASSERT_THROW( diagramsIH_1.empty() == false );
+  ALEPH_ASSERT_THROW( diagramsIH_2.empty() == false );
+  ALEPH_ASSERT_EQUAL( diagramsIH_1.front().dimension(), 0 );
+  ALEPH_ASSERT_EQUAL( diagramsIH_2.front().dimension(), 0 );
+
+  std::cerr << "Betti numbers:\n"
+            << "  - PH  : " << diagramsPH.front().betti() << "\n"
+            << "  - IH_1: " << diagramsIH_1.front().betti() << "\n"
+            << "  - IH_2: " << diagramsIH_2.front().betti() << "\n";
 
   ALEPH_TEST_END();
 }
@@ -364,7 +411,6 @@ template <class T> void testSphere()
     L.sort();
   }
 
-  auto Y1 = L;
   auto D2 = aleph::calculateIntersectionHomology( L, {X0,K}, aleph::Perversity( {0,0} ) );
 
   // This demonstrates that the barycentric subdivision of the space,
