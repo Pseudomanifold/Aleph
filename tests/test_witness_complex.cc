@@ -42,6 +42,35 @@ template <class T> aleph::containers::PointCloud<T> sampleFromDisk( T r, unsigne
   return pc;
 }
 
+template <class T> aleph::containers::PointCloud<T> createSpokes( T r, unsigned n, unsigned K )
+{
+  std::random_device rd;
+  std::mt19937 rng( rd() );
+
+  std::uniform_real_distribution<T> phiDistribution( 0, static_cast<T>( 2 * M_PI ) );
+  aleph::containers::PointCloud<T> pc( n*K, 2 );
+
+  for( unsigned i = 0; i < n; i++ )
+  {
+    auto phi = phiDistribution( rng );
+    auto x0  = r * std::cos( phi );
+    auto y0  = r * std::sin( phi );
+    auto x1  = x0;
+    auto y1  = y0;
+
+    for( unsigned k = 0; k < K; k++ )
+    {
+      pc.set( K*i+k, {x1,y1} );
+
+      x1 += 0.05 * x0;
+      y1 += 0.05 * x0;
+    }
+  }
+
+  return pc;
+
+}
+
 template <class SimplicialComplex> std::vector<std::size_t> bettiNumbers( SimplicialComplex K )
 {
   using Simplex  = typename SimplicialComplex::ValueType;
