@@ -13,6 +13,8 @@ import os
 import re
 import sys
 
+from textwrap import dedent
+
 # TODO: make configurable?
 directories = [ "../include", "../src" ]
 extensions  = [ ".cc", ".hh" ]
@@ -32,6 +34,13 @@ def extract_documentation(root, filename, output_root):
     data = f.read()
 
   for s in re_docstring.findall(data):
+    # Prune the result prior to writing it to the file: remove the
+    # starting portion of the comment and the end portion. This is
+    # easy because we just have to drop a few characters.
+    s = s[4:]
+    s = s[:-2]
+    s = dedent(s)
+
     output += s
 
   if output:
