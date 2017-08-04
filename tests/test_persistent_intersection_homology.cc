@@ -24,7 +24,7 @@ template <class T> aleph::containers::PointCloud<T> sampleFromDisk( T r, unsigne
   std::random_device rd;
   std::mt19937 rng( rd() );
 
-  std::uniform_real_distribution<T> rDistribution  ( 0, std::next( r, std::numeric_limits<T>::max() ) );
+  std::uniform_real_distribution<T> rDistribution  ( 0, std::nextafter( r, std::numeric_limits<T>::max() ) );
   std::uniform_real_distribution<T> phiDistribution( 0, static_cast<T>( 2 * M_PI ) );
 
   aleph::containers::PointCloud<T> pc( n, 2 );
@@ -62,8 +62,8 @@ template <class T> aleph::containers::PointCloud<T> createSpokes( T r, unsigned 
     {
       pc.set( K*i+k, {x1,y1} );
 
-      x1 += 0.05 * x0;
-      y1 += 0.05 * x0;
+      x1 += T(0.05) * x0;
+      y1 += T(0.05) * x0;
     }
   }
 
@@ -78,10 +78,21 @@ template <class T> aleph::containers::PointCloud<T> makeDiskWithFlares()
   ALEPH_ASSERT_EQUAL( pcDisk.dimension(), pcFlares.dimension() );
 
   aleph::containers::PointCloud<T> pc( pcDisk.size() + pcFlares.size(), pcDisk.dimension() );
+
+  // TODO: this would be easier if the point cloud had a concatenation
+  // operator...
+
+  std::size_t i = 0;
+  std::size_t j = 0;
+
+  for( j = 0; j < pcDisk.size(); j++, i++ )
+    pc.set( i, pcDisk[j].begin(), pcDisk[j].end() );
+
+  for( j = 0; j < pcFlares.size(); j++, i++ )
+    pc.set( i, pcFlares[j].begin(), pcFlares[j].end() );
+
   return pc;
 }
-
-
 
 template <class T> void test()
 {
@@ -217,6 +228,18 @@ template <class T> void testCircleWithWhisker()
 
   ALEPH_TEST_END();
 }
+
+template <class T> void testDiskWithFlares()
+{
+  ALEPH_TEST_BEGIN( "Persistent intersection homology: disk with flares" );
+
+  auto pc = makeDiskWithFlares<T>();
+
+  ALEPH_ASSERT_THROW( pc.empty() == false );
+
+  ALEPH_TEST_END();
+}
+
 template <class T> void testQuotientSpaces()
 {
   ALEPH_TEST_BEGIN( "Persistent intersection homology: quotient spaces" );
@@ -382,6 +405,9 @@ int main(int, char**)
 
   testCircleWithWhisker<float> ();
   testCircleWithWhisker<double>();
+
+  testDiskWithFlares<float> ();
+  testDiskWithFlares<double>();
 
   testQuotientSpaces<float> ();
   testQuotientSpaces<double>();
