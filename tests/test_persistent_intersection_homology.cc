@@ -244,9 +244,29 @@ template <class T> void testDiskWithFlares()
 {
   ALEPH_TEST_BEGIN( "Persistent intersection homology: disk with flares" );
 
+  using PointCloud = aleph::containers::PointCloud<T>;
+  using Distance   = aleph::distances::Euclidean<T>;
+
   auto pc = makeDiskWithFlares<T>();
+  auto K  = aleph::geometry::buildVietorisRipsComplex(
+    aleph::geometry::BruteForce<PointCloud, Distance>( pc ),
+    T(0.4),
+    2
+  );
 
   ALEPH_ASSERT_THROW( pc.empty() == false );
+  ALEPH_ASSERT_THROW( K.empty() == false );
+
+  auto diagrams
+    = aleph::calculatePersistenceDiagrams( K );
+
+  for( auto&& diagram : diagrams )
+  {
+    diagram.removeDiagonal();
+
+    std::cout << diagram.dimension() << ": " << diagram << "\n"
+              << diagram.betti() << "\n";
+  }
 
   ALEPH_TEST_END();
 }
