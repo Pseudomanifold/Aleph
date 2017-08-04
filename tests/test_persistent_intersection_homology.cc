@@ -1,5 +1,7 @@
 #include <tests/Base.hh>
 
+#include <aleph/containers/PointCloud.hh>
+
 #include <aleph/persistentHomology/algorithms/Standard.hh>
 
 #include <aleph/persistentHomology/Calculation.hh>
@@ -11,8 +13,75 @@
 #include <aleph/topology/Simplex.hh>
 #include <aleph/topology/SimplicialComplex.hh>
 
+#include <random>
 #include <unordered_map>
 #include <vector>
+
+#include <cmath>
+
+template <class T> aleph::containers::PointCloud<T> sampleFromDisk( T r, unsigned n )
+{
+  std::random_device rd;
+  std::mt19937 rng( rd() );
+
+  std::uniform_real_distribution<T> rDistribution  ( 0, std::next( r, std::numeric_limits<T>::max() ) );
+  std::uniform_real_distribution<T> phiDistribution( 0, static_cast<T>( 2 * M_PI ) );
+
+  aleph::containers::PointCloud<T> pc( n, 2 );
+
+  for( unsigned i = 0; i < n; i++ )
+  {
+    auto phi = phiDistribution( rng );
+    auto r   = rDistribution( rng );
+    auto x   = r * std::cos( phi );
+    auto y   = r * std::sin( phi );
+
+    pc.set( i, {x,y} );
+  }
+
+  return pc;
+}
+
+template <class T> aleph::containers::PointCloud<T> createSpokes( T r, unsigned n, unsigned K )
+{
+  std::random_device rd;
+  std::mt19937 rng( rd() );
+
+  std::uniform_real_distribution<T> phiDistribution( 0, static_cast<T>( 2 * M_PI ) );
+  aleph::containers::PointCloud<T> pc( n*K, 2 );
+
+  for( unsigned i = 0; i < n; i++ )
+  {
+    auto phi = phiDistribution( rng );
+    auto x0  = r * std::cos( phi );
+    auto y0  = r * std::sin( phi );
+    auto x1  = x0;
+    auto y1  = y0;
+
+    for( unsigned k = 0; k < K; k++ )
+    {
+      pc.set( K*i+k, {x1,y1} );
+
+      x1 += 0.05 * x0;
+      y1 += 0.05 * x0;
+    }
+  }
+
+  return pc;
+}
+
+template <class T> aleph::containers::PointCloud<T> makeDiskWithFlares()
+{
+  auto pcDisk   = sampleFromDisk( T(1), 300      );
+  auto pcFlares = createSpokes(   T(1),   3, 100 );
+
+  ALEPH_ASSERT_EQUAL( pcDisk.dimension(), pcFlares.dimension() );
+
+  aleph::containers::PointCloud<T> pc( pcDisk.size() + pcFlares.size(), pcDisk.dimension() );
+  return pc;
+}
+
+
 
 template <class T> void test()
 {
