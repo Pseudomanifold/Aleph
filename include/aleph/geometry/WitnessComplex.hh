@@ -226,9 +226,11 @@ template <class T, class OutputIterator> void generateRandomLandmarks( T n, T k,
 
   std::vector<T> indices( n );
 
+  using DifferenceType = typename std::vector<T>::difference_type;
+
   std::iota( indices.begin(), indices.end(), T() );
   std::shuffle( indices.begin(), indices.end(), rng );
-  std::copy( indices.begin(), indices.begin() + k, result );
+  std::copy( indices.begin(), indices.begin() + static_cast<DifferenceType>(k), result );
 }
 
 template <
