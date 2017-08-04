@@ -36,10 +36,11 @@ template <
                                                                     unsigned k,
                                                                     Distance /* distance */ = Distance() )
 {
-  using IndexType = typename Wrapper::IndexType;
+  using IndexType   = typename Wrapper::IndexType;
+  using ElementType = typename Wrapper::ElementType;
 
   std::vector< std::vector<IndexType> > indices;
-  std::vector< std::vector<double> > distances;
+  std::vector< std::vector<ElementType> > distances;
 
   Wrapper nnWrapper( container );
   nnWrapper.neighbourSearch( k+1, indices, distances );
@@ -206,10 +207,11 @@ template <
   if( kMax == 0 || kMin == 0 )
     throw std::runtime_error( "Expecting non-zero number of nearest neighbours" );
 
-  using IndexType = typename Wrapper::IndexType;
+  using IndexType   = typename Wrapper::IndexType;
+  using ElementType = typename Wrapper::ElementType;
 
   std::vector< std::vector<IndexType> > indices;
-  std::vector< std::vector<double> > distances;
+  std::vector< std::vector<ElementType> > distances;
 
   Wrapper nnWrapper( container );
   nnWrapper.neighbourSearch( kMax, indices, distances );
