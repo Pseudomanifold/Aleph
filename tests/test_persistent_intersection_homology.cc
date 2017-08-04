@@ -86,10 +86,16 @@ template <class T> aleph::containers::PointCloud<T> makeDiskWithFlares()
   std::size_t j = 0;
 
   for( j = 0; j < pcDisk.size(); j++, i++ )
-    pc.set( i, pcDisk[j].begin(), pcDisk[j].end() );
+  {
+    auto p = pcDisk[j];
+    pc.set( i, p.begin(), p.end() );
+  }
 
   for( j = 0; j < pcFlares.size(); j++, i++ )
-    pc.set( i, pcFlares[j].begin(), pcFlares[j].end() );
+  {
+    auto p = pcFlares[j];
+    pc.set( i, p.begin(), p.end() );
+  }
 
   return pc;
 }
