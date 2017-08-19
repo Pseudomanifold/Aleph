@@ -201,6 +201,8 @@ template <class T> void testCircleWithWhisker()
   using Simplex           = aleph::topology::Simplex<T>;
   using SimplicialComplex = aleph::topology::SimplicialComplex<Simplex>;
 
+  // The simplest way to model a circle using a simplicial complex, i.e.
+  // the edges and vertices of a triangle.
   SimplicialComplex K = {
     {0},
     {1},
@@ -209,6 +211,9 @@ template <class T> void testCircleWithWhisker()
     {1,2}
   };
 
+  // An additional vertex with a small 'whisker' has been added here in
+  // order to show the difference between ordinary homology and
+  // intersection homology.
   SimplicialComplex L =
   {
     {0},
@@ -238,15 +243,19 @@ template <class T> void testCircleWithWhisker()
 
   auto D1 = aleph::calculateIntersectionHomology( K, {X0,X1}, aleph::Perversity( {-1} ) );
   auto D2 = aleph::calculateIntersectionHomology( L, {Y0,Y1}, aleph::Perversity( {-1} ) );
+  auto D3 = aleph::calculateIntersectionHomology( L, {Y0,Y1}, aleph::Perversity( { 0} ) );
 
   ALEPH_ASSERT_THROW( D1.empty() == false );
   ALEPH_ASSERT_THROW( D2.empty() == false );
+  ALEPH_ASSERT_THROW( D3.empty() == false );
 
   ALEPH_ASSERT_EQUAL( D1.front().dimension(), 0 );
   ALEPH_ASSERT_EQUAL( D2.front().dimension(), 0 );
+  ALEPH_ASSERT_EQUAL( D3.front().dimension(), 0 );
 
   ALEPH_ASSERT_EQUAL( D1.front().betti(), 1 );
   ALEPH_ASSERT_EQUAL( D2.front().betti(), 2 );
+  ALEPH_ASSERT_EQUAL( D3.front().betti(), 1 );
 
   ALEPH_TEST_END();
 }
