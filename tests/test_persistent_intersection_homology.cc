@@ -235,7 +235,7 @@ template <class T> void testCircleWithWhisker()
     ALEPH_ASSERT_EQUAL( D1.front().betti(), D2.front().betti() );
   }
 
-  SimplicialComplex X0 = { {0}, {1}, {2} };
+  SimplicialComplex X0 = { {0} };
   SimplicialComplex X1 = K;
 
   SimplicialComplex Y0 = { {0} };
