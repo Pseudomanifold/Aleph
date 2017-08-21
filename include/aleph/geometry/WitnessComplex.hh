@@ -27,16 +27,6 @@ namespace geometry
 {
 
 /**
-  .. function:: template < class Distance, class Container,\
-                           class InputIterator > auto buildWitnessComplex( const Container& container,\
-                                                                           InputIterator begin,\
-                                                                           InputIterator end,\
-                                                                           unsigned dimension = 0,\
-                                                                           unsigned nu = 2,\
-                                                                           typename Distance::ResultType R = typename Distance::ResultType(),\
-                                                                           Distance distance = Distance() )
-
-
   Builds a witness complex from a given container. This requires a set
   of *landmarks*. Other configuration options influence how a new edge
   will be created from the data.
@@ -54,50 +44,50 @@ namespace geometry
   thereby given the complex more "slack" when creating edges. However,
   this also increases the size of the complex.
 
-  :param const Container& container: Container for which to calculate the witness complex
+  @param container Container for which to calculate the witness complex
 
-  :param begin:     Input iterator to begin of landmark range; landmarks
-                    must be specified as *indices*. Each index has to be
-                    valid for \p container.
+  @param begin     Input iterator to begin of landmark range; landmarks
+                   must be specified as *indices*. Each index has to be
+                   valid for \p container.
 
-  :param end:       Input iterator to end of landmark range
+  @param end       Input iterator to end of landmark range
 
-  :param dimension: Maximum dimension for expanding the witness complex
-                    after obtaining its edges. The expansion process is
-                    going to use the maximum possible dimension if this
-                    parameter is not specified by the client.
+  @param dimension Maximum dimension for expanding the witness complex
+                   after obtaining its edges. The expansion process is
+                   going to use the maximum possible dimension if this
+                   parameter is not specified by the client.
 
-  :param nu:        :math:`\nu`-parameter as defined in the paper. The
-                    parameter controls which distance threshold is used
-                    for creating an edge.\n
+  @param nu        \f$\nu\f$-parameter as defined in the paper. The
+                   parameter controls which distance threshold is used
+                   for creating an edge.\n
 
-                    More precisely, an edge is created if the following
-                    holds:\n
+                   More precisely, an edge is created if the following
+                   holds:\n
+                   \n
+                    \f[
+                     \max(\mathrm{dist}_{a,i}\mathrm{dist}_{b,i}) \leq R + m_i
+                    \f]
+                   \n
+                   Here, \f$m_i\f$ refers to the \f$\nu\f$th
+                   smallest element of the distance matrix.
 
-                    .. math::
+  @param R         Maximum radius parameter for determining whether to
+                   create an edge or not. The default value makes sure
+                   that *only* the distances between the landmarks and
+                   the points will be used for edge creation.
 
-                      \max(\mathrm{dist}_{a,i}\mathrm{dist}_{b,i}) \leq R + m_i
+  @param distance  Distance functor, e.g. the Euclidean distance, that
+                   is used for calculating distances between landmarks
+                   and data points. This parameter is provided to make
+                   it possible for the compiler to detect the template
+                   parameter \p distance automatically.
 
-                    Here, :math:`m_i` refers to the :math:`\nu`-th
-                    smallest element of the distance matrix.
-
-  :param R:         Maximum radius parameter for determining whether to
-                    create an edge or not. The default value makes sure
-                    that *only* the distances between the landmarks and
-                    the points will be used for edge creation.
-
-  :param distance:  Distance functor, e.g. the Euclidean distance, that
-                    is used for calculating distances between landmarks
-                    and data points. This parameter is provided to make
-                    it possible for the compiler to detect the template
-                    parameter \p distance automatically.
-
-  :returns:         Witness complex of the given container. Notice that
-                    the complex is stored as a simplicial complex whose
-                    data type and index type are derived from the input
-                    data. The data of a simplex contains the *smallest*
-                    threshold for which they appear in the complex. The
-                    complex will be sorted according to this value.
+  @returns         Witness complex of the given container. Notice that
+                   the complex is stored as a simplicial complex whose
+                   data type and index type are derived from the input
+                   data. The data of a simplex contains the *smallest*
+                   threshold for which they appear in the complex. The
+                   complex will be sorted according to this value.
 */
 
 template <
