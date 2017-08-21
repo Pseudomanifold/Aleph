@@ -144,7 +144,10 @@ public:
 
   /**
     Evaluates the kernel density estimator at a given position, using
-    a certain set of parameters.
+    a certain set of parameters. The evaluator function is written so
+    as to make type deduction easy for the compiler. For the 1D case,
+    everything works automatically, provided a suitable kernel exists
+    for the given data type.
 
     @param begin      Input iterator to begin of data range
     @param end        Input iterator to end of data range
@@ -170,7 +173,7 @@ public:
     class InputIterator,
     class DataType,
     class Kernel,
-    class Norm,
+    class Norm       = norms::Identity,
     class Difference = std::minus<DataType>
   > double operator()( InputIterator begin, InputIterator end,
                        DataType x,
