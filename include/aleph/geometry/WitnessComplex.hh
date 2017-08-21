@@ -54,7 +54,7 @@ namespace geometry
   thereby given the complex more "slack" when creating edges. However,
   this also increases the size of the complex.
 
-  :param container: Container for which to calculate the witness complex
+  :param const Container& container: Container for which to calculate the witness complex
 
   :param begin:     Input iterator to begin of landmark range; landmarks
                     must be specified as *indices*. Each index has to be
