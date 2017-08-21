@@ -1,0 +1,5 @@
+FIND_PACKAGE( pybind11 )
+
+IF( PYBIND11_FOUND )
+  ADD_SUBDIRECTORY( python )
+ENDIF()
