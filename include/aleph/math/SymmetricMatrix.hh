@@ -13,16 +13,23 @@ namespace math
 {
 
 /**
-  :class SymmetricMatrix: Describes a symmetric matrix of an arbitrary
-  data type. This class provides access to the data using an interface
-  that pretends to model a regular matrix.
+  @class SymmetricMatrix
 
-  Hence both types of queries will be valid:::
+  Describes a symmetric matrix of an arbitrary data type. The class is
+  able to access to the data using an interface that pretends to model
+  a regular matrix.
 
-    M(i,j)
-    M(j,i)
+  Hence both types of queries will be valid:
+
+      M(i,j)
+      M(j,i)
 
   Other than that, this class aims to have a small footprint.
+
+  @tparam T Data type stored in matrix, e.g. `double`
+  @tparam I Index type for accessing the matrix. You may change this for
+            small matrices in order to reduce their memory usage. Notice
+            that the default values should be sufficient in most cases.
 */
 
 template <class T, class I = std::size_t> class SymmetricMatrix
@@ -49,7 +56,7 @@ public:
     before clearing it, and finally fills it with a copy of the data the
     other matrix stores. Hence, this function is *not* highly-efficient.
 
-    :param other: Matrix from which to copy data
+    @param other Matrix from which to copy data
   */
 
   SymmetricMatrix( const SymmetricMatrix& other )
@@ -83,10 +90,10 @@ public:
     at the specified position. The function throws if an invalid index
     is encountered.
 
-    :param row:    Desired row for query
-    :param column: Desired column for query
+    @param row    Desired row for query
+    @param column Desired column for query
 
-    :returns: Const reference to the desired value
+    @returns Const reference to the desired value
   */
 
   const T& operator()( I row, I column ) const
