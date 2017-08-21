@@ -18,6 +18,20 @@ namespace aleph
 namespace topology
 {
 
+/**
+  @class Simplex
+
+  This class describes an abstract simplex of arbitrary dimensionality
+  with an optional *weight* or *data* value. This makes it possible to
+  use the class together with persistent homology calculations.
+
+  @see SimplicialComplex
+
+  @tparam D Data (weight) type, e.g. `double`
+  @tparam V Vertex type; usually, you do not have to change this type,
+            except if you want to change the memory footprint.
+*/
+
 template <
   class D,
   class V = unsigned short
@@ -31,11 +45,11 @@ public:
   // Note that these aliases follow the STL conventions in order to make it
   // easier to use the class with STL algorithms.
 
-  using DataType                      = D;
-  using VertexType                    = V;
+  using DataType                      = D;          ///< Data type alias
+  using VertexType                    = V;          ///< Vertex type alias
 
-  using data_type                     = DataType;
-  using vertex_type                   = VertexType;
+  using data_type                     = DataType;   ///< Data type alias, STL-style
+  using vertex_type                   = VertexType; ///< Vertex type alias, STL-style
 
   using vertex_container_type         = std::vector<vertex_type>;
   using vertex_iterator               = typename vertex_container_type::iterator;
