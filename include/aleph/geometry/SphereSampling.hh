@@ -63,19 +63,19 @@ std::vector< std::pair<T, T> > sphereSampling( unsigned n )
                 data required to actually build the sphere, the other
                 parameters merely control scaling
 
-  @param r Radius of the sphere
-  @param x Centre x-position of the sphere
-  @param y Centre y-position of the sphere
-  @param z Centre z-position of the sphere
+  @param r  Radius of the sphere
+  @param x0 Centre x-position of the sphere
+  @param y0 Centre y-position of the sphere
+  @param z0 Centre z-position of the sphere
 
   @returns Point cloud containing the sphere samples
 */
 
 template <class T> aleph::containers::PointCloud<T> makeSphere( const std::vector< std::pair<T, T> >& angles,
                                                                 T r,
-                                                                T x = T(),
-                                                                T y = T(),
-                                                                T z = T() )
+                                                                T x0 = T(),
+                                                                T y0 = T(),
+                                                                T z0 = T() )
 {
   using PointCloud = aleph::containers::PointCloud<T>;
 
@@ -87,9 +87,9 @@ template <class T> aleph::containers::PointCloud<T> makeSphere( const std::vecto
     auto theta = pair.first;
     auto phi   = pair.second;
 
-    auto x = r * std::sin( theta ) * std::cos( phi );
-    auto y = r * std::sin( theta ) * std::sin( phi );
-    auto z = r * std::cos( theta );
+    auto x = x0 + r * std::sin( theta ) * std::cos( phi );
+    auto y = y0 + r * std::sin( theta ) * std::sin( phi );
+    auto z = z0 + r * std::cos( theta );
 
     pc.set( index++, {x,y,z} );
   }
