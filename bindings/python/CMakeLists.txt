@@ -7,6 +7,11 @@ IF( PKG_CONFIG_FOUND )
       ${Python3_INCLUDE_DIRS}
     )
 
-    ADD_LIBRARY( aleph aleph.cc )
+    ADD_LIBRARY( aleph SHARED aleph.cc )
+
+    SET_TARGET_PROPERTIES( aleph
+      PROPERTIES
+        PREFIX ""
+    )
   ENDIF()
 ENDIF()
