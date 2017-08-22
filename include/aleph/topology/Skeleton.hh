@@ -8,7 +8,7 @@ namespace topology
 {
 
 /**
-  Stateless functor for extracting the $k$-skeleton of a simplicial
+  Stateless functor for extracting the \f$k\f$-skeleton of a simplicial
   complex. The functor is supposed to be used like a function:
 
   \code{.cpp}
@@ -27,9 +27,9 @@ class Skeleton
 public:
 
   /**
-    Extracts the $k$-skeleton of a given simplicial complex. The
-    function maintains the initial order of the input simplicial
-    complex. The returned skeleton may be empty.
+    Extracts the \f$k\f$-skeleton of a given simplicial complex. While
+    the function maintains the initial order of the input complex, the
+    returned skeleton may be empty.
   */
 
   template <class SimplicialComplex> SimplicialComplex operator()( std::size_t k, const SimplicialComplex& K ) const noexcept
