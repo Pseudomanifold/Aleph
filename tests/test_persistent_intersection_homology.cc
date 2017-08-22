@@ -92,27 +92,7 @@ template <class T, class OutputIterator> aleph::containers::PointCloud<T> makeDi
 
   ALEPH_ASSERT_EQUAL( pcDisk.dimension(), pcFlares.dimension() );
 
-  aleph::containers::PointCloud<T> pc( pcDisk.size() + pcFlares.size(), pcDisk.dimension() );
-
-  // TODO: this would be easier if the point cloud had a concatenation
-  // operator...
-
-  std::size_t i = 0;
-  std::size_t j = 0;
-
-  for( j = 0; j < pcDisk.size(); j++, i++ )
-  {
-    auto p = pcDisk[j];
-    pc.set( i, p.begin(), p.end() );
-  }
-
-  for( j = 0; j < pcFlares.size(); j++, i++ )
-  {
-    auto p = pcFlares[j];
-    pc.set( i, p.begin(), p.end() );
-  }
-
-  return pc;
+  return pcDisk + pcFlares;
 }
 
 template <class T> void test()
