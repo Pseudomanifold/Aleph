@@ -58,6 +58,22 @@ PointCloud makeOnePointUnionOfSpheres( unsigned n )
   return sphere1 + sphere2;
 }
 
+PointCloud makeTwoSpheres( unsigned n )
+{
+  auto makeSphere = [] ( unsigned n, DataType r, DataType x0, DataType y0, DataType z0 )
+  {
+    auto angles     = aleph::geometry::sphereSampling<DataType>( n );
+    auto pointCloud = aleph::geometry::makeSphere( angles, r, x0, y0, z0 );
+
+    return pointCloud;
+  };
+
+  auto sphere1 = makeSphere( n, DataType(1), DataType(0), DataType(0), DataType(0) );
+  auto sphere2 = makeSphere( n, DataType(1), DataType(3), DataType(0), DataType(0) );
+
+  return sphere1 + sphere2;
+}
+
 int main(int, char**)
 {
   auto pointCloud       = makeOnePointUnionOfSpheres(500);
@@ -101,12 +117,18 @@ int main(int, char**)
   for( auto&& D : {D1,D2,D3,D4} )
     persistenceDiagrams.insert( persistenceDiagrams.end(), D.begin(), D.end() );
 
-  for( auto&& D : persistenceDiagrams )
   {
-    D.removeDiagonal();
+    std::ofstream out0( "/tmp/D_0.txt" );
+    std::ofstream out1( "/tmp/D_1.txt" );
 
-    // FIXME: more output?
-    if( D.dimension() == 0 )
-      std::cout << D << "\n\n";
+    for( auto&& D : persistenceDiagrams )
+    {
+      D.removeDiagonal();
+
+      if( D.dimension() == 0 )
+        out0 << D << "\n\n";
+      else if( D.dimension() == 1 )
+        out1 << D << "\n\n";
+    }
   }
 }
