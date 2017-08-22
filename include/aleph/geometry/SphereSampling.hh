@@ -31,23 +31,20 @@ template <class T>
 std::vector< std::pair<T, T> > sphereSampling( unsigned n )
 {
   std::random_device rd;
-
-  std::mt19937 rngU( rd() );
-  std::mt19937 rngV( rd() );
+  std::mt19937 rng( rd() );
 
   std::vector< std::pair<T, T> > angles;
   angles.reserve( n );
 
-  std::uniform_real_distribution<T> uDistribution( std::nextafter( T(0), std::numeric_limits<T>::max() ), T(1) );
-  std::uniform_real_distribution<T> vDistribution( std::nextafter( T(0), std::numeric_limits<T>::max() ), T(1) );
+  std::uniform_real_distribution<T> distribution( std::nextafter( T(0), std::numeric_limits<T>::max() ), T(1) );
 
   for( unsigned i = 0; i < n; i++ )
   {
-    auto u = uDistribution( rngU );
-    auto v = uDistribution( rngV );
+    auto u = distribution( rng );
+    auto v = distribution( rng );
 
     T theta = T( 2*M_PI*u );
-    T phi   = std::acos( 2*v - 1 );
+    T phi   = std::acos( 1- 2*v );
 
     angles.push_back( std::make_pair( theta, phi ) );
   }
@@ -87,9 +84,9 @@ template <class T> aleph::containers::PointCloud<T> makeSphere( const std::vecto
     auto theta = pair.first;
     auto phi   = pair.second;
 
-    auto x = x0 + r * std::sin( theta ) * std::cos( phi );
+    auto x = x0 + r * std::cos( theta ) * std::sin( phi );
     auto y = y0 + r * std::sin( theta ) * std::sin( phi );
-    auto z = z0 + r * std::cos( theta );
+    auto z = z0 + r * std::cos( phi );
 
     pc.set( index++, {x,y,z} );
   }
