@@ -50,7 +50,7 @@ template <class SimplicialComplex, class Simplex> std::set<Simplex> intersect( c
                  "Simplex type and simplicial complex value type must coincide" );
 
   // Shortcut: if the simplex is contained in the simplicial complex, we
-  // report this an intersection.
+  // report this as an intersection.
   //
   // TODO: check whether this is allowed
   if( K.contains(s) )
