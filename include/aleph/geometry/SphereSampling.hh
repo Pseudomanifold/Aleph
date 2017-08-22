@@ -15,15 +15,16 @@ namespace geometry
 {
 
 /**
-  Samples $n$ points from a sphere such that the expected number of
-  points per area of the sphere is uniform. Only the angular values
-  of the sampled points ($\theta$, $\phi$) will be returned.
+  Samples \f$n\f$ points from a sphere such that the expected number of
+  points per area of the sphere is uniform. Only the angular values of
+  the sampled points (\f$\theta\f$, \f$\phi\f$) will be returned.
 
   @param n Number of samples to draw
 
-  @returns Vector of angle values, i.e. $\theta$ and $\phi$, which are
-  sufficient to describe the sphere. Use aleph::geometry::makeSphere()
-  for creating a point cloud from the resulting angles.
+  @returns Vector of angle values, i.e. \f$\theta\f$ and \f$\phi\f$,
+           which are sufficient to describe the sphere. Please use
+           aleph::geometry::makeSphere() to create  a point cloud
+           from the resulting angles.
 */
 
 template <class T>
@@ -57,9 +58,24 @@ std::vector< std::pair<T, T> > sphereSampling( unsigned n )
 /**
   Converts a vector of angles into a point cloud that contains samples
   from a sphere of a given radius.
+
+  @param angles The sampled angles of the sphere; these are the only
+                data required to actually build the sphere, the other
+                parameters merely control scaling
+
+  @param r Radius of the sphere
+  @param x Centre x-position of the sphere
+  @param y Centre y-position of the sphere
+  @param z Centre z-position of the sphere
+
+  @returns Point cloud containing the sphere samples
 */
 
-template <class T> aleph::containers::PointCloud<T> makeSphere( const std::vector< std::pair<T, T> >& angles, T r )
+template <class T> aleph::containers::PointCloud<T> makeSphere( const std::vector< std::pair<T, T> >& angles,
+                                                                T r,
+                                                                T x = T(),
+                                                                T y = T(),
+                                                                T z = T() )
 {
   using PointCloud = aleph::containers::PointCloud<T>;
 

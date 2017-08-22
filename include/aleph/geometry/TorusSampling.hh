@@ -17,15 +17,16 @@ namespace geometry
 /**
   Using the rejection sampling method from "Sampling from a manifold" by
   Diaconis et al., samples at most $n$ points from a torus with an inner
-  radius of $R$ and an outer radius of $r$.
+  radius of \f$R\f$ and an outer radius of \f$r\f$.
 
   @param R Inner radius
   @param r Outer radius
   @param n Maximum number of samples to draw
 
-  @returns Vector of angle values, i.e. $\theta$ and $\psi$, which are
-  sufficient to describe a torus. Use aleph::geometry::makeTorus() for
-  creating a point cloud from the resulting angles.
+  @returns Vector of angle values, i.e. \f$\theta\f$ and \f$\psi\f$,
+           which are sufficient to describe a torus. Please use
+           aleph::geometry::makeTorus() to create a point cloud
+           from the resulting angles.
 */
 
 template <class T>
@@ -77,6 +78,12 @@ std::vector< std::pair<T, T> > torusRejectionSampling( T R,
 /**
   Converts a vector of angles into a point cloud that contains samples
   from a torus.
+
+  @param angles Sampled angles to create the torus
+  @param R Inner radius
+  @param r Outer radius
+
+  @returns Point cloud containing the sampled points from the torus
 */
 
 template <class T> aleph::containers::PointCloud<T> makeTorus( const std::vector< std::pair<T, T> >& angles, T R, T r )
