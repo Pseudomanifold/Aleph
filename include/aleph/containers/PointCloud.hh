@@ -302,7 +302,7 @@ template <class T> std::ostream& operator<<( std::ostream& o, const aleph::conta
 
     for( auto it = data.begin(); it != data.end(); ++it )
     {
-      if( it != data.end() )
+      if( it != data.begin() )
         o << "\t";
 
       o << *it;
