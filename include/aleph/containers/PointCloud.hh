@@ -173,6 +173,44 @@ public:
     return p;
   }
 
+  // Operations --------------------------------------------------------
+
+  /**
+    Permits the concatenation of two point clouds. To this end, all of
+    the points in the first point cloud will be appended to the points
+    in the second point cloud, thereby forming a new point cloud. This
+    new point cloud is then returned. Note that the dimensions of both
+    point clouds have to be equal. Otherwise, an error is thrown.
+  */
+
+  PointCloud operator+( const PointCloud& other ) const
+  {
+    if( this->dimension() != other.dimension() )
+      throw std::runtime_error( "The dimensions of both point clouds have to coincide" );
+
+    auto d = this->dimension();
+    auto n = this->size() + other.size();
+
+    PointCloud result(n, d);
+
+    decltype(n) i = 0; // total index with respect to result point cloud
+    decltype(n) j = 0; // local index with respect to current point cloud
+
+    for( j = 0; j < this->size(); j++, i++ )
+    {
+      auto&& p = this->operator[](j);
+      result.set( i, p.begin(), p.end() );
+    }
+
+    for( j = 0; j < other.size(); j++, i++ )
+    {
+      auto&& p = other[j];
+      result.set(i, p.begin(), p.end() );
+    }
+
+    return result;
+  }
+
 private:
   std::size_t _n; ///< Number of points
   std::size_t _d; ///< Dimension
