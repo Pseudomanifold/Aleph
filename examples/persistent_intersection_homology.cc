@@ -33,6 +33,7 @@ using Distance           = aleph::distances::Euclidean<DataType>;
 using PointCloud         = aleph::containers::PointCloud<DataType>;
 using Simplex            = aleph::topology::Simplex<DataType, VertexType>;
 using SimplicialComplex  = aleph::topology::SimplicialComplex<Simplex>;
+using Filtration         = aleph::topology::filtrations::Data<Simplex>;
 using PersistenceDiagram = aleph::PersistenceDiagram<DataType>;
 
 #ifdef ALEPH_WITH_FLANN
@@ -87,6 +88,7 @@ int main(int, char**)
   // Barycentric subdivision to ensure that the resulting complex is
   // flaglike in sense of MacPherson et al.
   auto L  = aleph::topology::BarycentricSubdivision()( K );
+  L.sort( Filtration() );
 
   auto D1 = aleph::calculateIntersectionHomology( L, {K0,K1,K2}, aleph::Perversity( {-1, 0} ) );
   auto D2 = aleph::calculateIntersectionHomology( L, {K0,K1,K2}, aleph::Perversity( {-1, 1} ) );
