@@ -5,6 +5,7 @@
 #include <fstream>
 #include <initializer_list>
 #include <iterator>
+#include <ostream>
 #include <stdexcept>
 #include <string>
 
@@ -185,6 +186,7 @@ private:
   different attributes of each item are assumed to be separated by a
   comma or white-space characters.
 */
+
 template<class T> PointCloud<T> load( const std::string& filename )
 {
   std::ifstream in( filename );
@@ -241,5 +243,37 @@ template<class T> PointCloud<T> load( const std::string& filename )
 } // namespace containers
 
 } // namespace aleph
+
+/**
+  Output operator for writing a point cloud to an `std::ostream`. The
+  Individual attributes of the point cloud are separated by tabs, and
+  each point is on a single line.
+
+  @param o          Output stream
+  @param pointCloud Point cloud to store
+
+  @returns Modified output stream
+*/
+
+template <class T> std::ostream& operator<<( std::ostream& o, const aleph::containers::PointCloud<T>& pointCloud )
+{
+  auto n = pointCloud.size();
+  for( decltype(n) i = 0; i < n; i++ )
+  {
+    auto data = pointCloud[i];
+
+    for( auto it = data.begin(); it != data.end(); ++it )
+    {
+      if( it != data.end() )
+        o << "\t";
+
+      o << *it;
+    }
+
+    o << "\n";
+  }
+
+  return o;
+}
 
 #endif
