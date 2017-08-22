@@ -35,6 +35,32 @@ in the papers above.
 If you want to contribute, please see the [contribution
 guidelines](CONTRIBUTING.md) for more details.
 
+# Features
+
+Aleph contains numerous algorithms and helper classes that simplify
+working with persistent homology. Here is a brief selection of the most
+important ones:
+
+* Easy-to-use and expressive simplex and simplicial complex class
+* Support for different input formats to read simplicial complexes from
+  a variety of input files
+    - 1D functions
+    - Edge lists
+    - GML
+    - Lexicographic triangulations
+    - NET (Pajek graphs)
+    - PLY
+    - VTK
+* Standard algorithm and *twisted* reduction algorithm for calculating
+  persistent homology
+* Support for *dualized* variants of both algorithms
+* Support for different boundary matrix representations
+* Persistence diagram class
+* Distance and kernel measures
+    - Bottleneck distance
+    - Multi-scale smoothing kernel
+    - Wasserstein distance
+
 # Documentation
 
 [Documentation](https://submanifold.github.io/Aleph) of the main
