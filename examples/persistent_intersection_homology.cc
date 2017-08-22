@@ -88,12 +88,13 @@ int main(int, char**)
   // Barycentric subdivision to ensure that the resulting complex is
   // flaglike in sense of MacPherson et al.
   auto L  = aleph::topology::BarycentricSubdivision()( K );
-  L.sort( Filtration() );
+  L.sort( aleph::topology::filtrations::Data<typename decltype(L)::ValueType>() );
 
-  auto D1 = aleph::calculateIntersectionHomology( L, {K0,K1,K2}, aleph::Perversity( {-1, 0} ) );
-  auto D2 = aleph::calculateIntersectionHomology( L, {K0,K1,K2}, aleph::Perversity( {-1, 1} ) );
-  auto D3 = aleph::calculateIntersectionHomology( L, {K0,K1,K2}, aleph::Perversity( { 0, 0} ) );
-  auto D4 = aleph::calculateIntersectionHomology( L, {K0,K1,K2}, aleph::Perversity( { 0, 1} ) );
+  // FIXME: use L here?
+  auto D1 = aleph::calculateIntersectionHomology( K, {K0,K1,K2}, aleph::Perversity( {-1, 0} ) );
+  auto D2 = aleph::calculateIntersectionHomology( K, {K0,K1,K2}, aleph::Perversity( {-1, 1} ) );
+  auto D3 = aleph::calculateIntersectionHomology( K, {K0,K1,K2}, aleph::Perversity( { 0, 0} ) );
+  auto D4 = aleph::calculateIntersectionHomology( K, {K0,K1,K2}, aleph::Perversity( { 0, 1} ) );
 
   std::vector<PersistenceDiagram> persistenceDiagrams;
   persistenceDiagrams.reserve( D1.size() + D2.size() + D3.size() + D4.size() );
