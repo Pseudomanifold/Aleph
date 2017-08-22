@@ -242,20 +242,24 @@ template <class T> void testCircleWithWhisker()
   SimplicialComplex Y1 = L;
 
   auto D1 = aleph::calculateIntersectionHomology( K, {X0,X1}, aleph::Perversity( {-1} ) );
-  auto D2 = aleph::calculateIntersectionHomology( L, {Y0,Y1}, aleph::Perversity( {-1} ) );
-  auto D3 = aleph::calculateIntersectionHomology( L, {Y0,Y1}, aleph::Perversity( { 0} ) );
+  auto D2 = aleph::calculateIntersectionHomology( K, {X0,X1}, aleph::Perversity( {-1} ) );
+  auto D3 = aleph::calculateIntersectionHomology( L, {Y0,Y1}, aleph::Perversity( {-1} ) );
+  auto D4 = aleph::calculateIntersectionHomology( L, {Y0,Y1}, aleph::Perversity( { 0} ) );
 
   ALEPH_ASSERT_THROW( D1.empty() == false );
   ALEPH_ASSERT_THROW( D2.empty() == false );
   ALEPH_ASSERT_THROW( D3.empty() == false );
+  ALEPH_ASSERT_THROW( D4.empty() == false );
 
   ALEPH_ASSERT_EQUAL( D1.front().dimension(), 0 );
   ALEPH_ASSERT_EQUAL( D2.front().dimension(), 0 );
   ALEPH_ASSERT_EQUAL( D3.front().dimension(), 0 );
+  ALEPH_ASSERT_EQUAL( D4.front().dimension(), 0 );
 
   ALEPH_ASSERT_EQUAL( D1.front().betti(), 1 );
-  ALEPH_ASSERT_EQUAL( D2.front().betti(), 2 );
-  ALEPH_ASSERT_EQUAL( D3.front().betti(), 1 );
+  ALEPH_ASSERT_EQUAL( D2.front().betti(), 1 );
+  ALEPH_ASSERT_EQUAL( D3.front().betti(), 2 );
+  ALEPH_ASSERT_EQUAL( D4.front().betti(), 1 );
 
   ALEPH_TEST_END();
 }
