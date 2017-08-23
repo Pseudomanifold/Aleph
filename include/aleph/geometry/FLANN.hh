@@ -129,7 +129,7 @@ public:
                         std::vector< std::vector<IndexType> >& indices,
                         std::vector< std::vector<ElementType> >& distances ) const
   {
-    // FLANN does *not* like being queries for no neighbours at all, so
+    // FLANN does *not* like being queried for no neighbours at all, so
     // let's play nice.
     if( k == 0 )
     {

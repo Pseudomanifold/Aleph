@@ -24,10 +24,10 @@ namespace aleph
   values. This follows the persistent intersection homology algorithm
   in:
 
-    Persistent Intersection Homology
-    Paul Bendich and John Harer
+    Persistent Intersection Homology\n
+    Paul Bendich and John Harer\n
 
-  The function expects a simplicial complex $K$ and a function $\phi$
+  The function uses a simplicial complex \f$K\f$ and a function \f$\phi\f$
   that determines whether a simplex is proper or not. The function is
   going to create a new simplicial complex. This complex contains all
   proper simplices (in their original order) followed by all improper
@@ -156,8 +156,11 @@ template <class Simplex> auto calculateIntersectionHomology( const aleph::topolo
 
     for( auto&& x : X )
     {
-      minDimension = std::min( minDimension, x.dimension() );
-      maxDimension = std::max( maxDimension, x.dimension() );
+      if( !K.empty() )
+      {
+        minDimension = std::min( minDimension, x.dimension() );
+        maxDimension = std::max( maxDimension, x.dimension() );
+      }
     }
 
     if( maxDimension != K.dimension() )
