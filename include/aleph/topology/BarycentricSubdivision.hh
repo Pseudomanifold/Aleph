@@ -1,11 +1,21 @@
 #ifndef ALEPH_TOPOLOGY_BARYCENTRIC_SUBDIVISION_HH__
 #define ALEPH_TOPOLOGY_BARYCENTRIC_SUBDIVISION_HH__
 
+#include <aleph/utilities/EmptyFunctor.hh>
+
 #include <iterator>
 #include <set>
 #include <stdexcept>
+#include <type_traits>
 #include <unordered_map>
 #include <vector>
+
+// Since the data type of the simplex class is allowed to be a boolean
+// as well, there will be a multiplication involved in the functor and
+// the compiler rightfully warns about this because two boolean values
+// are part of the calculation.
+_Pragma( "GCC diagnostic push" )
+_Pragma( "GCC diagnostic ignored \"-Wint-in-bool-context\"" )
 
 namespace aleph
 {
@@ -40,10 +50,11 @@ public:
     and returns the result.
   */
 
-  template <class SimplicialComplex> SimplicialComplex operator()( const SimplicialComplex& K ) const
+  template <class SimplicialComplex, class Functor = aleph::utilities::EmptyFunctor> SimplicialComplex operator()( const SimplicialComplex& K, Functor&& functor = Functor() ) const
   {
     using Simplex    = typename SimplicialComplex::ValueType;
     using VertexType = typename Simplex::VertexType;
+    using DataType   = typename Simplex::DataType;
 
     // Stores the new vertex index of the next barycentre vertex that
     // is to be added to the subdivided complex. Initially, this uses
@@ -81,7 +92,8 @@ public:
         // Copy the data of the old simplex for its barycentric
         // subdivision. Since the subdivision is a _refinement_
         // of the original complex, this makes sense.
-        L.push_back( Simplex( barycentreVertex, s.data() ) );
+        auto data = s.data() * DataType( functor( 0 ) );
+        L.push_back( Simplex( barycentreVertex, data ) );
 
         // Contains all subdivided simplices of the boundary of
         // the current simplex.
@@ -113,7 +125,7 @@ public:
           // The new cone simplex needs to use the same weight as the
           // barycentre simplex.
           cone.emplace_back( Simplex( vertices.begin(), vertices.end(),
-                                      s.data() ) );
+                                      s.data() * DataType( functor( vertices.size() ) ) ) );
         }
 
        // Cone boundaries; required in order to ensure consistency of
@@ -213,5 +225,7 @@ private:
 } // namespace topology
 
 } // namespace aleph
+
+_Pragma( "GCC diagnostic pop" )
 
 #endif
