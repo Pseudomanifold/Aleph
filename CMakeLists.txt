@@ -78,9 +78,17 @@ IF( PKG_CONFIG_FOUND )
   IF( JSON_FOUND )
     # RapidJSON is now available in the normal include path, under the
     # prefix of RapidJSON.
-    INCLUDE_DIRECTORIES( ${JSON_INCLUDE_DIRS} )
+    INCLUDE_DIRECTORIES( SYSTEM ${JSON_INCLUDE_DIRS} )
 
     SET( ALEPH_WITH_RAPID_JSON TRUE )
+  ENDIF()
+
+  PKG_SEARCH_MODULE( EIGEN eigen3 )
+
+  IF( EIGEN_FOUND )
+    INCLUDE_DIRECTORIES( SYSTEM ${EIGEN_INCLUDE_DIRS} )
+
+    SET( ALEPH_WITH_EIGEN TRUE )
   ENDIF()
 ENDIF()
 
@@ -91,6 +99,7 @@ ENDIF()
 CONFIGURE_FILE( ${CMAKE_SOURCE_DIR}/include/aleph/config/Base.hh.in ${CMAKE_SOURCE_DIR}/include/aleph/config/Base.hh )
 CONFIGURE_FILE( ${CMAKE_SOURCE_DIR}/include/aleph/config/FLANN.hh.in ${CMAKE_SOURCE_DIR}/include/aleph/config/FLANN.hh )
 CONFIGURE_FILE( ${CMAKE_SOURCE_DIR}/include/aleph/config/RapidJSON.hh.in ${CMAKE_SOURCE_DIR}/include/aleph/config/RapidJSON.hh )
+CONFIGURE_FILE( ${CMAKE_SOURCE_DIR}/include/aleph/config/Eigen.hh.in ${CMAKE_SOURCE_DIR}/include/aleph/config/Eigen.hh ) 
 
 ########################################################################
 # Include directories

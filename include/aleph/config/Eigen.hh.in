@@ -1,0 +1,6 @@
+#ifndef ALEPH_CONFIG_EIGEN_HH__
+#define ALEPH_CONFIG_EIGEN_HH__
+
+#cmakedefine ALEPH_WITH_EIGEN
+
+#endif
