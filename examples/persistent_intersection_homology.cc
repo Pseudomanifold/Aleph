@@ -77,6 +77,49 @@ PointCloud makeTwoSpheres( unsigned n )
   return sphere1 + sphere2;
 }
 
+PointCloud findSingularities( const PointCloud& pointCloud, const std::vector<unsigned>& dimensionalities, unsigned k )
+{
+  using IndexType   = typename NearestNeighbours::IndexType;
+  using ElementType = typename NearestNeighbours::ElementType;
+
+  std::vector< std::vector<IndexType> > indices;
+  std::vector< std::vector<ElementType> > distances;
+
+  NearestNeighbours nearestNeighbours( pointCloud );
+  nearestNeighbours.neighbourSearch( k+1, indices, distances );
+
+  std::vector<IndexType> outliers;
+
+  for( std::size_t i = 0; i < pointCloud.size(); i++ )
+  {
+    auto&& localIndices     = indices.at(i);
+    auto myLabel            = dimensionalities.at(i);
+    unsigned numOtherLabels = 0;
+
+    for( auto&& index : localIndices )
+    {
+      if( dimensionalities.at(index) != myLabel )
+        numOtherLabels++;
+    }
+
+    // FIXME: somewhat arbitrary
+    if( numOtherLabels >= k/2 )
+      outliers.push_back( IndexType(i) );
+  }
+
+  PointCloud result( outliers.size(), pointCloud.dimension() );
+
+  for( std::size_t i = 0; i < outliers.size(); i++ )
+  {
+    auto&& index = outliers[i];
+    auto&& p     = pointCloud[index];
+
+    result.set( i, p.begin(), p.end() );
+  }
+
+  return result;
+}
+
 int main(int, char**)
 {
   auto pointCloud       = makeOnePointUnionOfSpheres(500);
