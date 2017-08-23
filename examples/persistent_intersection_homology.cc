@@ -136,7 +136,7 @@ std::set<VertexType> detectSingularities( const PointCloud& pointCloud )
 
   // FIXME: make radius configurable
   NearestNeighbours nearestNeighbours( pc );
-  nearestNeighbours.radiusSearch( 0.30, indices, distances );
+  nearestNeighbours.radiusSearch( 0.10, indices, distances );
 
   std::set<VertexType> singularities;
 
@@ -173,7 +173,7 @@ int main(int, char**)
   auto K
     = aleph::geometry::buildVietorisRipsComplex(
         NearestNeighbours( pointCloud ),
-        DataType( 0.25 ),
+        DataType( 0.30 ),
         1 // FIXME: make configurable
   );
 
@@ -233,9 +233,9 @@ int main(int, char**)
       D.removeDiagonal();
 
       if( D.dimension() == 0 )
-        out0 << D << "\n\n";
+        out0 << "# 0\n" << D << "\n\n";
       else if( D.dimension() == 1 )
-        out1 << D << "\n\n";
+        out1 << "# 1\n" << D << "\n\n";
     }
   }
 
