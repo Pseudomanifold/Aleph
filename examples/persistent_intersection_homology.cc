@@ -104,10 +104,15 @@ int main(int, char**)
   // Barycentric subdivision to ensure that the resulting complex is
   // flaglike in sense of MacPherson et al.
   auto L
-    = aleph::topology::BarycentricSubdivision()( K, [] ( std::size_t dimension ) { return dimension == 0 ? 1 : 0.5; } );
+    = aleph::topology::BarycentricSubdivision()( K, [] ( std::size_t dimension ) { return dimension == 0 ? 0 : 0.5; } );
 
-  L.recalculateWeights();
-  L.sort( aleph::topology::filtrations::Data<typename decltype(L)::ValueType>() ); // FIXME
+  {
+    bool useMaximum                  = true;
+    bool skipOneDimensionalSimplices = true;
+
+    L.recalculateWeights( useMaximum, skipOneDimensionalSimplices );
+    L.sort( aleph::topology::filtrations::Data<typename decltype(L)::ValueType>() ); // FIXME
+  }
 
   auto D1 = aleph::calculateIntersectionHomology( L, {K0,K1,K2}, aleph::Perversity( {-1, 0} ) );
   auto D2 = aleph::calculateIntersectionHomology( L, {K0,K1,K2}, aleph::Perversity( {-1, 1} ) );
