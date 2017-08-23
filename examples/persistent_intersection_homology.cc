@@ -113,11 +113,12 @@ int main(int, char**)
   auto D2 = aleph::calculateIntersectionHomology( L, {K0,K1,K2}, aleph::Perversity( {-1, 1} ) );
   auto D3 = aleph::calculateIntersectionHomology( L, {K0,K1,K2}, aleph::Perversity( { 0, 0} ) );
   auto D4 = aleph::calculateIntersectionHomology( L, {K0,K1,K2}, aleph::Perversity( { 0, 1} ) );
+  auto D5 = aleph::calculatePersistenceDiagrams ( L );
 
   std::vector<PersistenceDiagram> persistenceDiagrams;
-  persistenceDiagrams.reserve( D1.size() + D2.size() + D3.size() + D4.size() );
+  persistenceDiagrams.reserve( D1.size() + D2.size() + D3.size() + D4.size() + D5.size() );
 
-  for( auto&& D : {D1,D2,D3,D4} )
+  for( auto&& D : {D1,D2,D3,D4,D5} )
     persistenceDiagrams.insert( persistenceDiagrams.end(), D.begin(), D.end() );
 
   {
