@@ -92,8 +92,10 @@ public:
         // Copy the data of the old simplex for its barycentric
         // subdivision. Since the subdivision is a _refinement_
         // of the original complex, this makes sense.
-        auto data = s.data() * DataType( functor( 0 ) );
-        L.push_back( Simplex( barycentreVertex, data ) );
+        {
+          auto data = s.data() * DataType( functor( 0 ) );
+          L.push_back( Simplex( barycentreVertex, data ) );
+        }
 
         // Contains all subdivided simplices of the boundary of
         // the current simplex.
