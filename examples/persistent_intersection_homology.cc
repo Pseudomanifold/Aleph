@@ -112,7 +112,7 @@ std::set<VertexType> findSingularities( const PointCloud& pointCloud, const std:
 #endif
 
     if( myLabel == 1 )
-      singularities.insert( i );
+      singularities.insert( VertexType(i) );
   }
 
   return singularities;
@@ -134,15 +134,23 @@ std::set<VertexType> detectSingularities( const PointCloud& pointCloud )
   std::vector< std::vector<IndexType> > indices;
   std::vector< std::vector<ElementType> > distances;
 
-  NearestNeighbours nearestNeighbours( pointCloud );
-  nearestNeighbours.radiusSearch( 0.1, indices, distances );
+  // FIXME: make radius configurable
+  NearestNeighbours nearestNeighbours( pc );
+  nearestNeighbours.radiusSearch( 0.30, indices, distances );
 
   std::set<VertexType> singularities;
 
   auto&& neighbours = indices[ singularityIndex ];
   for( auto&& neighbour : neighbours )
     if( neighbour != singularityIndex )
-      singularities.insert( neighbour );
+      singularities.insert( VertexType( neighbour ) );
+
+  std::cerr << "* Detected " << singularities.size() << " singularities: ";
+
+  for( auto&& singularity : singularities )
+    std::cerr << singularity << " ";
+
+  std::cerr << "\n";
 
   return singularities;
 }
@@ -175,7 +183,7 @@ int main(int, char**)
   auto K2 = aleph::topology::Skeleton()( 2, K );
 
   {
-    auto singularities      = findSingularities( pointCloud, dimensionalities, 8 );
+    auto singularities      = detectSingularities( pointCloud );
     using SimplicialComplex = decltype(K);
     using Simplex           = typename SimplicialComplex::ValueType;
 
@@ -185,7 +193,7 @@ int main(int, char**)
                   [&singularities] ( const Simplex& s )
                   {
                     auto vertex = *s.begin();
-                    return singularities.find( VertexType( vertex ) ) == singularities.end();
+                    return singularities.find( VertexType( vertex ) ) != singularities.end();
                   } );
 
     K0 = SimplicialComplex( simplices.begin(), simplices.end() );
