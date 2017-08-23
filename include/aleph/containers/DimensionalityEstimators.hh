@@ -344,7 +344,9 @@ template <
 
 /**
   Estimates local intrinsic dimensionality of a container using its
-  local local principal components.
+  local principal components. The basic premise is that the largest
+  spectral gap in the eigenspectrum of a local PCA gives a suitable
+  hint about the local dimensionality at the given set of points.
 
   @param container Container to use for dimensionality estimation
   @param distance  Distance measure
@@ -375,12 +377,6 @@ template <
 
   for( auto&& localIndices : indices )
   {
-    // 1. Collect all points that are part of the nearest neighbours
-    // 2. Convert them into a point cloud
-    // 3. Apply principal component analysis to the point cloud
-    // 4. Analyse the principal components to estimate local intrinsic
-    //    dimensionality
-
     std::vector< std::vector<ElementType> > data( localIndices.size(), std::vector<ElementType>() );
 
     {
