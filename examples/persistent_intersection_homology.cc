@@ -14,6 +14,9 @@
 
 #include <aleph/geometry/distances/Euclidean.hh>
 
+#include <aleph/persistenceDiagrams/PersistenceDiagram.hh>
+#include <aleph/persistenceDiagrams/distances/Bottleneck.hh>
+
 #include <aleph/persistentHomology/Calculation.hh>
 #include <aleph/persistentHomology/PhiPersistence.hh>
 
@@ -139,5 +142,18 @@ int main(int, char**)
       else if( D.dimension() == 1 )
         out1 << D << "\n\n";
     }
+  }
+
+  {
+    std::ofstream out0( "/tmp/D_0_IH.txt" );
+    std::ofstream out1( "/tmp/D_0_PH.txt" );
+
+    D3.front().removeDiagonal();
+    D5.front().removeDiagonal();
+
+    out0 << D3.front() << "\n";
+    out1 << D5.front() << "\n";
+
+    std::cerr << "Bottleneck distance (IH vs. PH): " << aleph::distances::bottleneckDistance( D3.front(), D5.front() ) << "\n";
   }
 }
