@@ -27,8 +27,11 @@
 
 #include <aleph/topology/filtrations/Data.hh>
 
+#include <algorithm>
 #include <fstream>
 #include <iostream>
+#include <set>
+#include <vector>
 
 using DataType           = double;
 using VertexType         = unsigned;
@@ -77,7 +80,7 @@ PointCloud makeTwoSpheres( unsigned n )
   return sphere1 + sphere2;
 }
 
-PointCloud findSingularities( const PointCloud& pointCloud, const std::vector<unsigned>& dimensionalities, unsigned k )
+std::set<VertexType> findSingularities( const PointCloud& pointCloud, const std::vector<unsigned>& dimensionalities, unsigned k )
 {
   using IndexType   = typename NearestNeighbours::IndexType;
   using ElementType = typename NearestNeighbours::ElementType;
@@ -88,7 +91,7 @@ PointCloud findSingularities( const PointCloud& pointCloud, const std::vector<un
   NearestNeighbours nearestNeighbours( pointCloud );
   nearestNeighbours.neighbourSearch( k+1, indices, distances );
 
-  std::vector<IndexType> outliers;
+  std::set<VertexType> singularities;
 
   for( std::size_t i = 0; i < pointCloud.size(); i++ )
   {
@@ -102,28 +105,23 @@ PointCloud findSingularities( const PointCloud& pointCloud, const std::vector<un
         numOtherLabels++;
     }
 
+#if 0
     // FIXME: somewhat arbitrary
-    if( numOtherLabels >= k/2 )
-      outliers.push_back( IndexType(i) );
+    if( numOtherLabels >= 0.80*k )
+      singularities.insert( static_cast<VertexType>(i) );
+#endif
+
+    if( myLabel == 1 )
+      singularities.insert( i );
   }
 
-  PointCloud result( outliers.size(), pointCloud.dimension() );
-
-  for( std::size_t i = 0; i < outliers.size(); i++ )
-  {
-    auto&& index = outliers[i];
-    auto&& p     = pointCloud[index];
-
-    result.set( i, p.begin(), p.end() );
-  }
-
-  return result;
+  return singularities;
 }
 
 int main(int, char**)
 {
   auto pointCloud       = makeOnePointUnionOfSpheres(500);
-  auto dimensionalities = aleph::containers::estimateLocalDimensionalityNearestNeighbours<Distance, PointCloud, NearestNeighbours>( pointCloud, 10 );
+  auto dimensionalities = aleph::containers::estimateLocalDimensionalityPCA<Distance, PointCloud, NearestNeighbours>( pointCloud, 8 );
 
   {
     std::ofstream out1( "/tmp/P.txt" );
@@ -139,13 +137,30 @@ int main(int, char**)
     = aleph::geometry::buildVietorisRipsComplex(
         NearestNeighbours( pointCloud ),
         DataType( 0.25 ),
-        2
+        1 // FIXME: make configurable
   );
 
   // Skeleta (or skeletons?)
   auto K0 = aleph::topology::Skeleton()( 0, K );
   auto K1 = aleph::topology::Skeleton()( 1, K );
   auto K2 = aleph::topology::Skeleton()( 2, K );
+
+  {
+    auto singularities      = findSingularities( pointCloud, dimensionalities, 8 );
+    using SimplicialComplex = decltype(K);
+    using Simplex           = typename SimplicialComplex::ValueType;
+
+    std::vector<Simplex> simplices;
+
+    std::copy_if( K0.begin(), K0.end(), std::back_inserter( simplices ),
+                  [&singularities] ( const Simplex& s )
+                  {
+                    auto vertex = *s.begin();
+                    return singularities.find( VertexType( vertex ) ) == singularities.end();
+                  } );
+
+    K0 = SimplicialComplex( simplices.begin(), simplices.end() );
+  }
 
   // Barycentric subdivision to ensure that the resulting complex is
   // flaglike in sense of MacPherson et al.
@@ -197,6 +212,9 @@ int main(int, char**)
     out0 << D3.front() << "\n";
     out1 << D5.front() << "\n";
 
+#if 0
+    // FIXME: make configurable
     std::cerr << "Bottleneck distance (IH vs. PH): " << aleph::distances::bottleneckDistance( D3.front(), D5.front() ) << "\n";
+#endif
   }
 }
