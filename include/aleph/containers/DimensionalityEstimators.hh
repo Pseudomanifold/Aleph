@@ -1,12 +1,16 @@
 #ifndef ALEPH_CONTAINERS_DIMENSIONALITY_ESTIMATORS_HH__
 #define ALEPH_CONTAINERS_DIMENSIONALITY_ESTIMATORS_HH__
 
+#include <aleph/math/KahanSummation.hh>
+
+#include <boost/graph/adjacency_list.hpp>
+#include <boost/graph/kruskal_min_spanning_tree.hpp>
+
 #include <stdexcept>
 #include <vector>
 
 #include <cmath>
 
-#include <aleph/math/KahanSummation.hh>
 
 namespace aleph
 {
@@ -265,6 +269,75 @@ template <
   }
 
   return estimates;
+}
+
+/**
+  Estimates local intrinsic dimensionality of a container using its
+  minimum spanning tree.
+
+  @param container Container to use for dimensionality estimation
+  @param distance  Distance measure
+
+  @returns Vector of local intrinsic dimensionality estimates. Note
+           that the numbers are reported *without* rounding.
+*/
+
+template <
+  class Distance,
+  class Container
+> std::vector<double> estimateLocalDimensionalityNearestNeighbours( const Container& container,
+                                                                    Distance distance = Distance() )
+{
+  using WeightedGraph
+    = boost::adjacency_list<
+        boost::vecS,
+        boost::vecS,
+        boost::undirectedS,
+        boost::no_property,
+        boost::property<boost::edge_weight_t, double> >;
+
+  using VertexDescriptor = boost::graph_traits<WeightedGraph>::vertex_descriptor;
+  using EdgeDescriptor   = boost::graph_traits<WeightedGraph>::edge_descriptor;
+
+  auto n = container.size();
+  auto d = container.dimension();
+
+  WeightedGraph G( n );
+
+  for( std::size_t i = 0; i < n; i++ )
+  {
+    auto&& p = container[i];
+
+    for( std::size_t j = i+1; j < n; j++ )
+    {
+      auto&& q  = container[j];
+      auto dist = distance( p.begin(), q.begin(), d );
+
+      boost::add_edge( VertexDescriptor(i),
+                       VertexDescriptor(j),
+                       dist,
+                       G );
+    }
+  }
+
+  std::vector<EdgeDescriptor> mstEdges;
+  boost::kruskal_minimum_spanning_tree( G,
+                                        std::back_inserter( mstEdges ) );
+
+  WeightedGraph MST( n );
+
+  for( auto&& edge : mstEdges )
+  {
+    boost::add_edge( boost::source( edge, G ),
+                     boost::target( edge, G ),
+                     MST );
+  }
+
+  for( auto pair = boost::vertices( MST ); pair.first != pair.second; ++pair.first )
+  {
+  }
+
+  return {};
 }
 
 } // namespace containers
