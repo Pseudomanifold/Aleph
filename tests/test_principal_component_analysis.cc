@@ -32,6 +32,12 @@ template <class T> void testSimpleMatrix()
   ALEPH_ASSERT_THROW( std::abs( eigenvalues[0] - 16.3629 ) < 1e-4 );
   ALEPH_ASSERT_THROW( std::abs( eigenvalues[1] -  1.3037 ) < 1e-4 );
 
+  ALEPH_ASSERT_THROW( std::abs( result.components[0][0] - 0.0443134 ) < 1e-6 );
+  ALEPH_ASSERT_THROW( std::abs( result.components[0][1] - 0.9990180 ) < 1e-6 );
+  ALEPH_ASSERT_THROW( std::abs( result.components[1][0] - 0.9990180 ) < 1e-6 );
+  ALEPH_ASSERT_THROW( std::abs( result.components[1][1] + 0.0443134 ) < 1e-6 );
+
+
   ALEPH_TEST_END();
 }
 
