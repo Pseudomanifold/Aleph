@@ -118,6 +118,35 @@ std::set<VertexType> findSingularities( const PointCloud& pointCloud, const std:
   return singularities;
 }
 
+std::set<VertexType> detectSingularities( const PointCloud& pointCloud )
+{
+  PointCloud singularity( 1, pointCloud.dimension() );
+
+  std::vector<DataType> p = {1,0,0};
+  singularity.set(0, p.begin(), p.end() );
+
+  auto pc               = pointCloud + singularity;
+  auto singularityIndex = pc.size() - 1;
+
+  using IndexType   = typename NearestNeighbours::IndexType;
+  using ElementType = typename NearestNeighbours::ElementType;
+
+  std::vector< std::vector<IndexType> > indices;
+  std::vector< std::vector<ElementType> > distances;
+
+  NearestNeighbours nearestNeighbours( pointCloud );
+  nearestNeighbours.radiusSearch( 0.1, indices, distances );
+
+  std::set<VertexType> singularities;
+
+  auto&& neighbours = indices[ singularityIndex ];
+  for( auto&& neighbour : neighbours )
+    if( neighbour != singularityIndex )
+      singularities.insert( neighbour );
+
+  return singularities;
+}
+
 int main(int, char**)
 {
   auto pointCloud       = makeOnePointUnionOfSpheres(500);
