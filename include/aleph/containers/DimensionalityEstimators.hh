@@ -2,15 +2,17 @@
 #define ALEPH_CONTAINERS_DIMENSIONALITY_ESTIMATORS_HH__
 
 #include <aleph/math/KahanSummation.hh>
+#include <aleph/math/PrincipalComponentAnalysis.hh>
 
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/graph/kruskal_min_spanning_tree.hpp>
 
+#include <iterator>
+#include <limits>
 #include <stdexcept>
 #include <vector>
 
 #include <cmath>
-
 
 namespace aleph
 {
@@ -338,6 +340,99 @@ template <
   }
 
   return {};
+}
+
+/**
+  Estimates local intrinsic dimensionality of a container using its
+  local local principal components.
+
+  @param container Container to use for dimensionality estimation
+  @param distance  Distance measure
+
+  @returns Vector of local intrinsic dimensionality estimates. The numbers are
+           not rounded but taken directly from the estimation procedure.
+*/
+
+template <
+  class Distance,
+  class Container,
+  class Wrapper
+> std::vector<unsigned> estimateLocalDimensionalityPCA( const Container& container,
+                                                        unsigned k,
+                                                        Distance /* distance */ = Distance() )
+{
+  using IndexType   = typename Wrapper::IndexType;
+  using ElementType = typename Wrapper::ElementType;
+
+  std::vector< std::vector<IndexType> > indices;
+  std::vector< std::vector<ElementType> > distances;
+
+  Wrapper nnWrapper( container );
+  nnWrapper.neighbourSearch( k+1, indices, distances );
+
+  std::vector<unsigned> estimates;
+  estimates.reserve( container.size() );
+
+  for( auto&& localIndices : indices )
+  {
+    // 1. Collect all points that are part of the nearest neighbours
+    // 2. Convert them into a point cloud
+    // 3. Apply principal component analysis to the point cloud
+    // 4. Analyse the principal components to estimate local intrinsic
+    //    dimensionality
+
+    std::vector< std::vector<ElementType> > data( localIndices.size(), std::vector<ElementType>() );
+
+    {
+      std::size_t i = 0;
+      for( auto&& index : localIndices )
+      {
+        auto&& p = container[index];
+
+        data[i].assign( p.begin(), p.end() );
+
+        i++;
+      }
+    }
+
+    // Calculate a (local) principal component analysis and analyse the
+    // resulting spectrum. The largest spectral gap is used to estimate
+    // the local intrinsic dimensionality.
+    aleph::math::PrincipalComponentAnalysis pca;
+    auto result           = pca( data );
+    auto&& singularValues = result.singularValues;
+
+    if( singularValues.size() >= 2 )
+    {
+      ElementType spectralGap = std::numeric_limits<ElementType>::lowest();
+      unsigned spectralIndex  = 0;
+
+      auto prev = singularValues.begin();
+      auto curr = std::next( prev );
+
+      for( ; curr != singularValues.end(); ++prev, ++curr)
+      {
+        auto gap = std::abs( *prev - *curr );
+
+        if( gap > spectralGap )
+        {
+          // Notice that I am using the *lower* bound of the index here
+          // by specifying `prev` instead of current. This makes sense,
+          // as a jumping between $i-1$ and $i$ indicates that $i-1$ is
+          // sufficient to describe the data adequately.
+          //
+          // The additional offset of 1 is used because `std::distance`
+          // uses zero-based indices.
+          spectralGap   = gap;
+          spectralIndex = static_cast<unsigned>( std::distance( singularValues.begin(), prev ) ) + 1;
+        }
+      }
+
+      estimates.push_back( spectralIndex );
+    }
+  }
+
+  return estimates;
 }
 
 } // namespace containers
