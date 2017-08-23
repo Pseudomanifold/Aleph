@@ -142,7 +142,7 @@ public:
           // the resulting simplicial complex---it will not be used by
           // any other simplex during the subdivision.
           L.push_back( Simplex( vertices.begin(), vertices.end(),
-                                s.data() ) );
+                                s.data() * DataType( functor( vertices.size() ) ) ) );
         }
 
         subdivision[s] = cone;
