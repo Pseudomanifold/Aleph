@@ -1,9 +1,12 @@
 #ifndef ALEPH_MATH_PRINCIPAL_COMPONENT_ANALYSIS_HH__
 #define ALEPH_MATH_PRINCIPAL_COMPONENT_ANALYSIS_HH__
 
-#include <eigen3/Eigen/Core>
-#include <eigen3/Eigen/Eigenvalues>
-#include <eigen3/Eigen/SVD>
+#include <aleph/config/Eigen.hh>
+
+#ifdef ALEPH_WITH_EIGEN
+  #include <Eigen/Core>
+  #include <Eigen/SVD>
+#endif
 
 #include <vector>
 
@@ -36,6 +39,7 @@ public:
 
   template <class T> Result<T> operator()( const std::vector< std::vector<T> >& data )
   {
+#ifdef ALEPH_WITH_EIGEN
     if( data.empty() )
       return {};
 
@@ -82,6 +86,10 @@ public:
     }
 
     return result;
+
+#else
+  return {};
+#endif
   }
 
 private:
