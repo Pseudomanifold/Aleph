@@ -1,3 +1,4 @@
+#include <aleph/containers/DataDescriptors.hh>
 #include <aleph/containers/DimensionalityEstimators.hh>
 #include <aleph/containers/PointCloud.hh>
 
@@ -159,28 +160,34 @@ int main(int, char**)
 {
   auto pointCloud       = makeOnePointUnionOfSpheres(500);
   auto dimensionalities = aleph::containers::estimateLocalDimensionalityPCA<Distance, PointCloud, NearestNeighbours>( pointCloud, 8 );
+  auto densities        = aleph::containers::estimateDensityTruncatedGaussian( pointCloud, 1.0 );
 
   {
     std::ofstream out1( "/tmp/P.txt" );
     std::ofstream out2( "/tmp/F.txt" );
+    std::ofstream out3( "/tmp/D.txt" );
 
     out1 << pointCloud << "\n";
 
     for( auto&& dimensionality : dimensionalities )
       out2 << dimensionality << "\n";
+
+    for( auto&& density : densities )
+      out3 << density << "\n";
   }
 
   auto K
     = aleph::geometry::buildVietorisRipsComplex(
         NearestNeighbours( pointCloud ),
-        DataType( 0.30 ),
-        1 // FIXME: make configurable
+        DataType( 0.25 ),
+        3 // FIXME: make configurable
   );
 
   // Skeleta (or skeletons?)
   auto K0 = aleph::topology::Skeleton()( 0, K );
   auto K1 = aleph::topology::Skeleton()( 1, K );
   auto K2 = aleph::topology::Skeleton()( 2, K );
+  auto K3 = aleph::topology::Skeleton()( 3, K );
 
   {
     auto singularities      = detectSingularities( pointCloud );
@@ -212,10 +219,10 @@ int main(int, char**)
     L.sort( aleph::topology::filtrations::Data<typename decltype(L)::ValueType>() ); // FIXME
   }
 
-  auto D1 = aleph::calculateIntersectionHomology( L, {K0,K1,K2}, aleph::Perversity( {-1, 0} ) );
-  auto D2 = aleph::calculateIntersectionHomology( L, {K0,K1,K2}, aleph::Perversity( {-1, 1} ) );
-  auto D3 = aleph::calculateIntersectionHomology( L, {K0,K1,K2}, aleph::Perversity( { 0, 0} ) );
-  auto D4 = aleph::calculateIntersectionHomology( L, {K0,K1,K2}, aleph::Perversity( { 0, 1} ) );
+  auto D1 = aleph::calculateIntersectionHomology( L, {K0,K1,K2,K3}, aleph::Perversity( {-1, 0} ) );
+  auto D2 = aleph::calculateIntersectionHomology( L, {K0,K1,K2,K3}, aleph::Perversity( {-1, 1} ) );
+  auto D3 = aleph::calculateIntersectionHomology( L, {K0,K1,K2,K3}, aleph::Perversity( { 0, 0} ) );
+  auto D4 = aleph::calculateIntersectionHomology( L, {K0,K1,K2,K3}, aleph::Perversity( { 0, 1} ) );
   auto D5 = aleph::calculatePersistenceDiagrams ( L );
 
   std::vector<PersistenceDiagram> persistenceDiagrams;
@@ -227,6 +234,7 @@ int main(int, char**)
   {
     std::ofstream out0( "/tmp/D_0.txt" );
     std::ofstream out1( "/tmp/D_1.txt" );
+    std::ofstream out2( "/tmp/D_2.txt" );
 
     for( auto&& D : persistenceDiagrams )
     {
@@ -236,6 +244,8 @@ int main(int, char**)
         out0 << "# 0\n" << D << "\n\n";
       else if( D.dimension() == 1 )
         out1 << "# 1\n" << D << "\n\n";
+      else if( D.dimension() == 2 )
+        out2 << "# 2\n" << D << "\n\n";
     }
   }
 
