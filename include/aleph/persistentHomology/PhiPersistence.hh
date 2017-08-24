@@ -183,8 +183,8 @@ template <class Simplex> auto calculateIntersectionHomology( const aleph::topolo
         // The notation follows Bendich and Harer, so $i$ is actually
         // referring to a dimension instead of an index. Beware!
         auto i            = s.dimension();
-        auto intersection = aleph::topology::intersect( X.at( d - k ), s );
-        auto dimension    = intersection.empty() ? -1 : static_cast<long>( intersection.rbegin()->dimension() );
+        auto intersection = aleph::topology::lastLexicographicalIntersection( X.at( d - k ), s );
+        auto dimension    = intersection.empty() ? -1 : static_cast<long>( intersection.dimension() );
         admissible        = admissible && intersection.empty() ? true : static_cast<long>( dimension ) <= ( long(i) - long(k) + long( p(k) ) );
       }
 
