@@ -43,6 +43,9 @@
 #include <limits>
 #include <stdexcept>
 
+_Pragma( "GCC diagnostic push" )
+_Pragma( "GCC diagnostic ignored \"-Wunused-parameter\"" )
+
 namespace aleph
 {
 
@@ -993,5 +996,7 @@ count_each_reversible_circular_permutation(BidirIter first, BidirIter mid,
 } // namespace math
 
 } // namespace aleph
+
+_Pragma( "GCC diagnostic pop" )
 
 #endif

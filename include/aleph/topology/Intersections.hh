@@ -126,9 +126,11 @@ template <class SimplicialComplex, class Simplex> std::set<Simplex> intersectWit
 
 template <class SimplicialComplex, class Simplex> Simplex lastLexicographicalIntersection( const SimplicialComplex& K, const Simplex& s ) noexcept
 {
-  using Vertex   = typename Simplex::VertexType;
-  using Vector   = std::vector<Vertex>;
-  using Iterator = typename Vector::const_iterator;
+  using Vertex         = typename Simplex::VertexType;
+  using Vector         = std::vector<Vertex>;
+
+  using Iterator       = typename Vector::const_iterator;
+  using DifferenceType = typename Vector::difference_type;
 
   Vector vertices( s.begin(), s.end() );
   Simplex result;
@@ -143,7 +145,7 @@ template <class SimplicialComplex, class Simplex> Simplex lastLexicographicalInt
   // with all simplices of the complex.
   for( std::size_t d = s.size(); d >= 1; d-- )
   {
-    aleph::math::for_each_combination( vertices.begin(), vertices.begin() + d, vertices.end(),
+    aleph::math::for_each_combination( vertices.begin(), vertices.begin() + DifferenceType( d ), vertices.end(),
       [&K, &result] ( Iterator first, Iterator last )
       {
         auto pos = K.find( Simplex( first, last ) );
