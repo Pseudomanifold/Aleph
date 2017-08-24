@@ -16,7 +16,12 @@
 // are part of the calculation.
 _Pragma( "GCC diagnostic push" )
 _Pragma( "GCC diagnostic ignored \"-Wunknown-pragmas\"" )
-_Pragma( "GCC diagnostic ignored \"-Wint-in-bool-context\"" )
+
+#if __GNUC__ < 6
+  _Pragma( "GCC diagnostic ignored \"-Werror\"" )
+#else
+  _Pragma( "GCC diagnostic ignored \"-Wint-in-bool-context\"" )
+#endif
 
 namespace aleph
 {
