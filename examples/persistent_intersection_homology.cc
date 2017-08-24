@@ -179,9 +179,11 @@ int main(int, char**)
   auto K
     = aleph::geometry::buildVietorisRipsComplex(
         NearestNeighbours( pointCloud ),
-        DataType( 0.25 ),
+        DataType( 0.30 ),
         3 // FIXME: make configurable
   );
+
+  std::cerr << "* Obtained Vietoris--Rips complex with " << K.size() << " simplices\n";
 
   // Skeleta (or skeletons?)
   auto K0 = aleph::topology::Skeleton()( 0, K );
@@ -206,6 +208,7 @@ int main(int, char**)
     K0 = SimplicialComplex( simplices.begin(), simplices.end() );
   }
 
+#if 0
   // Barycentric subdivision to ensure that the resulting complex is
   // flaglike in sense of MacPherson et al.
   auto L
@@ -218,7 +221,9 @@ int main(int, char**)
     L.recalculateWeights( useMaximum, skipOneDimensionalSimplices );
     L.sort( aleph::topology::filtrations::Data<typename decltype(L)::ValueType>() ); // FIXME
   }
+#endif
 
+  auto L  = K;
   auto D1 = aleph::calculateIntersectionHomology( L, {K0,K1,K2,K3}, aleph::Perversity( {-1, 0} ) );
   auto D2 = aleph::calculateIntersectionHomology( L, {K0,K1,K2,K3}, aleph::Perversity( {-1, 1} ) );
   auto D3 = aleph::calculateIntersectionHomology( L, {K0,K1,K2,K3}, aleph::Perversity( { 0, 0} ) );
