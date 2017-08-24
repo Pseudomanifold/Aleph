@@ -1,6 +1,8 @@
 #ifndef ALEPH_TOPOLOGY_INTERSECTIONS_HH__
 #define ALEPH_TOPOLOGY_INTERSECTIONS_HH__
 
+#include <aleph/math/Combinations.hh>
+
 #include <algorithm>
 #include <iterator>
 #include <set>
@@ -108,6 +110,60 @@ template <class SimplicialComplex, class Simplex> std::set<Simplex> intersectWit
   }
 
   return simplices;
+}
+
+/**
+  Calculates the *last* lexicographical intersection of the given
+  simplex with the given simplicial complex. *Last* refers to the
+  fact that the function attempts to find the intersection of the
+  highest possible dimensionality.
+
+  @param K Simplicial complex
+  @param s Simplex
+
+  @returns Intersection or an empty simplex if there is none
+*/
+
+template <class SimplicialComplex, class Simplex> Simplex lastLexicographicalIntersection( const SimplicialComplex& K, const Simplex& s ) noexcept
+{
+  using Vertex   = typename Simplex::VertexType;
+  using Vector   = std::vector<Vertex>;
+  using Iterator = typename Vector::const_iterator;
+
+  Vector vertices( s.begin(), s.end() );
+  Simplex result;
+
+  // The basic idea of this function is that *all* possible subsets of
+  // the simplex need to be evaluated, as only one of them is possibly
+  // a match for the intersection.
+  //
+  // If the simplicial complex is large and the dimension of the input
+  // simplex is small, it is much cheaper to query the complex for the
+  // simplex rather than actually *calculating* intersections manually
+  // with all simplices of the complex.
+  for( std::size_t d = s.size(); d >= 1; d-- )
+  {
+    aleph::math::for_each_combination( vertices.begin(), vertices.begin() + d, vertices.end(),
+      [&K, &result] ( Iterator first, Iterator last )
+      {
+        auto pos = K.find( Simplex( first, last ) );
+        if( pos != K.end() )
+        {
+          result = *pos;
+          return true;
+        }
+
+        return false;
+      }
+    );
+
+    // We may break the loop as soon as a non-empty simplex has been
+    // identified.
+    if( result )
+      return result;
+  }
+
+  return result;
 }
 
 } // namespace topology
