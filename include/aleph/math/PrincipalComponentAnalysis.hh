@@ -12,6 +12,12 @@
 
 #include <cmath>
 
+// These warnings can become a bit overzealous; the initialization done
+// in the class is completely fine and will default to a struct that is
+// properly initialized.
+_Pragma( "GCC diagnostic push" )
+_Pragma( "GCC diagnostic ignored \"-Wmissing-field-initializers\"" )
+
 namespace aleph
 {
 
@@ -41,11 +47,12 @@ public:
 
     using Matrix = Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>;
     using Vector = Eigen::Matrix<T, 1, Eigen::Dynamic>;
+    using Index  = Eigen::Index;
 
     Matrix M(n,m);
 
     for( std::size_t row = 0; row < n; row++ )
-      M.row(row) = Vector::Map( &data[row][0], m );
+      M.row( Index(row) ) = Vector::Map( &data[row][0], Index(m) );
 
     M  = M.rowwise() - M.colwise().mean();
     M /= std::sqrt( static_cast<T>( m ) );
@@ -56,10 +63,10 @@ public:
 
     {
       auto&& singularValues = svd.singularValues();
-      result.singularValues.reserve( singularValues.size() );
+      result.singularValues.reserve( static_cast<std::size_t>( singularValues.size() ) );
 
       for( decltype( singularValues.size() ) i = 0; i < singularValues.size(); i++ )
-        result.singularValues.push_back( singularValues(i) );
+        result.singularValues.push_back( singularValues( Index(i) ) );
     }
 
     {
@@ -73,7 +80,7 @@ public:
 
       for( decltype(numSingularVectors) i = 0; i < numSingularVectors; i++ )
       {
-        auto&& column = V.col(i);
+        auto&& column = V.col( Index(i) );
         result.components[i].assign( column.data(), column.data() + dimension );
       }
     }
@@ -91,5 +98,7 @@ public:
 } // namespace math
 
 } // namespace aleph
+
+_Pragma( "GCC diagnostic pop" )
 
 #endif
