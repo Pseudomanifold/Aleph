@@ -28,13 +28,6 @@ public:
     std::vector<T> singularValues;
   };
 
-  // Constructors ------------------------------------------------------
-
-  PrincipalComponentAnalysis( unsigned numComponents = 0 )
-    : _numComponents( numComponents )
-  {
-  }
-
   // Main functor ------------------------------------------------------
 
   template <class T> Result<T> operator()( const std::vector< std::vector<T> >& data )
@@ -88,12 +81,11 @@ public:
     return result;
 
 #else
+  // to quiet compiler warnings
+  (void) data;
   return {};
 #endif
   }
-
-private:
-  unsigned _numComponents;
 };
 
 } // namespace math
