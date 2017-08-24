@@ -78,6 +78,17 @@ void wrapSimplicialComplex( py::module& m )
 
             return stream.str();
           }
+    )
+    .def( "append", &SimplicialComplex::push_back )
+    .def( "append",
+          [] ( SimplicialComplex& K, py::list vertices_ )
+          {
+            std::vector<VertexType> vertices;
+            for( auto vertexHandle : vertices_ )
+              vertices.push_back( py::cast<VertexType>( vertexHandle ) );
+
+            K.push_back( Simplex( vertices.begin(), vertices.end() ) );
+          }
     );
 }
 
