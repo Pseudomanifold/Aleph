@@ -51,16 +51,21 @@ template <class SimplicialComplex, class Simplex> std::set<Simplex> intersect( c
 
   // Shortcut: if the simplex is contained in the simplicial complex, we
   // report this as an intersection.
-  //
-  // TODO: check whether this is allowed
   if( K.contains(s) )
     return { *K.find(s) };
 
   std::set<Simplex> simplices;
 
-  for( auto&& t : K )
+  // Assuming that the simplicial complex is not malformed, it makes no
+  // sense to check for intersections with simplices whose dimension is
+  // larger than the input simplex.
+  auto range = K.range( [  ] ( std::size_t /* d */ ) { return true; },
+                        [&s] ( std::size_t d       ) { return d <= s.dimension(); } );
+
+  for( auto it = range.first; it != range.second; ++it )
   {
-    auto u = intersect(s,t);
+    auto&& t = *it;
+    auto u   = intersect(s,t);
 
     // Only insert non-empty intersections
     if( u )
