@@ -25,7 +25,7 @@
 
   Demonstrated functions:
 
-    - aleph::eccentricities
+    - aleph::containers::eccentricities
     - aleph::geometry::buildVietorisRipsComplex
     - aleph::calculatePersistenceDiagrams
     - aleph::utilities::convert
@@ -136,7 +136,7 @@ int main( int argc, char** argv )
   std::cerr << "* Calculating eccentricity data descriptor of order " << order << "...";
 
   auto eccentricity
-    = aleph::eccentricities<Distance>( pointCloud, order );
+    = aleph::containers::eccentricities<Distance>( pointCloud, order );
 
   {
     // We transform the values of the data descriptor so that the

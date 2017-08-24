@@ -17,6 +17,9 @@
 namespace aleph
 {
 
+namespace containers
+{
+
 /**
   Order-based eccentricity calculations. Eccentricity assigns low values
   to central points in a point cloud without having to define the actual
@@ -163,6 +166,8 @@ template <
 
   return densities;
 }
+
+} // namespace containers
 
 } // namespace aleph
 

@@ -86,17 +86,17 @@ std::vector<DataType> calculateDataDescriptor( const std::string& name, const Po
   if( name == "density" )
   {
     #ifdef ALEPH_WITH_FLANN
-      return aleph::estimateDensityDistanceToMeasure<Distance, PointCloud, Wrapper>( pointCloud, k );
+      return aleph::containers::estimateDensityDistanceToMeasure<Distance, PointCloud, Wrapper>( pointCloud, k );
     #else
       // The function will automatically fall back to the default
       // wrapper.
-      return aleph::estimateDensityDistanceToMeasure<Distance>( pointCloud, k );
+      return aleph::containers::estimateDensityDistanceToMeasure<Distance>( pointCloud, k );
     #endif
   }
   else if( name == "eccentricity" )
-    return aleph::eccentricities<Distance>( pointCloud, p );
+    return aleph::containers::eccentricities<Distance>( pointCloud, p );
   else if( name == "gaussian" )
-    return aleph::estimateDensityTruncatedGaussian( pointCloud, h );
+    return aleph::containers::estimateDensityTruncatedGaussian( pointCloud, h );
 
   return {};
 }
