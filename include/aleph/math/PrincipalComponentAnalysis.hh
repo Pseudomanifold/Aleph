@@ -47,7 +47,12 @@ public:
 
     using Matrix = Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>;
     using Vector = Eigen::Matrix<T, 1, Eigen::Dynamic>;
+
+#if EIGEN_VERSION_AT_LEAST(3,3,0)
     using Index  = Eigen::Index;
+#else
+    using Index  = typename Matrix::Index;
+#endif
 
     Matrix M(n,m);
 
