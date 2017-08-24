@@ -1,5 +1,7 @@
 #include <tests/Base.hh>
 
+#include <aleph/config/Eigen.hh>
+
 #include <aleph/math/PrincipalComponentAnalysis.hh>
 
 #include <algorithm>
@@ -43,6 +45,8 @@ template <class T> void testSimpleMatrix()
 
 int main(int, char**)
 {
+#ifdef ALEPH_WITH_EIGEN
   testSimpleMatrix<float> ();
   testSimpleMatrix<double>();
+#endif
 }
