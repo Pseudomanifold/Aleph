@@ -15,6 +15,7 @@
 // the compiler rightfully warns about this because two boolean values
 // are part of the calculation.
 _Pragma( "GCC diagnostic push" )
+_Pragma( "GCC diagnostic ignored \"-Wunknown-pragmas\"" )
 _Pragma( "GCC diagnostic ignored \"-Wint-in-bool-context\"" )
 
 namespace aleph
