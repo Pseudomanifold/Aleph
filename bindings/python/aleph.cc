@@ -58,13 +58,27 @@ void wrapSimplicialComplex( py::module& m )
             std::vector<Simplex> simplices;
             for( auto simplexHandle : simplices_ )
             {
-              auto&& vertices_ = py::cast<py::list>( simplexHandle );
+              // Let us first try to obtain a simplex from each handle
+              // in order to rapidly build a complex.
+              try
+              {
+                auto simplex = py::cast<Simplex>( simplexHandle );
+                simplices.push_back( simplex );
+              }
 
-              std::vector<VertexType> vertices;
-              for( auto vertexHandle : vertices_ )
-                vertices.push_back( py::cast<VertexType>( vertexHandle ) );
+              // Assume that the list contains only lists of vertices
+              // and convert them directly to simplices.
+              catch( py::cast_error& )
+              {
+                auto&& vertices_ = py::cast<py::list>( simplexHandle );
 
-              simplices.push_back( Simplex( vertices.begin(), vertices.end() ) );
+                std::vector<VertexType> vertices;
+                for( auto vertexHandle : vertices_ )
+                  vertices.push_back( py::cast<VertexType>( vertexHandle ) );
+
+                simplices.push_back( Simplex( vertices.begin(), vertices.end() ) );
+              }
+
             }
 
             new (&instance) SimplicialComplex( simplices.begin(), simplices.end() );
