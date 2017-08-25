@@ -105,81 +105,109 @@ void wrapSimplicialComplex( py::module& m )
   py::class_<SimplicialComplex>(m, "SimplicialComplex")
     .def( py::init<>() )
     .def( "__init__",
-          [] ( SimplicialComplex& instance, py::list simplices_ )
+      [] ( SimplicialComplex& instance, py::list simplices_ )
+      {
+        std::vector<Simplex> simplices;
+        for( auto simplexHandle : simplices_ )
+        {
+          // Let us first try to obtain a simplex from each handle
+          // in order to rapidly build a complex.
+          try
           {
-            std::vector<Simplex> simplices;
-            for( auto simplexHandle : simplices_ )
+            auto simplex = py::cast<Simplex>( simplexHandle );
+            simplices.push_back( simplex );
+          }
+
+          // Assume that the list contains only lists of vertices
+          // and convert them directly to simplices.
+          catch( py::cast_error& )
+          {
+            std::vector<VertexType> vertices;
+            DataType data = DataType();
+
+            try
             {
-              // Let us first try to obtain a simplex from each handle
-              // in order to rapidly build a complex.
-              try
-              {
-                auto simplex = py::cast<Simplex>( simplexHandle );
-                simplices.push_back( simplex );
-              }
+              auto&& vertices_ = py::cast<py::list>( simplexHandle );
 
-              // Assume that the list contains only lists of vertices
-              // and convert them directly to simplices.
-              catch( py::cast_error& )
-              {
-                std::vector<VertexType> vertices;
-                DataType data = DataType();
+              for( auto vertexHandle : vertices_ )
+                vertices.push_back( py::cast<VertexType>( vertexHandle ) );
+            }
+            catch( py::cast_error& )
+            {
+              auto&& tuple_    = py::cast<py::tuple>( simplexHandle );
 
-                try
-                {
-                  auto&& vertices_ = py::cast<py::list>( simplexHandle );
+              if( tuple_.size() != 2 )
+                throw std::runtime_error( "Unsupported number of tuple elements" );
 
-                  for( auto vertexHandle : vertices_ )
-                    vertices.push_back( py::cast<VertexType>( vertexHandle ) );
-                }
-                catch( py::cast_error& )
-                {
-                  auto&& tuple_    = py::cast<py::tuple>( simplexHandle );
+              auto&& vertices_ = py::cast<py::list>( tuple_[0] );
+              data             = py::cast<DataType>( tuple_[1] );
 
-                  if( tuple_.size() != 2 )
-                    throw std::runtime_error( "Unsupported number of tuple elements" );
-
-                  auto&& vertices_ = py::cast<py::list>( tuple_[0] );
-                  data             = py::cast<DataType>( tuple_[1] );
-
-                  for( auto vertexHandle : vertices_ )
-                    vertices.push_back( py::cast<VertexType>( vertexHandle ) );
-                }
-
-                simplices.push_back( Simplex( vertices.begin(), vertices.end(), data ) );
-              }
-
+              for( auto vertexHandle : vertices_ )
+                vertices.push_back( py::cast<VertexType>( vertexHandle ) );
             }
 
-            new (&instance) SimplicialComplex( simplices.begin(), simplices.end() );
+            simplices.push_back( Simplex( vertices.begin(), vertices.end(), data ) );
           }
+
+        }
+
+        new (&instance) SimplicialComplex( simplices.begin(), simplices.end() );
+      }
     )
+    .def( "__bool__",
+      [] ( const SimplicialComplex& K )
+      {
+        return !K.empty();
+      }
+    )
+    .def( "__contains__", &SimplicialComplex::contains )
+    .def( "__getitem__",  &SimplicialComplex::operator[] ) // FIXME: might want to handle negative indices?
     .def( "__iter__",
-          [] ( const SimplicialComplex& K )
-          {
-            return py::make_iterator( K.begin(), K.end() );
-          }, py::keep_alive<0,1>()
+      [] ( const SimplicialComplex& K )
+      {
+        return py::make_iterator( K.begin(), K.end() );
+      }, py::keep_alive<0,1>()
     )
     .def( "__len__", &SimplicialComplex::size )
     .def( "__repr__",
-          [] ( const SimplicialComplex& K )
-          {
-            std::ostringstream stream;
-            stream << K;
+      [] ( const SimplicialComplex& K )
+      {
+        std::ostringstream stream;
+        stream << K;
 
-            return stream.str();
-          }
+        return stream.str();
+      }
     )
     .def( "append", &SimplicialComplex::push_back )
     .def( "append",
-          [] ( SimplicialComplex& K, py::list vertices_ )
-          {
-            std::vector<VertexType> vertices;
-            for( auto vertexHandle : vertices_ )
-              vertices.push_back( py::cast<VertexType>( vertexHandle ) );
+      [] ( SimplicialComplex& K, py::list vertices_ )
+      {
+        std::vector<VertexType> vertices;
+        for( auto vertexHandle : vertices_ )
+          vertices.push_back( py::cast<VertexType>( vertexHandle ) );
 
-            K.push_back( Simplex( vertices.begin(), vertices.end() ) );
+        K.push_back( Simplex( vertices.begin(), vertices.end() ) );
+      }
+    )
+    .def( "sort",
+      [] ( SimplicialComplex& K )
+      {
+        K.sort();
+        return K;
+      }
+    )
+    .def( "sort",
+      [] ( SimplicialComplex& K, py::function functor )
+      {
+        K.sort(
+          [&functor] ( const Simplex& s, const Simplex& t )
+          {
+            return py::cast<bool>( functor(s,t) );
           }
+        );
+
+        return K;
+      }
     )
     .def_property_readonly( "dimension", &SimplicialComplex::dimension );
 }
