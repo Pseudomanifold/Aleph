@@ -3,6 +3,8 @@
 #include <aleph/topology/Simplex.hh>
 #include <aleph/topology/SimplicialComplex.hh>
 
+#include <stdexcept>
+
 namespace py = pybind11;
 
 using DataType   = double;
@@ -74,6 +76,12 @@ void wrapSimplex( py::module& m )
             return stream.str();
           }
     )
+    .def( "__reversed__",
+          [] ( const Simplex& simplex )
+          {
+            return py::make_iterator( simplex.rbegin(), simplex.rend() );
+          }, py::keep_alive<0,1>()
+    )
     .def_property_readonly( "boundary",
           [] ( const Simplex& simplex )
           {
@@ -108,13 +116,31 @@ void wrapSimplicialComplex( py::module& m )
               // and convert them directly to simplices.
               catch( py::cast_error& )
               {
-                auto&& vertices_ = py::cast<py::list>( simplexHandle );
-
                 std::vector<VertexType> vertices;
-                for( auto vertexHandle : vertices_ )
-                  vertices.push_back( py::cast<VertexType>( vertexHandle ) );
+                DataType data = DataType();
 
-                simplices.push_back( Simplex( vertices.begin(), vertices.end() ) );
+                try
+                {
+                  auto&& vertices_ = py::cast<py::list>( simplexHandle );
+
+                  for( auto vertexHandle : vertices_ )
+                    vertices.push_back( py::cast<VertexType>( vertexHandle ) );
+                }
+                catch( py::cast_error& )
+                {
+                  auto&& tuple_    = py::cast<py::tuple>( simplexHandle );
+
+                  if( tuple_.size() != 2 )
+                    throw std::runtime_error( "Unsupported number of tuple elements" );
+
+                  auto&& vertices_ = py::cast<py::list>( tuple_[0] );
+                  data             = py::cast<DataType>( tuple_[1] );
+
+                  for( auto vertexHandle : vertices_ )
+                    vertices.push_back( py::cast<VertexType>( vertexHandle ) );
+                }
+
+                simplices.push_back( Simplex( vertices.begin(), vertices.end(), data ) );
               }
 
             }
