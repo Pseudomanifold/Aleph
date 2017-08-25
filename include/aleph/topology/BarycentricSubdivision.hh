@@ -14,13 +14,13 @@
 // as well, there will be a multiplication involved in the functor and
 // the compiler rightfully warns about this because two boolean values
 // are part of the calculation.
-_Pragma( "GCC diagnostic push" )
-_Pragma( "GCC diagnostic ignored \"-Wunknown-pragmas\"" )
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunknown-pragmas"
 
 #if __GNUC__ < 6
-  _Pragma( "GCC diagnostic ignored \"-Werror\"" )
+  #pragma GCC diagnostic ignored "-Werror"
 #else
-  _Pragma( "GCC diagnostic ignored \"-Wint-in-bool-context\"" )
+  #pragma GCC diagnostic ignored "-Wint-in-bool-context"
 #endif
 
 namespace aleph
@@ -30,6 +30,9 @@ namespace topology
 {
 
 /**
+  @class BarycentricSubdivision
+  @brief Barycentric subdivision functor for complexes
+
   A functor for calculating the barycentric subdivision of
   a combinatorial simplicial complex. The interface of the
   functor is just like a regular function call in order to
@@ -45,6 +48,9 @@ namespace topology
   auto M = f( f(K) ); // second barycentric subdivision
 
   \endcode
+
+  The main operation of the functor is handled by BarycentricSubdivision::operator()(). Please
+  refer to the documentation of this function for more information.
 */
 
 class BarycentricSubdivision
@@ -54,6 +60,43 @@ public:
   /**
     Performs a barycentric subdivision of the given simplicial complex
     and returns the result.
+
+    @param K       Simplicial complex
+    @param functor Functor for assigning weights to subdivided
+                   simplices. The premise of the functor is to
+                   return a factor that determines how the old
+                   weight of a given simplex is being used for
+                   the subdivided one. The functor hence needs
+                   to return a scaling factor. By default, the
+                   scaling factor is 1, so the weights will be
+                   merely copied.\n
+
+                   The functor needs to provide the evaluation
+                   operator `operator()()` taking one unsigned
+                   value that describes the *dimension* of the
+                   current simplex. It should return a scaling
+                   factor for this dimension.\n
+
+                   The subsequent code provides a functor that
+                   is a good choice when subdividing edges for
+                   which the weight specifies a *length*:\n
+
+                   \code{.cpp}
+
+                    aleph::topology::BarycentricSubdivision subdivision;
+                    aleph::topology::SimplicialComplex K;
+
+                    auto L = subdivision( K, [] ( std::size_t dimension ) { return dimension == 0 ? 0 : 0.5; } );
+                    L.recalculateWeights( true, true );
+                   \endcode\n
+
+                    This will divide the length of every edge,
+                    while setting all other weights to zero so
+                    that the resulting simplicial complex does
+                    model a distance function correctly.
+
+    @tparam SimplicialComplex Simplicial complex class type
+    @tparam Functor           Functor type for assigning weights
   */
 
   template <class SimplicialComplex, class Functor = aleph::utilities::EmptyFunctor> SimplicialComplex operator()( const SimplicialComplex& K, Functor&& functor = Functor() ) const
@@ -166,6 +209,7 @@ public:
 
     return L;
   }
+
 private:
 
   /**
@@ -234,6 +278,6 @@ private:
 
 } // namespace aleph
 
-_Pragma( "GCC diagnostic pop" )
+#pragma GCC diagnostic pop
 
 #endif
