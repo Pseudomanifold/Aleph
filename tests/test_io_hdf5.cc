@@ -15,6 +15,7 @@ template <class D, class V> void test()
   using SimplicialComplex = aleph::topology::SimplicialComplex<Simplex>;
 
   SimplicialComplex K;
+  SimplicialComplex L;
 
   aleph::topology::io::HDF5SimpleDataSpaceReader reader;
   reader.setDataSetName( "Simple" );
@@ -23,13 +24,26 @@ template <class D, class V> void test()
           K,
           [] ( D a, D b ) { return std::min(a,b); } );
 
-  auto n0 = std::count_if( K.begin(), K.end(), [] ( const Simplex& s ) { return s.dimension() == 0; } );
-  auto n1 = std::count_if( K.begin(), K.end(), [] ( const Simplex& s ) { return s.dimension() == 1; } );
-  auto n2 = std::count_if( K.begin(), K.end(), [] ( const Simplex& s ) { return s.dimension() == 2; } );
+  reader( CMAKE_SOURCE_DIR + std::string( "/tests/input/Simple.h5" ), L );
 
-  ALEPH_ASSERT_EQUAL( n0,  9 );
-  ALEPH_ASSERT_EQUAL( n1, 16 );
-  ALEPH_ASSERT_EQUAL( n2,  8 );
+  ALEPH_ASSERT_THROW( K.empty() == false );
+  ALEPH_ASSERT_THROW( L.empty() == false );
+
+  ALEPH_ASSERT_EQUAL( K.size(), L.size() );
+
+  auto checkSimplexCount = [] ( const SimplicialComplex& K )
+  {
+    auto n0 = std::count_if( K.begin(), K.end(), [] ( const Simplex& s ) { return s.dimension() == 0; } );
+    auto n1 = std::count_if( K.begin(), K.end(), [] ( const Simplex& s ) { return s.dimension() == 1; } );
+    auto n2 = std::count_if( K.begin(), K.end(), [] ( const Simplex& s ) { return s.dimension() == 2; } );
+
+    ALEPH_ASSERT_EQUAL( n0,  9 );
+    ALEPH_ASSERT_EQUAL( n1, 16 );
+    ALEPH_ASSERT_EQUAL( n2,  8 );
+  };
+
+  checkSimplexCount( K );
+  checkSimplexCount( L );
 
   ALEPH_TEST_END();
 }
