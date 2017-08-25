@@ -41,7 +41,7 @@ public:
     this->operator()( filename, K, [] ( DataType a, DataType b ) { return std::max(a,b); } );
   }
 
-  template <class SimplicialComplex, class Functor> void operator()()( const std::string& filename, SimplicialComplex& K, Functor f )
+  template <class SimplicialComplex, class Functor> void operator()( const std::string& filename, SimplicialComplex& K, Functor f )
   {
     using namespace H5;
 
@@ -77,6 +77,8 @@ public:
 
     auto n    = width * height;
     auto data = read<DataType>( dataSet, n );
+
+    std::vector<Simplex> simplices;
 
     // 0-skeleton ------------------------------------------------------
     //
@@ -145,8 +147,8 @@ public:
           auto&& w = triangleCoordinates.at(2);
           auto&& x = triangleCoordinates.at(3);
 
-          simplices.push_back( Simplex( {u,x,w}, f( data[u], f( data[x], data[w] ) ) );
-          simplices.push_back( Simplex( {u,v,x}, f( data[u], f( data[v], data[x] ) ) );
+          simplices.push_back( Simplex( {u,x,w}, f( data[u], f( data[x], data[w] ) ) ) );
+          simplices.push_back( Simplex( {u,v,x}, f( data[u], f( data[v], data[x] ) ) ) );
         }
       }
     }
