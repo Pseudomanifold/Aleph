@@ -188,6 +188,15 @@ void wrapPersistenceDiagram( py::module& m )
 {
   py::class_<PersistenceDiagram>(m, "PersistenceDiagram")
     .def( py::init<>() )
+    .def( "__bool__",
+      [] ( const PersistenceDiagram& D )
+      {
+        return !D.empty();
+      }
+    )
+    .def( "__eq__", &PersistenceDiagram::operator== )
+    .def( "__ne__", &PersistenceDiagram::operator!= )
+    .def( "__len__", &PersistenceDiagram::size )
     .def( "__repr__",
       [] ( const PersistenceDiagram& D )
       {
@@ -196,7 +205,11 @@ void wrapPersistenceDiagram( py::module& m )
 
         return stream.str();
       }
-    );
+    )
+    .def( "removeDiagonal", &PersistenceDiagram::removeDiagonal )
+    .def( "removeUnpaired", &PersistenceDiagram::removeUnpaired )
+    .def_property( "dimension", &PersistenceDiagram::setDimension, &PersistenceDiagram::dimension )
+    .def_property_readonly( "betti", &PersistenceDiagram::betti );
 }
 
 void wrapPersistentHomologyCalculation( py::module& m )
