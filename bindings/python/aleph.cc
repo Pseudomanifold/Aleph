@@ -37,6 +37,34 @@ void wrapSimplex( py::module& m )
             new (&instance) Simplex( vertices.begin(), vertices.end(), dataType );
           }
     )
+    .def( "__bool__",
+          [] ( const Simplex& simplex )
+          {
+            return !simplex.empty();
+          }
+    )
+    .def( "__contains__",
+          [] ( const Simplex& simplex, VertexType v )
+          {
+            return simplex.contains(v);
+          }
+    )
+    .def( "__getitem__",
+          [] ( const Simplex& simplex, VertexType i )
+          {
+            return simplex[i];
+          }
+    )
+    .def( "__iter__",
+          [] ( const Simplex& simplex )
+          {
+            return py::make_iterator( simplex.begin(), simplex.end() );
+          }, py::keep_alive<0,1>()
+    )
+    .def( "__eq__" , &Simplex::operator== )
+    .def( "__ne__" , &Simplex::operator!= )
+    .def( "__lt__" , &Simplex::operator< )
+    .def( "__len__", &Simplex::size )
     .def( "__repr__",
           [] ( const Simplex& simplex )
           {
@@ -45,7 +73,17 @@ void wrapSimplex( py::module& m )
 
             return stream.str();
           }
-    );
+    )
+    .def_property_readonly( "boundary",
+          [] ( const Simplex& simplex )
+          {
+            return py::make_iterator( simplex.begin_boundary(), simplex.end_boundary() );
+          }, py::keep_alive<0,1>()
+    )
+    .def_property_readonly( "dimension", &Simplex::dimension )
+    .def_property_readonly( "empty"    , &Simplex::empty )
+    .def_property("data"  , &Simplex::data, &Simplex::setData )
+    .def_property("weight", &Simplex::data, &Simplex::setData );
 }
 
 void wrapSimplicialComplex( py::module& m )
@@ -84,6 +122,13 @@ void wrapSimplicialComplex( py::module& m )
             new (&instance) SimplicialComplex( simplices.begin(), simplices.end() );
           }
     )
+    .def( "__iter__",
+          [] ( const SimplicialComplex& K )
+          {
+            return py::make_iterator( K.begin(), K.end() );
+          }, py::keep_alive<0,1>()
+    )
+    .def( "__len__", &SimplicialComplex::size )
     .def( "__repr__",
           [] ( const SimplicialComplex& K )
           {
@@ -103,7 +148,8 @@ void wrapSimplicialComplex( py::module& m )
 
             K.push_back( Simplex( vertices.begin(), vertices.end() ) );
           }
-    );
+    )
+    .def_property_readonly( "dimension", &SimplicialComplex::dimension );
 }
 
 PYBIND11_PLUGIN(aleph)
