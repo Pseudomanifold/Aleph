@@ -68,6 +68,16 @@ ADD_EXECUTABLE( test_graph_generation                 test_graph_generation.cc )
 ADD_EXECUTABLE( test_io_functions                     test_io_functions.cc )
 ADD_EXECUTABLE( test_io_gml                           test_io_gml.cc )
 ADD_EXECUTABLE( test_io_json                          test_io_json.cc )
+
+# This test is a little bit special because it depends on another
+# shared library so it is possible that we cannot build it.
+IF( ALEPH_WITH_HDF5 )
+  ADD_EXECUTABLE( test_io_hdf5                        test_io_hdf5.cc )
+
+  TARGET_INCLUDE_DIRECTORIES( test_io_hdf5 SYSTEM PUBLIC ${HDF5_CXX_INCLUDE_DIRS} )
+  TARGET_LINK_LIBRARIES(      test_io_hdf5        ${HDF5_CXX_LIBRARIES} )
+ENDIF()
+
 ADD_EXECUTABLE( test_io_lexicographic_triangulation   test_io_lexicographic_triangulation.cc )
 ADD_EXECUTABLE( test_io_pajek                         test_io_pajek.cc )
 ADD_EXECUTABLE( test_io_vtk                           test_io_vtk.cc )
@@ -97,6 +107,12 @@ ADD_TEST( filesystem                       test_filesystem )
 ADD_TEST( graph_generation                 test_graph_generation )
 ADD_TEST( io_functions                     test_io_functions )
 ADD_TEST( io_gml                           test_io_gml )
+
+# The test will build nonetheless, but the results will of course be
+# incorrect if the library is not available.
+IF( ALEPH_WITH_HDF5 )
+  ADD_TEST( io_hdf5                        test_io_hdf5 )
+ENDIF()
 
 # The test will build nonetheless, but the results will of course be
 # incorrect if the library is not available.

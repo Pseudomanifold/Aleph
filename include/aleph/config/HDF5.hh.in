@@ -1,0 +1,6 @@
+#ifndef ALEPH_CONFIG_HDF5_HH__
+#define ALEPH_CONFIG_HDF5_HH__
+
+#cmakedefine ALEPH_WITH_HDF5
+
+#endif
