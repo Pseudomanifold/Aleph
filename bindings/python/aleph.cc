@@ -1,7 +1,12 @@
 #include <pybind11/pybind11.h>
+#include <pybind11/stl.h>
 
 #include <aleph/topology/Simplex.hh>
 #include <aleph/topology/SimplicialComplex.hh>
+
+#include <aleph/persistenceDiagrams/PersistenceDiagram.hh>
+
+#include <aleph/persistentHomology/Calculation.hh>
 
 #include <stdexcept>
 
@@ -10,8 +15,9 @@ namespace py = pybind11;
 using DataType   = double;
 using VertexType = unsigned;
 
-using Simplex           = aleph::topology::Simplex<DataType, VertexType>;
-using SimplicialComplex = aleph::topology::SimplicialComplex<Simplex>;
+using PersistenceDiagram = aleph::PersistenceDiagram<DataType>;
+using Simplex            = aleph::topology::Simplex<DataType, VertexType>;
+using SimplicialComplex  = aleph::topology::SimplicialComplex<Simplex>;
 
 void wrapSimplex( py::module& m )
 {
@@ -178,12 +184,39 @@ void wrapSimplicialComplex( py::module& m )
     .def_property_readonly( "dimension", &SimplicialComplex::dimension );
 }
 
+void wrapPersistenceDiagram( py::module& m )
+{
+  py::class_<PersistenceDiagram>(m, "PersistenceDiagram")
+    .def( py::init<>() )
+    .def( "__repr__",
+      [] ( const PersistenceDiagram& D )
+      {
+        std::ostringstream stream;
+        stream << D;
+
+        return stream.str();
+      }
+    );
+}
+
+void wrapPersistentHomologyCalculation( py::module& m )
+{
+  m.def( "calculatePersistenceDiagrams",
+    [] ( const SimplicialComplex& K )
+    {
+      return aleph::calculatePersistenceDiagrams( K );
+    }
+  );
+}
+
 PYBIND11_PLUGIN(aleph)
 {
   py::module m("aleph", "Python bindings for Aleph, a library for exploring persistent homology");
 
   wrapSimplex(m);
   wrapSimplicialComplex(m);
+  wrapPersistenceDiagram(m);
+  wrapPersistentHomologyCalculation(m);
 
   return m.ptr();
 }
