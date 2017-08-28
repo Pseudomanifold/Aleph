@@ -1,6 +1,16 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 
+#include <aleph/containers/PointCloud.hh>
+
+#include <aleph/config/FLANN.hh>
+
+#include <aleph/geometry/BruteForce.hh>
+#include <aleph/geometry/FLANN.hh>
+#include <aleph/geometry/VietorisRipsComplex.hh>
+
+#include <aleph/geometry/distances/Euclidean.hh>
+
 #include <aleph/topology/Simplex.hh>
 #include <aleph/topology/SimplicialComplex.hh>
 
@@ -15,9 +25,17 @@ namespace py = pybind11;
 using DataType   = double;
 using VertexType = unsigned;
 
+using PointCloud         = aleph::containers::PointCloud<DataType>;
 using PersistenceDiagram = aleph::PersistenceDiagram<DataType>;
 using Simplex            = aleph::topology::Simplex<DataType, VertexType>;
 using SimplicialComplex  = aleph::topology::SimplicialComplex<Simplex>;
+
+#ifdef ALEPH_WITH_FLANN
+  template <class Distance> using NearestNeighbours = aleph::geometry::FLANN<PointCloud, Distance>;
+
+#else
+  template <class Distance> using NearestNeighbours = aleph::geometry::BruteForce<PointCloud, Distance>;
+#endif
 
 void wrapSimplex( py::module& m )
 {
@@ -242,11 +260,50 @@ void wrapPersistenceDiagram( py::module& m )
 
 void wrapPersistentHomologyCalculation( py::module& m )
 {
+  using namespace pybind11::literals;
+
   m.def( "calculatePersistenceDiagrams",
     [] ( const SimplicialComplex& K )
     {
       return aleph::calculatePersistenceDiagrams( K );
     }
+  );
+
+  m.def( "calculatePersistenceDiagrams",
+    [] ( py::buffer buffer, DataType epsilon, unsigned dimension )
+    {
+      py::buffer_info bufferInfo = buffer.request();
+
+      if( bufferInfo.ndim != 2 || bufferInfo.shape.size() != 2 )
+        throw std::runtime_error( "Only two-dimensional buffers are supported" );
+
+      if( bufferInfo.format != py::format_descriptor<DataType>::format() )
+        throw std::runtime_error( "Unexpected format" );
+
+      auto n = bufferInfo.shape[0];
+      auto d = bufferInfo.shape[1];
+
+      PointCloud pointCloud(n,d);
+
+      DataType* target = pointCloud.data();
+      DataType* source = reinterpret_cast<DataType*>( bufferInfo.ptr );
+
+      std::copy( source, source + n*d, target );
+
+      using Distance = aleph::distances::Euclidean<DataType>;
+      dimension      = dimension > 0 ? dimension : static_cast<unsigned>( pointCloud.dimension() + 1 );
+
+      auto K         = aleph::geometry::buildVietorisRipsComplex(
+        NearestNeighbours<Distance>( pointCloud ),
+        epsilon,
+        dimension
+      );
+
+      return aleph::calculatePersistenceDiagrams( K );
+    },
+    "buffer"_a,
+    "epsilon"_a   = DataType(),
+    "dimension"_a = 0
   );
 }
 
