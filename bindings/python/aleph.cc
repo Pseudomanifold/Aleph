@@ -15,6 +15,7 @@
 #include <aleph/topology/SimplicialComplex.hh>
 
 #include <aleph/persistenceDiagrams/PersistenceDiagram.hh>
+#include <aleph/persistenceDiagrams/MultiScaleKernel.hh>
 
 #include <aleph/persistenceDiagrams/distances/Bottleneck.hh>
 #include <aleph/persistenceDiagrams/distances/Hausdorff.hh>
@@ -337,6 +338,25 @@ void wrapDistanceCalculations( py::module& m )
     "D1"_a,
     "D2"_a,
     "p"_a = DataType(1)
+  );
+}
+
+void wrapKernelCalculations( py::module& m )
+{
+  using namespace pybind11::literals;
+
+  m.def( "multiScaleKernel",
+    [] ( const PersistenceDiagram& D1, const PersistenceDiagram& D2, double sigma )
+    {
+      return aleph::multiScaleKernel( D1, D2, sigma );
+    }
+  );
+
+  m.def( "multiScalePseudoMetric",
+    [] ( const PersistenceDiagram& D1, const PersistenceDiagram& D2, double sigma )
+    {
+      return aleph::multiScalePseudoMetric( D1, D2, sigma );
+    }
   );
 }
 
