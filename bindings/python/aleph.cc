@@ -16,6 +16,10 @@
 
 #include <aleph/persistenceDiagrams/PersistenceDiagram.hh>
 
+#include <aleph/persistenceDiagrams/distances/Bottleneck.hh>
+#include <aleph/persistenceDiagrams/distances/Hausdorff.hh>
+#include <aleph/persistenceDiagrams/distances/Wasserstein.hh>
+
 #include <aleph/persistentHomology/Calculation.hh>
 
 #include <stdexcept>
@@ -304,6 +308,35 @@ void wrapPersistentHomologyCalculation( py::module& m )
     "buffer"_a,
     "epsilon"_a   = DataType(),
     "dimension"_a = 0
+  );
+}
+
+void wrapDistanceCalculations( py::module& m )
+{
+  using namespace pybind11::literals;
+
+  m.def( "bottleneckDistance",
+    [] (const PersistenceDiagram& D1, const PersistenceDiagram& D2 )
+    {
+      return aleph::distances::bottleneckDistance( D1, D2 );
+    }
+  );
+
+  m.def( "hausdorffDistances",
+    [] ( const PersistenceDiagram& D1, const PersistenceDiagram& D2 )
+    {
+      return aleph::distances::hausdorffDistance( D1, D2 );
+    }
+  );
+
+  m.def( "wassersteinDistance",
+    [] ( const PersistenceDiagram& D1, const PersistenceDiagram& D2, DataType p )
+    {
+      return aleph::distances::wassersteinDistance( D1, D2, p );
+    },
+    "D1"_a,
+    "D2"_a,
+    "p"_a = DataType(1)
   );
 }
 
