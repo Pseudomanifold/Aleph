@@ -38,20 +38,25 @@ public:
     {
     }
 
-    DataType x() const { return _x; }
-    DataType y() const { return _y; }
+    DataType x() const noexcept { return _x; }
+    DataType y() const noexcept { return _y; }
 
-    DataType persistence() const
+    DataType persistence() const noexcept
     {
       return _y - _x;
     }
 
-    bool operator==( const Point& other ) const
+    bool operator==( const Point& other ) const noexcept
     {
       return _x == other._x && _y == other._y;
     }
 
-    bool isUnpaired() const
+    bool operator!=( const Point& other ) const noexcept
+    {
+      return !this->operator==( other );
+    }
+
+    bool isUnpaired() const noexcept
     {
       return    (  std::numeric_limits<DataType>::has_infinity && _y == std::numeric_limits<DataType>::infinity() )
              || ( !std::numeric_limits<DataType>::has_infinity && _y == std::numeric_limits<DataType>::max() );
