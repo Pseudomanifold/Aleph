@@ -48,6 +48,17 @@ ENABLE_IF_SUPPORTED( CMAKE_CXX_FLAGS "-Wunsafe-loop-optimization" )
 ENABLE_IF_SUPPORTED( CMAKE_CXX_FLAGS "-pedantic" )
 
 ########################################################################
+# Compile options
+########################################################################
+
+SET( BUILD_PYTHON_BINDINGS
+  "ON"
+  CACHE
+  BOOL
+  "Build with Python bindings"
+)
+
+########################################################################
 # Additional packages
 ########################################################################
 
@@ -96,6 +107,10 @@ IF( PKG_CONFIG_FOUND )
 
     SET( ALEPH_WITH_EIGEN TRUE )
   ENDIF()
+
+  # Not used here, but in subordinate directories, so it is nicer to
+  # look for the package in a *single* location.
+  PKG_SEARCH_MODULE( Python3 python3 )
 ENDIF()
 
 ########################################################################

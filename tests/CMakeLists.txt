@@ -145,13 +145,15 @@ ADD_TEST( witness_complex                  test_witness_complex )
 # Special handling for the Python integration test. This program needs
 # to be run but with an updated `PYTHONPATH`.
 
-ADD_TEST(
-  NAME python_integration
-  COMMAND python3 test_python_integration.py
-)
+IF( BUILD_PYTHON_BINDINGS AND Python3_FOUND )
+  ADD_TEST(
+    NAME python_integration
+    COMMAND python3 test_python_integration.py
+  )
 
-SET_TESTS_PROPERTIES( python_integration
-  PROPERTIES ENVIRONMENT "PYTHONPATH=${CMAKE_BINARY_DIR}/bindings/python"
-)
+  SET_TESTS_PROPERTIES( python_integration
+    PROPERTIES ENVIRONMENT "PYTHONPATH=${CMAKE_BINARY_DIR}/bindings/python"
+  )
 
-CONFIGURE_FILE( test_python_integration.py ${CMAKE_CURRENT_BINARY_DIR} COPYONLY )
+  CONFIGURE_FILE( test_python_integration.py ${CMAKE_CURRENT_BINARY_DIR} COPYONLY )
+ENDIF()

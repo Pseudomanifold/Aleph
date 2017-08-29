@@ -1,6 +1,4 @@
-IF( PKG_CONFIG_FOUND )
-  PKG_SEARCH_MODULE( Python3 python3 )
-
+IF( BUILD_PYTHON_BINDINGS )
   IF( Python3_FOUND )
     INCLUDE_DIRECTORIES(
       ${PYBIND11_INCLUDE_DIRS}
@@ -13,5 +11,7 @@ IF( PKG_CONFIG_FOUND )
       PROPERTIES
         PREFIX ""
     )
+  ELSE()
+    MESSAGE( STATUS "Cannot build Python bindings because no suitable version of Python was found" )
   ENDIF()
 ENDIF()
