@@ -250,6 +250,12 @@ void wrapPersistenceDiagram( py::module& m )
     .def( "__eq__", &PersistenceDiagram::operator== )
     .def( "__ne__", &PersistenceDiagram::operator!= )
     .def( "__len__", &PersistenceDiagram::size )
+    .def( "__iter__",
+      [] ( const PersistenceDiagram& D )
+      {
+        return py::make_iterator( D.begin(), D.end() );
+      }, py::keep_alive<0,1>()
+    )
     .def( "__repr__",
       [] ( const PersistenceDiagram& D )
       {
@@ -263,6 +269,24 @@ void wrapPersistenceDiagram( py::module& m )
     .def( "removeUnpaired", &PersistenceDiagram::removeUnpaired )
     .def_property( "dimension", &PersistenceDiagram::setDimension, &PersistenceDiagram::dimension )
     .def_property_readonly( "betti", &PersistenceDiagram::betti );
+
+  using Point = typename PersistenceDiagram::Point;
+
+  py::class_<Point>(m, "PersistenceDiagram.Point" )
+    .def( py::init<DataType>() )
+    .def( py::init<DataType, DataType>() )
+    .def( "__eq__", &Point::operator== )
+    .def( "__ne__", &Point::operator!= )
+    .def( "__repr__",
+      [] ( const Point& p )
+      {
+        return "<" + std::to_string( p.x() ) + "," + std::to_string( p.y() ) + ">";
+      }
+    )
+    .def_property_readonly( "x", &Point::x )
+    .def_property_readonly( "y", &Point::y )
+    .def_property_readonly( "persistence", &Point::persistence )
+    .def_property_readonly( "unpaired"   , &Point::isUnpaired );
 }
 
 void wrapPersistentHomologyCalculation( py::module& m )
