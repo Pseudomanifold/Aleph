@@ -146,14 +146,20 @@ ADD_TEST( witness_complex                  test_witness_complex )
 # to be run but with an updated `PYTHONPATH`.
 
 IF( BUILD_PYTHON_BINDINGS AND Python3_FOUND )
-  ADD_TEST(
-    NAME python_integration
-    COMMAND python3 test_python_integration.py
-  )
+  # TODO: handle this dependency better by restructuring the way
+  # bindings are being generated
+  FIND_PACKAGE( pybind11 )
 
-  SET_TESTS_PROPERTIES( python_integration
-    PROPERTIES ENVIRONMENT "PYTHONPATH=${CMAKE_BINARY_DIR}/bindings/python"
-  )
+  IF( PYBIND11_FOUND )
+    ADD_TEST(
+      NAME python_integration
+      COMMAND python3 test_python_integration.py
+    )
 
-  CONFIGURE_FILE( test_python_integration.py ${CMAKE_CURRENT_BINARY_DIR} COPYONLY )
+    SET_TESTS_PROPERTIES( python_integration
+      PROPERTIES ENVIRONMENT "PYTHONPATH=${CMAKE_BINARY_DIR}/bindings/python"
+    )
+
+    CONFIGURE_FILE( test_python_integration.py ${CMAKE_CURRENT_BINARY_DIR} COPYONLY )
+  ENDIF()
 ENDIF()
