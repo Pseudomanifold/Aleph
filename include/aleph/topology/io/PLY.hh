@@ -377,7 +377,16 @@ private:
     using DataType   = typename Simplex::DataType;
     using VertexType = typename Simplex::VertexType;
 
-    DataType weight = DataType();
+    // FIXME: this is just to placate the compiler
+    {
+      (void) numFaces;
+
+      VertexType v = VertexType();
+      (void) v;
+
+      DataType weight = DataType();
+      (void) weight;
+    }
 
     for( std::size_t vertexIndex = 0; vertexIndex < numVertices; vertexIndex++ )
     {
@@ -416,6 +425,8 @@ private:
     for( std::size_t faceIndex = 0; faceIndex < numVertices; faceIndex++ )
     {
     }
+
+    return {};
   }
 
 
