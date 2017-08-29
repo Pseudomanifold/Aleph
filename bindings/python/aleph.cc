@@ -14,6 +14,8 @@
 #include <aleph/topology/Simplex.hh>
 #include <aleph/topology/SimplicialComplex.hh>
 
+#include <aleph/topology/io/SimplicialComplexReader.hh>
+
 #include <aleph/persistenceDiagrams/PersistenceDiagram.hh>
 #include <aleph/persistenceDiagrams/MultiScaleKernel.hh>
 
@@ -360,6 +362,41 @@ void wrapKernelCalculations( py::module& m )
   );
 }
 
+void wrapInputFunctions( py::module& m )
+{
+  m.def( "load",
+    [] ( py::object object )
+    {
+      std::string filename = py::cast<std::string>( object );
+
+      SimplicialComplex K;
+
+      aleph::topology::io::SimplicialComplexReader reader;
+      reader( filename, K);
+
+      return K;
+    }
+  );
+
+  m.def( "load",
+    [] ( py::object object, py::function functor )
+    {
+      std::string filename = py::cast<std::string>( object );
+
+      SimplicialComplex K;
+
+      aleph::topology::io::SimplicialComplexReader reader;
+      reader( filename,
+              K,
+              [&functor] ( DataType a, DataType b )
+              {
+                return py::cast<bool>( functor(a,b) );
+              }
+      );
+    }
+  );
+}
+
 PYBIND11_PLUGIN(aleph)
 {
   py::module m("aleph", "Python bindings for Aleph, a library for exploring persistent homology");
@@ -368,6 +405,7 @@ PYBIND11_PLUGIN(aleph)
   wrapSimplicialComplex(m);
   wrapPersistenceDiagram(m);
   wrapPersistentHomologyCalculation(m);
+  wrapInputFunctions(m);
 
   return m.ptr();
 }
