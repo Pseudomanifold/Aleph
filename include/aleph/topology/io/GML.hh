@@ -31,11 +31,11 @@ namespace io
 
   Currently, the following attributes will be read:
 
-  * \c id (for nodes)
-  * \c label (for nodes)
-  * \c source (for edges)
-  * \c target (for edges)
-  * \c weight (for edges)
+  - \c id (for nodes)
+  - \c label (for nodes)
+  - \c source (for edges)
+  - \c target (for edges)
+  - \c weight (for edges)
 */
 
 class GMLReader
