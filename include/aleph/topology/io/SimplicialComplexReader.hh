@@ -1,0 +1,196 @@
+#ifndef ALEPH_TOPOLOGY_IO_SIMPLICIAL_COMPLEX_READER_HH__
+#define ALEPH_TOPOLOGY_IO_SIMPLICIAL_COMPLEX_READER_HH__
+
+#include <fstream>
+#include <iterator>
+#include <string>
+#include <stdexcept>
+#include <vector>
+
+#include <aleph/topology/io/EdgeLists.hh>
+#include <aleph/topology/io/GML.hh>
+#include <aleph/topology/io/HDF5.hh>
+#include <aleph/topology/io/Pajek.hh>
+#include <aleph/topology/io/PLY.hh>
+#include <aleph/topology/io/VTK.hh>
+
+#include <aleph/utilities/Filesystem.hh>
+
+namespace aleph
+{
+
+namespace topology
+{
+
+namespace io
+{
+
+/**
+  @class SimplicialComplexReader
+  @brief Generic simplicial complex reader class
+
+  The purpose of this class is to provide a unified interface for
+  reading a simplicial complex from an input file, assign weights
+  that are consistent, and sort it.
+
+  The class offers a rich interface but not every file format has
+  the proper capabilities to support it.
+*/
+
+class SimplicialComplexReader
+{
+public:
+  template <class SimplicialComplex> void operator()( const std::string& filename, SimplicialComplex& K )
+  {
+    std::ifstream in( filename );
+    if( !in )
+      throw std::runtime_error( "Unable to read input file" );
+
+    auto extension = aleph::utilities::extension( filename );
+
+    // The GML parser works more or less on its own and does not make
+    // use of any stored variables.
+    if( extension == ".gml" )
+    {
+      GMLReader reader;
+      reader( filename, K );
+
+      // TODO: make node attribute configurable?
+      _labels = getLabels( reader.getNodeAttribute( "label" ) );
+    }
+
+    // The HDF5 parser permits the use of a functor that assigns
+    // a weight to a higher-dimensional simplex.
+    //
+    // TODO: support this
+    else if( extension == ".h5" )
+    {
+#if 0
+      HDF5SimpleDataSpaceReader reader;
+      reader( filename, K );
+#endif
+    }
+
+    // The Pajek parser also works on its own and does not require any
+    // other configuration options.
+    else if( extension == ".net" )
+    {
+      PajekReader reader;
+      reader( filename, K );
+
+      _labels = getLabels( reader.getLabelMap() );
+    }
+
+    // For PLY files, the parser supports optionally reading a property
+    // for every vertex to assign as a data property to the vertices of
+    // the simplicial complex.
+    else if( extension == ".ply" )
+    {
+      PLYReader reader;
+
+      if( !_dataAttribute.empty() )
+        reader.setDataProperty( _dataAttribute );
+
+      reader( filename, K );
+    }
+
+    // VTK files permit the use of a functor that assigns a weight to a
+    // higher-dimensional simplex.
+    //
+    // TODO: add support for this
+    else if( extension == ".vtk" )
+    {
+      VTKStructuredGridReader reader;
+      reader( filename, K );
+    }
+
+    // In all other cases, we fall back to reading a graph from an edge
+    // list, with optional weights being specified.
+    //
+    // TODO: does it make sense to make this reader configurable?
+    else
+    {
+      EdgeListReader reader;
+      reader.setTrimLines();
+      reader.setReadWeights();
+
+      reader( filename, K );
+    }
+  }
+
+  /**
+    Sets the attribute that is used to extract data values from input
+    files. For PLY files, for example, this means using an  attribute
+    of the vertices of the mesh. Note that the attribute is only used
+    if non-empty.
+  */
+
+  void setDataAttribute( const std::string& attribute ) noexcept
+  {
+    _dataAttribute = attribute;
+  }
+
+  /**
+    @returns Current data attribute
+    @see SimplicialComplexReader::setDataAttribute()
+  */
+
+  std::string dataAttribute() const noexcept
+  {
+    return _dataAttribute;
+  }
+
+private:
+
+  /**
+    Specifies an attribute of the input data file that stores the data
+    property of the corresponding simplicial complex. The usage of the
+    attribute depends on the file format. For a PLY file, for example,
+    this means that a certain vertex attribute of the mesh set is used
+    to obtain weights.
+
+    This property is only used if it is not left empty.
+
+    @see SimplicialComplexReader::dataAttribute()
+    @see SimplicialComplexReader::setDataAttribute()
+  */
+
+  std::string _dataAttribute;
+
+  /**
+    Converts a map of labels, obtained from a subordinate reader class,
+    to a vector of labels. The order is guaranteed to follow the vertex
+    order in the graph and in the simplicial complex.
+  */
+
+  template <class Map> std::vector<std::string> getLabels( const Map& map )
+  {
+    std::vector<std::string> labels;
+    labels.reserve( map.size() );
+
+    for( auto&& pair : map )
+    {
+      if( !pair.second.empty() )
+        labels.push_back( pair.second );
+    }
+
+    return labels;
+  }
+
+  /**
+    Optionally stores labels that have been extracted when reading an
+    input file.
+
+    Use SimplicialComplexReader::labels() to access them.
+  */
+
+  std::vector<std::string> _labels;
+};
+
+} // namespace io
+
+} // namespace topology
+
+} // namespace aleph
+
+#endif
