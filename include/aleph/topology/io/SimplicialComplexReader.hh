@@ -40,7 +40,54 @@ namespace io
 class SimplicialComplexReader
 {
 public:
+
+  /**
+    Attempts to read the simplicial complex \p K from the given input
+    file, while using a default strategy for assigning weights. For a
+    support file format, weights of higher-dimensional simplices will
+    be assigned according to the *maximum* of their vertices.
+
+    @param filename Input file
+    @param K        Simplicial complex to read
+
+    @see SimplicialComplexReader::operator()( const std::string&, SimplicialComplex&, Functor )
+  */
+
   template <class SimplicialComplex> void operator()( const std::string& filename, SimplicialComplex& K )
+  {
+    using Simplex  = typename SimplicialComplex::ValueType;
+    using DataType = typename Simplex::DataType;
+
+    this->operator()( filename, K, [] ( DataType a, DataType b ) { return std::max(a,b); } );
+  }
+
+  /**
+    Reads a simplicial complex from a file using a separate functor to
+    assign weights for higher-dimensional simplices. The functor needs
+    to support the following interface:
+
+    \code{.cpp}
+    using SimplexType = typename SimplicialComplex::ValueType;
+    using DataType    = typename Simplex::DataType;
+
+    DataType Functor::operator()( DataType a, DataType b )
+    {
+      // Do something with a and b. Typically, this would be calculating
+      // either the minimum or the maximum...
+      return std::max(a, b);
+    }
+    \endcode
+
+    Typically, if you use `std::max()` in the functor, you obtain
+    a simplicial complex that is filtrated by its *sublevel* sets,
+    whereas you obtain a *superlevel* set filtration whenever you
+    use `std::min()` instead. Other functors need to yield a valid
+    filtration. This class does *not* check for it!
+
+    @see SimplicialComplexReader::operator()( const std::string&, SimplicialComplex& )
+  */
+
+  template <class SimplicialComplex, class Functor> void operator()( const std::string& filename, SimplicialComplex& K, Functor functor )
   {
     std::ifstream in( filename );
     if( !in )
@@ -96,12 +143,10 @@ public:
 
     // VTK files permit the use of a functor that assigns a weight to a
     // higher-dimensional simplex.
-    //
-    // TODO: add support for this
     else if( extension == ".vtk" )
     {
       VTKStructuredGridReader reader;
-      reader( filename, K );
+      reader( filename, K, functor );
     }
 
     // In all other cases, we fall back to reading a graph from an edge
