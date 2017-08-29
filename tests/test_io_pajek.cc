@@ -6,6 +6,7 @@
 #include <aleph/topology/SimplicialComplex.hh>
 
 #include <aleph/topology/io/Pajek.hh>
+#include <aleph/topology/io/SimplicialComplexReader.hh>
 
 #include <set>
 
@@ -49,6 +50,20 @@ template <class D, class V> void test( const std::string& filename )
   {
     ALEPH_ASSERT_EQUAL( w1, 23 );
     ALEPH_ASSERT_EQUAL( w2, 42 );
+  }
+
+  {
+    SimplicialComplex L;
+
+    aleph::topology::io::SimplicialComplexReader reader;
+    reader( filename, L );
+
+    ALEPH_ASSERT_THROW( K == L );
+
+    auto sigma1 = *K.find( Simplex( {2,8} ) );
+    auto sigma2 = *L.find( Simplex( {2,8} ) );
+
+    ALEPH_ASSERT_EQUAL( sigma1.data(), sigma2.data() );
   }
 
   ALEPH_TEST_END();

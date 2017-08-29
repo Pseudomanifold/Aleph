@@ -6,6 +6,7 @@
 #include <aleph/topology/SimplicialComplex.hh>
 
 #include <aleph/topology/io/GML.hh>
+#include <aleph/topology/io/SimplicialComplexReader.hh>
 
 #include <set>
 
@@ -30,6 +31,15 @@ template <class D, class V> void test( const std::string& filename )
 
   ALEPH_ASSERT_EQUAL( *vertices.begin(),  0 );
   ALEPH_ASSERT_EQUAL( *vertices.rbegin(), 2 );
+
+  {
+    SimplicialComplex L;
+
+    aleph::topology::io::SimplicialComplexReader reader;
+    reader( filename, L );
+
+    ALEPH_ASSERT_THROW( K == L );
+  }
 
   ALEPH_TEST_END();
 }

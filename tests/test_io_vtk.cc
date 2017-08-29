@@ -9,6 +9,7 @@
 
 #include <aleph/topology/filtrations/Data.hh>
 
+#include <aleph/topology/io/SimplicialComplexReader.hh>
 #include <aleph/topology/io/VTK.hh>
 
 #include <algorithm>
@@ -45,6 +46,19 @@ template <class D, class V> void test()
   auto pd   = std::get<0>( pdpp );
 
   ALEPH_ASSERT_EQUAL( pd.size(), 3 );
+
+  {
+    SimplicialComplex L;
+
+    aleph::topology::io::SimplicialComplexReader reader;
+    reader( CMAKE_SOURCE_DIR + std::string( "/tests/input/Simple.vtk" ), L );
+
+    ALEPH_ASSERT_EQUAL( K.size(), L.size() );
+
+    // TODO: it is impossible to check for the weights right now because
+    // the simplicial complex reader does not yet support arbitrary
+    // functor assignments.
+  }
 
   ALEPH_TEST_END();
 }
