@@ -9,11 +9,15 @@
   All files will be written to '/tmp', prefixed with 'PIF_'.
 */
 
+#include <algorithm>
 #include <iostream>
+#include <limits>
 #include <string>
 #include <vector>
 
 #include <getopt.h>
+
+#include <aleph/math/KahanSummation.hh>
 
 #include <aleph/persistenceDiagrams/PersistenceDiagram.hh>
 #include <aleph/persistenceDiagrams/PersistenceIndicatorFunction.hh>
@@ -88,7 +92,12 @@ int main( int argc, char** argv )
 
   // Calculate persistence indicator functions -------------------------
 
-  decltype( aleph::persistenceIndicatorFunction( PersistenceDiagram() ) ) mean;
+  using PersistenceIndicatorFunction = decltype( aleph::persistenceIndicatorFunction( PersistenceDiagram() ) );
+
+  std::vector<PersistenceIndicatorFunction> persistenceIndicatorFunctions;
+  persistenceIndicatorFunctions.reserve( persistenceDiagrams.size() );
+
+  PersistenceIndicatorFunction mean;
 
   unsigned i = 0;
   for( auto&& D : persistenceDiagrams )
@@ -108,6 +117,8 @@ int main( int argc, char** argv )
     std::ofstream out( outputFilename );
     out << f << "\n";
 
+    persistenceIndicatorFunctions.emplace_back( f );
+
     ++i;
   }
 
@@ -120,5 +131,34 @@ int main( int argc, char** argv )
 
     std::ofstream out( outputFilename );
     out << mean << "\n";
+
+    // Since Y is supposed to be a random variable at this point, this
+    // nomenclature makes sense.
+    auto Y = mean.integral();
+
+    std::cerr << "* Norm of the mean persistence indicator function: " << Y << "\n";
+
+    std::vector<double> squaredDifferences( persistenceDiagrams.size() );
+
+    std::transform( persistenceIndicatorFunctions.begin(), persistenceIndicatorFunctions.end(),
+                    squaredDifferences.begin(),
+                      [&Y] ( const PersistenceIndicatorFunction& f )
+                      {
+                        auto Z = f.integral();
+                        return (Z-Y) * (Z-Y);
+                      }
+                    );
+
+    auto s
+      = aleph::math::accumulate_kahan_sorted( squaredDifferences.begin(),
+                                              squaredDifferences.end(),
+                                              0.0 );
+
+    if( persistenceDiagrams.size() > 1 )
+      s /= static_cast<double>( persistenceDiagrams.size() - 1 );
+    else
+      s = std::numeric_limits<double>::infinity();
+
+    std::cerr << "* Sample variance: " << s << "\n";
   }
 }
