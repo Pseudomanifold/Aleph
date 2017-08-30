@@ -85,7 +85,8 @@ struct DataSet
 void usage()
 {
   std::cerr << "Usage: topological_distance [--power=POWER] [--kernel] [--exp] [--sigma]\n"
-            << "                            [--hausdorff|indicator|wasserstein] FILES\n"
+            << "                            [--hausdorff|indicator|wasserstein]\n"
+            << "                            [--clean] FILES\n"
             << "\n"
             << "Calculates distances between a set of persistence diagrams, stored\n"
             << "in FILES. By default, this tool calculates Hausdorff distances for\n"
@@ -105,6 +106,7 @@ void usage()
             << "a 'd' (for dimension) or a 'k' (for clique dimension).\n"
             << "\n"
             << "Flags:\n"
+            << "  -c: clean persistence diagrams (remove unpaired points)\n"
             << "  -e: use exponential weighting for kernel calculation\n"
             << "  -h: calculate Hausdorff distances\n"
             << "  -i: calculate persistence indicator function distances\n"
@@ -250,6 +252,7 @@ int main( int argc, char** argv )
   {
     { "power"      , required_argument, nullptr, 'p' },
     { "sigma"      , required_argument, nullptr, 's' },
+    { "clean"      , no_argument      , nullptr, 'c' },
     { "exp"        , no_argument      , nullptr, 'e' },
     { "hausdorff"  , no_argument      , nullptr, 'h' },
     { "indicator"  , no_argument      , nullptr, 'i' },
@@ -261,6 +264,7 @@ int main( int argc, char** argv )
 
   double power                      = 2.0;
   double sigma                      = 1.0;
+  bool cleanPersistenceDiagrams     = false;
   bool useExponentialFunction       = false;
   bool useIndicatorFunctionDistance = false;
   bool normalize                    = false;
@@ -268,7 +272,7 @@ int main( int argc, char** argv )
   bool useWassersteinDistance       = false;
 
   int option = 0;
-  while( ( option = getopt_long( argc, argv, "p:s:ehikw", commandLineOptions, nullptr ) ) != -1 )
+  while( ( option = getopt_long( argc, argv, "p:s:cehikw", commandLineOptions, nullptr ) ) != -1 )
   {
     switch( option )
     {
@@ -277,6 +281,9 @@ int main( int argc, char** argv )
       break;
     case 's':
       sigma = std::stod( optarg );
+      break;
+    case 'c':
+      cleanPersistenceDiagrams = true;
       break;
     case 'e':
       useExponentialFunction = true;
@@ -390,6 +397,12 @@ int main( int argc, char** argv )
 
           dataSet.persistenceDiagram = aleph::io::load<DataType>( dataSet.filename );
 
+          if( cleanPersistenceDiagrams )
+          {
+            dataSet.persistenceDiagram.removeDiagonal();
+            dataSet.persistenceDiagram.removeUnpaired();
+          }
+
           // FIXME: This is only required in order to ensure that the
           // persistence indicator function has a finite integral; it
           // can be solved more elegantly by using a special value to
@@ -431,6 +444,12 @@ int main( int argc, char** argv )
           // indicate infinite intervals.
           auto pd = diagram;
           pd.removeUnpaired();
+
+          if( cleanPersistenceDiagrams )
+          {
+            diagram.removeDiagonal();
+            diagram.removeUnpaired();
+          }
 
           dataSet.push_back( { name,
                                filename,
