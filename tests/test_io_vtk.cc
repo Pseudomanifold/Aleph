@@ -55,9 +55,15 @@ template <class D, class V> void test()
 
     ALEPH_ASSERT_EQUAL( K.size(), L.size() );
 
-    // TODO: it is impossible to check for the weights right now because
-    // the simplicial complex reader does not yet support arbitrary
-    // functor assignments.
+    SimplicialComplex M;
+    reader( CMAKE_SOURCE_DIR + std::string( "/tests/input/Simple.vtk" ),
+            M,
+            [] ( D a, D b ) { return std::min(a,b); }
+    );
+
+    M.sort( aleph::topology::filtrations::Data<Simplex, std::greater<D> >() );
+
+    ALEPH_ASSERT_THROW( K == M );
   }
 
   ALEPH_TEST_END();
