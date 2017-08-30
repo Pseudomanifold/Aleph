@@ -103,6 +103,12 @@ public:
         return I();
     }
 
+    /** Raises the indicator function to a certain power */
+    IndicatorFunction& pow( I p ) noexcept
+    {
+      _y = std::pow( _y, p );
+    }
+
     // Arithmetic ------------------------------------------------------
 
     IndicatorFunction& operator*=( I lambda ) noexcept
@@ -414,6 +420,18 @@ public:
 
     for( auto&& f : _indicatorFunctions )
       indicatorFunctions.insert( IndicatorFunction( f.a(), f.b(), std::abs( f.y() ) ) );
+
+    _indicatorFunctions.swap( indicatorFunctions );
+    return *this;
+  }
+
+  /** Raises the function to a certain power */
+  StepFunction& pow( I p )
+  {
+    std::set<IndicatorFunction> indicatorFunctions;
+
+    for( auto&& f : _indicatorFunctions )
+      indicatorFunctions.insert( f.pow( p ) );
 
     _indicatorFunctions.swap( indicatorFunctions );
     return *this;
