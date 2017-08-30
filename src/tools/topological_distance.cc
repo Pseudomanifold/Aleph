@@ -190,7 +190,7 @@ double distancePIF( const std::vector<DataSet>& dataSet1,
     if( power == 1.0 )
       d = d + (f+g).abs().integral();
     else
-      d = d + (f+g).abs().integral_p( power );
+      d = d + (f+g).abs().pow( power ).integral();
   }
 
   return d;

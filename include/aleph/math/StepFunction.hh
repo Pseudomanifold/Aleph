@@ -104,9 +104,9 @@ public:
     }
 
     /** Raises the indicator function to a certain power */
-    IndicatorFunction& pow( I p ) noexcept
+    IndicatorFunction pow( I p ) const noexcept
     {
-      _y = std::pow( _y, p );
+      return IndicatorFunction( this->a(), this->b(), std::pow( this->y(), p ) );
     }
 
     // Arithmetic ------------------------------------------------------
