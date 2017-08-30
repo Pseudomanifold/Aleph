@@ -1,8 +1,11 @@
 #ifndef ALEPH_TOPOLOGY_IO_HDF5_HH__
 #define ALEPH_TOPOLOGY_IO_HDF5_HH__
 
-// FIXME: guard this inclusion
-#include <H5Cpp.h>
+#include <aleph/config/HDF5.hh>
+
+#ifdef ALEPH_WITH_HDF5
+  #include <H5Cpp.h>
+#endif
 
 #include <algorithm>
 #include <string>
@@ -43,6 +46,7 @@ public:
 
   template <class SimplicialComplex, class Functor> void operator()( const std::string& filename, SimplicialComplex& K, Functor f )
   {
+#ifdef ALEPH_WITH_HDF5
     using namespace H5;
 
     H5File file( filename, H5F_ACC_RDONLY );
@@ -154,6 +158,13 @@ public:
     }
 
     K = SimplicialComplex( simplices.begin(), simplices.end() );
+#else
+    (void) filename;
+    (void) K;
+    (void) f;
+
+    // TODO: throw error?
+#endif
   }
 
   // Getters -----------------------------------------------------------
@@ -174,6 +185,7 @@ private:
     but merely attempts a direct conversion.
   */
 
+#ifdef ALEPH_WITH_HDF5
   template <class T> std::vector<T> read( const H5::DataSet& dataSet, std::size_t size )
   {
     std::vector<T> data;
@@ -209,6 +221,7 @@ private:
 
     return data;
   }
+#endif
 
   std::string _groupName    = "/";
   std::string _dataSetName  = "YField";
