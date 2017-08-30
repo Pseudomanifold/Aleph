@@ -3,7 +3,9 @@ IF( CMAKE_CXX_COMPILER_ID MATCHES "GNU" )
     # Disable this warning for older versions of GCC because it will
     # be triggered by some of the test cases.
     SET_SOURCE_FILES_PROPERTIES(
+      test_io_pajek.cc
       test_io_gml.cc
+      test_io_vtk.cc
       PROPERTIES COMPILE_FLAGS "-Wno-missing-field-initializers"
     )
   ENDIF()
