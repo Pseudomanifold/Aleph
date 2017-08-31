@@ -26,6 +26,8 @@
 #include <aleph/persistenceDiagrams/distances/Hausdorff.hh>
 #include <aleph/persistenceDiagrams/distances/Wasserstein.hh>
 
+#include <aleph/persistenceDiagrams/io/Raw.hh>
+
 #include <aleph/persistentHomology/Calculation.hh>
 
 #include <stdexcept>
@@ -392,7 +394,7 @@ void wrapKernelCalculations( py::module& m )
 
 void wrapStepFunction( py::module& m )
 {
-  py::class_<PersistenceDiagram>(m, "StepFunction")
+  py::class_<StepFunction>(m, "StepFunction")
     .def( py::init<>() )
     .def( "__init__",
       [] ( StepFunction& instance, const PersistenceDiagram& D )
@@ -436,6 +438,13 @@ void wrapStepFunction( py::module& m )
         return f(x);
       }
     );
+
+  m.def( "make_persistence_indicator_function",
+    [] ( const PersistenceDiagram& diagram )
+    {
+      return aleph::persistenceIndicatorFunction( diagram );
+    }
+  );
 }
 
 void wrapInputFunctions( py::module& m )
@@ -469,6 +478,15 @@ void wrapInputFunctions( py::module& m )
                 return py::cast<bool>( functor(a,b) );
               }
       );
+    }
+  );
+
+  m.def( "load_persistence_diagram",
+    [] ( py::object object )
+    {
+      std::string filename = py::cast<std::string>( object );
+
+      return aleph::io::load<DataType>( filename );
     }
   );
 }
