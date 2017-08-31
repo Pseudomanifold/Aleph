@@ -243,7 +243,7 @@ private:
       throw std::runtime_error( "Unable to read graph indicator file" );
 
     std::string line;
-    VertexType nodeID = 1;
+    VertexType nodeID = static_cast<VertexType>( _firstNodeID );
 
     while( std::getline( in, line ) )
     {
@@ -381,6 +381,14 @@ private:
 
   std::size_t _nodeAttributeIndex = std::numeric_limits<std::size_t>::max();
   std::size_t _edgeAttributeIndex = std::numeric_limits<std::size_t>::max();
+
+  /**
+    By default, the first node ID starts with 1. This should be
+    changeable, however, because we may just as well have files
+    for which the initial node ID is zero-based.
+  */
+
+  std::size_t _firstNodeID = 1;
 
   /**
     Graph labels stored during the main parsing routine of this class.
