@@ -13,6 +13,7 @@
 #include <stdexcept>
 #include <unordered_map>
 #include <unordered_set>
+#include <tuple>
 #include <vector>
 
 namespace aleph
@@ -27,78 +28,40 @@ namespace io
 class SparseAdjacencyMatrixReader
 {
 public:
-  template <class SimplicialComplex> void operator()( const std::string& filenameMatrix,
-                                                      const std::string& filenameIndicator,
+  template <class SimplicialComplex> void operator()( const std::string& filename,
                                                       std::vector<SimplicialComplex>& result )
   {
     using Simplex    = typename SimplicialComplex::ValueType;
     using VertexType = typename Simplex::VertexType;
     using Edge       = std::pair<VertexType, VertexType>;
 
-    std::vector<Edge> edges;
     std::unordered_set<VertexType> vertices;
+    std::vector<Edge> edges;
 
-    {
-      std::ifstream in( filenameMatrix );
-      if( !in )
-        throw std::runtime_error( "Unable to read input adjacency matrix file" );
+    std::tie( vertices, edges )
+      = this->readVerticesAndEdges<VertexType>( filename );
 
-      std::string line;
+    auto graphIndicatorFilename = getFilenameGraphIndicator( filename );
 
-      while( std::getline( in, line ) )
-      {
-        using namespace aleph::utilities;
+#if 0
+    // TODO: implement?
 
-        auto tokens = split( line, _separator );
-
-        if( tokens.size() == 2 )
-        {
-          auto u = convert<VertexType>( tokens.front() );
-          auto v = convert<VertexType>( tokens.back()  );
-
-          edges.push_back( std::make_pair(u, v) );
-
-          vertices.insert( u );
-          vertices.insert( v );
-        }
-        else
-        {
-          // TODO: throw error?
-        }
-      }
-
-      std::cerr << __PRETTY_FUNCTION__ << ": Read " << edges.size() << " edges\n";
-    }
-
-    // Maps a node ID to a graph ID, i.e. yields the inex of the graph
-    // that should contain the node. All indices are starting at 1 but
-    // will be mapped to 0 later on.
-    std::unordered_map<VertexType, VertexType> node_id_to_graph_id;
+    if( !aleph::utilities::exists( graphIndicatorFilename ) )
+      throw std::runtime_error( "Missing required graph indicator file" );
+#endif
 
     // Stores *all* graph IDs. The set makes sense here because I want
     // to ensure that repeated calls to this function always yield the
     // same order.
     std::set<VertexType> graphIDs;
 
-    {
-      std::ifstream in( filenameIndicator );
-      if( !in )
-        throw std::runtime_error( "Unable to read input graph indicator file" );
+    // Maps a node ID to a graph ID, i.e. yields the inex of the graph
+    // that should contain the node. All indices are starting at 1 but
+    // will be mapped to 0 later on.
+    std::unordered_map<VertexType, VertexType> node_id_to_graph_id;
 
-      std::string line;
-      VertexType nodeID = 1;
-
-      while( std::getline( in, line ) )
-      {
-        using namespace aleph::utilities;
-        line = trim( line );
-
-        auto graphID                    = convert<VertexType>( line );
-        node_id_to_graph_id[ nodeID++ ] = graphID;
-
-        graphIDs.insert( graphID );
-      }
-    }
+    std::tie( graphIDs, node_id_to_graph_id )
+      = readGraphAndNodeIDs<VertexType>( graphIndicatorFilename );
 
     // Maps a graph ID (arbitrary start point) to an index in the
     // vector.
@@ -146,11 +109,85 @@ public:
 
       K.push_back( Simplex( {u,v} ) );
     }
-
-    std::cerr << getFilenameGraphIndicator( filenameMatrix ) << "\n";
   }
 
 private:
+
+  /**
+    Reads all vertices and  edges from a sparse adjacency matrix. Note
+    that this function is not static because it needs access to values
+    that depend on class instances.
+  */
+
+  template <class VertexType>
+    std::pair<
+      std::unordered_set<VertexType>,
+      std::vector< std::pair<VertexType, VertexType> >
+    > readVerticesAndEdges( const std::string& filename )
+  {
+    using Edge = std::pair<VertexType, VertexType>;
+
+    std::unordered_set<VertexType> vertices;
+    std::vector<Edge> edges;
+
+    std::ifstream in( filename );
+    if( !in )
+      throw std::runtime_error( "Unable to read input adjacency matrix file" );
+
+    std::string line;
+
+    while( std::getline( in, line ) )
+    {
+      using namespace aleph::utilities;
+
+      auto tokens = split( line, _separator );
+
+      if( tokens.size() == 2 )
+      {
+        auto u = convert<VertexType>( tokens.front() );
+        auto v = convert<VertexType>( tokens.back()  );
+
+        edges.push_back( std::make_pair(u, v) );
+
+        vertices.insert( u );
+        vertices.insert( v );
+      }
+      else
+        throw std::runtime_error( "Format error: cannot parse line in sparse adjacency matrix" );
+    }
+
+    return std::make_pair( vertices, edges );
+  }
+
+  template <class VertexType>
+    std::pair<
+      std::set<VertexType>,
+      std::unordered_map<VertexType, VertexType>
+    > readGraphAndNodeIDs( const std::string& filename )
+  {
+    std::unordered_map<VertexType, VertexType> node_id_to_graph_id;
+    std::set<VertexType> graphIDs;
+
+    std::ifstream in( filename );
+    if( !in )
+      throw std::runtime_error( "Unable to read graph indicator file" );
+
+    std::string line;
+    VertexType nodeID = 1;
+
+    while( std::getline( in, line ) )
+    {
+      using namespace aleph::utilities;
+      line = trim( line );
+
+      auto graphID                    = convert<VertexType>( line );
+      node_id_to_graph_id[ nodeID++ ] = graphID;
+
+      graphIDs.insert( graphID );
+    }
+
+    return std::make_pair( graphIDs, node_id_to_graph_id );
+  }
 
   /**
    Given a base filename, gets its prefix. The prefix is everything that
@@ -161,11 +198,9 @@ private:
 
   static std::string getPrefix( const std::string& filename )
   {
-    using namespace aleph::utilities;
-
-    auto s      = stem( filename );
-    auto prefix = s.substr( 0, s.find_last_of( '_' ) );
-
+    // Note that this contains the complete filename portion of the path
+    // along with any subdirectories.
+    auto prefix = filename.substr( 0, filename.find_last_of( '_' ) );
     return prefix;
   }
 
