@@ -64,10 +64,10 @@ public:
     std::tie( graphIDs, node_id_to_graph_id )
       = readGraphAndNodeIDs<VertexType>( graphIndicatorFilename );
 
+    using IndexType = std::size_t;
+
     // Maps a graph ID (arbitrary start point) to an index in the
     // vector.
-
-    using IndexType = std::size_t;
     std::unordered_map<VertexType, IndexType> graph_id_to_index;
 
     {
@@ -75,6 +75,24 @@ public:
 
       for( auto&& id : graphIDs )
         graph_id_to_index[id] = index++;
+    }
+
+    // Maps a node ID (arbitrary start point) to an index. Note that no
+    // direct vector for nodes/vertices exists; this is merely required
+    // for internal bookkeeping.
+    //
+    // Moreover, this information can be used to access node attributes
+    // directly.
+
+    std::unordered_map<VertexType, IndexType> node_id_to_index;
+
+    {
+      std::set<VertexType> vertices_( vertices.begin(), vertices.end() );
+
+      IndexType index = IndexType();
+
+      for( auto&& id : vertices_ )
+        node_id_to_index[id] = index++;
     }
 
     // Reading optional attributes -------------------------------------
@@ -100,29 +118,43 @@ public:
     result.clear();
     result.resize( graphIDs.size() );
 
+    using DataType = typename Simplex::DataType;
+
     for( auto&& vertex : vertices )
     {
       auto&& id    = node_id_to_graph_id[vertex];
       auto&& index = graph_id_to_index[id];
       auto&& K     = result[index];
+      auto s       = Simplex( vertex );
 
-      K.push_back( Simplex( vertex ) );
+      if( _readNodeAttributes && isValidIndex( _nodeAttributeIndex ) )
+      {
+        auto&& index = node_id_to_index[vertex];
+        s.setData( static_cast<DataType>( _nodeAttributes[index][ _nodeAttributeIndex ] ) );
+      }
+
+      K.push_back( s );
     }
 
-    for( auto&& edge : edges )
+    for( std::size_t i = 0; i < edges.size(); i++ )
     {
-      auto&& u   = edge.first;
-      auto&& v   = edge.second;
-      auto&& uID = node_id_to_graph_id[u];
-      auto&& vID = node_id_to_graph_id[v];
+      auto&& edge = edges.at(i);
+      auto&& u    = edge.first;
+      auto&& v    = edge.second;
+      auto&& uID  = node_id_to_graph_id[u];
+      auto&& vID  = node_id_to_graph_id[v];
 
       if( uID != vID )
         throw std::runtime_error( "Format error: an edge must not belong to multiple graphs" );
 
       auto&& index = graph_id_to_index[ uID ];
       auto&& K     = result[index];
+      auto s       = Simplex( {u,v} );
 
-      K.push_back( Simplex( {u,v} ) );
+      if( _readEdgeAttributes && isValidIndex( _edgeAttributeIndex ) )
+        s.setData( static_cast<DataType>( _edgeAttributes[i][ _edgeAttributeIndex ] ) );
+
+      K.push_back( s );
     }
   }
 
@@ -302,6 +334,11 @@ private:
   {
     auto edgeAttributesFilename = getFilenameEdgeAttributes( filename );
     _edgeAttributes             = readAttributes( edgeAttributesFilename );
+  }
+
+  static bool isValidIndex( std::size_t index )
+  {
+    return index != std::numeric_limits<std::size_t>::max();
   }
 
   /**
