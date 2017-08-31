@@ -18,7 +18,7 @@ def kernel_2(I1, I2):
 
 def run_classification(K,C):
   clf    = svm.SVC(kernel='precomputed', probability=True)
-  ss     = model_selection.ShuffleSplit(n_splits=10, test_size=0.3)
+  ss     = model_selection.ShuffleSplit(n_splits=10, test_size=0.5)
   scores = list()
 
   for train, test in ss.split(K):
@@ -45,7 +45,7 @@ def run_classification(K,C):
 
     print("\n")
 
-  print("Average accuracy:", sum(scores)/len(scores))
+  print("Average accuracy:", sum(scores)/len(scores), file=sys.stderr)
 
 if __name__ == "__main__":
   persistenceDiagrams = []
