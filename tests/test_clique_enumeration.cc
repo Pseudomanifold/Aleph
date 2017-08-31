@@ -132,10 +132,10 @@ template <class Data, class Vertex> void trianglesNonZeroBasedIndices()
   ALEPH_ASSERT_EQUAL( C1.size(), C2.size() );
   ALEPH_ASSERT_EQUAL( C1.size(), 2 );
 
-  ALEPH_ASSERT_THROW( std::find( C1.begin(), C1.end(), std::set<Vertex>( {0,1,2} ) ) != C1.end() );
-  ALEPH_ASSERT_THROW( std::find( C1.begin(), C1.end(), std::set<Vertex>( {0,1,3} ) ) != C1.end() );
-  ALEPH_ASSERT_THROW( std::find( C2.begin(), C2.end(), std::set<Vertex>( {0,1,2} ) ) != C2.end() );
-  ALEPH_ASSERT_THROW( std::find( C2.begin(), C2.end(), std::set<Vertex>( {0,1,3} ) ) != C2.end() );
+  ALEPH_ASSERT_THROW( std::find( C1.begin(), C1.end(), std::set<Vertex>( {1,2,3} ) ) != C1.end() );
+  ALEPH_ASSERT_THROW( std::find( C1.begin(), C1.end(), std::set<Vertex>( {1,2,4} ) ) != C1.end() );
+  ALEPH_ASSERT_THROW( std::find( C2.begin(), C2.end(), std::set<Vertex>( {1,2,3} ) ) != C2.end() );
+  ALEPH_ASSERT_THROW( std::find( C2.begin(), C2.end(), std::set<Vertex>( {1,2,4} ) ) != C2.end() );
 
   aleph::geometry::RipsExpanderTopDown<SimplicialComplex> expander;
 
