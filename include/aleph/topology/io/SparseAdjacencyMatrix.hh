@@ -85,6 +85,12 @@ public:
     if( _readNodeLabels )
       this->readNodeLabels( filename );
 
+    if( _readNodeAttributes )
+      this->readNodeAttributes( filename );
+
+    if( _readEdgeAttributes )
+      this->readEdgeAttributes( filename );
+
     // Create output ---------------------------------------------------
     //
     // Create the set of output graphs and distribute the edges among
@@ -131,11 +137,17 @@ public:
   void setReadEdgeAttributes( bool value = true ) noexcept { _readEdgeAttributes = value; }
   void setTrimLines( bool value = true )          noexcept { _trimLines = value;          }
 
+  void setNodeAttributeIndex( std::size_t value ) noexcept { _nodeAttributeIndex = value; }
+  void setEdgeAttributeIndex( std::size_t value ) noexcept { _edgeAttributeIndex = value; }
+
   bool readGraphLabels()    const noexcept { return _readGraphLabels;    }
   bool readNodeLabels()     const noexcept { return _readNodeLabels;     }
   bool readNodeAttributes() const noexcept { return _readNodeAttributes; }
   bool readEdgeAttributes() const noexcept { return _readEdgeAttributes; }
   bool trimLines()          const noexcept { return _trimLines;          }
+
+  std::size_t nodeAttributeIndex() const noexcept { return _nodeAttributeIndex; }
+  std::size_t edgeAttributeIndex() const noexcept { return _edgeAttributeIndex; }
 
 private:
 
@@ -329,6 +341,9 @@ private:
   bool _readNodeAttributes = false;
   bool _readEdgeAttributes = false;
   bool _trimLines          = true;
+
+  std::size_t _nodeAttributeIndex = std::numeric_limits<std::size_t>::max();
+  std::size_t _edgeAttributeIndex = std::numeric_limits<std::size_t>::max();
 
   /**
     Graph labels stored during the main parsing routine of this class.
