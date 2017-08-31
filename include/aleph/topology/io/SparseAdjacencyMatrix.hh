@@ -1,11 +1,10 @@
 #ifndef ALEPH_TOPOLOGY_IO_SPARSE_ADJACENCY_MATRIX_HH__
 #define ALEPH_TOPOLOGY_IO_SPARSE_ADJACENCY_MATRIX_HH__
 
+#include <aleph/topology/filtrations/Data.hh>
+
 #include <aleph/utilities/Filesystem.hh>
 #include <aleph/utilities/String.hh>
-
-// FIXME: remove after debugging
-#include <iostream>
 
 #include <algorithm>
 #include <fstream>
@@ -30,7 +29,7 @@ class SparseAdjacencyMatrixReader
 {
 public:
   template <class SimplicialComplex> void operator()( const std::string& filename,
-                                                      std::vector<SimplicialComplex>& result )
+                                                      std::vector<SimplicialComplex>& complexes )
   {
     using Simplex    = typename SimplicialComplex::ValueType;
     using VertexType = typename Simplex::VertexType;
@@ -115,8 +114,8 @@ public:
     // them according to their graph ID. This function also does some
     // sanity checks in order to check input data consistency.
 
-    result.clear();
-    result.resize( graphIDs.size() );
+    complexes.clear();
+    complexes.resize( graphIDs.size() );
 
     using DataType = typename Simplex::DataType;
 
@@ -124,7 +123,7 @@ public:
     {
       auto&& id    = node_id_to_graph_id[vertex];
       auto&& index = graph_id_to_index[id];
-      auto&& K     = result[index];
+      auto&& K     = complexes[index];
       auto s       = Simplex( vertex );
 
       if( _readNodeAttributes && isValidIndex( _nodeAttributeIndex ) )
@@ -148,7 +147,7 @@ public:
         throw std::runtime_error( "Format error: an edge must not belong to multiple graphs" );
 
       auto&& index = graph_id_to_index[ uID ];
-      auto&& K     = result[index];
+      auto&& K     = complexes[index];
       auto s       = Simplex( {u,v} );
 
       if( _readEdgeAttributes && isValidIndex( _edgeAttributeIndex ) )
@@ -156,6 +155,9 @@ public:
 
       K.push_back( s );
     }
+
+    for( auto&& K : complexes )
+      K.sort( aleph::topology::filtrations::Data<Simplex>() );
   }
 
   // Configuration options ---------------------------------------------
