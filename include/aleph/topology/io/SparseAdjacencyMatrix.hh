@@ -76,6 +76,14 @@ public:
         graph_id_to_index[id] = index++;
     }
 
+    // Reading optional attributes -------------------------------------
+
+    if( _readGraphLabels )
+      this->readGraphLabels( filename );
+
+    if( _readNodeLabels )
+      this->readNodeLabels( filename );
+
     // Create output ---------------------------------------------------
     //
     // Create the set of output graphs and distribute the edges among
@@ -110,6 +118,17 @@ public:
       K.push_back( Simplex( {u,v} ) );
     }
   }
+
+  // Configuration options ---------------------------------------------
+  //
+  // The following attributes configure how the parsing process works
+  // and which attributes are being read.
+
+  void setReadGraphLabels( bool value = true ) noexcept { _readGraphLabels = value; }
+  void setTrimLines( bool value = true )       noexcept { _trimLines = value; }
+
+  bool readGraphLabels() const noexcept { return _readGraphLabels;  }
+  bool trimLines()       const noexcept { return _trimLines; }
 
 private:
 
@@ -189,6 +208,38 @@ private:
     return std::make_pair( graphIDs, node_id_to_graph_id );
   }
 
+  std::vector<std::string> readLabels( const std::string& filename )
+  {
+    std::ifstream in( filename );
+    if( !in )
+      throw std::runtime_error( "Unable to read labels input file" );
+
+    std::vector<std::string> labels;
+    std::string line;
+
+    while( std::getline( in, line ) )
+    {
+      if( _trimLines )
+        line = aleph::utilities::trim( line );
+
+      labels.push_back( line );
+    }
+
+    return labels;
+  }
+
+  void readGraphLabels( const std::string& filename )
+  {
+    auto graphLabelsFilename = getFilenameGraphLabels( filename );
+    _graphLabels             = readLabels( graphLabelsFilename );
+  }
+
+  void readNodeLabels( const std::string& filename )
+  {
+    auto nodeLabelsFilename = getFilenameNodeLabels( filename );
+    _nodeLabels             = readLabels( nodeLabelsFilename );
+  }
+
   /**
    Given a base filename, gets its prefix. The prefix is everything that
    comes before the last `_` character. It is used to generate filenames
@@ -220,6 +271,24 @@ private:
   static std::string getFilenameEdgeAttributes( const std::string& filename )  { return getPrefix(filename) + "_edge_attributes.txt";  }
   static std::string getFilenameNodeAttributes( const std::string& filename )  { return getPrefix(filename) + "_node_attributes.txt";  }
   static std::string getFilenameGraphAttributes( const std::string& filename ) { return getPrefix(filename) + "_graph_attributes.txt"; }
+
+  bool _readGraphLabels = true;
+  bool _readNodeLabels  = false;
+  bool _trimLines       = true;
+
+  /**
+    Graph labels stored during the main parsing routine of this class.
+    If no graph labels are specified, this vector remains empty. Since
+    the format does not specify the format of graph labels, the labels
+    will *not* be converted but reported as-is.
+
+    Graph labels are only read if `_readGraphLabels` is true.
+  */
+
+  std::vector<std::string> _graphLabels;
+
+  /** Node labels; the same comments as for the graph labels apply */
+  std::vector<std::string> _nodeLabels;
 
   // TODO: make configurable
   std::string _separator = ",";
