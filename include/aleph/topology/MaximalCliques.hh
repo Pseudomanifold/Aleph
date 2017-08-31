@@ -23,6 +23,29 @@ namespace topology
 namespace detail
 {
 
+/**
+  Given a simplicial complex, calculates the vertex set for enumerating
+  cliques. This function is able to handle simplicial complexes without
+  zero-based indices. The remaining functions ensures that an index can
+  be mapped back to the original complex.
+*/
+
+template <class SimplicialComplex> auto createInitialVertexSet( const SimplicialComplex& K )
+  -> std::unordered_set<typename SimplicialComplex::ValueType::VertexType>
+{
+  using Simplex    = typename SimplicialComplex::ValueType;
+  using VertexType = typename Simplex::VertexType;
+
+  std::unordered_set<VertexType> vertices;
+  K.vertices( std::inserter( vertices, vertices.begin() ) );
+
+  std::unordered_set<VertexType> I;
+  for( VertexType i = VertexType(); i < VertexType( vertices.size() ); i++ )
+    I.insert( i );
+
+  return I;
+}
+
 template <class Simplex> auto adjacencyMatrix( const SimplicialComplex<Simplex>& K ) -> math::SparseBinaryMatrix<typename Simplex::VertexType>
 {
   using VertexType = typename Simplex::VertexType;
@@ -201,10 +224,8 @@ template <class Simplex> auto maximalCliquesKoch( const SimplicialComplex<Simple
   using VertexType = typename Simplex::VertexType;
 
   std::unordered_set<VertexType> C;
-  std::unordered_set<VertexType> I;
+  std::unordered_set<VertexType> I = detail::createInitialVertexSet( K );
   std::unordered_set<VertexType> X;
-
-  K.vertices( std::inserter( I, I.begin() ) );
 
   std::vector< std::set<VertexType> > cliques;
 
@@ -217,10 +238,8 @@ template <class Simplex> auto maximalCliquesBronKerbosch( const SimplicialComple
   using VertexType = typename Simplex::VertexType;
 
   std::unordered_set<VertexType> C;
-  std::unordered_set<VertexType> I;
+  std::unordered_set<VertexType> I = detail::createInitialVertexSet( K );
   std::unordered_set<VertexType> X;
-
-  K.vertices( std::inserter( I, I.begin() ) );
 
   std::vector< std::set<VertexType> > cliques;
 
