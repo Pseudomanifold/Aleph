@@ -5,6 +5,8 @@
 #include <aleph/topology/Simplex.hh>
 #include <aleph/topology/SimplicialComplex.hh>
 
+#include <aleph/topology/filtrations/Degree.hh>
+
 #include <aleph/topology/io/SparseAdjacencyMatrix.hh>
 
 #include <iostream>
@@ -29,6 +31,13 @@ template <class T> void test()
   ALEPH_ASSERT_EQUAL( complexes[0].size(), 6 );
   ALEPH_ASSERT_EQUAL( complexes[1].size(), 3 );
   ALEPH_ASSERT_EQUAL( complexes[2].size(), 3 );
+
+  std::vector<unsigned> degrees;
+  aleph::topology::filtrations::degrees( complexes[0], std::back_inserter( degrees ) );
+
+  ALEPH_ASSERT_THROW( degrees.empty() == false );
+  ALEPH_ASSERT_EQUAL( degrees.size(), 3 );
+  ALEPH_ASSERT_THROW( degrees == std::vector<unsigned>( { 2,2,2 } ) );
 }
 
 int main(int, char**)
