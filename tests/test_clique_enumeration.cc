@@ -100,8 +100,62 @@ template <class Data, class Vertex> void triangles()
   ALEPH_TEST_END();
 }
 
+template <class Data, class Vertex> void trianglesNonZeroBasedIndices()
+{
+  ALEPH_TEST_BEGIN( "Triangles with non-zero-based indices" );
+
+  using Simplex           = Simplex<Data, Vertex>;
+  using SimplicialComplex = SimplicialComplex<Simplex>;
+
+  // 3---2
+  // |  /|
+  // | / |
+  // |/  |
+  // 1---4
+  //
+  // Expected cliques: {1,2,3}, {1,4,2}
+  std::vector<Simplex> triangles
+    = {
+        {1}, {2}, {3}, {4},
+        {1,2}, {1,3}, {1,4}, {2,3}, {2,4},
+        {1,2,3}, {1,2,4}
+    };
+
+  SimplicialComplex K( triangles.begin(), triangles.end() );
+
+  auto C1 = maximalCliquesBronKerbosch( K );
+  auto C2 = maximalCliquesKoch( K );
+
+  ALEPH_ASSERT_THROW( C1.empty() == false );
+  ALEPH_ASSERT_THROW( C2.empty() == false );
+
+  ALEPH_ASSERT_EQUAL( C1.size(), C2.size() );
+  ALEPH_ASSERT_EQUAL( C1.size(), 2 );
+
+  ALEPH_ASSERT_THROW( std::find( C1.begin(), C1.end(), std::set<Vertex>( {0,1,2} ) ) != C1.end() );
+  ALEPH_ASSERT_THROW( std::find( C1.begin(), C1.end(), std::set<Vertex>( {0,1,3} ) ) != C1.end() );
+  ALEPH_ASSERT_THROW( std::find( C2.begin(), C2.end(), std::set<Vertex>( {0,1,2} ) ) != C2.end() );
+  ALEPH_ASSERT_THROW( std::find( C2.begin(), C2.end(), std::set<Vertex>( {0,1,3} ) ) != C2.end() );
+
+  aleph::geometry::RipsExpanderTopDown<SimplicialComplex> expander;
+
+  auto L = expander( K, 3 );
+  L      = expander.assignMaximumWeight( L, K );
+
+  L.sort( aleph::topology::filtrations::Data<Simplex>() );
+
+  ALEPH_ASSERT_THROW( L.empty() == false );
+
+  ALEPH_TEST_END();
+}
+
+
+
 int main()
 {
   triangles<double, unsigned>();
   triangles<float,  unsigned>();
+
+  trianglesNonZeroBasedIndices<double, unsigned>();
+  trianglesNonZeroBasedIndices<float,  unsigned>();
 }
