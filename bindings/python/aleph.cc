@@ -11,13 +11,16 @@
 
 #include <aleph/geometry/distances/Euclidean.hh>
 
+#include <aleph/math/StepFunction.hh>
+
 #include <aleph/topology/Simplex.hh>
 #include <aleph/topology/SimplicialComplex.hh>
 
 #include <aleph/topology/io/SimplicialComplexReader.hh>
 
-#include <aleph/persistenceDiagrams/PersistenceDiagram.hh>
 #include <aleph/persistenceDiagrams/MultiScaleKernel.hh>
+#include <aleph/persistenceDiagrams/PersistenceDiagram.hh>
+#include <aleph/persistenceDiagrams/PersistenceIndicatorFunction.hh>
 
 #include <aleph/persistenceDiagrams/distances/Bottleneck.hh>
 #include <aleph/persistenceDiagrams/distances/Hausdorff.hh>
@@ -36,6 +39,7 @@ using PointCloud         = aleph::containers::PointCloud<DataType>;
 using PersistenceDiagram = aleph::PersistenceDiagram<DataType>;
 using Simplex            = aleph::topology::Simplex<DataType, VertexType>;
 using SimplicialComplex  = aleph::topology::SimplicialComplex<Simplex>;
+using StepFunction       = aleph::math::StepFunction<DataType>;
 
 #ifdef ALEPH_WITH_FLANN
   template <class Distance> using NearestNeighbours = aleph::geometry::FLANN<PointCloud, Distance>;
@@ -386,6 +390,54 @@ void wrapKernelCalculations( py::module& m )
   );
 }
 
+void wrapStepFunction( py::module& m )
+{
+  py::class_<PersistenceDiagram>(m, "StepFunction")
+    .def( py::init<>() )
+    .def( "__init__",
+      [] ( StepFunction& instance, const PersistenceDiagram& D )
+      {
+        new (&instance) StepFunction( aleph::persistenceIndicatorFunction( D ) );
+      }
+    )
+    .def( "__abs__" , &StepFunction::abs )
+    .def( "__add__" ,
+      [] ( const StepFunction& f, const StepFunction& g )
+      {
+        return f+g;
+      }
+    )
+    .def( "__sub__" ,
+      [] ( const StepFunction& f, const StepFunction& g )
+      {
+        return f-g;
+      }
+    )
+    .def( "__iadd__", &StepFunction::operator+= )
+    .def( "__isub__", &StepFunction::operator-= )
+    .def( "__neg__" ,
+      [] ( const StepFunction& f )
+      {
+        return -f;
+      }
+    )
+    .def( "pow",
+      [] ( StepFunction& f, double p )
+      {
+        return f.pow(p);
+      }
+    )
+    .def_property_readonly( "max", &StepFunction::max )
+    .def_property_readonly( "sup", &StepFunction::sup )
+    .def_property_readonly( "integral", &StepFunction::integral )
+    .def( "__call__",
+      [] ( const StepFunction& f, DataType x )
+      {
+        return f(x);
+      }
+    );
+}
+
 void wrapInputFunctions( py::module& m )
 {
   m.def( "load",
@@ -429,6 +481,7 @@ PYBIND11_PLUGIN(aleph)
   wrapSimplicialComplex(m);
   wrapPersistenceDiagram(m);
   wrapPersistentHomologyCalculation(m);
+  wrapStepFunction(m);
   wrapInputFunctions(m);
 
   return m.ptr();
