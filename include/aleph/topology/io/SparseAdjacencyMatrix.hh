@@ -7,6 +7,7 @@
 // FIXME: remove after debugging
 #include <iostream>
 
+#include <algorithm>
 #include <fstream>
 #include <set>
 #include <string>
@@ -124,11 +125,17 @@ public:
   // The following attributes configure how the parsing process works
   // and which attributes are being read.
 
-  void setReadGraphLabels( bool value = true ) noexcept { _readGraphLabels = value; }
-  void setTrimLines( bool value = true )       noexcept { _trimLines = value; }
+  void setReadGraphLabels( bool value = true )    noexcept { _readGraphLabels = value;    }
+  void setReadNodeLabels( bool value = true )     noexcept { _readNodeLabels = value;     }
+  void setReadNodeAttributes( bool value = true ) noexcept { _readNodeAttributes = value; }
+  void setReadEdgeAttributes( bool value = true ) noexcept { _readEdgeAttributes = value; }
+  void setTrimLines( bool value = true )          noexcept { _trimLines = value;          }
 
-  bool readGraphLabels() const noexcept { return _readGraphLabels;  }
-  bool trimLines()       const noexcept { return _trimLines; }
+  bool readGraphLabels()    const noexcept { return _readGraphLabels;    }
+  bool readNodeLabels()     const noexcept { return _readNodeLabels;     }
+  bool readNodeAttributes() const noexcept { return _readNodeAttributes; }
+  bool readEdgeAttributes() const noexcept { return _readEdgeAttributes; }
+  bool trimLines()          const noexcept { return _trimLines;          }
 
 private:
 
@@ -240,6 +247,51 @@ private:
     _nodeLabels             = readLabels( nodeLabelsFilename );
   }
 
+  std::vector< std::vector<double> > readAttributes( const std::string& filename )
+  {
+    std::ifstream in( filename );
+    if( !in )
+      throw std::runtime_error( "Unable to read attributes input file" );
+
+    std::vector< std::vector<double> > allAttributes;
+
+    std::string line;
+    while( std::getline( in, line ) )
+    {
+      using namespace aleph::utilities;
+
+      if( _trimLines )
+        line = trim( line );
+
+      auto tokens = split( line, _separator );
+
+      std::vector<double> attributes;
+      std::transform( tokens.begin(), tokens.end(), std::back_inserter( attributes ),
+        [] ( const std::string& token )
+        {
+          return convert<double>( token );
+        }
+      );
+
+      attributes.shrink_to_fit();
+      allAttributes.push_back( attributes );
+    }
+
+    return allAttributes;
+  }
+
+  void readNodeAttributes( const std::string& filename )
+  {
+    auto nodeAttributesFilename = getFilenameNodeAttributes( filename );
+    _nodeAttributes             = readAttributes( nodeAttributesFilename );
+  }
+
+  void readEdgeAttributes( const std::string& filename )
+  {
+    auto edgeAttributesFilename = getFilenameEdgeAttributes( filename );
+    _edgeAttributes             = readAttributes( edgeAttributesFilename );
+  }
+
   /**
    Given a base filename, gets its prefix. The prefix is everything that
    comes before the last `_` character. It is used to generate filenames
@@ -272,9 +324,11 @@ private:
   static std::string getFilenameNodeAttributes( const std::string& filename )  { return getPrefix(filename) + "_node_attributes.txt";  }
   static std::string getFilenameGraphAttributes( const std::string& filename ) { return getPrefix(filename) + "_graph_attributes.txt"; }
 
-  bool _readGraphLabels = true;
-  bool _readNodeLabels  = false;
-  bool _trimLines       = true;
+  bool _readGraphLabels    = true;
+  bool _readNodeLabels     = false;
+  bool _readNodeAttributes = false;
+  bool _readEdgeAttributes = false;
+  bool _trimLines          = true;
 
   /**
     Graph labels stored during the main parsing routine of this class.
@@ -289,6 +343,21 @@ private:
 
   /** Node labels; the same comments as for the graph labels apply */
   std::vector<std::string> _nodeLabels;
+
+  /**
+    Node attributes stored during the main parsing routine of this
+    class. It is assumed that the attributes are *numerical* or at
+    least *convertible* to a numerical representation.
+  */
+
+  std::vector< std::vector<double> > _nodeAttributes;
+
+  /**
+    Edge attributes; just like the node attributes, it is assumed that
+    they are convertible to a numerical representation.
+  */
+
+  std::vector< std::vector<double> > _edgeAttributes;
 
   // TODO: make configurable
   std::string _separator = ",";
