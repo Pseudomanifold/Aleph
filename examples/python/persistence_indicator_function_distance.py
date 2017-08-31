@@ -8,6 +8,7 @@ from sklearn import svm
 from sklearn import model_selection
 
 from sklearn.metrics import accuracy_score
+from sklearn.metrics import precision_recall_curve
 
 def kernel_1(I1, I2):
   return -abs(I1-I2).integral
@@ -21,8 +22,6 @@ def run_classification(K,C):
   scores = list()
 
   for train, test in ss.split(K):
-    print(train,test)
-
     kTrain = K[train][:,train]
     cTrain = C[train]
 
@@ -35,9 +34,16 @@ def run_classification(K,C):
     cTest = C[test]
 
     clf.fit(kTrain, cTrain)
-    prediction = clf.predict(kTest)
-    score      = accuracy_score(cTest, prediction)
+    prediction  = clf.predict(kTest)
+    score       = accuracy_score(cTest, prediction)
     scores.append(score)
+
+    p,r,t = precision_recall_curve(cTest, clf.decision_function(kTest))
+
+    for x,y in zip(p,r):
+      print("%f\t%f" % (x,y))
+
+    print("\n")
 
   print("Average accuracy:", sum(scores)/len(scores))
 
