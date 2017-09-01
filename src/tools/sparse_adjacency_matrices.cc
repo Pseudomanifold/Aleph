@@ -12,6 +12,7 @@
 
 #include <aleph/utilities/Format.hh>
 
+#include <algorithm>
 #include <fstream>
 #include <iostream>
 #include <string>
@@ -51,6 +52,8 @@ int main( int argc, char** argv )
 
   // Calculate degrees -------------------------------------------------
 
+  unsigned maxDegree = 0;
+
   std::cerr << "* Calculating degree-based filtration...";
 
   for( auto&& K : simplicialComplexes )
@@ -58,14 +61,22 @@ int main( int argc, char** argv )
     std::vector<DataType> degrees;
     aleph::topology::filtrations::degrees( K, std::back_inserter( degrees ) );
 
+    // TODO: check degree for isolated vertices?
+
+    if( !degrees.empty() )
+    {
+      maxDegree
+        = std::max( maxDegree,
+                    *std::max_element( degrees.begin(), degrees.end() ) );
+    }
+
     K = expander.assignMaximumData( K, degrees.begin(), degrees.end() );
 
     K.sort( aleph::topology::filtrations::Data<Simplex>() );
-
-    std::cout << K << "\n";
   }
 
-  std::cerr << "finished\n";
+  std::cerr << "finished\n"
+            << "* Identified maximum degree as D=" << maxDegree << "\n";
 
   // Calculate persistent homology -------------------------------------
 
@@ -93,7 +104,14 @@ int main( int argc, char** argv )
                       + ".txt";
 
         std::ofstream out( output );
-        out << diagram << "\n";
+
+        for( auto&& point : diagram )
+        {
+          if( point.isUnpaired() )
+            out << point.x() << "\t" << 2 * maxDegree << "\n";
+          else
+            out << point.x() << "\t" << point.y() << "\n";
+        }
       }
 
       ++index;
