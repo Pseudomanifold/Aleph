@@ -271,14 +271,16 @@ int main( int argc, char** argv )
 
   std::cerr << "* Expanding simplicial complex...";
 
-  aleph::geometry::RipsExpander<SimplicialComplex> ripsExpander;
-  if( argc - optind > 0 )
-    K = ripsExpander( K, static_cast<unsigned>( std::stoul( argv[optind++] ) ) );
+  // By default, tThis leaves the simplicial complex untouched. The
+  // simplices with highest dimension are the 1-simplices, i.e. the
+  // edges. If the user specified an optional parameter, we use it.
+  unsigned k = 1;
 
-  // This leaves the simplicial complex untouched. The simplices with
-  // highest dimension are the edges, i.e. the 1-simplices.
-  else
-    K = ripsExpander( K, 1 );
+  if( argc - optind > 0 )
+    k = static_cast<unsigned>( std::stoul( argv[optind++] ) );
+
+  aleph::geometry::RipsExpander<SimplicialComplex> ripsExpander;
+  K = ripsExpander( K, k );
 
   // This tells the expander to use the maximum weight of the faces of
   // a simplex in order to assign the weight of the simplex. Thus, the
@@ -369,9 +371,13 @@ int main( int argc, char** argv )
     {
       using namespace aleph::utilities;
 
+      // The formatting ensures that if the user specified an expansion
+      // up to, say, 10, the resulting files will use two-digit numbers
+      // instead of one-digit numbers, regardless of how many complexes
+      // there are.
       auto outputFilename = basePath + "/" + stem( basename( filename ) )
                                      + "_d"
-                                     + format( D.dimension(), K.dimension() )
+                                     + format( D.dimension(), std::max( K.dimension(), static_cast<std::size_t>(k) ) )
                                      + ".txt";
 
       std::cerr << "* Storing output in '" << outputFilename << "'...\n";
