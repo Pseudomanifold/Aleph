@@ -96,21 +96,22 @@ std::vector<PersistenceDiagram> createRandomBoxPersistenceDiagrams( DataType r, 
   std::default_random_engine rng( rd() );
   std::uniform_real_distribution<DataType> distribution( DataType(0), DataType( std::nextafter( DataType(r), std::numeric_limits<DataType>::max() ) ) );
 
-  PointCloud pointCloud( n, 2 );
+  PointCloud pointCloud( n, 3 );
 
   for( unsigned i = 0; i < n; i++ )
   {
     auto x = distribution( rng );
     auto y = distribution( rng );
+    auto z = distribution( rng );
 
-    std::vector<DataType> p = {x,y};
+    std::vector<DataType> p = {x,y,z};
     pointCloud.set(i, p.begin(), p.end() );
   }
 
   aleph::geometry::BruteForce<PointCloud, Distance> bruteForceWrapper( pointCloud );
 
   auto K
-    = aleph::geometry::buildVietorisRipsComplex( bruteForceWrapper, r, 2 );
+    = aleph::geometry::buildVietorisRipsComplex( bruteForceWrapper, 0.7 * r, 3 );
 
   auto diagrams
     = aleph::calculatePersistenceDiagrams( K );
