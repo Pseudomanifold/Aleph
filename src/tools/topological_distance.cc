@@ -529,4 +529,11 @@ int main( int argc, char** argv )
   storeMatrix( distances, std::cout );
 
   std::cerr << "finished\n";
+
+  std::cerr << "Data sets were processed in the following order:\n";
+  for( auto&& dataSet : dataSets )
+  {
+    if( !dataSet.empty() )
+      std::cerr << "  - " << dataSet.front().name << "\n";
+  }
 }
