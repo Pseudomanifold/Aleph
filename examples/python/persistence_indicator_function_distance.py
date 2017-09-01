@@ -9,6 +9,8 @@ from sklearn import model_selection
 
 from sklearn.metrics import accuracy_score
 from sklearn.metrics import precision_recall_curve
+from sklearn.metrics import precision_score
+from sklearn.metrics import recall_score
 
 def kernel_1(I1, I2):
   return -abs(I1-I2).integral
@@ -17,9 +19,11 @@ def kernel_2(I1, I2):
   return -abs(I1-I2).pow(2).integral
 
 def run_classification(K,C):
-  clf    = svm.SVC(kernel='precomputed', probability=True)
-  ss     = model_selection.ShuffleSplit(n_splits=10, test_size=0.5)
-  scores = list()
+  clf              = svm.SVC(kernel='precomputed', probability=True)
+  ss               = model_selection.ShuffleSplit(n_splits=10, test_size=0.5)
+  accuracy_scores  = list()
+  precision_scores = list()
+  recall_scores    = list()
 
   for train, test in ss.split(K):
     kTrain = K[train][:,train]
@@ -35,17 +39,14 @@ def run_classification(K,C):
 
     clf.fit(kTrain, cTrain)
     prediction  = clf.predict(kTest)
-    score       = accuracy_score(cTest, prediction)
-    scores.append(score)
 
-    p,r,t = precision_recall_curve(cTest, clf.decision_function(kTest))
+    accuracy_scores.append( accuracy_score(cTest, prediction) )
+    precision_scores.append( precision_score(cTest, prediction) )
+    recall_scores.append( recall_score(cTest, prediction) )
 
-    for x,y in zip(p,r):
-      print("%f\t%f" % (x,y))
-
-    print("\n")
-
-  print("Average accuracy:", sum(scores)/len(scores), file=sys.stderr)
+  print("Average accuracy: ", sum(accuracy_scores)/len(accuracy_scores), file=sys.stderr)
+  print("Average precision:", sum(precision_scores)/len(precision_scores), file=sys.stderr)
+  print("Average recall:   ", sum(recall_scores)/len(recall_scores), file=sys.stderr)
 
 if __name__ == "__main__":
   persistenceDiagrams = []
