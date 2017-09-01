@@ -41,6 +41,7 @@
 #include <limits>
 #include <random>
 #include <sstream>
+#include <vector>
 
 #include <cmath>
 
@@ -79,6 +80,45 @@ PersistenceDiagram createRandomPersistenceDiagram( unsigned n )
   }
 
   return D;
+}
+
+/**
+  Auxiliary function for creating random persistence diagrams based on
+  random samples from a box with a given length.
+
+  Note that this function automatically handles Vietoris--Rips
+  expansion.
+*/
+
+std::vector<PersistenceDiagram> createRandomBoxPersistenceDiagrams( DataType r, unsigned n )
+{
+  std::random_device rd;
+  std::default_random_engine rng( rd() );
+  std::uniform_real_distribution<DataType> distribution( DataType(0), DataType( std::nextafter( DataType(r), std::numeric_limits<DataType>::max() ) ) );
+
+  PointCloud pointCloud( n, 2 );
+
+  for( unsigned i = 0; i < n; i++ )
+  {
+    auto x = distribution( rng );
+    auto y = distribution( rng );
+
+    std::vector<DataType> p = {x,y};
+    pointCloud.set(i, p.begin(), p.end() );
+  }
+
+  aleph::geometry::BruteForce<PointCloud, Distance> bruteForceWrapper( pointCloud );
+
+  auto K
+    = aleph::geometry::buildVietorisRipsComplex( bruteForceWrapper, r, 2 );
+
+  auto diagrams
+    = aleph::calculatePersistenceDiagrams( K );
+
+  for( auto&& diagram : diagrams )
+    diagram.removeDiagonal();
+
+  return diagrams;
 }
 
 /**
@@ -150,6 +190,7 @@ int main( int argc, char** argv )
       { "n"     , required_argument, nullptr, 'n' },
       { "R"     , required_argument, nullptr, 'R' },
       { "r"     , required_argument, nullptr, 'r' },
+      { "box"   , no_argument      , nullptr, 'b' },
       { "sphere", no_argument      , nullptr, 's' },
       { "torus" , no_argument      , nullptr, 't' },
       { nullptr , 0                , nullptr,  0  }
@@ -160,11 +201,12 @@ int main( int argc, char** argv )
   DataType R           = DataType(0.25);
   DataType r           = DataType(0.50);
 
+  bool sampleFromBox    = false;
   bool sampleFromSphere = false;
   bool sampleFromTorus  = false;
 
   int option = 0;
-  while( ( option = getopt_long( argc, argv, "m:n:R:r:t", commandLineOptions, nullptr ) ) != -1 )
+  while( ( option = getopt_long( argc, argv, "m:n:R:r:bst", commandLineOptions, nullptr ) ) != -1 )
   {
     switch( option )
     {
@@ -180,11 +222,18 @@ int main( int argc, char** argv )
     case 'r':
       r = static_cast<DataType>( std::stod(optarg) );
       break;
+    case 'b':
+      sampleFromBox    = true;
+      sampleFromSphere = false;
+      sampleFromTorus  = false;
+      break;
     case 's':
+      sampleFromBox    = false;
       sampleFromSphere = true;
       sampleFromTorus  = false;
       break;
     case 't':
+      sampleFromBox    = false;
       sampleFromSphere = false;
       sampleFromTorus  = true;
       break;
@@ -194,7 +243,9 @@ int main( int argc, char** argv )
   }
 
   std::cerr << "* Sampling " << n << " persistence diagrams\n";
-  if( sampleFromSphere )
+  if( sampleFromBox )
+    std::cerr << "* Sampling " << m << " points from a box with a=" << r << "\n";
+  else if( sampleFromSphere )
     std::cerr << "* Sampling " << m << " points from a sphere with r=" << r << "\n";
   else if( sampleFromTorus )
     std::cerr << "* Sampling at most " << m << " points from a torus with R=" << R << " and r=" << r << "\n";
@@ -203,21 +254,40 @@ int main( int argc, char** argv )
 
   for( unsigned i = 0; i < n; i++ )
   {
+    std::vector<PersistenceDiagram> pds;
     PersistenceDiagram pd;
 
-    if( sampleFromSphere )
+    if( sampleFromBox )
+      pds = createRandomBoxPersistenceDiagrams(r,m);
+    else if( sampleFromSphere )
       pd = createRandomSpherePersistenceDiagram(r, m);
     else if( sampleFromTorus )
       pd = createRandomTorusPersistenceDiagram(R, r, m);
     else
       pd = createRandomPersistenceDiagram(m);
 
-    std::stringstream stream;
-    stream << "/tmp/";
-    stream << std::setw( static_cast<int>( std::floor( std::log10(n)+1 ) ) ) << std::setfill( '0' ) << i;
-    stream << ".txt";
+    if( !pds.empty() )
+    {
+      for( auto&& pd : pds )
+      {
+        std::stringstream stream;
+        stream << "/tmp/";
+        stream << std::setw( static_cast<int>( std::floor( std::log10(n)+1 ) ) ) << std::setfill( '0' ) << i << "_d" << pd.dimension();
+        stream << ".txt";
 
-    std::ofstream out( stream.str() );
-    out << pd << "\n";
+        std::ofstream out( stream.str() );
+        out << pd << "\n";
+      }
+    }
+    else
+    {
+      std::stringstream stream;
+      stream << "/tmp/";
+      stream << std::setw( static_cast<int>( std::floor( std::log10(n)+1 ) ) ) << std::setfill( '0' ) << i;
+      stream << ".txt";
+
+      std::ofstream out( stream.str() );
+      out << pd << "\n";
+    }
   }
 }
