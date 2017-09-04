@@ -272,7 +272,7 @@ int main( int argc, char** argv )
   bool useWassersteinDistance       = false;
 
   int option = 0;
-  while( ( option = getopt_long( argc, argv, "p:s:cehikw", commandLineOptions, nullptr ) ) != -1 )
+  while( ( option = getopt_long( argc, argv, "p:s:cehinkw", commandLineOptions, nullptr ) ) != -1 )
   {
     switch( option )
     {
