@@ -8,6 +8,7 @@
 #include <aleph/topology/filtrations/Data.hh>
 #include <aleph/topology/filtrations/Degree.hh>
 
+#include <aleph/topology/io/GML.hh>
 #include <aleph/topology/io/SparseAdjacencyMatrix.hh>
 
 #include <aleph/utilities/Filesystem.hh>
@@ -78,6 +79,25 @@ int main( int argc, char** argv )
 
   std::cerr << "finished\n"
             << "* Identified maximum degree as D=" << maxDegree << "\n";
+
+  // Store graphs ------------------------------------------------------
+
+  {
+    aleph::topology::io::GMLWriter writer;
+
+    for( std::size_t i = 0; i < simplicialComplexes.size(); i++ )
+    {
+      auto filename = "/tmp/"
+                      + aleph::utilities::format( i, simplicialComplexes.size() )
+                      + ".gml";
+
+      std::cerr << "* Storing graph in '" << filename << "'...";
+
+      writer( filename, simplicialComplexes[i] );
+
+      std::cerr << "finished\n";
+    }
+  }
 
   // Calculate persistent homology -------------------------------------
 
