@@ -160,6 +160,28 @@ public:
       K.sort( aleph::topology::filtrations::Data<Simplex>() );
   }
 
+  // Output ------------------------------------------------------------
+
+  /**
+    Stores graph labels in an output iterator. This function does not
+    check for their availability.
+  */
+
+  template <class OutputIterator> void graphLabels( OutputIterator result )
+  {
+    std::copy( _graphLabels.begin(), _graphLabels.end(), result );
+  }
+
+  /**
+    Stores node labels in an output iterator. This function does not
+    check for their availability.
+  */
+
+  template <class OutputIterator> void nodeLabels( OutputIterator result )
+  {
+    std::copy( _graphLabels.begin(), _graphLabels.end(), result );
+  }
+
   // Configuration options ---------------------------------------------
   //
   // The following attributes configure how the parsing process works

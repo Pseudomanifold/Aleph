@@ -10,6 +10,7 @@
 
 #include <aleph/topology/io/SparseAdjacencyMatrix.hh>
 
+#include <aleph/utilities/Filesystem.hh>
 #include <aleph/utilities/Format.hh>
 
 #include <algorithm>
@@ -116,5 +117,19 @@ int main( int argc, char** argv )
 
       ++index;
     }
+  }
+
+  // Store labels ------------------------------------------------------
+
+  {
+    std::vector<std::string> labels;
+    reader.graphLabels( std::back_inserter( labels ) );
+
+    std::ofstream out( "/tmp/"
+                      + aleph::utilities::basename( filename )
+                      + ".txt" );
+
+    for( auto&& label : labels )
+      out << label << "\n";
   }
 }
