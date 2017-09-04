@@ -51,6 +51,8 @@ public:
     std::set<Simplex> vertices;
     std::vector<Simplex> edges;
 
+    std::size_t lastID = 0;
+
     while( in )
     {
       std::getline( in, line );
@@ -68,11 +70,31 @@ public:
 
       if( tokens.size() >= 2 )
       {
-        // TODO: Make order of vertices & weights configurable?
-        VertexType u = convert<VertexType>( tokens[0] );
-        VertexType v = convert<VertexType>( tokens[1] );
-        DataType   w = DataType();
+        VertexType u = VertexType();
+        VertexType v = VertexType();
 
+        // TODO: Make order of vertices & weights configurable?
+        if( tokens[0].find_first_not_of( "0123456789" ) == std::string::npos )
+        {
+          u = convert<VertexType>( tokens[0] );
+          v = convert<VertexType>( tokens[1] );
+        }
+        else
+        {
+          auto&& us = tokens[0];
+          auto&& vs = tokens[1];
+
+          if( _nodeLabels.find(us) == _nodeLabels.end() )
+            _nodeLabels[us] = lastID++;
+
+          if( _nodeLabels.find(vs) == _nodeLabels.end() )
+            _nodeLabels[vs] = lastID++;
+
+          u = static_cast<VertexType>( _nodeLabels.at(us) );
+          v = static_cast<VertexType>( _nodeLabels.at(vs) );
+        }
+
+        DataType w = DataType();
         if( tokens.size() >= 3 && _readWeights )
           w = convert<DataType>( tokens[2] );
 
@@ -101,6 +123,14 @@ public:
 
 private:
   std::vector<char> _commentTokens = { '#', '%', '\"', '*' };
+
+  /**
+    Optional set of node labels. These are read automatically in case an
+    input data set does not use numeric labels. The idea is to map an ID
+    in the form of a string to an index in corresponding graph.
+  */
+
+  std::map<std::string, std::size_t> _nodeLabels;
 
   bool _readWeights              = true;
   bool _trimLines                = true;
