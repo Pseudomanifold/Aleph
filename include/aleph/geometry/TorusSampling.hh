@@ -80,8 +80,8 @@ std::vector< std::pair<T, T> > torusRejectionSampling( T R,
   from a torus.
 
   @param angles Sampled angles to create the torus
-  @param R Inner radius
-  @param r Outer radius
+  @param R Major radius
+  @param r Minor radius
 
   @returns Point cloud containing the sampled points from the torus
 */
@@ -95,6 +95,8 @@ template <class T> aleph::containers::PointCloud<T> makeTorus( const std::vector
   unsigned index = 0;
   for( auto&& pair : angles )
   {
+    // Note that this terminology follows Diaconis et al. who use "\psi"
+    // insteadf of "\phi".
     auto theta = pair.first;
     auto psi   = pair.second;
 
