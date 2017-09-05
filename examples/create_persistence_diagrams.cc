@@ -194,20 +194,23 @@ int main( int argc, char** argv )
       { "box"   , no_argument      , nullptr, 'b' },
       { "sphere", no_argument      , nullptr, 's' },
       { "torus" , no_argument      , nullptr, 't' },
+      { "output", no_argument      , nullptr, 'o' },
       { nullptr , 0                , nullptr,  0  }
   };
 
-  unsigned m           = 50;
-  unsigned n           = 50;
-  DataType R           = DataType(0.25);
-  DataType r           = DataType(0.50);
+  unsigned m            = 50;
+  unsigned n            = 50;
+  DataType R            = DataType(0.25);
+  DataType r            = DataType(0.50);
 
   bool sampleFromBox    = false;
   bool sampleFromSphere = false;
   bool sampleFromTorus  = false;
 
+  bool output           = false;
+
   int option = 0;
-  while( ( option = getopt_long( argc, argv, "m:n:R:r:bst", commandLineOptions, nullptr ) ) != -1 )
+  while( ( option = getopt_long( argc, argv, "m:n:R:r:bsto", commandLineOptions, nullptr ) ) != -1 )
   {
     switch( option )
     {
@@ -238,6 +241,9 @@ int main( int argc, char** argv )
       sampleFromSphere = false;
       sampleFromTorus  = true;
       break;
+    case 'o':
+      output = true;
+      break;
     default:
       break;
     }
@@ -267,28 +273,31 @@ int main( int argc, char** argv )
     else
       pd = createRandomPersistenceDiagram(m);
 
-    if( !pds.empty() )
+    if( output )
     {
-      for( auto&& pd : pds )
+      if( !pds.empty() )
+      {
+        for( auto&& pd : pds )
+        {
+          std::stringstream stream;
+          stream << "/tmp/";
+          stream << std::setw( static_cast<int>( std::floor( std::log10(n)+1 ) ) ) << std::setfill( '0' ) << i << "_d" << pd.dimension();
+          stream << ".txt";
+
+          std::ofstream out( stream.str() );
+          out << pd << "\n";
+        }
+      }
+      else
       {
         std::stringstream stream;
         stream << "/tmp/";
-        stream << std::setw( static_cast<int>( std::floor( std::log10(n)+1 ) ) ) << std::setfill( '0' ) << i << "_d" << pd.dimension();
+        stream << std::setw( static_cast<int>( std::floor( std::log10(n)+1 ) ) ) << std::setfill( '0' ) << i;
         stream << ".txt";
 
         std::ofstream out( stream.str() );
         out << pd << "\n";
       }
-    }
-    else
-    {
-      std::stringstream stream;
-      stream << "/tmp/";
-      stream << std::setw( static_cast<int>( std::floor( std::log10(n)+1 ) ) ) << std::setfill( '0' ) << i;
-      stream << ".txt";
-
-      std::ofstream out( stream.str() );
-      out << pd << "\n";
     }
   }
 }
