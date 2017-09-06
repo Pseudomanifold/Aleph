@@ -11,9 +11,24 @@
 #include <aleph/math/KahanSummation.hh>
 
 #include <unordered_map>
+#include <stdexcept>
+#include <string>
 #include <vector>
 
 #include <cmath>
+
+#define THROW_EIGEN_REQUIRED_ERROR()\
+{\
+  auto message =  std::string( __FILE__ )           \
+                + std::string( ":" )                \
+                + std::to_string( __LINE__ )        \
+                + std::string( " in " )             \
+                + std::string( __PRETTY_FUNCTION__ )\
+                + std::string( ":" )                \
+                + std::string( " Eigen is required for this function to work properly" );\
+  \
+  throw std::runtime_error( message );\
+}
 
 namespace aleph
 {
@@ -174,10 +189,7 @@ public:
       _eigenvectors.push_back( eigenvectors.col(i) );
 
 #else
-
-    // FIXME: throw error?
-    (void) L;
-
+  THROW_EIGEN_REQUIRED_ERROR();
 #endif
 
   }
@@ -187,7 +199,7 @@ public:
     a given time \f$t\f$ and returns the result.
   */
 
-  T operator()( IndexType i, IndexType j, double t )
+  T operator()( IndexType i, IndexType j, T t )
   {
 #ifdef ALEPH_WITH_EIGEN
 
@@ -205,7 +217,37 @@ public:
     return result;
 
 #else
-  // FIXME: throw error?
+  THROW_EIGEN_REQUIRED_ERROR();
+#endif
+  }
+
+  /**
+    Calculates the auto-diffusion for a given vertex \f$i\f$ and a given
+    time \f$t\f$ and returns it.
+  */
+
+  T operator()( IndexType i, T t )
+  {
+#ifdef ALEPH_WITH_EIGEN
+
+    // Note that this function could have been implemented in terms of
+    // operator(i,j,t), but this implementation is a *little* bit more
+    // efficient as it defines the multiplication explicitly.
+
+    aleph::math::KahanSummation<T> result = T();
+
+    for( std::size_t k = 0; k < _eigenvalues.size(); k++ )
+    {
+      auto&& lk  = std::exp( -t * _eigenvalues[k] );
+      auto&& uik = _eigenvectors[k](i);
+
+      result += lk * uik * uik;
+    }
+
+    return result;
+
+#else
+  THROW_EIGEN_REQUIRED_ERROR();
 #endif
   }
 
