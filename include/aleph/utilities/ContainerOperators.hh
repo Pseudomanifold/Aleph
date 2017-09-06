@@ -28,6 +28,29 @@ namespace utilities
 {
 
 /**
+  Scalar multiplication of a vector.
+
+  @param lambda Scalar
+  @param vector Vector
+
+  @returns Vector in which every element has been multiplied by the scalar
+*/
+
+template <class U, class V> std::vector<U> operator*( V lambda, const std::vector<U>& vector )
+{
+  std::vector<U> result( vector.size() );
+
+  std::transform( vector.begin(), vector.end(), result.begin(),
+    [&lambda] ( U x )
+    {
+      return static_cast<U>(lambda) * x;
+    }
+  );
+
+  return result;
+}
+
+/**
   Element-wise addition of two vectors of the same size.
 
   @param lhs First vector
