@@ -50,7 +50,7 @@ template <class T> void testWeightedLaplacianMatrix()
   auto L = aleph::geometry::weightedLaplacianMatrix( K );
 
   std::vector<T> actualValues;
-  actualValues.reserve( L.size() );
+  actualValues.reserve( std::size_t( L.size() ) );
 
   for( unsigned i = 0; i < L.rows(); i++ )
     for( unsigned j = 0; j < L.cols(); j++ )

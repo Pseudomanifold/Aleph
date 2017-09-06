@@ -180,8 +180,8 @@ public:
     auto&& eigenvalues  = solver.eigenvalues(). template cast<T>();
     auto&& eigenvectors = solver.eigenvectors().template cast<T>();
 
-    _eigenvalues.reserve( eigenvalues.size() );
-    _eigenvectors.reserve( eigenvectors.size() );
+    _eigenvalues.reserve( std::size_t( eigenvalues.size() ) );
+    _eigenvectors.reserve( std::size_t( eigenvectors.size() ) );
 
     using IndexType_ = typename decltype(L)::Index;
 
