@@ -10,6 +10,7 @@
 
 #include <aleph/math/KahanSummation.hh>
 
+#include <algorithm>
 #include <unordered_map>
 #include <stdexcept>
 #include <string>
@@ -310,6 +311,16 @@ public:
 
   // Sampling intervals ------------------------------------------------
 
+  /**
+    Uses a heuristic to determine a sampling interval for the time
+    parameter \f$t\f$ of the heat kernel. This heuristic was first
+    described by Sun et al. in their paper *A Concise and Provably
+    Informative Multi-Scale Signature Based on Heat Diffusion*.
+
+    @param n Number of sampling points
+    @returns Vector of sampling points
+  */
+
   std::vector<T> logarithmicSamplingInterval( unsigned n ) const
   {
     auto t_min  = 4 * std::log( 10 ) / _eigenvalues.back();
@@ -321,6 +332,13 @@ public:
 
     for( unsigned i = 0; i < n; i++ )
       samples.push_back( std::log( t_min ) + i * offset );
+
+    std::transform( samples.begin(), samples.end(),
+                    samples.begin(),
+                    [] ( const T x )
+                    {
+                      return std::pow( std::exp(1), x );
+                    } );
 
     return samples;
   }
