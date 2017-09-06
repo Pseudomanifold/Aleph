@@ -278,6 +278,36 @@ public:
 #endif
   }
 
+  /**
+    Calculates the *trace* of the heat kernel for a given time \f$t\f$
+    and returns it.
+  */
+
+  T trace( T t ) const
+  {
+    aleph::math::KahanSummation<T> result = T();
+
+    for( auto&& eigenvalue : _eigenvalues )
+      result += std::exp( -t * eigenvalue );
+
+    return result;
+  }
+
+  /**
+    Calculates the *determinant* of the heat kernel for a given time
+    \f$t\f$ and returns it.
+  */
+
+  T determinant( T t) const
+  {
+    T result = T();
+
+    for( auto&& eigenvalue : _eigenvalues )
+      result = result * std::exp( -t * eigenvalue );
+
+    return result;
+  }
+
 private:
 
   /**
