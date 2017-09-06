@@ -195,6 +195,33 @@ public:
   }
 
   /**
+    Evaluates the heat kernel for *all* vertices at a given time \f$t\f$
+    and returns the resulting values. This function is guaranteed to be
+    more efficient than calling the per-element functions repeatedly.
+  */
+
+  std::vector<T> operator()( T t )
+  {
+#ifdef ALEPH_WITH_EIGEN
+
+    Vector result = Vector();
+
+    for( std::size_t k = 0; k < _eigenvalues.size(); k++ )
+    {
+      auto&& lk  = std::exp( -t * _eigenvalues[k] );
+      auto&& uk = _eigenvectors[k];
+
+      result += lk * uk * uk.transpose();
+    }
+
+    return std::vector<T>( result.data(), result.data() + result.size() );
+
+#else
+    THROW_EIGEN_REQUIRED_ERROR();
+#endif
+  }
+
+  /**
     Evaluates the heat kernel for two vertices \f$i\f$ and \f$j\f$ at
     a given time \f$t\f$ and returns the result.
   */
