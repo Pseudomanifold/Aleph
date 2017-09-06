@@ -7,12 +7,8 @@
 #include <aleph/topology/Simplex.hh>
 #include <aleph/topology/SimplicialComplex.hh>
 
-#ifdef ALEPH_WITH_EIGEN
-
-template <class T> void testWeightedLaplacianMatrix()
+template <class T> aleph::topology::SimplicialComplex< aleph::topology::Simplex<T, unsigned> > createTestSimplicialComplex()
 {
-  ALEPH_TEST_BEGIN( "Weighted Laplacian matrix" );
-
   using Simplex           = typename aleph::topology::Simplex<T, unsigned>;
   using SimplicialComplex = typename aleph::topology::SimplicialComplex<Simplex>;
 
@@ -27,8 +23,16 @@ template <class T> void testWeightedLaplacianMatrix()
     Simplex( {2,4},T(1) )
   };
 
-  SimplicialComplex K( simplices.begin(), simplices.end() );
+  return SimplicialComplex( simplices.begin(), simplices.end() );
+}
 
+#ifdef ALEPH_WITH_EIGEN
+
+template <class T> void testWeightedLaplacianMatrix()
+{
+  ALEPH_TEST_BEGIN( "Weighted Laplacian matrix" );
+
+  auto K = createTestSimplicialComplex<T>();
   auto M = aleph::geometry::weightedAdjacencyMatrix( K );
 
   for( auto&& i : {0,1,2,3} )
@@ -64,6 +68,24 @@ template <class T> void testWeightedLaplacianMatrix()
   ALEPH_TEST_END();
 }
 
+template <class T> void testHeatKernelSimple()
+{
+  ALEPH_TEST_BEGIN( "Simple heat kernel test" );
+
+  auto K = createTestSimplicialComplex<T>();
+  aleph::geometry::HeatKernel hk( K );
+
+  auto samples1 = hk.logarithmicSamplingInterval( 20 );
+
+  for( auto&& t : samples1 )
+  {
+    auto trace = hk.trace(t);
+    std::cerr << t << "\t" << trace << "\n";
+  }
+
+  ALEPH_TEST_END();
+}
+
 #endif
 
 int main( int, char** )
@@ -71,5 +93,8 @@ int main( int, char** )
 #ifdef ALEPH_WITH_EIGEN
   testWeightedLaplacianMatrix<float> ();
   testWeightedLaplacianMatrix<double>();
+
+  testHeatKernelSimple<float> ();
+  testHeatKernelSimple<double>();
 #endif
 }
