@@ -59,6 +59,7 @@ SET_SOURCE_FILES_PROPERTIES(
 )
 
 ADD_EXECUTABLE( test_barycentric_subdivision          test_barycentric_subdivision.cc )
+ADD_EXECUTABLE( test_beta_skeleton                    test_beta_skeleton.cc )
 ADD_EXECUTABLE( test_bootstrap                        test_bootstrap.cc )
 ADD_EXECUTABLE( test_boundary_matrix_reduction        test_boundary_matrix_reduction.cc )
 ADD_EXECUTABLE( test_clique_enumeration               test_clique_enumeration.cc )
@@ -101,6 +102,7 @@ ADD_EXECUTABLE( test_step_function                    test_step_function.cc )
 ADD_EXECUTABLE( test_witness_complex                  test_witness_complex.cc )
 
 ADD_TEST( barycentric_subdivision          test_barycentric_subdivision )
+ADD_TEST( beta_skeleton                    test_beta_skeleton )
 ADD_TEST( bootstrap                        test_bootstrap )
 ADD_TEST( boundary_matrix_reduction        test_boundary_matrix_reduction )
 ADD_TEST( clique_enumeration               test_clique_enumeration )
