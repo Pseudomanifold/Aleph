@@ -308,6 +308,23 @@ public:
     return result;
   }
 
+  // Sampling intervals ------------------------------------------------
+
+  std::vector<T> logarithmicSamplingInterval( unsigned n ) const
+  {
+    auto t_min  = 4 * std::log( 10 ) / _eigenvalues.back();
+    auto t_max  = 4 * std::log( 10 ) / _eigenvalues.front();
+    auto offset = ( std::log( t_max ) - std::log( t_min ) ) / ( n - 1 );
+
+    std::vector<T> samples;
+    samples.reserve( n );
+
+    for( unsigned i = 0; i < n; i++ )
+      samples.push_back( std::log( t_min ) + i * offset );
+
+    return samples;
+  }
+
 private:
 
   /**
