@@ -143,8 +143,9 @@ class HeatKernel
 {
 public:
 
+  using T = double;
+
 #ifdef ALEPH_WITH_EIGEN
-  using T      = double;
   using Matrix = Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>;
   using Vector = Eigen::Matrix<T, 1, Eigen::Dynamic>;
 
@@ -154,6 +155,10 @@ public:
   using IndexType  = typename Matrix::Index;
 #endif
 
+#else
+  // This declares a fallback index type in case Eigen is not available,
+  // making sure that the interface of the class remains the same.
+  using IndexType = unsigned;
 #endif
 
   /**
@@ -190,6 +195,9 @@ public:
       _eigenvectors.push_back( eigenvectors.col(i) );
 
 #else
+  (void) K;
+  (void) L;
+
   THROW_EIGEN_REQUIRED_ERROR();
 #endif
 
@@ -218,6 +226,8 @@ public:
     return std::vector<T>( result.data(), result.data() + result.size() );
 
 #else
+    (void) t;
+
     THROW_EIGEN_REQUIRED_ERROR();
 #endif
   }
@@ -245,6 +255,10 @@ public:
     return result;
 
 #else
+  (void) i;
+  (void) j;
+  (void) t;
+
   THROW_EIGEN_REQUIRED_ERROR();
 #endif
   }
@@ -275,6 +289,9 @@ public:
     return result;
 
 #else
+  (void) i;
+  (void) t;
+
   THROW_EIGEN_REQUIRED_ERROR();
 #endif
   }
