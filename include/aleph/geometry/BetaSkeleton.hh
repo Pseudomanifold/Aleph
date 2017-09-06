@@ -97,6 +97,20 @@ private:
 
 } // namespace detail
 
+/**
+  Builds a \f$\beta\f$-skeleton for a given container. This skeleton is
+  defined as an empty region graph where the empty region is defined by
+  two congruent disks, whose diameter is initially the distance between
+  two points, scaled by \f$\beta\f$. Edges will be created only if this
+  region is devoid of any other points.
+
+  @param container Container from which to calculate the skeleton
+  @param beta      Scaling parameter for the empty region
+  @param distance  Distance functor to use for the calculation
+
+  @returns Simplicial complex representing the \f$\beta\f$-skeleton.
+*/
+
 template <class Distance, class Container, class Index = std::size_t>
   auto buildBetaSkeletonNaive( const Container& container,
                                double beta,
