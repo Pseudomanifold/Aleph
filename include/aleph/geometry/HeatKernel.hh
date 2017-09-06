@@ -5,10 +5,15 @@
 
 #ifdef ALEPH_WITH_EIGEN
   #include <Eigen/Core>
+  #include <Eigen/Eigenvalues>
 #endif
+
+#include <aleph/math/KahanSummation.hh>
 
 #include <unordered_map>
 #include <vector>
+
+#include <cmath>
 
 namespace aleph
 {
@@ -80,6 +85,16 @@ template <class SimplicialComplex> auto weightedAdjacencyMatrix( const Simplicia
   return W;
 }
 
+/**
+  Calculates the weighhted Laplacian matrix of a given simplicial
+  complex and returns it.
+
+  @param K Simplicial complex
+
+  @returns Weighted Laplacian matrix. The indices of rows and columns
+           follow the order of the vertices in the complex.
+*/
+
 template <class SimplicialComplex> auto weightedLaplacianMatrix( const SimplicialComplex& K ) -> Eigen::Matrix<typename SimplicialComplex::ValueType::DataType, Eigen::Dynamic, Eigen::Dynamic>
 {
   auto W          = weightedAdjacencyMatrix( K );
@@ -97,6 +112,127 @@ template <class SimplicialComplex> auto weightedLaplacianMatrix( const Simplicia
 }
 
 #endif
+
+/**
+  @class HeatKernel
+  @brief Caclulates the heat kernel for simplicial complexes
+
+  This class acts as a query functor for the heat kernel values of
+  vertices in a weighted simplicial complex. It will pre-calculate
+  the heat matrix and permit queries about the progression of heat
+  values for *all* vertices for some time \f$t\f$.
+*/
+
+class HeatKernel
+{
+public:
+
+#ifdef ALEPH_WITH_EIGEN
+  using T      = double;
+  using Matrix = Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>;
+  using Vector = Eigen::Matrix<T, 1, Eigen::Dynamic>;
+
+#if EIGEN_VERSION_AT_LEAST(3,3,0)
+  using IndexType  = Eigen::Index;
+#else
+  using IndexType  = typename Matrix::Index;
+#endif
+
+#endif
+
+  /**
+    Constructs a heat kernel from a given simplicial complex. Afterwards,
+    the functor will be ready for queries.
+
+    @param K Simplicial complex
+  */
+
+  template <class SimplicialComplex> HeatKernel( const SimplicialComplex& K )
+  {
+    auto L = weightedLaplacianMatrix( K );
+
+#ifdef ALEPH_WITH_EIGEN
+
+    Eigen::SelfAdjointEigenSolver< decltype(L) > solver;
+    solver.compute( L );
+
+    auto&& eigenvalues  = solver.eigenvalues(). template cast<T>();
+    auto&& eigenvectors = solver.eigenvectors().template cast<T>();
+
+    _eigenvalues.reserve( eigenvalues.size() );
+    _eigenvectors.reserve( eigenvectors.size() );
+
+    using IndexType_ = typename decltype(L)::Index;
+
+    // Skip the first eigenvector and the first eigenvalue because they
+    // do not contribute anything to the operations later on.
+
+    for( IndexType_ i = 1; i < eigenvalues.size(); i++ )
+      _eigenvalues.push_back( eigenvalues(i) );
+
+    for( IndexType_ i = 1; i < eigenvectors.cols(); i++ )
+      _eigenvectors.push_back( eigenvectors.col(i) );
+
+#else
+
+    // FIXME: throw error?
+    (void) L;
+
+#endif
+
+  }
+
+  /**
+    Evaluates the heat kernel for two vertices \f$i\f$ and \f$j\f$ at
+    a given time \f$t\f$ and returns the result.
+  */
+
+  T operator()( IndexType i, IndexType j, double t )
+  {
+#ifdef ALEPH_WITH_EIGEN
+
+    aleph::math::KahanSummation<T> result = T();
+
+    for( std::size_t k = 0; k < _eigenvalues.size(); k++ )
+    {
+      auto&& lk  = std::exp( -t * _eigenvalues[k] );
+      auto&& uik = _eigenvectors[k](i);
+      auto&& ujk = _eigenvectors[k](j);
+
+      result += lk * uik * ujk;
+    }
+
+    return result;
+
+#else
+  // FIXME: throw error?
+#endif
+  }
+
+private:
+
+  /**
+    Stores the eigenvalues of the heat matrix, or, more precisely, the
+    eigenvalues of the Laplacian. They will be used for the evaluation
+    of the heat kernel.
+  */
+
+  std::vector<T> _eigenvalues;
+
+#ifdef ALEPH_WITH_EIGEN
+
+  /** Stores the eigenvectors of the heat matrix */
+  std::vector<Vector> _eigenvectors;
+
+  /**
+    Heat matrix; will be created automatically upon constructing this
+    functor class.
+  */
+
+  Matrix _H;
+#endif
+
+};
 
 } // namespace geometry
 
