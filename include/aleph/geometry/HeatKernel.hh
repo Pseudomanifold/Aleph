@@ -82,7 +82,7 @@ template <class SimplicialComplex> auto weightedAdjacencyMatrix( const Simplicia
 
   // Prepare matrix ----------------------------------------------------
 
-  Matrix W( n, n );
+  Matrix W = Matrix::Zero( n, n );
 
   for(auto&& s : K )
   {
@@ -117,7 +117,7 @@ template <class SimplicialComplex> auto weightedLaplacianMatrix( const Simplicia
   using Matrix    = decltype(W);
   using IndexType = typename Matrix::Index;
 
-  Matrix L( W.rows(), W.cols() );
+  Matrix L = Matrix::Zero( W.rows(), W.cols() );
 
   auto V = W.rowwise().sum();
 
