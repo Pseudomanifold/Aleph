@@ -5,6 +5,7 @@
 
 #include <aleph/geometry/distances/Euclidean.hh>
 
+#include <fstream>
 #include <iostream>
 #include <unordered_map>
 #include <string>
@@ -103,15 +104,37 @@ int main( int argc, char** argv )
 
   aleph::geometry::HeatKernel hk( betaSkeleton );
 
-  auto t0 = 0.001;
-  auto t1 = 0.010;
-  auto t2 = 0.100;
+  auto t0 = 0.000;
+  auto t1 = 0.001;
+  auto t2 = 0.010;
+  auto t3 = 0.100;
+  auto t4 = 0.500;
 
-  for( auto&& t : {t0,t1,t2} )
+  for( auto&& t : {t0,t1,t2,t3,t4} )
   {
     for( std::size_t i = 0; i < scalesBefore.size(); i++ )
-      std::cout << scalesBefore.at(i) * hk(i,t) << "\n";
+      std::cout << i << "\t" << scalesBefore.at(i) * hk(i,t) << "\n";
 
-    std::cout << "\n";
+    std::cout << "\n\n";
+  }
+
+  // gnuplot output ---------------------------------------------------
+
+  {
+    std::ofstream out( "/tmp/HKS.txt" );
+
+    for( auto&& t : {t0,t1,t2,t3} )
+    {
+      for( std::size_t i = 0; i < scalesBefore.size(); i++ )
+      {
+        auto p = pointCloud[i];
+        auto x = p[0];
+        auto y = p[1];
+
+        out << x << "\t" << y << "\t" << scalesBefore.at(i) * hk(i,t) << "\n";
+      }
+
+      out << "\n\n";
+    }
   }
 }
