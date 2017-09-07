@@ -1,6 +1,7 @@
 ADD_EXECUTABLE( clique_communities_to_json                     clique_communities_to_json.cc )
 ADD_EXECUTABLE( clique_persistence_diagram                     clique_persistence_diagram.cc )
 ADD_EXECUTABLE( interlevel_set_persistence_hierarchy           interlevel_set_persistence_hierarchy.cc )
+ADD_EXECUTABLE( multi_scale_skeleton                           multi_scale_skeleton.cc )
 ADD_EXECUTABLE( persistence_diagram_statistics                 persistence_diagram_statistics.cc )
 ADD_EXECUTABLE( persistence_indicator_function                 persistence_indicator_function.cc )
 ADD_EXECUTABLE( persistence_indicator_function_confidence_sets persistence_indicator_function_confidence_sets.cc )
