@@ -170,9 +170,9 @@ public:
 
   template <class SimplicialComplex> HeatKernel( const SimplicialComplex& K )
   {
-    auto L = weightedLaplacianMatrix( K );
-
 #ifdef ALEPH_WITH_EIGEN
+
+    auto L = weightedLaplacianMatrix( K );
 
     Eigen::SelfAdjointEigenSolver< decltype(L) > solver;
     solver.compute( L );
