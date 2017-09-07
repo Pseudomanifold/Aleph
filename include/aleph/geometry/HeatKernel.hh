@@ -131,7 +131,7 @@ template <class SimplicialComplex> auto weightedLaplacianMatrix( const Simplicia
 
 /**
   @class HeatKernel
-  @brief Caclulates the heat kernel for simplicial complexes
+  @brief Calculates the heat kernel for simplicial complexes
 
   This class acts as a query functor for the heat kernel values of
   vertices in a weighted simplicial complex. It will pre-calculate
