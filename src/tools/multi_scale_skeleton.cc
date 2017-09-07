@@ -103,14 +103,14 @@ int main( int argc, char** argv )
 
   aleph::geometry::HeatKernel hk( betaSkeleton );
 
-  auto h0 = hk( 0.001 );
-  auto h1 = hk( 0.010 );
-  auto h2 = hk( 0.100 );
+  auto t0 = 0.001;
+  auto t1 = 0.010;
+  auto t2 = 0.100;
 
-  for( auto&& h : {h0,h1,h2} )
+  for( auto&& t : {t0,t1,t2} )
   {
     for( std::size_t i = 0; i < scalesBefore.size(); i++ )
-      std::cout << scalesBefore.at(i) * h.at(i) << "\n";
+      std::cout << scalesBefore.at(i) * hk(i,t) << "\n";
 
     std::cout << "\n";
   }
