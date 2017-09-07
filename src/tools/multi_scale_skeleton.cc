@@ -98,4 +98,20 @@ int main( int argc, char** argv )
   for( auto&& s : scalesBefore )
     std::cerr << s << " ";
   std::cerr << "\n";
+
+  // Heat kernel application -------------------------------------------
+
+  aleph::geometry::HeatKernel hk( betaSkeleton );
+
+  auto h0 = hk( 0.001 );
+  auto h1 = hk( 0.010 );
+  auto h2 = hk( 0.100 );
+
+  for( auto&& h : {h0,h1,h2} )
+  {
+    for( std::size_t i = 0; i < scalesBefore.size(); i++ )
+      std::cout << scalesBefore.at(i) * h.at(i) << "\n";
+
+    std::cout << "\n";
+  }
 }
