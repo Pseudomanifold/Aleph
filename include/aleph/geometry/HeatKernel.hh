@@ -195,7 +195,6 @@ public:
 
 #else
   (void) K;
-  (void) L;
 
   THROW_EIGEN_REQUIRED_ERROR();
 #endif
