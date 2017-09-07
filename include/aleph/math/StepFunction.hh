@@ -39,6 +39,21 @@ template <class T> T previous( T x )
 
 } // namespace detail
 
+/**
+  @class StepFunction
+  @brief Models a step function
+
+  Step functions are defined as sets of indicator functions over an
+  interval. They occur when calculating a summarizing function of a
+  persistence diagram, for example.
+
+  This class provides an interface for working with step functions,
+  and performing numerous arithmetical operations.
+
+  @tparam D Type of the *domain* of the step function
+  @tparam I Type of the *image* of the step function
+*/
+
 template <class D, class I = D> class StepFunction
 {
 public:
@@ -196,8 +211,8 @@ public:
     {
       auto&& f = *it;
 
-      // TODO: Not sure whether I really want this. The step functions must not
-      // overlap anyway...
+      // If multiple indicator functions overlap, take the one whose
+      // absolute value is largest.
       if( std::abs( f(x) ) > value )
         value = f(x);
     }
@@ -482,7 +497,7 @@ private:
   std::set<IndicatorFunction> _indicatorFunctions;
 };
 
-// TODO: This does not need to be a friend function; it suffices to be
+// FIXME: This does not need to be a friend function; it suffices to be
 // implemented using the public interface of the class.
 template <class D, class I> std::ostream& operator<<( std::ostream& o, const StepFunction<D, I>& f )
 {
