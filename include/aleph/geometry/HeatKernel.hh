@@ -185,13 +185,12 @@ public:
 
     using IndexType_ = typename decltype(L)::Index;
 
-    // Skip the first eigenvector and the first eigenvalue because they
-    // do not contribute anything to the operations later on.
-
-    for( IndexType_ i = 1; i < eigenvalues.size(); i++ )
+    // If configured, skip both the first eigenvector and the first
+    // eigenvalue because they do not contribute anything later on.
+    for( IndexType_ i = _skip ? 1 : 0; i < eigenvalues.size(); i++ )
       _eigenvalues.push_back( eigenvalues(i) );
 
-    for( IndexType_ i = 1; i < eigenvectors.cols(); i++ )
+    for( IndexType_ i = _skip ? 1 : 0; i < eigenvectors.cols(); i++ )
       _eigenvectors.push_back( eigenvectors.col(i) );
 
 #else
@@ -341,7 +340,7 @@ public:
   std::vector<T> logarithmicSamplingInterval( unsigned n ) const
   {
     auto t_min  = 4 * std::log( 10 ) / _eigenvalues.back();
-    auto t_max  = 4 * std::log( 10 ) / _eigenvalues.front();
+    auto t_max  = 4 * std::log( 10 ) / ( _skip ? _eigenvalues.front() : *( _eigenvalues.begin() + 1 ) );
     auto offset = ( std::log( t_max ) - std::log( t_min ) ) / ( n - 1 );
 
     std::vector<T> samples;
@@ -360,7 +359,15 @@ public:
     return samples;
   }
 
+  // Configuration -----------------------------------------------------
+
+  void setSkip( bool value = true ) { _skip = value; }
+  bool skip() const noexcept        { return _skip;  }
+
 private:
+
+  /** If set, skips the first eigenvector and eigenvalue */
+  bool _skip = false;
 
   /**
     Stores the eigenvalues of the heat matrix, or, more precisely, the
