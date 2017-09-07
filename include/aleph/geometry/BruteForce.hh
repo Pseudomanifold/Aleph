@@ -63,7 +63,7 @@ public:
 
         d = _traits.from( d );
 
-        if( d <= radius )
+        if( d < radius )
         {
           indices[i].push_back( j );
           distances[i].push_back( d );

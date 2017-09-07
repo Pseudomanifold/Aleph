@@ -69,7 +69,6 @@ template <class Wrapper, class PointCloud> void testInternal( const PointCloud& 
   ALEPH_ASSERT_EQUAL( indices.size(), pointCloud.size() );
   for( auto&& i : indices )
     ALEPH_ASSERT_EQUAL( pointCloud.size(), i.size() );
-
 }
 
 template <class T> void test()
