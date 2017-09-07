@@ -18,14 +18,43 @@ namespace topology
 /**
   Given a simplicial complex, extracts its corresponding clique graph. The
   clique graph is defined as the graph in which each node corresponds to a
-  k-simplex and an edge connects two nodes if there is a $(k-1)$-face that
-  connects the two simplices.
+  \f$k\f$-simplex and an edge connects two nodes whenever there exists one
+  \f$(k-1)\f$-face that connects the two simplices. Edges in the graph are
+  weighted, using the *maximum* of the simplex weights of their endpoints;
+  this behaviour can be changed by calling an overload of this function.
+
+  @param K Simplicial complex
+  @param k Degree of cliques to extract
 
   Note that the graph is represented as a simplicial complex. It makes any
-  other operations easier.
+  further operations easier.
 */
 
 template <class Simplex> SimplicialComplex<Simplex> getCliqueGraph( const SimplicialComplex<Simplex>& K, unsigned k )
+{
+  using DataType = typename Simplex::DataType;
+
+  return getCliqueGraph( K, k, [] ( DataType a, DataType b ) { return std::max(a,b); } );
+}
+
+/**
+  Extracts the clique graph using a predefined functor for assigning the
+  weights of simplices. The functor requires the following interface:
+
+  \code{.cpp}
+  // DataType refers to the data type stored in the simplicial complex,
+  // for example `double`.
+  DataType Functor::operator()( DataType a, DataType b )
+  {
+  }
+  \endcode
+
+  @param K       Simplicial complex
+  @param k       Degree of cliques to extract
+  @param functor Functor for assigning weights
+*/
+
+template <class Simplex, class Functor> SimplicialComplex<Simplex> getCliqueGraph( const SimplicialComplex<Simplex>& K, unsigned k, Functor functor )
 {
   // Stores the co-faces of (k-1)-dimensional simplices. This is required for
   // the edge creation. Whenever two (or more) k-simplices appear in this map
@@ -48,8 +77,6 @@ template <class Simplex> SimplicialComplex<Simplex> getCliqueGraph( const Simpli
       auto&& simplex = pair.first;
       auto&& index   = pair.second;
 
-      // TODO: Is the number of co-faces bounded? If so, I could reserve
-      // sufficient memory in the map.
       for( auto itFace = simplex.begin_boundary(); itFace != simplex.end_boundary(); ++itFace )
         cofaceMap[ *itFace ].push_back( index );
     }
@@ -88,15 +115,9 @@ template <class Simplex> SimplicialComplex<Simplex> getCliqueGraph( const Simpli
         {
           auto vIndex = indices[j];
 
-          // TODO: What happens if the indices are invalid? Do I need to
-          // prepare for this situation explicitly?
-          auto&& s = K.at( uIndex );
-          auto&& t = K.at( vIndex );
-
-          // TODO: Does it make sense to make this configurable? As of now, I
-          // am restricting the weights to the usual maximum filtration, i.e.
-          // I am assuming a growth process here.
-          auto data = std::max( s.data(), t.data() );
+          auto&& s    = K.at( uIndex );
+          auto&& t    = K.at( vIndex );
+          auto data   = functor( s.data(), t.data() );
 
           edges.push_back( Simplex( {VertexType(uIndex), VertexType(vIndex)}, data ) );
         }
