@@ -63,8 +63,7 @@ public:
 
         d = _traits.from( d );
 
-        // TODO: Less than or equal?
-        if( d < radius )
+        if( d <= radius )
         {
           indices[i].push_back( j );
           distances[i].push_back( d );
