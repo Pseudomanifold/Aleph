@@ -14,6 +14,19 @@ namespace aleph
 namespace math
 {
 
+/**
+  @class SparseBinaryMatrix
+  @brief Models a sparse binary matrix with arbitrary data types
+
+  Sparse matrices commonly occur as a simple model of adjacency
+  relations in simplicial complexes, for example. This class is
+  a model for them, providing *direct* and *fast* access to the
+  respective values.
+
+  @see aleph::topology::maximalCliquesBronKerbosch
+  @see aleph::topology::maximalCliquesKoch
+*/
+
 template <class T> class SparseBinaryMatrix
 {
 public:
@@ -23,6 +36,7 @@ public:
   using IndexMap    = std::vector<IndexType>;
   using size_type   = typename ColumnType::size_type;
 
+  /** Creates a new matrix with a given number of columns. */
   explicit SparseBinaryMatrix( IndexType columns )
   {
     _columns.resize( size_type( columns ) );
@@ -100,16 +114,6 @@ private:
   // indices occur that may not be contiguous.
   IndexMap _indexMap;
   ColumnsType _columns;
-};
-
-template <class I, class D> class SparseMatrix
-{
-  /*
-    TODO: Implement this. In contrast to the binary matrix, this matrix
-    should also be capable of storing the value in a given column.
-
-    Hence, there is the need for an additional lookup data structure.
-  */
 };
 
 } // namespace math
