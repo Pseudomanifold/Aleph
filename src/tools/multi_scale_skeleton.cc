@@ -109,8 +109,10 @@ int main( int argc, char** argv )
   auto t2 = 0.010;
   auto t3 = 0.100;
   auto t4 = 0.500;
+  auto t5 = 1.000;
+  auto t6 = 9.000;
 
-  for( auto&& t : {t0,t1,t2,t3,t4} )
+  for( auto&& t : {t0,t1,t2,t3,t4,t5,t6} )
   {
     for( std::size_t i = 0; i < scalesBefore.size(); i++ )
       std::cout << i << "\t" << scalesBefore.at(i) * hk(i,t) << "\n";
@@ -123,7 +125,7 @@ int main( int argc, char** argv )
   {
     std::ofstream out( "/tmp/HKS.txt" );
 
-    for( auto&& t : {t0,t1,t2,t3} )
+    for( auto&& t : {t0,t1,t2,t3,t4,t5,t6} )
     {
       for( std::size_t i = 0; i < scalesBefore.size(); i++ )
       {
