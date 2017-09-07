@@ -113,9 +113,6 @@ public:
         // permits the use of non-contiguous node IDs.
         _labels[id] = label;
 
-        // TODO: We could potentially support vertex weights here as well but
-        // the original file format specification apparently does not account
-        // for it.
         simplices.push_back( Simplex( VertexType( std::stoul(id) ) ) );
       }
 
