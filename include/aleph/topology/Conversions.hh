@@ -6,6 +6,7 @@
 #include <aleph/topology/BoundaryMatrix.hh>
 
 #include <algorithm>
+#include <unordered_map>
 
 namespace aleph
 {
@@ -29,10 +30,25 @@ template <
   class SimplicialComplex
 > BoundaryMatrix<Representation> makeBoundaryMatrix( const SimplicialComplex& K, std::size_t max = 0 )
 {
-  using Index = typename BoundaryMatrix<Representation>::Index;
+  using Simplex = typename SimplicialComplex::ValueType;
+  using Index   = typename BoundaryMatrix<Representation>::Index;
 
   BoundaryMatrix<Representation> M;
   M.setNumColumns( static_cast<Index>( K.size() ) );
+
+  // Prepare index map -------------------------------------------------
+  //
+  // The idea is to map simplices to their index within the filtration
+  // in order to speed up the conversion process.
+
+  std::unordered_map<Simplex, Index> simplex_to_index;
+
+  {
+    Index i = Index(0);
+
+    for( auto&& simplex : K )
+      simplex_to_index[simplex] = i++;
+  }
 
   Index j = Index(0);
 
@@ -45,12 +61,7 @@ template <
          itBoundary != itSimplex->end_boundary();
          ++itBoundary )
     {
-      // TODO: This lookup is *not* optimal. A hash map or something similar
-      // should be used here. Else, every access incurs a cost of at least
-      // O(log n) instead of O(1).
-      auto index = K.index( *itBoundary );
-
-      column.push_back( static_cast<Index>( index ) );
+      column.push_back( simplex_to_index[ *itBoundary ] );
     }
 
     M.setColumn( j, column.begin(), column.end() );
