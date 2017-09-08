@@ -74,6 +74,30 @@ FileType fileType( const std::string& path )
   return t;
 }
 
+/** Checks whether a given path is a directory */
+bool isDirectory( const std::string& path )
+{
+  return fileType( path ) == FileType::Directory;
+}
+
+/** Checks whether a given path is a regular file */
+bool isRegularFile( const std::string& path )
+{
+  return fileType( path ) == FileType::RegularFile;
+}
+
+/** Checks whether a given path is a socket */
+bool isSocket( const std::string& path )
+{
+  return fileType( path ) == FileType::Socket;
+}
+
+/** Checks whether a path or a file exists */
+bool exists( const std::string& path )
+{
+  return isDirectory( path ) || isRegularFile( path ) || isSocket( path );
+}
+
 /** Returns the basename, i.e the filename portion, of a path */
 std::string basename( const std::string& path )
 {
