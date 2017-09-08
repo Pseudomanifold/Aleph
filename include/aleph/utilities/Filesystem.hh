@@ -4,6 +4,16 @@
 #if defined(__unix__) || defined(__unix) || ( defined(__APPLE__) && defined(__MACH__) )
   #include <libgen.h>
   #include <unistd.h>
+
+  #include <sys/stat.h>
+#endif
+
+#if defined(_BSD_SOURCE) || defined(_SVID_SOURCE) || defined(_DEFAULT_SOURCE)
+  #define ALL_FILE_TYPE_QUERIES_AVAILABLE
+#endif
+
+#if defined(ALL_FILE_TYPE_QUERIES_AVAILABLE) || defined(_BSD_SOURCE) || defined(_DEFAULT_SOURCE) || ( defined(_XOPEN_SOURCE) && _XOPEN_SOURCE >= 500 )
+  #define SOCKET_FILE_TYPE_QUERY_AVAILABLE
 #endif
 
 namespace aleph
@@ -11,6 +21,58 @@ namespace aleph
 
 namespace utilities
 {
+
+/**
+  Describes potential file types. This is used *internally* but also by
+  methods such as the `fileType()` function.
+*/
+
+enum class FileType
+{
+  BlockDevice,
+  CharacterDevice,
+  Directory,
+  NamedPipe,
+  RegularFile,
+  Socket,
+  SymbolicLink,
+  Undefined
+};
+
+/** Returns the file type of a path */
+FileType fileType( const std::string& path )
+{
+  FileType t = FileType::Undefined;
+
+#if defined(__unix__) && ( ( defined(_POSIX_C_SOURCE) && _POSIX_C_SOURCE >= 200112L ) || defined(_DEFAULT_SOURCE) )
+  struct stat info;
+  int error = lstat( path.c_str(), &info );
+
+  if( error == 0 )
+  {
+  #if defined(ALL_FILE_TYPE_QUERIES_AVAILABLE) || defined(_XOPEN_SOURCE)
+    if( S_ISBLK( info.st_mode ) )
+      t = FileType::BlockDevice;
+    else if( S_ISCHR( info.st_mode ) )
+      t = FileType::CharacterDevice;
+    else if( S_ISDIR( info.st_mode ) )
+      t = FileType::Directory;
+    else if( S_ISFIFO( info.st_mode ) )
+      t = FileType::NamedPipe;
+    else if( S_ISREG( info.st_mode ) )
+      t = FileType::RegularFile;
+    else if( S_ISLNK( info.st_mode ) )
+      t = FileType::SymbolicLink;
+    #ifdef SOCKET_FILE_TYPE_QUERY_AVAILABLE
+    else if( S_ISSOCK( info.st_mode ) )
+      t = FileType::Socket;
+    #endif
+  #endif
+  }
+#endif
+
+  return t;
+}
 
 /** Returns the basename, i.e the filename portion, of a path */
 std::string basename( const std::string& path )
