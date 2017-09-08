@@ -85,6 +85,9 @@ void usage()
             << "                   the strength of a relationship, and not a\n"
             << "                   dissimilarity between nodes.\n"
             << "\n"
+            << " --node-weights  : Specifies a file from which to load node\n"
+            << "                   weights for the filtration.\n"
+            << "\n"
             << " --normalize     : Normalizes all weights to [0,1]. Use this\n"
             << "                   to compare multiple networks.\n"
             << "\n"
@@ -109,19 +112,21 @@ int main( int argc, char** argv )
   {
     { "infinity"      , required_argument, nullptr, 'f' },
     { "invert-weights", no_argument      , nullptr, 'i' },
+    { "node-weights"  , required_argument, nullptr, 'w' },
     { "normalize"     , no_argument      , nullptr, 'n' },
     { "output"        , required_argument, nullptr, 'o' },
     { nullptr         , 0                , nullptr,  0  }
   };
 
-  bool invertWeights       = false;
-  bool normalize           = false;
-  DataType infinity        = std::numeric_limits<DataType>::has_infinity ? std::numeric_limits<DataType>::infinity() : std::numeric_limits<DataType>::max();
-  std::string basePath     = std::string();
+  bool invertWeights          = false;
+  bool normalize              = false;
+  DataType infinity           = std::numeric_limits<DataType>::has_infinity ? std::numeric_limits<DataType>::infinity() : std::numeric_limits<DataType>::max();
+  std::string basePath        = std::string();
+  std::string nodeWeightsFile = std::string();
 
   {
     int option = 0;
-    while( ( option = getopt_long( argc, argv, "f:ino:", commandLineOptions, nullptr ) ) != -1 )
+    while( ( option = getopt_long( argc, argv, "f:iw:no:", commandLineOptions, nullptr ) ) != -1 )
     {
       switch( option )
       {
@@ -139,6 +144,10 @@ int main( int argc, char** argv )
 
       case 'o':
         basePath = optarg;
+        break;
+
+      case 'w':
+        nodeWeightsFile = optarg;
         break;
 
       default:
@@ -198,6 +207,21 @@ int main( int argc, char** argv )
 
   std::cerr << "finished\n"
             << "* Extracted simplicial complex with " << K.size() << " simplices\n";
+
+  // Assign nodes weights if specified by the user. This requires
+  // re-calculating *all* weights of the simplicial complex.
+
+  if( !nodeWeightsFile.empty() )
+  {
+    std::ifstream in( nodeWeightsFile );
+
+    std::vector<DataType> nodeWeights;
+
+    aleph::geometry::RipsExpander<SimplicialComplex> ripsExpander;
+    K = ripsExpander.assignMaximumData(
+      K,
+      std::istream_iterator<DataType>( in ), std::istream_iterator<DataType>() );
+  }
 
   // Pre-processing ----------------------------------------------------
   //
