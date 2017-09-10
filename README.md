@@ -20,11 +20,11 @@ For more information, please read the [original paper describing
 Since its inception in late 2016, Aleph has been used to support the
 following papers:
 
-- Clique Community Persistence: A Topological Visual Analysis Approach for Complex Networks
-- Persistence Concepts for 2D Skeleton Evolution Analysis
-- Hierarchies and Ranks for Persistence Pairs
-- *Shall I compare thee to a network?*&mdash;Visualizing the Topological
-  Structure of Shakespeare&rsquo;s plays
+- [Clique Community Persistence: A Topological Visual Analysis Approach for Complex Networks](https://submanifold.github.io/Aleph/Rieck17d.html)
+- [Persistence Concepts for 2D Skeleton Evolution Analysis](https://submanifold.github.io/Aleph/Rieck17b.html)
+- [Hierarchies and Ranks for Persistence Pairs](https://submanifold.github.io/Aleph/Rieck17a.html)
+- [*Shall I compare thee to a network?*&mdash;Visualizing the Topological
+  Structure of Shakespeare&rsquo;s plays](https://submanifold.github.io/Aleph/Rieck16b.html)
 
 Please refer to [the list of
 publications](https://submanifold.github.io/Aleph/publications) in the
