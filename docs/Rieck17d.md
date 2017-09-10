@@ -4,9 +4,9 @@ title: Clique Community Persistence: A Topological Visual Analysis Approach for 
 
 # Clique Community Persistence: A Topological Visual Analysis Approach for Complex Networks
 
-This paper, which is also [available as
+This paper, which is [available as
 a preprint](http://bastian.rieck.ru/research/Vis2017_Networks.pdf) on my
-personal website, deals with the analysis of complex networks. The basic
+personal website or as a [full repository on OSF.io](https://osf.io/rdktg), deals with the analysis of complex networks. The basic
 idea is to decompose a network into its
 [cliques](https://en.wikipedia.org/wiki/Clique_(graph_theory)) and
 subsequently track their evolution using a modified variant of
