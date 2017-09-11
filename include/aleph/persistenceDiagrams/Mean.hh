@@ -17,6 +17,11 @@
 #include <stdexcept>
 #include <vector>
 
+// Ignore the OMP pragmas that are specified in this file. Depending on
+// the compiler configuration, they may not be available.
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunknown-pragmas"
+
 namespace aleph
 {
 
@@ -290,5 +295,7 @@ template <class InputIterator> auto mean( InputIterator begin, InputIterator end
 
 
 } // namespace aleph
+
+#pragma GCC diagnostic pop
 
 #endif
