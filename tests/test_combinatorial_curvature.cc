@@ -12,7 +12,7 @@ template <class T > void testSphere()
 {
   ALEPH_TEST_BEGIN( "Sphere" );
 
-  using DataType   = bool;
+  using DataType   = float;
   using VertexType = T;
 
   using Simplex           = aleph::topology::Simplex<DataType, VertexType>;
@@ -35,6 +35,19 @@ template <class T > void testSphere()
   ALEPH_ASSERT_EQUAL( curvature.size(), 6 );
   ALEPH_ASSERT_EQUAL( curvature.front(), curvature.back() );
   ALEPH_ASSERT_EQUAL( curvature.front(), 4 );
+
+  {
+    std::vector<DataType> weights = { 1,1,1,1 };
+    K.recalculateWeights( weights.begin(), weights.end() );
+  }
+
+  std::vector<DataType> weightedCurvature;
+  aleph::topology::weightedCurvature( K, std::back_inserter( weightedCurvature ) );
+
+  ALEPH_ASSERT_THROW( weightedCurvature.empty() == false );
+  ALEPH_ASSERT_EQUAL( weightedCurvature.size(), 6 );
+  ALEPH_ASSERT_EQUAL( weightedCurvature.front(), weightedCurvature.back() );
+  ALEPH_ASSERT_EQUAL( weightedCurvature.front(), 4 );
 
   ALEPH_TEST_END();
 }
