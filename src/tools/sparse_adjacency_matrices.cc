@@ -1,7 +1,10 @@
 #include <aleph/geometry/RipsExpander.hh>
 
+#include <aleph/math/KahanSummation.hh>
+
 #include <aleph/persistentHomology/Calculation.hh>
 
+#include <aleph/topology/FloydWarshall.hh>
 #include <aleph/topology/Simplex.hh>
 #include <aleph/topology/SimplicialComplex.hh>
 
@@ -20,13 +23,34 @@
 #include <string>
 #include <vector>
 
+using DataType          = float;
+using VertexType        = std::size_t;
+using Simplex           = aleph::topology::Simplex<DataType, VertexType>;
+using SimplicialComplex = aleph::topology::SimplicialComplex<Simplex>;
+
+std::vector<DataType> closenessCentrality( const SimplicialComplex& K )
+{
+  auto M = aleph::topology::floydWarshall( K );
+  auto n = M.numRows();
+
+  std::vector<DataType> result;
+  result.reserve( n );
+
+  for( decltype(n) i = 0; i < n; i++ )
+  {
+    aleph::math::KahanSummation<DataType> sum = DataType();
+
+    for( decltype(n) j = 0; j < n; j++ )
+      sum += M(i,j);
+
+    result.push_back( DataType(n) / sum );
+  }
+
+  return result;
+}
+
 int main( int argc, char** argv )
 {
-  using DataType          = unsigned;
-  using VertexType        = std::size_t;
-  using Simplex           = aleph::topology::Simplex<DataType, VertexType>;
-  using SimplicialComplex = aleph::topology::SimplicialComplex<Simplex>;
-
   if( argc <= 1 )
     return -1;
 
@@ -45,6 +69,25 @@ int main( int argc, char** argv )
   std::cerr << "finished\n"
             << "* Read " << simplicialComplexes.size() << " simplicial complexes\n";
 
+  // Calculate closeness centrality ------------------------------------
+
+  {
+    std::size_t index = 0;
+
+    for( auto&& K : simplicialComplexes )
+    {
+      K.sort();
+      auto cc     = closenessCentrality( K );
+      auto output = "/tmp/"
+                    + aleph::utilities::format( index, simplicialComplexes.size() )
+                    + "_closeness_centrality.txt";
+
+      std::ofstream out( output );
+      for( auto&& value : cc )
+        out << value << "\n";
+    }
+  }
+
   // Expand simplicial complexes ---------------------------------------
 
   aleph::geometry::RipsExpander<SimplicialComplex> expander;
@@ -54,7 +97,7 @@ int main( int argc, char** argv )
 
   // Calculate degrees -------------------------------------------------
 
-  unsigned maxDegree = 0;
+  DataType maxDegree = 0;
 
   std::cerr << "* Calculating degree-based filtration...";
 
