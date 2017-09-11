@@ -12,6 +12,11 @@ IF( BUILD_PYTHON_BINDINGS )
       PROPERTIES
         PREFIX ""
     )
+
+    IF( HDF5_FOUND )
+      TARGET_INCLUDE_DIRECTORIES( aleph SYSTEM PUBLIC ${HDF5_CXX_INCLUDE_DIRS} )
+      TARGET_LINK_LIBRARIES(      aleph               ${HDF5_CXX_LIBRARIES} )
+    ENDIF()
   ELSE()
     MESSAGE( STATUS "Cannot build Python bindings because no suitable version of Python was found" )
   ENDIF()
