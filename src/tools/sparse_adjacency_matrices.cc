@@ -17,6 +17,8 @@
 #include <aleph/utilities/Filesystem.hh>
 #include <aleph/utilities/Format.hh>
 
+#include <getopt.h>
+
 #include <algorithm>
 #include <fstream>
 #include <iostream>
@@ -54,7 +56,28 @@ std::vector<DataType> closenessCentrality( const SimplicialComplex& K )
 
 int main( int argc, char** argv )
 {
-  if( argc <= 1 )
+  static option commandLineOptions[] =
+  {
+    { "closeness-centrality", no_argument, nullptr, 'c' },
+    { nullptr               , 0          , nullptr,  0  }
+  };
+
+  bool calculateClosenessCentrality = false;
+
+  {
+    int option = 0;
+    while( ( option = getopt_long( argc, argv, "c", commandLineOptions, nullptr ) ) != -1 )
+    {
+      switch( option )
+      {
+      case 'c':
+        calculateClosenessCentrality = true;
+        break;
+      }
+    }
+  }
+
+  if( ( argc - optind ) < 1 )
     return -1;
 
   std::string filename = argv[1];
@@ -74,6 +97,7 @@ int main( int argc, char** argv )
 
   // Calculate closeness centrality ------------------------------------
 
+  if( calculateClosenessCentrality )
   {
     std::size_t index = 0;
 
