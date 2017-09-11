@@ -108,14 +108,10 @@ public:
 
     // The HDF5 parser permits the use of a functor that assigns
     // a weight to a higher-dimensional simplex.
-    //
-    // TODO: support this
     else if( extension == ".h5" )
     {
-#if 0
       HDF5SimpleDataSpaceReader reader;
       reader( filename, K );
-#endif
     }
 
     // The Pajek parser also works on its own and does not require any

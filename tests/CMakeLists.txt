@@ -71,17 +71,8 @@ ADD_EXECUTABLE( test_graph_generation                 test_graph_generation.cc )
 ADD_EXECUTABLE( test_heat_kernel                      test_heat_kernel.cc )
 ADD_EXECUTABLE( test_io_functions                     test_io_functions.cc )
 ADD_EXECUTABLE( test_io_gml                           test_io_gml.cc )
+ADD_EXECUTABLE( test_io_hdf5                          test_io_hdf5.cc )
 ADD_EXECUTABLE( test_io_json                          test_io_json.cc )
-
-# This test is a little bit special because it depends on another
-# shared library so it is possible that we cannot build it.
-IF( ALEPH_WITH_HDF5 )
-  ADD_EXECUTABLE( test_io_hdf5                        test_io_hdf5.cc )
-
-  TARGET_INCLUDE_DIRECTORIES( test_io_hdf5 SYSTEM PUBLIC ${HDF5_CXX_INCLUDE_DIRS} )
-  TARGET_LINK_LIBRARIES(      test_io_hdf5        ${HDF5_CXX_LIBRARIES} )
-ENDIF()
-
 ADD_EXECUTABLE( test_io_lexicographic_triangulation   test_io_lexicographic_triangulation.cc )
 ADD_EXECUTABLE( test_io_pajek                         test_io_pajek.cc )
 ADD_EXECUTABLE( test_io_sparse_adjacency_matrix       test_io_sparse_adjacency_matrix.cc )
@@ -145,6 +136,23 @@ ADD_TEST( rips_skeleton                    test_rips_skeleton )
 ADD_TEST( step_function                    test_step_function )
 ADD_TEST( union_find                       test_union_find )
 ADD_TEST( witness_complex                  test_witness_complex )
+
+# These test are a little bit special because they depend on another
+# shared library so we need to adjust the interface if we are unable 
+# to build them.
+IF( ALEPH_WITH_HDF5 )
+  TARGET_INCLUDE_DIRECTORIES( test_io_gml SYSTEM PUBLIC ${HDF5_CXX_INCLUDE_DIRS} )
+  TARGET_LINK_LIBRARIES(      test_io_gml               ${HDF5_CXX_LIBRARIES} )
+
+  TARGET_INCLUDE_DIRECTORIES( test_io_hdf5 SYSTEM PUBLIC ${HDF5_CXX_INCLUDE_DIRS} )
+  TARGET_LINK_LIBRARIES(      test_io_hdf5               ${HDF5_CXX_LIBRARIES} )
+
+  TARGET_INCLUDE_DIRECTORIES( test_io_pajek SYSTEM PUBLIC ${HDF5_CXX_INCLUDE_DIRS} )
+  TARGET_LINK_LIBRARIES(      test_io_pajek               ${HDF5_CXX_LIBRARIES} )
+
+  TARGET_INCLUDE_DIRECTORIES( test_io_vtk SYSTEM PUBLIC ${HDF5_CXX_INCLUDE_DIRS} )
+  TARGET_LINK_LIBRARIES(      test_io_vtk               ${HDF5_CXX_LIBRARIES} )
+ENDIF()
 
 ########################################################################
 # Python integration
