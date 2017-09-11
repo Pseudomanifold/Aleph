@@ -77,6 +77,7 @@ ADD_EXECUTABLE( test_connected_components             test_connected_components.
 ADD_EXECUTABLE( test_data_descriptors                 test_data_descriptors.cc )
 ADD_EXECUTABLE( test_filesystem                       test_filesystem.cc )
 ADD_EXECUTABLE( test_graph_generation                 test_graph_generation.cc )
+ADD_EXECUTABLE( test_floyd_warshall                   test_floyd_warshall.cc )
 ADD_EXECUTABLE( test_heat_kernel                      test_heat_kernel.cc )
 ADD_EXECUTABLE( test_io_functions                     test_io_functions.cc )
 ADD_EXECUTABLE( test_io_gml                           test_io_gml.cc )
