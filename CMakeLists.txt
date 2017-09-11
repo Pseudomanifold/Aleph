@@ -16,6 +16,9 @@ LIST( APPEND CMAKE_MODULE_PATH
 
 SET( CMAKE_EXPORT_COMPILE_COMMANDS ON )
 
+MESSAGE( STATUS "CMAKE_ROOT:           ${CMAKE_ROOT}" )
+MESSAGE( STATUS "CMAKE_SYSTEM_VERSION: ${CMAKE_SYSTEM_VERSION}" )
+
 ########################################################################
 # Versioning
 ########################################################################
