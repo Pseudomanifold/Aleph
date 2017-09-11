@@ -8,6 +8,7 @@
 #endif
 
 #include <algorithm>
+#include <stdexcept>
 #include <string>
 #include <vector>
 
@@ -36,6 +37,18 @@ class HDF5SimpleDataSpaceReader
 {
 public:
 
+  /**
+    Reads data from a given filename into a given simplicial complex,
+    while using a standard maximum functor for the weights of the new
+    simplices. Please use the overloaded variant of this operator for
+    arbitrary functors.
+
+    @param filename Input file
+    @param K        Simplicial complex
+
+    @see operator()( const std::string&, SimplicialComplex&, Functor )
+  */
+
   template <class SimplicialComplex> void operator()( const std::string& filename, SimplicialComplex& K )
   {
     using Simplex  = typename SimplicialComplex::ValueType;
@@ -43,6 +56,27 @@ public:
 
     this->operator()( filename, K, [] ( DataType a, DataType b ) { return std::max(a,b); } );
   }
+
+  /**
+    Overloaded variant of the main reader function. This permits you to
+    specify an arbitrary functor for assigning new weights to simplices.
+    The functor needs to support the following interface:
+
+    \code{.cpp}
+    using SimplexType = typename SimplicialComplex::ValueType;
+    using DataType    = typename Simplex::DataType;
+
+    DataType Functor::operator()( DataType a, DataType b )
+    {
+      // Do something with a and b. Typically, this would be calculating
+      // either the minimum or the maximum...
+      return std::max(a, b);
+    }
+    \endcode
+
+    Please refer to the documentation of SimplicialComplexReader::operator()( const std::string& SimplicialComplex&, Functor )
+    for more details.
+  */
 
   template <class SimplicialComplex, class Functor> void operator()( const std::string& filename, SimplicialComplex& K, Functor f )
   {
@@ -163,7 +197,7 @@ public:
     (void) K;
     (void) f;
 
-    // TODO: throw error?
+    throw std::runtime_error( "Missing dependency HDF5 to use this reader" );
 #endif
   }
 
@@ -215,9 +249,7 @@ private:
       data.assign( data_.begin(), data_.end() );
     }
     else
-    {
-      // FIXME: handle unknown data type
-    }
+      throw std::runtime_error( "Encountered unknown value for H5::PredType" );
 
     return data;
   }
