@@ -29,12 +29,25 @@ namespace io
   This class is a simple parser for VTK files in 'legacy format'. It is
   capable of parsing a structured grid and converting it to a simplicial
   complex. Data and weights of the simplicial complex will be taken from
-  the VTK file.
+  the VTK file. Various query functions permit reading the name and data
+  type of scalars, for example.
 */
 
 class VTKStructuredGridReader
 {
 public:
+
+  /**
+    Reads a simplicial complex from a file, using the default maximum
+    functor for weight assignment. If you want to change the functor,
+    please refer to the overloaded variant of this method.
+
+    @param filename Input filename
+    @param  K       Simplicial complex
+
+    @see operator()( const std::string&, SimplicialComplex& )
+  */
+
   template <class SimplicialComplex> void operator()( const std::string& filename, SimplicialComplex& K )
   {
     using Simplex    = typename SimplicialComplex::ValueType;
@@ -42,6 +55,27 @@ public:
 
     this->operator()( filename, K, [] ( DataType a, DataType b ) { return std::max(a,b); } );
   }
+
+  /**
+    Reads a simplicial complex from a file while supporting arbitrary
+    functors for weight assignment. The functor needs to support this
+    interface:
+
+    \code{.cpp}
+    using SimplexType = typename SimplicialComplex::ValueType;
+    using DataType    = typename Simplex::DataType;
+
+    DataType Functor::operator()( DataType a, DataType b )
+    {
+      // Do something with a and b. Typically, this would be calculating
+      // either the minimum or the maximum...
+      return std::max(a, b);
+    }
+    \endcode
+
+    Please refer to the documentation of SimplicialComplexReader::operator()( const std::string& SimplicialComplex&, Functor )
+    for more details.
+  */
 
   template <class SimplicialComplex, class Functor> void operator()( const std::string& filename, SimplicialComplex& K, Functor f )
   {
@@ -52,6 +86,7 @@ public:
     this->operator()( in, K, f );
   }
 
+  /** @overload operator()( const std::string&, SimplicialComplex& ) */
   template <class SimplicialComplex> void operator()( std::ifstream& in, SimplicialComplex& K )
   {
     using Simplex    = typename SimplicialComplex::ValueType;
@@ -60,6 +95,7 @@ public:
     this->operator()( in, K, [] ( DataType a, DataType b ) { return std::max(a,b); } );
   }
 
+  /** @see operator()( const std::string&, SimplicialComplex&, SimplicialComplex&, Functor ) */
   template <class SimplicialComplex, class Functor> void operator()( std::ifstream& in, SimplicialComplex& K, Functor f )
   {
     using namespace aleph::utilities;
@@ -80,8 +116,10 @@ public:
     if( !parsedHeader )
       return;
 
-    // TODO: Check data type size against 's' and report if there are
-    // issues such as insufficient storage space
+    // This stores the data type size and makes it possible for a client
+    // to look it up and compare it to the requested size of the complex
+    // in order to see whether it is capable of storing the data.
+    _dataTypeSize = s;
 
     // Parse body ------------------------------------------------------
     //
@@ -128,14 +166,11 @@ public:
           auto type       = matches[2];
           auto components = matches[3];
 
-          // TODO:
-          //  - Use name
-          //  - Check type
-          //  - Check number of components (if present)
+          _scalarsName = name;
+          _scalarsType = type;
 
-          (void) name;
-          (void) type;
-          (void) components;
+          if( !std::string( components ).empty() && std::stoul( components ) != 1 )
+            throw std::runtime_error( "Format error: cannot handle scalars with more than one component" );
         }
         else if( std::regex_match( line, matches, reLookupTable ) )
         {
@@ -203,6 +238,15 @@ public:
 
     K = SimplicialComplex( simplices.begin(), simplices.end() );
   }
+
+  /** @returns Last read data type size */
+  std::size_t dataTypeSize() const noexcept { return _dataTypeSize; }
+
+  /** @returns Last read scalars name */
+  std::string scalarsName() const noexcept  { return _scalarsName; }
+
+  /** @returns Last read scalars data type */
+  std::string scalarsType() const noexcept  { return _scalarsType; }
 
 private:
 
@@ -381,6 +425,15 @@ private:
 
     return true;
   }
+
+  /** Stores last read data type size */
+  std::size_t _dataTypeSize = 0;
+
+  /** Stores last read name of scalars (if present) */
+  std::string _scalarsName;
+
+  /** Stores last read data type of scalars (if present) */
+  std::string _scalarsType;
 };
 
 } // namespace io
