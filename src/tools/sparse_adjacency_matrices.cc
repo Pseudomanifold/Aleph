@@ -23,6 +23,8 @@
 #include <string>
 #include <vector>
 
+#include <cmath>
+
 using DataType          = float;
 using VertexType        = std::size_t;
 using Simplex           = aleph::topology::Simplex<DataType, VertexType>;
@@ -30,7 +32,7 @@ using SimplicialComplex = aleph::topology::SimplicialComplex<Simplex>;
 
 std::vector<DataType> closenessCentrality( const SimplicialComplex& K )
 {
-  auto M = aleph::topology::floydWarshall( K );
+  auto M = aleph::topology::floydWarshall( K, 1 );
   auto n = M.numRows();
 
   std::vector<DataType> result;
@@ -41,7 +43,8 @@ std::vector<DataType> closenessCentrality( const SimplicialComplex& K )
     aleph::math::KahanSummation<DataType> sum = DataType();
 
     for( decltype(n) j = 0; j < n; j++ )
-      sum += M(i,j);
+      if( std::isfinite( M(i,j) ) )
+        sum += M(i,j);
 
     result.push_back( DataType(n) / sum );
   }
@@ -85,6 +88,8 @@ int main( int argc, char** argv )
       std::ofstream out( output );
       for( auto&& value : cc )
         out << value << "\n";
+
+      ++index;
     }
   }
 

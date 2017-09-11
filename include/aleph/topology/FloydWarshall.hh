@@ -18,12 +18,16 @@ namespace topology
   between *all* nodes.
 
   @param K Simplicial complex
+
+  @param w Default weight to assign in a 1-simplex does not have a
+           weight assigned already.
+
   @returns Matrix of distances. The indexing of the matrix follows
            the order in which the *vertices* of the simplicial are
            encountered.
 */
 
-template <class SimplicialComplex> auto floydWarshall( const SimplicialComplex& K )
+template <class SimplicialComplex> auto floydWarshall( const SimplicialComplex& K, typename SimplicialComplex::ValueType::DataType w = 0 )
   -> aleph::math::SymmetricMatrix<
       typename SimplicialComplex::ValueType::DataType,
       typename SimplicialComplex::ValueType::VertexType>
@@ -73,7 +77,7 @@ template <class SimplicialComplex> auto floydWarshall( const SimplicialComplex& 
       auto&& iu = vertex_to_index.at(u);
       auto&& iv = vertex_to_index.at(v);
 
-      M(iu, iv) = s.data();
+      M(iu, iv) = s.data() != DataType() ? s.data() : w;
     }
   }
 
