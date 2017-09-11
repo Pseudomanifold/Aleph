@@ -92,9 +92,9 @@ template <class SimplicialComplex, class OutputIterator> void curvature( const S
     range                      = K.range( s.dimension() );
     auto numParallelNeighbours = std::count_if( range.first, range.second, isParallelNeighbour );
 
-    *result++ = VertexType(   numCofaces
-                            + s.size()
-                            - numParallelNeighbours );
+    *result++ = VertexType(   VertexType( numCofaces )
+                            + VertexType( s.size() )
+                            - VertexType( numParallelNeighbours ) );
   }
 }
 
