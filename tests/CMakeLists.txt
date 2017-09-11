@@ -8,6 +8,14 @@ IF( CMAKE_CXX_COMPILER_ID MATCHES "GNU" )
       test_io_vtk.cc
       PROPERTIES COMPILE_FLAGS "-Wno-missing-field-initializers"
     )
+
+    # Disable warnings for unknown pragmas in case OpenMP cannot be
+    # found in the specified configuration. This will only make the
+    # test take longer.
+    SET_SOURCE_FILES_PROPERTIES(
+      test_persistence_diagrams.cc
+      PROPERTIES COMPILE_FLAGS "-Wno-unknown-pragmas"
+    )
   ENDIF()
 ENDIF()
 
