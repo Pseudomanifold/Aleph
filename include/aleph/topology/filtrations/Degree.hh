@@ -52,6 +52,42 @@ template <class SimplicialComplex, class OutputIterator> void degrees( const Sim
     *result++ = pair.second;
 }
 
+/**
+  Calculates the degree of a simplex. Given a simplex of dimension \f$n-2\f$,
+  the degree is the number of simplices of dimension \f$n\f$ that have the
+  simplex as a face.
+
+  @param K
+*/
+
+template <class SimplicialComplex> unsigned degree( const SimplicialComplex& K, const typename SimplicialComplex::ValueType& s )
+{
+  auto n         = s.dimension() + 2;
+  auto iterators = K.range( n );
+
+  unsigned d = 0;
+
+  using Simplex    = typename SimplicialComplex::ValueType;
+  using VertexType = typename Simplex::VertexType;
+
+  std::set<VertexType> sVertices( s.begin(), s.end() );
+
+  for( auto&& it = iterators.first; it != iterators.second; ++it )
+  {
+    std::set<VertexType> tVertices( it->begin(), it->end() );
+    std::set<VertexType> stVertices;
+
+    std::set_intersection( sVertices.begin(), sVertices.end(),
+                           tVertices.begin(), tVertices.end(),
+                           std::inserter( stVertices, stVertices.begin() ) );
+
+    if( stVertices.size() == sVertices.size() )
+      ++d;
+  }
+
+  return d;
+}
+
 } // namespace filtrations
 
 } // namespace topology

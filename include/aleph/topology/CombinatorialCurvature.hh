@@ -3,16 +3,36 @@
 
 #include <aleph/math/KahanSummation.hh>
 
+#include <aleph/topology/filtrations/Degree.hh>
+
 #include <algorithm>
 #include <iterator>
 #include <set>
 #include <vector>
+
+#include <cmath>
 
 namespace aleph
 {
 
 namespace topology
 {
+
+template <class SimplicialComplex, class OutputIterator> void angleDefectCurvature(
+  const SimplicialComplex& K,
+  OutputIterator result )
+{
+  auto n         = K.dimension();
+  auto iterators = K.range( n-2 );
+
+  for( auto&& it = iterators.first; it != iterators.second; ++it )
+  {
+    double theta  = std::acos( 1.0 / double(n) );
+    double defect = 2*M_PI - theta * aleph::topology::filtrations::degree( K, *it );
+
+    *result++ = defect;
+  }
+}
 
 template <class Simplex> bool hasFace( const Simplex& s, const Simplex& f )
 {
