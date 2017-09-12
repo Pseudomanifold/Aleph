@@ -1,6 +1,8 @@
 #ifndef ALEPH_MATH_BOOTSTRAP_HH__
 #define ALEPH_MATH_BOOTSTRAP_HH__
 
+#include <aleph/math/KahanSummation.hh>
+
 #include <algorithm>
 #include <iterator>
 #include <random>
@@ -11,6 +13,16 @@ namespace aleph
 
 namespace math
 {
+
+/**
+  @class Bootstrap
+  @brief Generic bootstrap functor
+
+  This functor provides a generic interface for performing bootstrap
+  operations on *arbitrary* data, using an *arbitrary* statistic for
+  testing. Several convenience functions for estimating *confidence*
+  values are provided.
+*/
 
 class Bootstrap
 {
