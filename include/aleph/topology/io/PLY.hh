@@ -54,7 +54,7 @@ std::map<std::string, unsigned short> TypeSizeMap = {
   Maps PLY data types to their 'signedness'. This is required for
   parsing binary files later on.
 
-  TODO: Use this to extend parse
+  TODO: Use this to extend parser
 */
 
 std::map<std::string, bool> TypeSignednessMap = {
@@ -107,13 +107,6 @@ template <class T> void readValue( std::ifstream& stream,
       reversedBuffer[i] = buffer[ bytes - 1 - i ];
 
     std::copy( reversedBuffer, reversedBuffer + bytes, target );
-
-    // FIXME: Superfluous?
-#if 0
-    memcpy( reinterpret_cast<void*>( &target ),
-            reinterpret_cast<void*>( reversedBuffer ),
-            bytes );
-#endif
 
     delete[] reversedBuffer;
     delete[] buffer;
