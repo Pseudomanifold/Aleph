@@ -3,6 +3,8 @@
 
 #include <aleph/math/KahanSummation.hh>
 
+#include <boost/math/distributions/students_t.hpp>
+
 #include <algorithm>
 #include <iterator>
 #include <random>
@@ -199,6 +201,25 @@ public:
     auto upperEstimate   = estimates.at( Bootstrap::index( numSamples, upperPercentile ) );
 
     return std::make_pair( lowerEstimate, upperEstimate );
+  }
+
+  template <class InputIterator, class Functor>
+  auto studentConfidenceInterval( unsigned numSamples,
+                                  double alpha,
+                                  InputIterator begin, InputIterator end,
+                                  Functor functor ) -> std::pair< decltype( functor(begin, end) ), decltype( functor(begin, end) ) >
+  {
+    auto theta = functor( begin, end );
+
+    boost::math::students_t distribution( static_cast<double>( std::distance( begin, end ) - 1 ) );
+
+    auto tl = boost::math::quantile( distribution, 1 - alpha );
+    auto tu = boost::math::quantile( distribution,     alpha );
+    auto se = this->standardError( numSamples,
+                                   begin, end,
+                                   functor );
+
+    return std::make_pair( theta - tl * se, theta - tu * se );
   }
 
 private:
