@@ -8,6 +8,8 @@
 #include <random>
 #include <vector>
 
+#include <cmath>
+
 namespace aleph
 {
 
@@ -73,6 +75,77 @@ public:
     }
 
     std::copy( replicates.begin(), replicates.end(), result );
+  }
+
+  /**
+    Calculates a bootstrap estimate of the standard error of a test
+    statistics on a data set.
+
+    @param numSamples Number of bootstrap samples
+    @param begin      Input iterator to begin of data range
+    @param end        Input iterator to end of data range
+    @param functor    Functor to describe the test statistics that is to be
+                      calculated on the data range. The functor has to take
+                      the `value_type` of the range as a parameter, because
+                      the function will show the individual samples to it.\n
+
+                      A good example of a functor is the following *mean*
+                      functor:\n
+
+    \code{.cpp}
+    auto meanCalculation = [] ( auto begin, auto end )
+    {
+      using T  = typename std::iterator_traits<decltype(begin)>::value_type;
+      auto sum = std::accumulate( begin, end, T() );
+
+      return static_cast<double>( sum / static_cast<double>( std::distance(begin, end) ) );
+    };
+    \endcode
+                     Note that the functor requires `C++14` because the use
+                     of `auto` in a lambda expression.
+
+    @returns Bootstrapped estimated of the standard error
+  */
+
+  template <class InputIterator, class Functor>
+  double standardError( unsigned numSamples,
+                        InputIterator begin, InputIterator end,
+                        Functor functor )
+  {
+    using FunctorValueType = decltype( functor(begin, end) );
+
+    std::vector<FunctorValueType> estimates;
+    estimates.reserve( numSamples );
+
+    this->makeReplicates( numSamples,
+                          begin, end,
+                          functor,
+                          std::back_inserter( estimates ) );
+
+    using namespace aleph::math;
+
+    double mean  = static_cast<double>( accumulate_kahan( estimates.begin(), estimates.end(), FunctorValueType() ) );
+    mean        /= numSamples;
+
+    std::vector<double> sampleSquaredDeviations;
+    sampleSquaredDeviations.reserve( numSamples );
+
+    for( auto&& estimate : estimates )
+    {
+      auto delta  = mean - estimate;
+      delta      *= delta;
+
+      sampleSquaredDeviations.push_back( delta );
+    }
+
+    double sumSquaredDeviations
+      = accumulate_kahan_sorted(
+          sampleSquaredDeviations.begin(),
+          sampleSquaredDeviations.end(),
+          0.0 );
+
+    sumSquaredDeviations /= (numSamples - 1);
+    return std::sqrt( static_cast<double>( sumSquaredDeviations ) );
   }
 
   template <class InputIterator, class Functor>
