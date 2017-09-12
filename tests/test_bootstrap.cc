@@ -16,9 +16,10 @@ auto meanCalculation = [] ( auto begin, auto end )
 
 void testSimple()
 {
+  ALEPH_TEST_BEGIN( "Bootstrap: Confidence intervals" );
 
   // Data and some of the estimates were taken from an MIT course [1],
-  // even though their methdology is slightly different.
+  // even though their methodology is slightly different.
   //
   // [1]: https://ocw.mit.edu/courses/mathematics/18-05-introduction-to-probability-and-statistics-spring-2014/readings/MIT18_05S14_Reading24.pdf
 
@@ -69,9 +70,48 @@ void testSimple()
 
   ALEPH_ASSERT_THROW( percentileConfidenceInterval.first  >= 37.0 );
   ALEPH_ASSERT_THROW( percentileConfidenceInterval.second <= 43.0 );
+
+  // Checking the student-t confidence interval ------------------------
+
+  auto studentConfidenceInterval
+    = bootstrap.studentConfidenceInterval( numBootstrapSamples,
+                                           0.20,
+                                           samples.begin(), samples.end(),
+                                           meanCalculation );
+
+  ALEPH_ASSERT_THROW( studentConfidenceInterval.first  >= 37.0 );
+  ALEPH_ASSERT_THROW( studentConfidenceInterval.second <= 43.0 );
+
+  ALEPH_TEST_END();
+}
+
+void testStandardError()
+{
+  ALEPH_TEST_BEGIN( "Bootstrap: Standard error" );
+
+  std::vector<unsigned short> samples = {
+    61, 88, 89, 89, 90, 92, 93, 94, 98, 98, 101, 102, 105, 108,
+    109, 113, 114, 115, 120, 138
+  };
+
+  std::vector<double> means;
+
+  unsigned numBootstrapSamples = 10000;
+
+  aleph::math::Bootstrap bootstrap;
+
+  auto se = bootstrap.standardError(
+    numBootstrapSamples,
+    samples.begin(), samples.end(),
+    meanCalculation );
+
+  ALEPH_ASSERT_THROW( std::abs( se - 3.50 ) < 1e-1 );
+
+  ALEPH_TEST_END();
 }
 
 int main(int, char**)
 {
   testSimple();
+  testStandardError();
 }
