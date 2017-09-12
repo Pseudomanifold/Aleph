@@ -8,6 +8,7 @@
 #include <sstream>
 #include <stack>
 #include <string>
+#include <unordered_map>
 #include <vector>
 
 #include <aleph/utilities/String.hh>
@@ -234,6 +235,10 @@ public:
     std::vector<Simplex> simplices;
     simplices.reserve( _nodes.size() + _edges.size() );
 
+    // Maps an ID directly to its corresponding simplex in order to
+    // facilitate the assignment of weights.
+    std::unordered_map<VertexType, Simplex> id_to_simplex;
+
     for( auto&& node : _nodes )
     {
       auto id = getID( node.id );
@@ -244,23 +249,11 @@ public:
         simplices.push_back( Simplex( id, convert<DataType>( node.dict.at( "value" ) ) ) );
       else
         simplices.push_back( Simplex( id ) );
+
+      id_to_simplex[id] = simplices.back();
     }
 
     // Create edges ----------------------------------------------------
-
-    auto getSimplexByID = [&simplices] ( VertexType id )
-    {
-      auto position = std::find_if( simplices.begin(), simplices.end(),
-                                    [&id] ( const Simplex& s )
-                                    {
-                                      return s.dimension() == 0 && s[0] == id;
-                                    } );
-
-      if( position != simplices.end() )
-        return *position;
-      else
-        throw std::runtime_error( "Querying unknown simplex for edge creation" );
-    };
 
     for( auto&& edge : _edges )
     {
@@ -271,10 +264,8 @@ public:
       // weights, if those are available.
       if( edge.dict.find( "weight" ) == edge.dict.end() && edge.dict.find( "value" ) == edge.dict.end() )
       {
-        // TODO: This is very slow and could be sped up by maintaining
-        // the simplex ID somewhere else with faster access.
-        auto uSimplex = getSimplexByID( u );
-        auto vSimplex = getSimplexByID( v );
+        auto uSimplex = id_to_simplex.at(u);
+        auto vSimplex = id_to_simplex.at(v);
 
         // TODO: Permit the usage of other weight assignment strategies
         // here, for example by using a functor.
