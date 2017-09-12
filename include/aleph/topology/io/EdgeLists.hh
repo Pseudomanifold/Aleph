@@ -20,15 +20,30 @@ namespace topology
 namespace io
 {
 
+/**
+  @class EdgeListReader
+  @brief Reader class for unstructured edge lists
+
+  Graphs are often specified in this informal format in which every line
+  consists of two vertex indices, separated by white-space, and followed
+  by an optional weight. This reader permits loading these files in some
+  variations. For example, weights may optionally not be read. Also, the
+  *separator* that is used to separate vertex indices is configurable.
+
+  Note that by default, this reader is capable of reading files in which
+  different indices are separated by white-space. The indices may either
+  be *numeric*, in which case they are automatically used, or *strings*,
+  in which case they are converted to numerical IDs, following the order
+  in which they occur in the file.
+
+  The reader expects that vertex IDs are *followed* by weights per line,
+  and considers `#`, `%`, `"`, `*` to be comment tokens while *skipping*
+  empty lines.
+*/
+
 class EdgeListReader
 {
 public:
-
-  bool readWeights() const noexcept { return _readWeights; }
-  bool trimLines()   const noexcept { return _trimLines;   }
-
-  void setReadWeights( bool value = true ) noexcept { _readWeights = value; }
-  void setTrimLines( bool value = true )   noexcept { _trimLines = value; }
 
   template <class SimplicialComplex> void operator()( const std::string& filename, SimplicialComplex& K )
   {
@@ -61,9 +76,7 @@ public:
       if( _trimLines )
         line = trim( line );
 
-      // TODO: Make this configurable and permit splitting by different
-      // tokens such as commas
-      auto tokens = split( line );
+      auto tokens = split( line, "[" + _separator + "]+" );
 
       // Skip empty lines and comments
       if( line.empty() || std::find( _commentTokens.begin(), _commentTokens.end(), line.front() ) != _commentTokens.end() )
@@ -74,7 +87,6 @@ public:
         VertexType u = VertexType();
         VertexType v = VertexType();
 
-        // TODO: Make order of vertices & weights configurable?
         if( tokens[0].find_first_not_of( "0123456789" ) == std::string::npos )
         {
           u = convert<VertexType>( tokens[0] );
@@ -105,9 +117,7 @@ public:
         vertices.insert( Simplex( v ) );
       }
       else
-      {
-        // TODO: Throw error?
-      }
+        throw std::runtime_error(" Format error: not enough tokens to continue parsing" );
     }
 
     // Using a set has the advantage of ensuring that duplicate
@@ -122,8 +132,31 @@ public:
     K = SimplicialComplex( simplices.begin(), simplices.end() );
   }
 
+  bool readWeights() const noexcept { return _readWeights; }
+  bool trimLines()   const noexcept { return _trimLines;   }
+
+  void setReadWeights( bool value = true ) noexcept { _readWeights = value; }
+  void setTrimLines( bool value = true )   noexcept { _trimLines = value; }
+
+  /**
+    Sets the separator to use for splitting tokens on every line of an
+    input file. Setting this to ":", for example, means that different
+    vertex indices for an edge are separated by ":" instead of space.
+
+    Set this to the special value `[:space:]` to permit splitting by
+    any white-space character. This is the default behaviour.
+
+    @param separator Separator to use
+  */
+
+  void setSeparator( const std::string& separator )
+  {
+    _separator = separator;
+  }
+
 private:
   std::vector<char> _commentTokens = { '#', '%', '\"', '*' };
+  std::string _separator           = "[:space:]";
 
   /**
     Optional set of node labels. These are read automatically in case an
