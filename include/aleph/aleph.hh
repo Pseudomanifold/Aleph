@@ -36,6 +36,14 @@ namespace aleph
       @brief     This namespace is reserved for topological concepts, such as simplicial complexes
     */
 
+    namespace filtrations
+    {
+      /**
+        @namespace aleph::topology::filtrations
+        @brief     This namespace contains different *filtrations*, i.e. sorting orders of simplicial complexes
+      */
+    }
+
   } // namespace topology
 }
 

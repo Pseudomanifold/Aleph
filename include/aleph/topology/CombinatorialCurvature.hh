@@ -18,6 +18,20 @@ namespace aleph
 namespace topology
 {
 
+/**
+  Calculates combinatorial curvature based on angle defects. This
+  follows the description in the publication *Positively Curved
+  Combinatorial 3-Manifolds* by Aaron Trout. Note that in two
+  dimensions, this curvature measure corresponds to the angle defect as
+  described for hyperbolic geometries.
+
+  @param K      Simplicial complex
+  @param result Output iterator for storing the resulting values. The defects
+                are measured as `double` variables.
+
+  @see http://www.combinatorics.org/ojs/index.php/eljc/article/view/v17i1r49
+*/
+
 template <class SimplicialComplex, class OutputIterator> void angleDefectCurvature(
   const SimplicialComplex& K,
   OutputIterator result )
@@ -28,7 +42,7 @@ template <class SimplicialComplex, class OutputIterator> void angleDefectCurvatu
   for( auto&& it = iterators.first; it != iterators.second; ++it )
   {
     double theta  = std::acos( 1.0 / double(n) );
-    double defect = 2*M_PI - theta * aleph::topology::filtrations::degree( K, *it );
+    double defect = 2*M_PI - theta * aleph::topology::filtrations::n_degree( K, *it );
 
     *result++ = defect;
   }

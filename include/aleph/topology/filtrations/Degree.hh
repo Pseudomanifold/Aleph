@@ -53,16 +53,25 @@ template <class SimplicialComplex, class OutputIterator> void degrees( const Sim
 }
 
 /**
-  Calculates the degree of a simplex. Given a simplex of dimension \f$n-2\f$,
-  the degree is the number of simplices of dimension \f$n\f$ that have the
-  simplex as a face.
+  Calculates the \f$n\f$-degree of a simplex, where \f$n\f$ is the
+  dimension of the given simplicial complex. Given another simplex
+  \f$\sigma\f$ the \f$n\f$-degree of \f$\sigma\f$ is the number of
+  \f$n\f$-simplices that have \f$\sigma\f$ as a face.
 
-  @param K
+  Please refer to the publication *Positively Curved Combinatorial
+  3-Manifolds* by Aaron Trout for more details.
+
+  @see http://www.combinatorics.org/ojs/index.php/eljc/article/view/v17i1r49
+
+  @param K Simplicial complex
+  @param s Simplex
+
+  @return The \f$n\f$-degree of \p s
 */
 
-template <class SimplicialComplex> unsigned degree( const SimplicialComplex& K, const typename SimplicialComplex::ValueType& s )
+template <class SimplicialComplex> unsigned n_degree( const SimplicialComplex& K, const typename SimplicialComplex::ValueType& s )
 {
-  auto n         = s.dimension() + 2;
+  auto n         = K.dimension();
   auto iterators = K.range( n );
 
   unsigned d = 0;
