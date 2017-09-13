@@ -102,7 +102,7 @@ template <class SimplicialComplex> auto weightedAdjacencyMatrix( const Simplicia
 }
 
 /**
-  Calculates the weighhted Laplacian matrix of a given simplicial
+  Calculates the weighted Laplacian matrix of a given simplicial
   complex and returns it.
 
   @param K Simplicial complex
@@ -125,6 +125,30 @@ template <class SimplicialComplex> auto weightedLaplacianMatrix( const Simplicia
     L(i,i) = V(i);
 
   return L - W;
+}
+
+/**
+  Calculates the Moore--Penrose pseudo-inverse of the weighted Laplacian
+  matrix of a given simplicial complex and returns it.
+
+  @param K Simplicial complex
+
+  @returns Moore--Penrose pseudo-inverse matrix. The indices of rows and
+           columns follow the order of the vertices in the complex.
+*/
+
+template <class SimplicialComplex> auto pinvWeightedLaplacianMatrix( const SimplicialComplex& K ) -> Eigen::Matrix<typename SimplicialComplex::ValueType::DataType, Eigen::Dynamic, Eigen::Dynamic>
+{
+  auto L = weightedLaplacianMatrix( K );
+  auto n = L.rows();
+
+  using Matrix    = decltype(L);
+  using Simplex   = typename SimplicialComplex::ValueType;
+  using DataType  = typename Simplex::DataType;
+
+  Matrix M = Matrix::Constant( L.rows(), L.cols(), static_cast<DataType>( 1/ n ) );
+
+  return (M+L).inverse() - M;
 }
 
 #endif
