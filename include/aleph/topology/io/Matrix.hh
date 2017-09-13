@@ -108,7 +108,7 @@ public:
         // neighbour: (x+1,y) --> width * y + x+1
         auto u = static_cast<VertexType>( width * y + x   );
         auto v = static_cast<VertexType>( width * y + x+1 );
-        auto w = functor( values.at(u), values.at(v) );
+        auto w = f( values.at(u), values.at(v) );
 
         simplices.push_back( Simplex( {u,v}, w ) );
       }
@@ -124,7 +124,7 @@ public:
         // neighbour: (x,y+1) --> width * (y+1) + x
         auto u = static_cast<VertexType>( width * (y  ) + x );
         auto v = static_cast<VertexType>( width * (y+1) + x );
-        auto w = functor( values.at(u), values.at(v) );
+        auto w = f( values.at(u), values.at(v) );
 
         simplices.push_back( Simplex( {u,v}, w ) );
       }
@@ -140,7 +140,7 @@ public:
         // neighbour: (x+1,y+1) --> width * (y+1) + x+1
         auto u = static_cast<VertexType>( width * (y  ) + x   );
         auto v = static_cast<VertexType>( width * (y+1) + x+1 );
-        auto w = functor( values.at(u), values.at(v) );
+        auto w = f( values.at(u), values.at(v) );
 
         simplices.push_back( Simplex( {u,v}, w ) );
       }
