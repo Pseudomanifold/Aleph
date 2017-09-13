@@ -1,6 +1,7 @@
 ADD_EXECUTABLE( 1D                               1D.cc                               )
 ADD_EXECUTABLE( create_persistence_diagrams      create_persistence_diagrams.cc      )
 ADD_EXECUTABLE( create_random_graph              create_random_graph.cc              )
+ADD_EXECUTABLE( image_analysis                   image_analysis.cc                   )
 ADD_EXECUTABLE( network_analysis                 network_analysis.cc                 )
 ADD_EXECUTABLE( persistent_intersection_homology persistent_intersection_homology.cc )
 ADD_EXECUTABLE( ply                              ply.cc                              )
