@@ -1,6 +1,7 @@
 #ifndef ALEPH_TOPOLOGY_IO_SIMPLICIAL_COMPLEX_READER_HH__
 #define ALEPH_TOPOLOGY_IO_SIMPLICIAL_COMPLEX_READER_HH__
 
+#include <algorithm>
 #include <fstream>
 #include <iterator>
 #include <string>
@@ -102,8 +103,10 @@ public:
       GMLReader reader;
       reader( filename, K );
 
+      using VertexType = typename SimplicialComplex::ValueType::VertexType;
+
       // TODO: make node attribute configurable?
-      _labels = getLabels( reader.getNodeAttribute( "label" ) );
+      _labels = getLabels( reader.getNodeAttribute( "label" ), reader.id_to_index<VertexType>() );
     }
 
     // The HDF5 parser permits the use of a functor that assigns
@@ -217,6 +220,9 @@ private:
 
   template <class Map> std::vector<std::string> getLabels( const Map& map )
   {
+    if( map.empty() )
+      return {};
+
     std::vector<std::string> labels;
     labels.reserve( map.size() );
 
@@ -224,6 +230,24 @@ private:
     {
       if( !pair.second.empty() )
         labels.push_back( pair.second );
+    }
+
+    return labels;
+  }
+
+  // TODO: missing documentation
+  template <class Map1, class Map2> std::vector<std::string> getLabels( const Map1& labelMap, const Map2& idMap )
+  {
+    if( labelMap.empty() || idMap.empty() )
+      return {};
+
+    std::vector<std::string> labels;
+    labels.resize( labelMap.size() );
+
+    for( auto&& pair : labelMap )
+    {
+      if( !pair.second.empty() )
+        labels.at( idMap.at( pair.first ) ) =  pair.second;
     }
 
     return labels;

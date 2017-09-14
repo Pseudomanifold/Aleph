@@ -306,6 +306,53 @@ public:
     return map;
   }
 
+  /**
+    Returns a map that maps a node ID to an index. It corresponds
+    to the order in which node IDs were allocated. It is *always*
+    zero-indexed.
+  */
+
+  template <class VertexType> std::map<std::string, VertexType> id_to_index() const noexcept
+  {
+    // FIXME: copy & paste; make this rather a stand-alone function or
+    // a bound lambda within the class
+
+    std::set<std::string> nodeIDs;
+    for( auto&& node : _nodes )
+      nodeIDs.insert( node.id );
+
+    // Lambda expression for creating a numerical ID out of a parsed ID. In
+    // case non-numerical IDs are being used in the source file this Lambda
+    // expression ensures that internal IDs always start with a zero.
+    auto getID = [&nodeIDs] ( const std::string& id )
+    {
+      // Try to be smart: If the node ID can be converted into the
+      // vertex type, we use the converted number instead.
+      try
+      {
+        auto convertedID = std::stoll( id );
+        return static_cast<VertexType>( convertedID );
+      }
+      catch( std::out_of_range& e )
+      {
+        throw;
+      }
+      catch( std::invalid_argument& )
+      {
+        return static_cast<VertexType>(
+          std::distance( nodeIDs.begin(), nodeIDs.find( id ) )
+        );
+      }
+    };
+
+    std::map<std::string, VertexType> result;
+
+    for( auto&& node : _nodes )
+      result[ node.id ] = static_cast<VertexType>( getID( node.id ) );
+
+    return result;
+  }
+
 private:
 
   /** Describes a parsed graph along with all of its attributes */
