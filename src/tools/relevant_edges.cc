@@ -1,5 +1,7 @@
 #include <aleph/persistentHomology/ConnectedComponents.hh>
 
+#include <aleph/topology/filtrations/Data.hh>
+
 #include <aleph/topology/io/SimplicialComplexReader.hh>
 
 #include <aleph/topology/Simplex.hh>
@@ -15,6 +17,7 @@ using DataType          = double;
 using VertexType        = unsigned;
 using Simplex           = aleph::topology::Simplex<DataType, VertexType>;
 using SimplicialComplex = aleph::topology::SimplicialComplex<Simplex>;
+using Filtration        = aleph::topology::filtrations::Data<Simplex>;
 using Edge              = std::pair<VertexType, VertexType>;
 
 namespace
@@ -70,6 +73,8 @@ int main( int argc, char** argv )
 
   aleph::topology::io::SimplicialComplexReader reader;
   reader( filename, K );
+
+  K.sort( Filtration() );
 
   SizeFunctor sf;
 
