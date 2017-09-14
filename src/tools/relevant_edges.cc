@@ -41,11 +41,16 @@ struct SizeFunctor
     if( u > v )
       std::swap(u,v);
 
-    _componentSize[older]                 += _componentSize[younger];
-    _edgeRelevance[ std::make_pair(u,v) ]  = _componentSize[older];
+    auto&& e         = std::make_pair(u,v);
+    double c_older   = _componentSize[older];
+    double c_younger = _componentSize[younger];
+
+    _componentSize[older] += _componentSize[younger];
+    _edgeRelevance[ e ]    = std::min( c_older, c_younger)  / std::max( c_older, c_younger );
+    _edgeStrength [ e ]    = _componentSize[older];
 
     std::cerr << "* Edge " << "(" << u << "," << v << "): "
-              << _edgeRelevance[ std::make_pair(u,v) ]
+              << _edgeRelevance[e]
               << " "
               << "[" << creation << "," << destruction << "]"
               << "\n";
@@ -57,7 +62,8 @@ struct SizeFunctor
   }
 
   std::unordered_map<VertexType, unsigned> _componentSize;
-  std::map<Edge, unsigned>                 _edgeRelevance;
+  std::map<Edge, double>                   _edgeRelevance;
+  std::map<Edge, unsigned>                 _edgeStrength;
 };
 
 }
