@@ -6,16 +6,20 @@
 #include <aleph/topology/SimplicialComplex.hh>
 
 #include <iostream>
+#include <map>
 #include <string>
+#include <utility>
 #include <unordered_map>
 
 using DataType          = double;
 using VertexType        = unsigned;
 using Simplex           = aleph::topology::Simplex<DataType, VertexType>;
 using SimplicialComplex = aleph::topology::SimplicialComplex<Simplex>;
+using Edge              = std::pair<VertexType, VertexType>;
 
 namespace
 {
+
 
 struct SizeFunctor
 {
@@ -31,22 +35,26 @@ struct SizeFunctor
                    VertexType u,
                    VertexType v )
   {
-    _componentSize[older] += _componentSize[younger];
+    if( u > v )
+      std::swap(u,v);
 
-    std::cerr << "DEBUG:\n"
-              << "  MERGE " << younger << " -> " << older << "\n"
-              << "  PAIR  " << "(" << creation << "," << destruction << ")\n";
+    _componentSize[older]                 += _componentSize[younger];
+    _edgeRelevance[ std::make_pair(u,v) ]  = _componentSize[older];
+
+    std::cerr << "* Edge " << "(" << u << "," << v << "): "
+              << _edgeRelevance[ std::make_pair(u,v) ]
+              << " "
+              << "[" << creation << "," << destruction << "]"
+              << "\n";
   }
 
-  void operator()( VertexType root,
-                   DataType creation )
+  void operator()( VertexType /* root */,
+                   DataType /* creation */ )
   {
-    std::cerr << "DEBUG:\n"
-              << " ROOT     " << root << "\n"
-              << " CREATION " << creation << "\n";
   }
 
   std::unordered_map<VertexType, unsigned> _componentSize;
+  std::map<Edge, unsigned>                 _edgeRelevance;
 };
 
 }
