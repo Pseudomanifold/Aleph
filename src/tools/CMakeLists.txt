@@ -7,6 +7,7 @@ ADD_EXECUTABLE( persistence_indicator_function                 persistence_indic
 ADD_EXECUTABLE( persistence_indicator_function_confidence_sets persistence_indicator_function_confidence_sets.cc )
 ADD_EXECUTABLE( persistence_indicator_function_glyph           persistence_indicator_function_glyph.cc )
 ADD_EXECUTABLE( point_cloud_data_descriptors                   point_cloud_data_descriptors.cc )
+ADD_EXECUTABLE( relevant_edges                                 relevant_edges.cc )
 ADD_EXECUTABLE( sparse_adjacency_matrices                      sparse_adjacency_matrices.cc )
 ADD_EXECUTABLE( topological_distance                           topological_distance.cc )
 ADD_EXECUTABLE( wicked_triangulations                          wicked_triangulations.cc )
@@ -20,3 +21,6 @@ SET_SOURCE_FILES_PROPERTIES(
   PROPERTIES COMPILE_FLAGS "-std=c++14"
 )
 
+IF( ALEPH_WITH_HDF5 )
+  TARGET_LINK_LIBRARIES( relevant_edges ${HDF5_LIBRARIES} )
+ENDIF()
