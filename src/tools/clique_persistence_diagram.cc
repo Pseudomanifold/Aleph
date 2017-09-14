@@ -90,10 +90,12 @@ public:
     _cc[v] = {v};
   }
 
-  void operator()( VertexType younger,  // younger connected component
-                   VertexType older,    // older connected component
-                   DataType creation,   // creation threshold
-                   DataType destruction // destruction threshold
+  void operator()( VertexType younger,   // younger connected component
+                   VertexType older,     // older connected component
+                   DataType creation,    // creation threshold
+                   DataType destruction, // destruction threshold
+                   VertexType /* u */,   // unused
+                   VertexType /* v */    // unused
                  )
   {
     // Increase component size recursively by increasing the vertex

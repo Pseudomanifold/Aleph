@@ -170,7 +170,9 @@ calculateZeroDimensionalPersistenceDiagram( const topology::SimplicialComplex<Si
     functor( youngerComponent,
              olderComponent,
              creation,
-             destruction );
+             destruction,
+             u,
+             v );
 
     if( et( creation, destruction ) )
     {

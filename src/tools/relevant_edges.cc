@@ -27,7 +27,9 @@ struct SizeFunctor
   void operator()( VertexType younger,
                    VertexType older,
                    DataType creation,
-                   DataType destruction )
+                   DataType destruction,
+                   VertexType u,
+                   VertexType v )
   {
     _componentSize[older] += _componentSize[younger];
 
