@@ -49,11 +49,22 @@ struct SizeFunctor
     _edgeRelevance[ e ]    = std::min( c_older, c_younger)  / std::max( c_older, c_younger );
     _edgeStrength [ e ]    = _componentSize[older];
 
-    std::cerr << "* Edge " << "(" << u << "," << v << "): "
-              << _edgeRelevance[e]
-              << " "
-              << "[" << creation << "," << destruction << "]"
-              << "\n";
+    if( _labels.empty() )
+    {
+      std::cerr << "* Edge " << "(" << u << "," << v << "): "
+                << _edgeRelevance[e]
+                << " "
+                << "[" << creation << "," << destruction << "]"
+                << "\n";
+    }
+    else
+    {
+      std::cerr << "* Edge " << "(" << _labels.at(u) << "," << _labels.at(v) << "): "
+                << _edgeRelevance[e]
+                << " "
+                << "[" << creation << "," << destruction << "]"
+                << "\n";
+    }
   }
 
   void operator()( VertexType /* root */,
@@ -64,6 +75,8 @@ struct SizeFunctor
   std::unordered_map<VertexType, unsigned> _componentSize;
   std::map<Edge, double>                   _edgeRelevance;
   std::map<Edge, unsigned>                 _edgeStrength;
+
+  std::vector<std::string> _labels;
 };
 
 }
@@ -83,6 +96,7 @@ int main( int argc, char** argv )
   K.sort( Filtration() );
 
   SizeFunctor sf;
+  sf._labels = reader.labels();
 
   auto&& tuple = aleph::calculateZeroDimensionalPersistenceDiagram<Simplex, aleph::traits::PersistencePairingCalculation<aleph::PersistencePairing<VertexType> > >( K, sf );
   auto&& pd    = std::get<0>( tuple );

@@ -181,6 +181,17 @@ public:
     return _dataAttribute;
   }
 
+  /**
+    @returns Node labels (if any). The indexing follows the vertex order
+    in the simplicial complex and the graph. The label at index `0` thus
+    corresponds to the vertex `0` in the resulting simplicial complex.
+  */
+
+  std::vector<std::string> labels() const noexcept
+  {
+    return _labels;
+  }
+
 private:
 
   /**
