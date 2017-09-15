@@ -67,14 +67,8 @@ public:
     x = x - _x0;
     y = y - _y0;
 
-    unsigned i = unsigned( x / _xOffset + 0.5 * _xOffset );
-    unsigned j = unsigned( y / _yOffset + 0.5 * _yOffset );
-
-    if( i >= _width )
-      i = _width - 1;
-
-    if( j >= _height )
-      j = _height - 1;
+    unsigned i = unsigned( x / _xOffset );
+    unsigned j = unsigned( y / _yOffset );
 
     return this->operator()(i,j);
   }
