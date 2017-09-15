@@ -44,6 +44,56 @@ using Distance           = aleph::distances::Euclidean<DataType>;
   using NearestNeighbours = aleph::geometry::BruteForce<PointCloud, Distance>;
 #endif
 
+class RegularGrid
+{
+public:
+  RegularGrid( unsigned width, unsigned height,
+               DataType x0, DataType x1,
+               DataType y0, DataType y1 )
+    : _width( width )
+    , _height( height )
+    , _x0( x0 ), _x1( x1 ), _xOffset( (_x1 - _x0) / _width )
+    , _y0( y0 ), _y1( y1 ), _yOffset( (_y1 - _y0) / _height )
+    , _cells( new unsigned[ _width * _height ] )
+  {
+    std::fill( this->begin(), this->end(), 0 );
+  }
+
+  unsigned* begin() { return _cells; }
+  unsigned* end()   { return _cells + _width * _height; }
+
+  unsigned& operator()( DataType x, DataType y )
+  {
+    x = x - _x0;
+    y = y - _y0;
+
+    unsigned i = unsigned( x / _xOffset + 0.5 * _xOffset );
+    unsigned j = unsigned( y / _yOffset + 0.5 * _yOffset );
+
+    if( i >= _width )
+      i = _width - 1;
+
+    if( j >= _height )
+      j = _height - 1;
+
+    return this->operator()(i,j);
+  }
+
+  unsigned& operator()( unsigned i, unsigned j )
+  {
+    return _cells[j * _width + i];
+  }
+
+private:
+  unsigned _width;
+  unsigned _height;
+
+  DataType _x0, _x1, _xOffset;
+  DataType _y0, _y1, _yOffset;
+
+  unsigned* _cells;
+};
+
 struct Input
 {
   std::string filename;
