@@ -52,8 +52,8 @@ public:
                DataType y0, DataType y1 )
     : _width( width )
     , _height( height )
-    , _x0( x0 ), _x1( x1 ), _xOffset( (_x1 - _x0) / _width )
-    , _y0( y0 ), _y1( y1 ), _yOffset( (_y1 - _y0) / _height )
+    , _x0( x0 ), _x1( x1 ), _xOffset( (_x1 - _x0) / ( _width - 1 ) )
+    , _y0( y0 ), _y1( y1 ), _yOffset( (_y1 - _y0) / ( _height - 1 ) )
     , _cells( new unsigned[ _width * _height ] )
   {
     std::fill( this->begin(), this->end(), 0 );
@@ -82,6 +82,11 @@ public:
   unsigned& operator()( unsigned i, unsigned j )
   {
     return _cells[j * _width + i];
+  }
+
+  unsigned size() const noexcept
+  {
+    return _width * _height;
   }
 
 private:
@@ -121,6 +126,58 @@ template <class T> T log( T x )
     return T();
   else
     return std::log( x );
+}
+
+DataType gridEntropy( const PointCloud& pc, unsigned n )
+{
+  std::vector<DataType> X;
+  std::vector<DataType> Y;
+
+  X.reserve( pc.size() );
+  Y.reserve( pc.size() );
+
+  for( std::size_t i = 0; i < pc.size(); i++ )
+  {
+    auto&& p = pc[i];
+    auto   x = p.front();
+    auto   y = p.back();
+
+    X.push_back(  0.5 * std::sqrt(2) * x + 0.5 * std::sqrt(2) * y );
+    Y.push_back( -0.5 * std::sqrt(2) * x + 0.5 * std::sqrt(2) * y );
+  }
+
+  auto minmax_x = std::minmax_element( X.begin(), X.end() );
+  auto minmax_y = std::minmax_element( Y.begin(), Y.end() );
+
+  if( X.empty() || Y.empty() )
+    return DataType();
+
+  RegularGrid grid( n, n,
+                    *minmax_x.first, *minmax_x.second,
+                    *minmax_y.first, *minmax_y.second );
+
+  for( std::size_t i = 0; i < X.size(); i++ )
+    grid( X[i], Y[i] ) += 1;
+
+  std::vector<DataType> entropies( grid.size() );
+
+  std::transform( grid.begin(), grid.end(), entropies.begin(),
+                  [&pc] ( unsigned n )
+                  {
+                    if( n != 0 )
+                    {
+                      DataType p = n / static_cast<DataType>( pc.size() );
+                      DataType e = p * log( p );
+
+                      return e;
+                    }
+                    else
+                      return DataType();
+                  } );
+
+  return -aleph::math::accumulate_kahan_sorted( entropies.begin(),
+                                                entropies.end(),
+                                                DataType() );
 }
 
 DataType nearestNeighbourAreaEntropy( const PointCloud& pc )
@@ -208,5 +265,10 @@ int main( int argc, char** argv )
   }
 
   for( auto&& input : inputs )
-    std::cout << nearestNeighbourAreaEntropy( input.pointCloud ) << "\n";
+  {
+    auto e_nn = nearestNeighbourAreaEntropy( input.pointCloud );
+    auto e_rg = gridEntropy( input.pointCloud, 20 );
+
+    std::cout << e_nn << "\t" << e_rg << "\n";
+  }
 }
