@@ -208,30 +208,6 @@ public:
         throw std::runtime_error( "Duplicate node id '" + node.id + "'" );
     }
 
-    // Lambda expression for creating a numerical ID out of a parsed ID. In
-    // case non-numerical IDs are being used in the source file this Lambda
-    // expression ensures that internal IDs always start with a zero.
-    auto getID = [&nodeIDs] ( const std::string& id )
-    {
-      // Try to be smart: If the node ID can be converted into the
-      // vertex type, we use the converted number instead.
-      try
-      {
-        auto convertedID = std::stoll( id );
-        return static_cast<VertexType>( convertedID );
-      }
-      catch( std::out_of_range& e )
-      {
-        throw;
-      }
-      catch( std::invalid_argument& )
-      {
-        return static_cast<VertexType>(
-          std::distance( nodeIDs.begin(), nodeIDs.find( id ) )
-        );
-      }
-    };
-
     std::vector<Simplex> simplices;
     simplices.reserve( _nodes.size() + _edges.size() );
 
@@ -241,7 +217,7 @@ public:
 
     for( auto&& node : _nodes )
     {
-      auto id = getID( node.id );
+      auto id = static_cast<VertexType>( getID( nodeIDs, node.id ) );
 
       if( node.dict.find( "weight" ) != node.dict.end() )
         simplices.push_back( Simplex( id, convert<DataType>( node.dict.at( "weight" ) ) ) );
@@ -257,8 +233,8 @@ public:
 
     for( auto&& edge : _edges )
     {
-      auto u = getID( edge.source );
-      auto v = getID( edge.target );
+      auto u = static_cast<VertexType>( getID( nodeIDs, edge.source ) );
+      auto v = static_cast<VertexType>( getID( nodeIDs, edge.target ) );
 
       // No optional data attached; need to create weight based on node
       // weights, if those are available.
@@ -314,46 +290,45 @@ public:
 
   template <class VertexType> std::map<std::string, VertexType> id_to_index() const noexcept
   {
-    // FIXME: copy & paste; make this rather a stand-alone function or
-    // a bound lambda within the class
-
     std::set<std::string> nodeIDs;
     for( auto&& node : _nodes )
       nodeIDs.insert( node.id );
 
-    // Lambda expression for creating a numerical ID out of a parsed ID. In
-    // case non-numerical IDs are being used in the source file this Lambda
-    // expression ensures that internal IDs always start with a zero.
-    auto getID = [&nodeIDs] ( const std::string& id )
-    {
-      // Try to be smart: If the node ID can be converted into the
-      // vertex type, we use the converted number instead.
-      try
-      {
-        auto convertedID = std::stoll( id );
-        return static_cast<VertexType>( convertedID );
-      }
-      catch( std::out_of_range& e )
-      {
-        throw;
-      }
-      catch( std::invalid_argument& )
-      {
-        return static_cast<VertexType>(
-          std::distance( nodeIDs.begin(), nodeIDs.find( id ) )
-        );
-      }
-    };
-
     std::map<std::string, VertexType> result;
 
     for( auto&& node : _nodes )
-      result[ node.id ] = static_cast<VertexType>( getID( node.id ) );
+      result[ node.id ] = static_cast<VertexType>( getID( nodeIDs, node.id ) );
 
     return result;
   }
 
 private:
+
+  /**
+    Auxiliary function for creating a numerical ID out of a parsed ID.
+    In case non-numerical IDs are being used in the source file, this
+    function ensures that internal IDs *always* start with a zero. If,
+    however, numerical IDs are being used, they are converted as-is.
+  */
+
+  static std::size_t getID( const std::set<std::string>& ids, const std::string& id )
+  {
+    // Try to be smart: If the node ID can be converted into the
+    // vertex type, we use the converted number instead.
+    try
+    {
+      auto convertedID = std::stoll( id );
+      return static_cast<std::size_t>( convertedID );
+    }
+    catch( std::out_of_range& e )
+    {
+      throw;
+    }
+    catch( std::invalid_argument& )
+    {
+      return static_cast<std::size_t>( std::distance( ids.begin(), ids.find( id ) ) );
+    }
+  };
 
   /** Describes a parsed graph along with all of its attributes */
   struct Graph
