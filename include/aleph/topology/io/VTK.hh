@@ -95,7 +95,7 @@ public:
     this->operator()( in, K, [] ( DataType a, DataType b ) { return std::max(a,b); } );
   }
 
-  /** @see operator()( const std::string&, SimplicialComplex&, SimplicialComplex&, Functor ) */
+  /** @overload operator()( const std::string&, SimplicialComplex&, SimplicialComplex&, Functor ) */
   template <class SimplicialComplex, class Functor> void operator()( std::ifstream& in, SimplicialComplex& K, Functor f )
   {
     using namespace aleph::utilities;

@@ -43,16 +43,66 @@ class GMLReader
 {
 public:
 
+  /**
+    Reads a simplicial complex from a file, using the default maximum
+    functor for weight assignment. If you want to change the functor,
+    please refer to the overloaded variant of this method.
+
+    @param filename Input filename
+    @param  K       Simplicial complex
+
+    @see operator()( const std::string&, SimplicialComplex& )
+  */
+
   template <class SimplicialComplex> void operator()( const std::string& filename, SimplicialComplex& K )
+  {
+    using Simplex    = typename SimplicialComplex::ValueType;
+    using DataType   = typename Simplex::DataType;
+
+    this->operator()( filename, K, [] ( DataType a, DataType b ) { return std::max(a,b); } );
+  }
+
+  /**
+    Reads a simplicial complex from a file while supporting arbitrary
+    functors for weight assignment. The functor needs to support this
+    interface:
+
+    \code{.cpp}
+    using SimplexType = typename SimplicialComplex::ValueType;
+    using DataType    = typename Simplex::DataType;
+
+    DataType Functor::operator()( DataType a, DataType b )
+    {
+      // Do something with a and b. Typically, this would be calculating
+      // either the minimum or the maximum...
+      return std::max(a, b);
+    }
+    \endcode
+
+    Please refer to the documentation of SimplicialComplexReader::operator()( const std::string& SimplicialComplex&, Functor )
+    for more details.
+  */
+
+  template <class SimplicialComplex, class Functor> void operator()( const std::string& filename, SimplicialComplex& K, Functor f )
   {
     std::ifstream in( filename );
     if( !in )
       throw std::runtime_error( "Unable to read input file" );
 
-    this->operator()( in, K );
+    this->operator()( in, K, f );
   }
 
+  /** @overload operator()( const std::string&, SimplicialComplex& ) */
   template <class SimplicialComplex> void operator()( std::ifstream& in, SimplicialComplex& K )
+  {
+    using Simplex    = typename SimplicialComplex::ValueType;
+    using DataType   = typename Simplex::DataType;
+
+    this->operator()( in, K, [] ( DataType a, DataType b ) { return std::max(a,b); } );
+  }
+
+  /** @overload operator()( const std::string&, SimplicialComplex&, SimplicialComplex&, Functor ) */
+  template <class SimplicialComplex, class Functor> void operator()( std::ifstream& in, SimplicialComplex& K, Functor f )
   {
     _nodes.clear();
     _edges.clear();
@@ -243,11 +293,7 @@ public:
         auto uSimplex = id_to_simplex.at(u);
         auto vSimplex = id_to_simplex.at(v);
 
-        // TODO: Permit the usage of other weight assignment strategies
-        // here, for example by using a functor.
-        auto data = std::max( uSimplex.data(), vSimplex.data() );
-
-        simplices.push_back( Simplex( {u,v}, data ) );
+        simplices.push_back( Simplex( {u,v}, f( uSimplex.data(), vSimplex.data() ) ) );
       }
 
       // Use converted weight
