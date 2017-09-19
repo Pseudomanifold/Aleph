@@ -9,6 +9,7 @@ ADD_EXECUTABLE( persistence_indicator_function_confidence_sets persistence_indic
 ADD_EXECUTABLE( persistence_indicator_function_glyph           persistence_indicator_function_glyph.cc )
 ADD_EXECUTABLE( point_cloud_data_descriptors                   point_cloud_data_descriptors.cc )
 ADD_EXECUTABLE( relevant_edges                                 relevant_edges.cc )
+ADD_EXECUTABLE( rips_distributions                             rips_distributions.cc )
 ADD_EXECUTABLE( sparse_adjacency_matrices                      sparse_adjacency_matrices.cc )
 ADD_EXECUTABLE( topological_distance                           topological_distance.cc )
 ADD_EXECUTABLE( wicked_triangulations                          wicked_triangulations.cc )
