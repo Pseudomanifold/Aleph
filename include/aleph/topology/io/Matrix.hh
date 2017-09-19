@@ -147,9 +147,38 @@ public:
     }
 
     // Triangles -------------------------------------------------------
-    //
-    // TODO: not yet implemented
-    // TODO: make configurable
+
+    for( std::size_t y = 0; y < _height - 1; y++ )
+    {
+      for( std::size_t x = 0; x < _width - 1; x++ )
+      {
+        /*
+          [a] (x,y  ) o---o (x+1,y  ) [b]
+                      |\  |
+                      | \ |
+                      |  \|
+          [d] (x,y+1) o---o (x+1,y+1) [c]
+
+          The two triangles are formed by the respective corner points.
+
+          [a] (x  ,y  ):  width * (y  ) + x
+          [b] (x+1,y  ):  width * (y  ) + x+1
+          [c] (x+1,y+1):  width * (y+1) + x+1
+          [d] (x  ,y+1):  width * (y+1) + x
+        */
+
+        auto a = static_cast<VertexType>( width * (y  ) + x   );
+        auto b = static_cast<VertexType>( width * (y  ) + x+1 );
+        auto c = static_cast<VertexType>( width * (y+1) + x+1 );
+        auto d = static_cast<VertexType>( width * (y+1) + x   );
+
+        auto v = f( f( values.at(a), values.at(b) ), values.at(c) );
+        auto w = f( f( values.at(a), values.at(c) ), values.at(d) );
+
+        simplices.push_back( Simplex( {a,b,c}, v ) );
+        simplices.push_back( Simplex( {a,c,d}, w ) );
+      }
+    }
 
     K = SimplicialComplex( simplices.begin(), simplices.end() );
   }
