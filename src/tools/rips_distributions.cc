@@ -41,13 +41,33 @@ template <class Distance> std::vector<DataType> pairwiseDistances( const PointCl
                             pointCloud[j].begin(),
                             d );
 
+      // I want to be sure that I get the *square* of the distance, but
+      // I cannot take this transformation within the distance functor,
+      // such as the Manhattan distance, for granted.
       dist      = traits.from( dist );
+      dist     *= dist;
 
       distances.emplace_back( dist );
     }
   }
 
   return distances;
+}
+
+template <class Container> void containerAsJSON( std::ostream& out, const Container& container, const std::string& name, unsigned indent = 2 )
+{
+  out << std::string( indent, ' ' ) << "\"" << name << "\": "
+      << "[";
+
+  for( auto it = container.begin(); it != container.end(); ++it )
+  {
+    if( it != container.begin() )
+      out << ",";
+
+    out << *it;
+  }
+
+  out << "]\n";
 }
 
 int main( int argc, char** argv )
@@ -88,6 +108,9 @@ int main( int argc, char** argv )
   else if( selectedDistanceFunctor == "manhattan" )
     distances = pairwiseDistances( pointCloud, ManhattanDistance() );
 
-  for( auto&& distance : distances )
-    std::cout << distance << "\n";
+  std::cout << "{\n";
+
+  containerAsJSON( std::cout, distances, "distances" );
+
+  std::cout << "}\n";
 }
