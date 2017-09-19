@@ -2,7 +2,7 @@
 
 ![Aleph logo](Aleph.png "The logo of Aleph in all its glory")
 
-# Aleph &mdash; *A* *L*ibrary for *E*xploring *P*ersistent *H*omology
+# Aleph &mdash; A Library for Exploring Persistent Homology
 
 Aleph is a C++ library for exploring and extending usages of [persistent
 homology](https://en.wikipedia.org/wiki/Persistent_homology). Its main
@@ -28,9 +28,8 @@ following papers:
 
 Please refer to [the list of
 publications](https://submanifold.github.io/Aleph/publications) in the
-documentation of Aleph for more details. In particular, the
-documentation covers how to reproduce a subset of the results reported
-in the papers above.
+documentation of Aleph for more details. The documentation covers how to
+reproduce a subset of the results reported in the papers above.
 
 If you want to contribute, please see the [contribution
 guidelines](CONTRIBUTING.md) for more details.
@@ -47,7 +46,9 @@ important ones:
     - 1D functions
     - Edge lists
     - GML
+    - HDF5
     - Lexicographic triangulations
+    - Matrices
     - NET (Pajek graphs)
     - PLY
     - VTK
@@ -78,7 +79,7 @@ in the main directory of the repository for more details.
 * Several `Boost` dependencies for some of the data structures:
   * `Boost.Functional`
   * `Boost.Iterator`
-  * `Boost.MultiIndex` 
+  * `Boost.MultiIndex`
 
 # Optional dependencies
 
@@ -107,3 +108,8 @@ you can run the unit test with:
     $ make test
 
 Please submit any issues you may encounter.
+
+# Contact
+
+For general discussion, questions, and comments please contact Bastian
+Rieck (bastian.rieck@iwr.uni-heidelberg.de).
