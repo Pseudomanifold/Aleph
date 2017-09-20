@@ -134,13 +134,26 @@ if __name__ == "__main__":
   _, c_parameters = max_likelihood(c_posteriors)
   _, d_parameters = max_likelihood(d_posteriors)
 
-  v = [ c for c,_ in data ]
-  x = numpy.linspace(min(v), max(v), 100)
+  #v = [ c for c,_ in data ]
+  #x = numpy.linspace(min(v), max(v), 100)
+  #
+  #plt.hist([c for c,_ in data], normed=True, bins=20, label="Creation [samples]")
+  #plt.plot(x, pdf(x, c_parameters[0], c_parameters[1]), label="Creation [Bayes]")
+  #plt.plot(x, pdf(x, c_alpha, c_beta), label="Creation [estimate]")
+  #plt.legend()
+  #plt.show()
 
-  plt.hist([c for c,_ in data], normed=True, bins=20, label="Creation [samples]")
-  plt.plot(x, pdf(x, c_parameters[0], c_parameters[1]), label="Creation [Bayes]")
-  plt.plot(x, pdf(x, c_alpha, c_beta), label="Creation [estimate]")
-  plt.legend()
+  xs = sorted([ c for c,_ in data[:100] ])
+  ys = sorted([ d for _,d in data[:100] ])
+
+  X, Y = numpy.meshgrid(xs, ys)
+  f    = lambda x,y: likelihood( (x,y), (c_parameters[0], c_parameters[1], d_parameters[0], d_parameters[1]) )
+  f    = numpy.vectorize(f)
+  Z    = f(X,Y)
+
+  plt.pcolormesh(X,Y,Z)
+  plt.scatter([ c for c,_ in data[:100] ], [ d for _,d in data[:100] ] )
+
   plt.show()
 
   #plt.hist(numpy.exp( list( c_posteriors.values() ) ) )
