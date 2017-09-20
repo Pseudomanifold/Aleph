@@ -42,6 +42,18 @@ def log_likelihood_multiple(data, hypothesis):
 
   return l
 
+def max_likelihood(posteriors):
+  max_likelihood = -sys.float_info.max
+  max_arg        = (0,0)
+
+  for (alpha,beta) in sorted( posteriors.keys() ):
+    likelihood = posteriors[ (alpha,beta) ]
+    if likelihood > max_likelihood:
+      max_likelihood = likelihood
+      max_arg        = (alpha,beta)
+
+  return max_likelihood, max_arg
+
 def make_prior_ranges(alpha, beta, n, N, k=3):
   mean    = alpha/beta
   var     = alpha/beta**2
@@ -81,7 +93,7 @@ if __name__ == "__main__":
     x = numpy.linspace(min(v), max(v), 100)
 
     plt.hist([c for c,_ in data], normed=True, bins=20, label="Creation [samples]")
-    plt.plot(x, pdf(x, d_alpha, c_beta), label="Creation [estimate]")
+    plt.plot(x, pdf(x, c_alpha, c_beta), label="Creation [estimate]")
     plt.legend()
     plt.show()
 
@@ -114,6 +126,20 @@ if __name__ == "__main__":
       #  d_posteriors[ (d_alpha, d_beta) ] = d_posteriors.get((d_alpha, d_beta), 1.0) * likelihood_single(d, (d_alpha, d_beta))
 
   print("Finished posterior estimation for destruction values")
+
+  _, c_parameters = max_likelihood(c_posteriors)
+  _, d_parameters = max_likelihood(d_posteriors)
+
+  v = [ c for c,_ in data ]
+  x = numpy.linspace(min(v), max(v), 100)
+
+  plt.hist([c for c,_ in data], normed=True, bins=20, label="Creation [samples]")
+  plt.plot(x, pdf(x, c_parameters[0], c_parameters[1]), label="Creation [Bayes]")
+  plt.plot(x, pdf(x, c_alpha, c_beta), label="Creation [estimate]")
+  plt.legend()
+  plt.show()
+
+
 
   #plt.hist(numpy.exp( list( c_posteriors.values() ) ) )
   #plt.show()
