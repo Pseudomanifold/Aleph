@@ -18,6 +18,21 @@ def point_estimates(samples):
 def pdf(x, alpha, beta):
   return stats.gamma.pdf(x, a=alpha, scale=1.0/beta)
 
+def likelihood(data, hypothesis):
+  c,d                              = data
+  c_alpha, c_beta, d_alpha, d_beta = hypothesis
+
+  likelihood_c = pdf(c, c_alpha, c_beta)
+  likelihood_d = pdf(d, d_alpha, d_beta)
+
+  return likelihood_c * likelihood_d
+
+def likelihood_single(data, hypothesis):
+  c           = data
+  alpha, beta = hypothesis
+
+  return pdf(c, alpha, beta)
+
 def make_prior_ranges(alpha, beta, n, N, k=3):
   mean    = alpha/beta
   var     = alpha/beta**2
@@ -69,14 +84,21 @@ if __name__ == "__main__":
     plt.legend()
     plt.show()
 
-  c_alphas, c_betas = make_prior_ranges(c_alpha, c_beta, len(data), 100)
+  c_alphas, c_betas = make_prior_ranges(c_alpha, c_beta, len(data), 10)
+  d_alphas, d_betas = make_prior_ranges(d_alpha, d_beta, len(data), 10)
 
-  #v = [ c for c,_ in data ]
-  #x = numpy.linspace(min(v), max(v), 100)
+  c_posteriors = dict()
+  d_posteriors = dict()
 
-  #plt.hist([c for c,_ in data], normed=True, bins=20)
+  for d_alpha, d_beta in zip(d_alphas, d_betas):
+    d_posteriors[ (d_alpha,d_beta) ] = 0.0
 
-  #for c_alpha, c_beta in zip(c_alphas, c_betas):
-  #  plt.plot(x, pdf(x, c_alpha, c_beta))
+  for c_alpha in c_alphas:
+    for c_beta in c_betas:
+      for c in [ c for c,_ in data[:100]]:
+        c_posteriors[ (c_alpha, c_beta) ] = c_posteriors.get((c_alpha, c_beta), 0.0) + likelihood_single(c, (c_alpha, c_beta))
 
-  #plt.show()
+  for d_alpha in d_alphas:
+    for d_beta in d_betas:
+      for d in [ d for _,d in data[:100]]:
+        d_posteriors[ (d_alpha, d_beta) ] = d_posteriors.get((d_alpha, d_beta), 0.0) + likelihood_single(d, (d_alpha, d_beta))
