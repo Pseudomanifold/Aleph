@@ -80,7 +80,7 @@ if __name__ == "__main__":
       (c,d) = [ float(x) for x in line.strip().split() ]
 
       if not math.isinf(c) and not math.isinf(d):
-        data.append( (c,d) )
+        data.append( (c+d,d-c) )
 
   c_alpha, c_beta = point_estimates( [ c for c,_ in data ] )
   d_alpha, d_beta = point_estimates( [ d for _,d in data ] )
@@ -134,9 +134,9 @@ if __name__ == "__main__":
   _, c_parameters = max_likelihood(c_posteriors)
   _, d_parameters = max_likelihood(d_posteriors)
 
-  #v = [ c for c,_ in data ]
-  #x = numpy.linspace(min(v), max(v), 100)
-  #
+  v = [ c for c,_ in data ]
+  x = numpy.linspace(min(v), max(v), 100)
+
   #plt.hist([c for c,_ in data], normed=True, bins=20, label="Creation [samples]")
   #plt.plot(x, pdf(x, c_parameters[0], c_parameters[1]), label="Creation [Bayes]")
   #plt.plot(x, pdf(x, c_alpha, c_beta), label="Creation [estimate]")
