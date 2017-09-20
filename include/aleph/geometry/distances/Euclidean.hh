@@ -12,6 +12,9 @@
 namespace aleph
 {
 
+namespace geometry
+{
+
 namespace distances
 {
 
@@ -144,6 +147,8 @@ template <class T> struct Traits< Euclidean<T> >
     return ResultType( x*x );
   }
 };
+
+} // namespace geometry
 
 } // namespace distances
 

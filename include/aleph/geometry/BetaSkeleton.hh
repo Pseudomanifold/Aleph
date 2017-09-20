@@ -118,7 +118,7 @@ template <class Distance, class Container, class Index = std::size_t>
     -> topology::SimplicialComplex< topology::Simplex<typename Distance::ResultType, Index> >
 
 {
-  using Traits            = aleph::distances::Traits<Distance>;
+  using Traits            = aleph::geometry::distances::Traits<Distance>;
   using DataType          = typename Distance::ResultType;
   using VertexType        = Index;
   using Simplex           = topology::Simplex<DataType, VertexType>;

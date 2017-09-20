@@ -42,7 +42,7 @@ template <class Distance, class Container> std::vector<double> eccentricities( c
   eccentricities.reserve( n );
 
   Distance dist;
-  distances::Traits<Distance> traits;
+  aleph::geometry::distances::Traits<Distance> traits;
 
   for( decltype(n) i = 0; i < n; i++ )
   {
@@ -101,7 +101,7 @@ template <class Container> std::vector<double> estimateDensityTruncatedGaussian(
   std::vector<double> densities;
   densities.reserve( n );
 
-  distances::Euclidean<double> distanceFunctor;
+  aleph::geometry::distances::Euclidean<double> distanceFunctor;
 
   for( decltype(n) i = 0; i < n; i++ )
   {

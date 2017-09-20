@@ -249,7 +249,7 @@ template <class T> void testDiskWithFlares()
   ALEPH_TEST_BEGIN( "Persistent intersection homology: disk with flares" );
 
   using PointCloud        = aleph::containers::PointCloud<T>;
-  using Distance          = aleph::distances::Euclidean<T>;
+  using Distance          = aleph::geometry::distances::Euclidean<T>;
   using NearestNeighbours = aleph::geometry::BruteForce<PointCloud, Distance>;
 
   std::vector<std::size_t> singularIndices;

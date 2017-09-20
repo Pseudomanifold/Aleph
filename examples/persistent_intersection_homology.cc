@@ -36,7 +36,7 @@
 
 using DataType           = double;
 using VertexType         = unsigned;
-using Distance           = aleph::distances::Euclidean<DataType>;
+using Distance           = aleph::geometry::distances::Euclidean<DataType>;
 using PointCloud         = aleph::containers::PointCloud<DataType>;
 using Simplex            = aleph::topology::Simplex<DataType, VertexType>;
 using SimplicialComplex  = aleph::topology::SimplicialComplex<Simplex>;

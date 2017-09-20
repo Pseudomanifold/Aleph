@@ -36,7 +36,7 @@
 using DataType           = double;
 using PersistenceDiagram = aleph::PersistenceDiagram<DataType>;
 using PointCloud         = aleph::containers::PointCloud<DataType>;
-using Distance           = aleph::distances::Euclidean<DataType>;
+using Distance           = aleph::geometry::distances::Euclidean<DataType>;
 
 #ifdef ALEPH_WITH_FLANN
   using NearestNeighbours = aleph::geometry::FLANN<PointCloud, Distance>;

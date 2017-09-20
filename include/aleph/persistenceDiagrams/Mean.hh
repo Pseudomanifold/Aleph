@@ -46,7 +46,7 @@ struct Pairing
 
 template <
   class DataType,
-  class Distance = aleph::distances::InfinityDistance<DataType>
+  class Distance = aleph::geometry::distances::InfinityDistance<DataType>
 > Pairing optimalPairing( const PersistenceDiagram<DataType>& D1,
                           const PersistenceDiagram<DataType>& D2,
                           DataType power = DataType( 2 ) )

@@ -106,7 +106,7 @@ template <
   using IndexType         = typename std::iterator_traits<InputIterator>::value_type;
   using VertexType        = IndexType;
   using DataType          = typename Distance::ResultType;
-  using Traits            = aleph::distances::Traits<Distance>;
+  using Traits            = aleph::geometry::distances::Traits<Distance>;
   using Simplex           = topology::Simplex<DataType, VertexType>;
   using SimplicialComplex = topology::SimplicialComplex<Simplex>;
 

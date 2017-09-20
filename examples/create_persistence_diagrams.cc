@@ -50,7 +50,7 @@
 // We first have to specify the data type of the persistence diagram,
 // i.e. the type that is used by its individual points.
 using DataType           = double;
-using Distance           = aleph::distances::Euclidean<DataType>;
+using Distance           = aleph::geometry::distances::Euclidean<DataType>;
 using PointCloud         = aleph::containers::PointCloud<DataType>;
 using PersistenceDiagram = aleph::PersistenceDiagram<DataType>;
 

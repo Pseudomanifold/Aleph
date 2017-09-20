@@ -25,10 +25,11 @@
 
 using namespace aleph::persistentHomology::algorithms;
 
-using namespace aleph::containers;
-using namespace aleph::geometry;
-using namespace aleph::topology;
 using namespace aleph;
+using namespace containers;
+using namespace geometry;
+using namespace topology;
+using namespace distances;
 
 template <class R, class S> auto testInternal( const S& K ) -> std::vector< PersistenceDiagram<typename S::ValueType::DataType> >
 {
@@ -77,7 +78,7 @@ template <class T> void test()
   ALEPH_TEST_BEGIN( "Point cloud loading" );
 
   using PointCloud = PointCloud<T>;
-  using Distance   = aleph::distances::Euclidean<T>;
+  using Distance   = Euclidean<T>;
 
   PointCloud pointCloud = load<T>( CMAKE_SOURCE_DIR + std::string( "/tests/input/Iris_colon_separated.txt" ) );
 

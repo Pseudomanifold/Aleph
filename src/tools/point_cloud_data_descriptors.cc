@@ -46,7 +46,7 @@
 
 using DataType   = double;
 using PointCloud = aleph::containers::PointCloud<DataType>;
-using Distance   = aleph::distances::Euclidean<DataType>;
+using Distance   = aleph::geometry::distances::Euclidean<DataType>;
 
 #ifdef ALEPH_WITH_FLANN
   using Wrapper = aleph::geometry::FLANN<PointCloud, Distance>;

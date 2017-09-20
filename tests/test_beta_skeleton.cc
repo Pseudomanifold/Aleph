@@ -8,9 +8,10 @@
 
 #include <aleph/geometry/distances/Euclidean.hh>
 
-using namespace aleph::containers;
-using namespace aleph::geometry;
-using namespace aleph::distances;
+using namespace aleph;
+using namespace containers;
+using namespace geometry;
+using namespace distances;
 
 template <class T> void test()
 {

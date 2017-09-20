@@ -37,7 +37,7 @@ template <class SimplicialComplex> std::vector<std::size_t> bettiNumbers( Simpli
 
 template <class T> void test()
 {
-  using Distance   = aleph::distances::Euclidean<T>;
+  using Distance   = aleph::geometry::distances::Euclidean<T>;
   using PointCloud = aleph::containers::PointCloud<T>;
 
   PointCloud pc( 8, 2 );
@@ -88,7 +88,7 @@ template <class T> void testSphereReconstruction()
     std::vector<std::size_t> indices;
     aleph::geometry::generateRandomLandmarks( pc.size(), decltype(pc.size())( 12 ), std::back_inserter( indices ) );
 
-    using Distance = aleph::distances::Euclidean<T>;
+    using Distance = aleph::geometry::distances::Euclidean<T>;
 
     auto K
       = aleph::geometry::buildWitnessComplex<Distance>(
@@ -106,7 +106,7 @@ template <class T> void testSphereReconstruction()
 
   for( unsigned i = 0; i < trials; i++ )
   {
-    using Distance = aleph::distances::Euclidean<T>;
+    using Distance = aleph::geometry::distances::Euclidean<T>;
 
     std::vector<std::size_t> indices;
     aleph::geometry::generateMaxMinLandmarks( pc, 12, std::back_inserter( indices ), Distance() );
@@ -120,8 +120,6 @@ template <class T> void testSphereReconstruction()
     if( betti == std::vector<std::size_t>( {1,0,1} ) )
       ++hits;
   }
-
-
 
   ALEPH_TEST_END();
 }

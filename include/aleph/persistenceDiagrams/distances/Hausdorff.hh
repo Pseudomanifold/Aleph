@@ -33,7 +33,7 @@ namespace distances
 
 template <
   class DataType,
-  class Distance = InfinityDistance<DataType>
+  class Distance = aleph::geometry::distances::InfinityDistance<DataType>
 > DataType hausdorffDistance( const PersistenceDiagram<DataType>& D1,
                               const PersistenceDiagram<DataType>& D2,
                               Distance d = Distance() )

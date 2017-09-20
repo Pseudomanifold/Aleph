@@ -19,8 +19,8 @@
 
 using DataType          = double;
 using PointCloud        = aleph::containers::PointCloud<DataType>;
-using EuclideanDistance = aleph::distances::Euclidean<DataType>;
-using ManhattanDistance = aleph::distances::Manhattan<DataType>;
+using EuclideanDistance = aleph::geometry::distances::Euclidean<DataType>;
+using ManhattanDistance = aleph::geometry::distances::Manhattan<DataType>;
 
 template <class Distance> std::vector<DataType> pairwiseDistances( const PointCloud& pointCloud, Distance distance = Distance() )
 {
@@ -32,7 +32,7 @@ template <class Distance> std::vector<DataType> pairwiseDistances( const PointCl
 
   auto d       = pointCloud.dimension();
   auto n       = pointCloud.size();
-  using Traits = aleph::distances::Traits<Distance>;
+  using Traits = aleph::geometry::distances::Traits<Distance>;
 
   Traits traits;
   for( decltype(n) i = 0; i < n; i++ )

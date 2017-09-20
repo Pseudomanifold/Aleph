@@ -23,7 +23,7 @@ template <class T> void test()
   ALEPH_TEST_BEGIN( "Rips skeleton test with different types" );
 
   using PointCloud = PointCloud<T>;
-  using Distance   = aleph::distances::Euclidean<T>;
+  using Distance   = distances::Euclidean<T>;
 
   PointCloud pointCloud = load<T>( CMAKE_SOURCE_DIR + std::string( "/tests/input/Iris_colon_separated.txt" ) );
 

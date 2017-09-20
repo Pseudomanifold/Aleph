@@ -72,7 +72,7 @@ int main( int argc, char** argv )
   // For educational purposes, we use the full namespace here.
   using DataType   = double;
   using PointCloud = aleph::containers::PointCloud<DataType>;
-  using Distance   = aleph::distances::Euclidean<DataType>;
+  using Distance   = aleph::geometry::distances::Euclidean<DataType>;
 
   std::string input = argv[1];
 

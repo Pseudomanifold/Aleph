@@ -16,9 +16,10 @@
 
 #include <cassert>
 
-using namespace aleph::geometry;
-using namespace aleph::containers;
 using namespace aleph;
+using namespace geometry;
+using namespace distances;
+using namespace containers;
 
 template <class Wrapper, class PointCloud> void testInternal( const PointCloud& pointCloud )
 {
@@ -76,7 +77,7 @@ template <class T> void test()
   ALEPH_TEST_BEGIN( "Nearest-neighbour calculation with different types" );
 
   using PointCloud = PointCloud<T>;
-  using Distance   = aleph::distances::Euclidean<T>;
+  using Distance   = Euclidean<T>;
 
   PointCloud pointCloud = load<T>( CMAKE_SOURCE_DIR + std::string( "/tests/input/Iris_colon_separated.txt" ) );
 

@@ -25,7 +25,7 @@ class FLANN : public NearestNeighbours< FLANN<Container, DistanceFunctor>, std::
 public:
   using IndexType       = std::size_t;
   using ElementType     = typename Container::ElementType;
-  using Traits          = aleph::distances::Traits<DistanceFunctor>;
+  using Traits          = aleph::geometry::distances::Traits<DistanceFunctor>;
   using Distance        = DistanceFunctor;
 
   explicit FLANN( const Container& container )

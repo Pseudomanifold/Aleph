@@ -4,6 +4,9 @@
 namespace aleph
 {
 
+namespace geometry
+{
+
 namespace distances
 {
 
@@ -32,6 +35,8 @@ template <class T> struct Traits
     return ResultType( x );
   }
 };
+
+} // namespace geometry
 
 } // namespace distances
 

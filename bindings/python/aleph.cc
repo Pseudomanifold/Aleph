@@ -327,7 +327,7 @@ void wrapPersistentHomologyCalculation( py::module& m )
 
       std::copy( source, source + n*d, target );
 
-      using Distance = aleph::distances::Euclidean<DataType>;
+      using Distance = aleph::geometry::distances::Euclidean<DataType>;
       dimension      = dimension > 0 ? dimension : static_cast<unsigned>( pointCloud.dimension() + 1 );
 
       auto K         = aleph::geometry::buildVietorisRipsComplex(

@@ -16,6 +16,7 @@
 
 #include <cmath>
 
+using namespace aleph::geometry;
 using namespace aleph::containers;
 using namespace aleph;
 
@@ -96,7 +97,7 @@ template <class D> void eccentricityTest()
 
   // Only run this test for the Euclidean distance. I have no ground
   // truth values for the other distance measures.
-  if( std::is_same<D, distances::Euclidean<typename D::ResultType> >::value )
+  if( std::is_same<D, aleph::geometry::distances::Euclidean<typename D::ResultType> >::value )
   {
     ALEPH_ASSERT_THROW( moreOrLessEqual( e0.begin(), e0.end(), eccentricities0Euclidean.begin(), eccentricities0Euclidean.end() ) );
     ALEPH_ASSERT_THROW( moreOrLessEqual( e1.begin(), e1.end(), eccentricities1Euclidean.begin(), eccentricities1Euclidean.end() ) );

@@ -10,6 +10,9 @@
 namespace aleph
 {
 
+namespace geometry
+{
+
 namespace distances
 {
 
@@ -128,6 +131,8 @@ public:
 };
 
 } // namespace distances
+
+} // namespace geometry
 
 } // namespace aleph
 

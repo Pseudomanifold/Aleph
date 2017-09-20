@@ -12,7 +12,7 @@
 #include <vector>
 
 using DataType   = double;
-using Distance   = aleph::distances::Euclidean<DataType>;
+using Distance   = aleph::geometry::distances::Euclidean<DataType>;
 using PointCloud = aleph::containers::PointCloud<DataType>;
 
 struct ScaleEstimationFunctor

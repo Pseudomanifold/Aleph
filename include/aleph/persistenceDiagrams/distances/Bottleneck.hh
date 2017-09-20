@@ -124,7 +124,7 @@ template <class T> struct CheckMatchingCardinality
 
 template <
   class DataType,
-  class Distance = InfinityDistance<DataType>
+  class Distance = aleph::geometry::distances::InfinityDistance<DataType>
 > DataType bottleneckDistance( const PersistenceDiagram<DataType>& D1,
                                const PersistenceDiagram<DataType>& D2 )
 {
