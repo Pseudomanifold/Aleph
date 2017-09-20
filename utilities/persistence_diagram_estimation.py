@@ -90,15 +90,15 @@ if __name__ == "__main__":
   c_posteriors = dict()
   d_posteriors = dict()
 
-  for d_alpha, d_beta in zip(d_alphas, d_betas):
-    d_posteriors[ (d_alpha,d_beta) ] = 0.0
-
   for c_alpha in c_alphas:
     for c_beta in c_betas:
       for c in [ c for c,_ in data[:100]]:
-        c_posteriors[ (c_alpha, c_beta) ] = c_posteriors.get((c_alpha, c_beta), 0.0) + likelihood_single(c, (c_alpha, c_beta))
+        c_posteriors[ (c_alpha, c_beta) ] = c_posteriors.get((c_alpha, c_beta), 1.0) * likelihood_single(c, (c_alpha, c_beta))
 
   for d_alpha in d_alphas:
     for d_beta in d_betas:
       for d in [ d for _,d in data[:100]]:
-        d_posteriors[ (d_alpha, d_beta) ] = d_posteriors.get((d_alpha, d_beta), 0.0) + likelihood_single(d, (d_alpha, d_beta))
+        d_posteriors[ (d_alpha, d_beta) ] = d_posteriors.get((d_alpha, d_beta), 1.0) * likelihood_single(d, (d_alpha, d_beta))
+
+  plt.hist(list(c_posteriors.values()))
+  plt.show()
