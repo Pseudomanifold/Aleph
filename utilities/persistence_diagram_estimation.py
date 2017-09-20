@@ -33,6 +33,15 @@ def likelihood_single(data, hypothesis):
 
   return pdf(c, alpha, beta)
 
+def log_likelihood_multiple(data, hypothesis):
+  l           = 0.0
+  alpha, beta = hypothesis
+
+  for x in data:
+    l += stats.gamma.logpdf(x, a=alpha, scale=1.0/beta)
+
+  return l
+
 def make_prior_ranges(alpha, beta, n, N, k=3):
   mean    = alpha/beta
   var     = alpha/beta**2
@@ -92,13 +101,19 @@ if __name__ == "__main__":
 
   for c_alpha in c_alphas:
     for c_beta in c_betas:
-      for c in [ c for c,_ in data[:100]]:
-        c_posteriors[ (c_alpha, c_beta) ] = c_posteriors.get((c_alpha, c_beta), 1.0) * likelihood_single(c, (c_alpha, c_beta))
+      c_posteriors[ (c_alpha, c_beta) ] = c_posteriors.get((c_alpha, c_beta), 1.0) + log_likelihood_multiple([c for c,_ in data[:100]], (c_alpha, c_beta))
+      #for c in [ c for c,_ in data[:1000]]:
+      #  c_posteriors[ (c_alpha, c_beta) ] = c_posteriors.get((c_alpha, c_beta), 1.0) * likelihood_single(c, (c_alpha, c_beta))
+
+  print("Finished posterior estimation for creation values")
 
   for d_alpha in d_alphas:
     for d_beta in d_betas:
-      for d in [ d for _,d in data[:100]]:
-        d_posteriors[ (d_alpha, d_beta) ] = d_posteriors.get((d_alpha, d_beta), 1.0) * likelihood_single(d, (d_alpha, d_beta))
+      d_posteriors[ (d_alpha, d_beta) ] = d_posteriors.get((d_alpha, d_beta), 1.0) + log_likelihood_multiple([d for _,d in data[:100]], (d_alpha, d_beta))
+      #for d in [ d for _,d in data[:1000]]:
+      #  d_posteriors[ (d_alpha, d_beta) ] = d_posteriors.get((d_alpha, d_beta), 1.0) * likelihood_single(d, (d_alpha, d_beta))
 
-  plt.hist(list(c_posteriors.values()))
-  plt.show()
+  print("Finished posterior estimation for destruction values")
+
+  #plt.hist(numpy.exp( list( c_posteriors.values() ) ) )
+  #plt.show()
