@@ -117,6 +117,8 @@ if __name__ == "__main__":
       #for c in [ c for c,_ in data[:1000]]:
       #  c_posteriors[ (c_alpha, c_beta) ] = c_posteriors.get((c_alpha, c_beta), 1.0) * likelihood_single(c, (c_alpha, c_beta))
 
+  c_posteriors.update( ((a,b), math.exp( c_posteriors[ (a,b) ] )) for a,b in c_posteriors )
+
   print("Finished posterior estimation for creation values")
 
   for d_alpha in d_alphas:
@@ -124,6 +126,8 @@ if __name__ == "__main__":
       d_posteriors[ (d_alpha, d_beta) ] = d_posteriors.get((d_alpha, d_beta), 1.0) + log_likelihood_multiple([d for _,d in data[:100]], (d_alpha, d_beta))
       #for d in [ d for _,d in data[:1000]]:
       #  d_posteriors[ (d_alpha, d_beta) ] = d_posteriors.get((d_alpha, d_beta), 1.0) * likelihood_single(d, (d_alpha, d_beta))
+
+  d_posteriors.update( ((a,b), math.exp( d_posteriors[ (a,b) ] )) for a,b in d_posteriors )
 
   print("Finished posterior estimation for destruction values")
 
@@ -138,8 +142,6 @@ if __name__ == "__main__":
   plt.plot(x, pdf(x, c_alpha, c_beta), label="Creation [estimate]")
   plt.legend()
   plt.show()
-
-
 
   #plt.hist(numpy.exp( list( c_posteriors.values() ) ) )
   #plt.show()
