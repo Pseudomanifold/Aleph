@@ -24,8 +24,9 @@ import sys
 
 if __name__ == "__main__":
 
-  parser = argparse.ArgumentParser() 
-  parser.add_argument("-i", "--invert-weights", action="store_true", help="if specified, inverts weights stored in the network")
+  parser = argparse.ArgumentParser()
+  parser.add_argument("-i", "--invert-weights",    action="store_true", help="if specified, inverts weights stored in the network")
+  parser.add_argument("-n", "--normalize-weights", action="store_true", help="if specified, normalizes weights stored in the network to [0,1]")
   parser.add_argument("FILE", type=str, help="input file; must contain a *valid* network that can be read by Aleph")
 
   arguments = parser.parse_args()
@@ -37,6 +38,16 @@ if __name__ == "__main__":
   K = load(filename)
 
   sys.stderr.write("finished\n")
+
+  ######################################################################
+  # Determine weight range
+  ######################################################################
+
+  def get_min_max_weights(K):
+    weights = [ s.data() for s in K ]
+    return min(weights), max(weights)
+
+  get_min_max_weights(K)
 
   # TODO:
   #  - Rips expansion
