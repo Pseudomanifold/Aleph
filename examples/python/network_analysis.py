@@ -27,7 +27,9 @@ if __name__ == "__main__":
   parser = argparse.ArgumentParser()
   parser.add_argument("-i", "--invert-weights",    action="store_true", help="if specified, inverts weights stored in the network")
   parser.add_argument("-n", "--normalize-weights", action="store_true", help="if specified, normalizes weights stored in the network to [0,1]")
+
   parser.add_argument("FILE", type=str, help="input file; must contain a *valid* network that can be read by Aleph")
+  parser.add_argument("dimension", type=int, help="dimension for expansion", default="1", nargs="?")
 
   arguments = parser.parse_args()
   filename  = arguments.FILE
@@ -44,13 +46,24 @@ if __name__ == "__main__":
   ######################################################################
 
   def get_min_max_weights(K):
-    weights = [ s.data() for s in K ]
+    weights = [ s.data for s in K ]
     return min(weights), max(weights)
 
-  get_min_max_weights(K)
+  min_weight, max_weight = get_min_max_weights(K)
+
+  if arguments.normalize_weights and min_weight != max_weight:
+    weight_range = max_weight - min_weight
+    # TODO: replace weights
+
+  ######################################################################
+  # Rips expansion
+  ######################################################################
+
+  rips_expander = RipsExpander()
+  K = rips_expander(K, arguments.dimension)
+  K = rips_expander.assignMaximumWeight(K)
 
   # TODO:
-  #  - Rips expansion
   #  - Weight assignment
 
   diagrams = calculatePersistenceDiagrams( K )

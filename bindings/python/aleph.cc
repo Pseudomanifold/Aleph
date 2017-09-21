@@ -7,6 +7,7 @@
 
 #include <aleph/geometry/BruteForce.hh>
 #include <aleph/geometry/FLANN.hh>
+#include <aleph/geometry/RipsExpander.hh>
 #include <aleph/geometry/VietorisRipsComplex.hh>
 
 #include <aleph/geometry/distances/Euclidean.hh>
@@ -41,6 +42,7 @@ using PointCloud         = aleph::containers::PointCloud<DataType>;
 using PersistenceDiagram = aleph::PersistenceDiagram<DataType>;
 using Simplex            = aleph::topology::Simplex<DataType, VertexType>;
 using SimplicialComplex  = aleph::topology::SimplicialComplex<Simplex>;
+using RipsExpander       = aleph::geometry::RipsExpander<SimplicialComplex>;
 using StepFunction       = aleph::math::StepFunction<DataType>;
 
 #ifdef ALEPH_WITH_FLANN
@@ -392,6 +394,20 @@ void wrapKernelCalculations( py::module& m )
   );
 }
 
+void wrapRipsExpander( py::module& m )
+{
+  py::class_<RipsExpander>(m, "RipsExpander")
+    .def( py::init<>() )
+    .def( "__call__",
+      [] ( RipsExpander& ripsExpander, const SimplicialComplex& K, unsigned dimension )
+      {
+        return ripsExpander(K, dimension);
+      }
+    )
+    .def( "assignMaximumWeight", &RipsExpander::assignMaximumWeight );
+}
+
+
 void wrapStepFunction( py::module& m )
 {
   py::class_<StepFunction>(m, "StepFunction")
@@ -499,6 +515,7 @@ PYBIND11_PLUGIN(aleph)
   wrapSimplicialComplex(m);
   wrapPersistenceDiagram(m);
   wrapPersistentHomologyCalculation(m);
+  wrapRipsExpander(m);
   wrapStepFunction(m);
   wrapInputFunctions(m);
 
