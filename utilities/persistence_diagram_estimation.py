@@ -80,10 +80,15 @@ if __name__ == "__main__":
       (c,d) = [ float(x) for x in line.strip().split() ]
 
       if not math.isinf(c) and not math.isinf(d):
-        data.append( (c+d,d-c) )
+        # FIXME: does it make sense to do the intensity-based
+        # transformation here?
+        #data.append( (c+d,d-c) )
+        data.append( (c,d) )
 
-  c_alpha, c_beta = point_estimates( [ c for c,_ in data ] )
-  d_alpha, d_beta = point_estimates( [ d for _,d in data ] )
+  # FIXME: the point estimates do not yet work as expected, so I am
+  # required to add these fake estimates here.
+  c_alpha, c_beta = [7.0, 0.7] #point_estimates( [ c for c,_ in data ] )
+  d_alpha, d_beta = [8.0, 1.9] #point_estimates( [ d for _,d in data ] )
 
   # Plot the distributions to ensure that the point estimates are
   # actually useful.
