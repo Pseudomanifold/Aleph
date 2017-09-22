@@ -59,19 +59,24 @@ int main( int argc, char** argv )
   static option commandLineOptions[] =
   {
     { "closeness-centrality", no_argument, nullptr, 'c' },
+    { "sum"                 , no_argument, nullptr, 's' },
     { nullptr               , 0          , nullptr,  0  }
   };
 
   bool calculateClosenessCentrality = false;
+  bool useSumOfDegrees              = false;
 
   {
     int option = 0;
-    while( ( option = getopt_long( argc, argv, "c", commandLineOptions, nullptr ) ) != -1 )
+    while( ( option = getopt_long( argc, argv, "cs", commandLineOptions, nullptr ) ) != -1 )
     {
       switch( option )
       {
       case 'c':
         calculateClosenessCentrality = true;
+        break;
+      case 's':
+        useSumOfDegrees = true;
         break;
       }
     }
@@ -144,7 +149,10 @@ int main( int argc, char** argv )
                     *std::max_element( degrees.begin(), degrees.end() ) );
     }
 
-    K = expander.assignMaximumData( K, degrees.begin(), degrees.end() );
+    if( useSumOfDegrees )
+      K = expander.assignData( K, degrees.begin(), degrees.end(), DataType(0), [] ( DataType a, DataType b ) { return a+b; } );
+    else
+      K = expander.assignMaximumData( K, degrees.begin(), degrees.end() );
 
     K.sort( aleph::topology::filtrations::Data<Simplex>() );
   }
