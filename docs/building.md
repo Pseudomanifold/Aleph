@@ -94,6 +94,21 @@ A typical output of this command should look like this:
 Please submit any issues you may encounter. If you want to help, please
 take a look at the [contribution guidelines](https://github.com/Submanifold/Aleph/blob/master/CONTRIBUTING.md).
 
+# Additional options
+
+Some of the components of Aleph may be disabled if you want to increase
+performance of the build. Currently, these components include the
+examples and the tools. Use `ccmake .` in the build directory to get an
+overview of the available options. A typical output of this command
+would be:
+
+    BUILD_EXAMPLES        ON
+    BUILD_PYTHON_BINDINGS ON
+    BUILD_TOOLS           ON
+
+Toggle the required options and re-configure the project in order to
+change what is built.
+
 # Installing Aleph
 
 Having built Aleph, you can install the library as follows:
