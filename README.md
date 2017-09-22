@@ -109,6 +109,11 @@ you can run the unit test with:
 
 Please submit any issues you may encounter.
 
+For more information, including how to run tests, please refer to the
+[detailed build
+instructions](https://submanifold.github.io/Aleph/building) in the
+documentation.
+
 # Contact
 
 For general discussion, questions, and comments please contact Bastian
