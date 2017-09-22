@@ -7,7 +7,7 @@ IF( CMAKE_MAJOR_VERSION GREATER 3 OR ( CMAKE_MAJOR_VERSION EQUAL 3 AND CMAKE_MIN
 ELSE()
   # This is not the nicest way of activating C++11, but it is guaranteed to
   # work with older versions
-  ADD_DEFINITIONS( "-std=c++11" ) 
+  ADD_DEFINITIONS( "-std=c++11" )
 ENDIF()
 
 LIST( APPEND CMAKE_MODULE_PATH
@@ -59,6 +59,20 @@ SET( BUILD_PYTHON_BINDINGS
   CACHE
   BOOL
   "Build with Python bindings"
+)
+
+SET( BUILD_EXAMPLES
+  "ON"
+  CACHE
+  BOOL
+  "Build with examples"
+)
+
+SET( BUILD_TOOLS
+  "ON"
+  CACHE
+  BOOL
+  "Build with tools"
 )
 
 ########################################################################
