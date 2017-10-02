@@ -107,7 +107,7 @@ public:
   ConstIterator find( Index creator ) const noexcept
   {
     return std::find_if( _pairs.begin(), _pairs.end(),
-                         [this, &creator] ( const ValueType& pair )
+                         [&creator] ( const ValueType& pair )
                          {
                            return pair.first == creator;
                          } );
