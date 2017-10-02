@@ -17,10 +17,15 @@
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunknown-pragmas"
 
-#if __GNUC__ < 6
-  #pragma GCC diagnostic ignored "-Werror"
+#ifdef __clang__
+  // Nothing to do here, but clang also defines __GNUCC__, making this
+  // check below moot.
 #else
-  #pragma GCC diagnostic ignored "-Wint-in-bool-context"
+  #if __GNUC__ < 6
+    #pragma GCC diagnostic ignored "-Werror"
+  #else
+    #pragma GCC diagnostic ignored "-Wint-in-bool-context"
+  #endif
 #endif
 
 namespace aleph
