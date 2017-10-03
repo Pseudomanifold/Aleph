@@ -17,6 +17,28 @@ namespace aleph
 namespace geometry
 {
 
+/**
+  @class RipsExpander
+  @brief Class for performing Vietoris--Rips expansion of a simplicial complex
+
+  This class is meant to be used as a functor for calculating the
+  Vietoris--Rips complex of a given simplicial complex. For every
+  simplex, its co-faces are evaluated and higher-dimensional ones
+  are inserted into the complex.
+
+  The implementation follows the paper:
+
+  > Fast Construction of the Vietoris--Rips Complex
+  > Afra Zomorodian
+  > Computers & Graphics
+  > Volume 34, Issue 3, June 2010, Pages 263--271
+
+  Please refer to the network analysis example for a concise demo
+  on how to use the class.
+
+  @see network_analysis.cc
+*/
+
 template <class SimplicialComplex> class RipsExpander
 {
 public:
