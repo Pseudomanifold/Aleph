@@ -209,6 +209,17 @@ template <
   return L;
 }
 
+/**
+  Generates a random set of landmarks for use with the witness complex.
+  Essentially, this function merely generates a set of *random indices*
+  based on a random shuffle operation. The results of this are saved in
+  an output iterator.
+
+  @param n      Number of points
+  @param k      Number of landmarks
+  @param result Output iterator for storing the results
+*/
+
 template <class T, class OutputIterator> void generateRandomLandmarks( T n, T k, OutputIterator result )
 {
   std::random_device rd;
@@ -222,6 +233,20 @@ template <class T, class OutputIterator> void generateRandomLandmarks( T n, T k,
   std::shuffle( indices.begin(), indices.end(), rng );
   std::copy( indices.begin(), indices.begin() + static_cast<DifferenceType>(k), result );
 }
+
+/**
+  Generates a set of landmarks for the witness complex, using the
+  max-min strategy. Given a distance measure, a new landmark will
+  be chosen so as to *maximize* the *minimum distance* to the set
+  of selected landmarks. An output iterator is used to report the
+  indices of the selected landmarks.
+
+  @param container Container that stores the input data
+  @param n         Number of landmarks to select
+  @param result    Output iterator for storing the results
+  @param distance  Distance measure. This parameter may be specified
+                   to permit template type deduction.
+*/
 
 template <
   class Distance,
@@ -275,7 +300,6 @@ template <
 
   std::copy( indices.begin(), indices.end(), result );
 }
-
 
 } // namespace geometry
 
