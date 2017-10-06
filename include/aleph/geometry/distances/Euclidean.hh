@@ -40,6 +40,27 @@ public:
   using ResultType  = T;
 
   /**
+    Given two points (such as those used in a persistence diagram),
+    calculates their squared Euclidean distance.
+  */
+
+  template <class Point> ResultType operator()( const Point& p, const Point& q ) const noexcept
+  {
+    auto x0 = p.x();
+    auto y0 = p.y();
+    auto x1 = q.x();
+    auto y1 = q.y();
+
+    // The check ensures that dx and dy are always positive. Thus, even if
+    // the underlying data type is an unsigned type, both expressions will
+    // evaluate properly.
+    auto dx = x0 > x1 ? x0-x1 : x1-x0;
+    auto dy = y0 > y1 ? y0-y1 : y1-y0;
+
+    return static_cast<ResultType>( dx*dx + dy*dy );
+  }
+
+  /**
     Given two ranges of double values, which are assumed to represent two
     vectors, calculates the distance between them.
 
