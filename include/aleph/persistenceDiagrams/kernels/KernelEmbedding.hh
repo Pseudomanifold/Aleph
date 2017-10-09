@@ -123,10 +123,10 @@ template
   class Weight = detail::DefaultWeightFunction,
   class Kernel = detail::DefaultKernel
 >
-template <class T> double pseudoMetric( const PersistenceDiagram<T>& D,
-                                        const PersistenceDiagram<T>& E,
-                                        Weight w,
-                                        Kernel k )
+double pseudoMetric( const PersistenceDiagram<T>& D,
+                     const PersistenceDiagram<T>& E,
+                     Weight w,
+                     Kernel k )
 {
   auto kxx = linearKernel(D, E, w, k);
   auto kxy = linearKernel(D, E, w, k);
@@ -163,15 +163,44 @@ template
   class Weight = detail::DefaultWeightFunction,
   class Kernel = detail::DefaultKernel
 >
-template <class T> double gaussianKernel( const PersistenceDiagram<T>& D,
-                                          const PersistenceDiagram<T>& E,
-                                          Weight w,
-                                          Kernel k,
-                                          double tau )
+double gaussianKernel( const PersistenceDiagram<T>& D,
+                       const PersistenceDiagram<T>& E,
+                       Weight w,
+                       Kernel k,
+                       double tau )
 {
   auto d = pseudoMetric(D, E, w, k);
   return std::exp( -1/(2*tau*tau) * d );
 }
+
+/**
+  Convenience function for calculating the persistence-weighted Gaussian
+  kernel using a subordinate Gaussian kernel and a weight function based
+  on `atan`.
+
+  @param sigma Smoothing parameter for subordinate Gaussian kernel
+  @param C     Scaling parameter for `atan`
+  @param p     Power parameter for `atan`
+  @param tau   Smoothing parameter for main Gaussian kernel
+
+  @returns Kernel value
+*/
+
+template <class T>
+double gaussianKernel( const PersistenceDiagram<T>& D,
+                       const PersistenceDiagram<T>& E,
+                       double sigma,
+                       double C,
+                       double p,
+                       double tau )
+{
+  auto w = detail::DefaultWeightFunction( C, p );
+  auto k = detail::DefaultKernel( sigma );
+  auto d = pseudoMetric(D, E, w, k);
+
+  return std::exp( -1/(2*tau*tau) * d );
+}
+
 
 } // namespace aleph
 
