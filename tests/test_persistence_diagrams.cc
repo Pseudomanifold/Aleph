@@ -2,7 +2,6 @@
 
 #include <aleph/persistenceDiagrams/Mean.hh>
 #include <aleph/persistenceDiagrams/Norms.hh>
-#include <aleph/persistenceDiagrams/MultiScaleKernel.hh>
 #include <aleph/persistenceDiagrams/PersistenceDiagram.hh>
 #include <aleph/persistenceDiagrams/PersistenceIndicatorFunction.hh>
 
@@ -10,6 +9,8 @@
 #include <aleph/persistenceDiagrams/distances/Hausdorff.hh>
 #include <aleph/persistenceDiagrams/distances/NearestNeighbour.hh>
 #include <aleph/persistenceDiagrams/distances/Wasserstein.hh>
+
+#include <aleph/persistenceDiagrams/kernels/MultiScaleKernel.hh>
 
 #include <algorithm>
 #include <limits>
