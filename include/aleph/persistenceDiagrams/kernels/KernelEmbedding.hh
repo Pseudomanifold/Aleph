@@ -29,7 +29,7 @@ public:
 
   template <class Point> double operator()( const Point& p ) const
   {
-    return std::atan( C * std::pow( static_cast<double>( point.persistence() ), p ) );
+    return std::atan( _C * std::pow( static_cast<double>( p.persistence() ), _p ) );
   }
 
 private:
@@ -49,7 +49,7 @@ public:
   {
     aleph::geometry::distances::Euclidean<double> distance;
     auto dist  = distance(p,q);
-    return std::exp( -dist / (2*sigma*sigma) );
+    return std::exp( -dist / (2*_sigma*_sigma) );
   }
 
 private:

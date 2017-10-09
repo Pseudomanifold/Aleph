@@ -10,6 +10,7 @@
 #include <aleph/persistenceDiagrams/distances/NearestNeighbour.hh>
 #include <aleph/persistenceDiagrams/distances/Wasserstein.hh>
 
+#include <aleph/persistenceDiagrams/kernels/KernelEmbedding.hh>
 #include <aleph/persistenceDiagrams/kernels/MultiScaleKernel.hh>
 
 #include <algorithm>
@@ -206,6 +207,28 @@ template <class T> void testPersistenceIndicatorFunction()
   ALEPH_TEST_END();
 }
 
+template <class T> void testKernelEmbedding()
+{
+  ALEPH_TEST_BEGIN( "Kernel embedding" );
+
+  auto D1 = createRandomPersistenceDiagram<T>( 50 );
+  auto D2 = createRandomPersistenceDiagram<T>( 50 );
+
+  auto d1 = aleph::gaussianKernel( D1, D2, 1.0, 1.0, 1.0, 1.0 );
+  auto d2 = aleph::gaussianKernel( D1, D2, 1.0, 1.0, 2.0, 2.0 );
+
+  // Non-negativity
+  ALEPH_ASSERT_THROW( d1 > 0.0 );
+  ALEPH_ASSERT_THROW( d2 > 0.0 );
+
+  // Symmetry
+  ALEPH_ASSERT_EQUAL( aleph::gaussianKernel(D1, D1, 1.0, 1.0, 1.0, 1.0), aleph::gaussianKernel(D2, D2, 1.0, 1.0, 1.0, 1.0) );
+  ALEPH_ASSERT_EQUAL( aleph::gaussianKernel(D1, D1, 1.0, 1.0, 1.0, 1.0), 1.0 );
+
+  ALEPH_TEST_END();
+}
+
+
 template <class T> void testMultiScaleKernel()
 {
   ALEPH_TEST_BEGIN( "Multi-scale kernel" );
@@ -301,6 +324,9 @@ int main(int, char**)
 
   testHausdorffDistance<float> ();
   testHausdorffDistance<double>();
+
+  testKernelEmbedding<float> ();
+  testKernelEmbedding<double>();
 
   testMultiScaleKernel<float> ();
   testMultiScaleKernel<double>();
