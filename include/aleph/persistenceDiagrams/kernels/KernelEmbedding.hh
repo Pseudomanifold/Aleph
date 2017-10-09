@@ -5,7 +5,7 @@
 
 #include <aleph/persistenceDiagrams/PersistenceDiagram.hh>
 
-#include <aleph/geometry/distances/Infinity.hh>
+#include <aleph/geometry/distances/Euclidean.hh>
 
 #include <algorithm>
 #include <utility>
@@ -47,12 +47,8 @@ public:
 
   template <class Point> double operator()( const Point& p, const Point& q ) const
   {
-    // TODO: make choice of distance measure selectable; I am pretty
-    // sure that this should be the regular Euclidean distance here.
-    aleph::geometry::distances::Infinity<Point> distance;
+    aleph::geometry::distances::Euclidean<double> distance;
     auto dist  = distance(p,q);
-    dist      *= dist;
-
     return std::exp( -dist / (2*sigma*sigma) );
   }
 
@@ -61,6 +57,23 @@ private:
 };
 
 } // namespace detail
+
+/**
+  Calculates the linear version of the persistence-weighted Gaussian
+  kernel between two persistence diagrams.
+
+  @param D First persistence diagram
+  @param E Second persistence diagram
+  @param w Weight function; by default, a function based on `atan` is being used
+  @param k Kernel function; by default, a *Gaussian kernel* is used. Notice that
+           the parameters of this kernel need to be adjusted.
+
+  @tparam T      Data type of persistence diagram (inferred)
+  @tparam Weight Functor for calculating weights of persistence points
+  @tparam Kernel Functor for calculating kernel values of persistence points
+
+  @returns Kernel value
+*/
 
 template
 <
@@ -84,6 +97,26 @@ double linearKernel( const PersistenceDiagram<T>& D,
   return result;
 }
 
+/**
+  Calculate the pseudo-metric based on the persistence-weighted Gaussian
+  kernel. A linear kernel is used to obtain a value for the metric. This
+  follows the approach in the original paper.
+
+  @see http://proceedings.mlr.press/v48/kusano16.pdf (original paper by Kusano et al.)
+
+  @param D First persistence diagram
+  @param E Second persistence diagram
+  @param w Weight function; by default, a function based on `atan` is being used
+  @param k Kernel function; by default, a *Gaussian kernel* is used. Notice that
+           the parameters of this kernel need to be adjusted.
+
+  @tparam T      Data type of persistence diagram (inferred)
+  @tparam Weight Functor for calculating weights of persistence points
+  @tparam Kernel Functor for calculating kernel values of persistence points
+
+  @returns Pseudo-metric value
+*/
+
 template
 <
   class T,
@@ -102,6 +135,28 @@ template <class T> double pseudoMetric( const PersistenceDiagram<T>& D,
   return std::sqrt( kxx + kyy - 2*kxy );
 }
 
+/**
+  Calculate the Gaussian kernel value based on the persistence-weighted
+  Gaussian kernel, using a smoothing parameter \p tau. This function is
+  using the *pseudo-metric function*, which in turn employs a *linear*
+  kernel.
+
+  @see http://proceedings.mlr.press/v48/kusano16.pdf (original paper by Kusano et al.)
+
+  @param D   First persistence diagram
+  @param E   Second persistence diagram
+  @param w   Weight function; by default, a function based on `atan` is being used
+  @param k   Kernel function; by default, a *Gaussian kernel* is used. Notice that
+             the parameters of this kernel need to be adjusted.
+  @param tau Smoothing parameter
+
+  @tparam T      Data type of persistence diagram (inferred)
+  @tparam Weight Functor for calculating weights of persistence points
+  @tparam Kernel Functor for calculating kernel values of persistence points
+
+  @returns Gaussian kernel value
+*/
+
 template
 <
   class T,
@@ -118,6 +173,6 @@ template <class T> double gaussianKernel( const PersistenceDiagram<T>& D,
   return std::exp( -1/(2*tau*tau) * d );
 }
 
-}
+} // namespace aleph
 
 #endif
