@@ -45,6 +45,21 @@ template <class Point> double squaredEuclideanDistance( const Point& p,
 
 } // namespace detail
 
+/**
+  Calculates the multi-scale kernel between two persistence diagrams,
+  using a pre-defined smoothing parameter \p sigma. The data types of
+  the involved diagrams are converted to `double`, and the *Euclidean
+  distance* is used to calculate differences between points.
+
+  @param D1    First persistence diagram
+  @param D2    Second persistence diagram
+  @param sigma Smoothing parameter
+
+  @returns Kernel value
+
+  @see https://arxiv.org/abs/1412.6821 (the original paper by Reininghaus et al.)
+*/
+
 template <class T> double multiScaleKernel( const PersistenceDiagram<T>& D1,
                                             const PersistenceDiagram<T>& D2,
                                             double sigma )
@@ -86,6 +101,17 @@ template <class T> double multiScaleFeatureMap( const PersistenceDiagram<T>& D,
   return 1.0 / ( 4.0*M_PI*sigma ) * result;
 }
 
+/**
+  Calculates the pseudo-metric based on the multi-scale kernel for two
+  persistence diagrams, using a smoothing parameter of \p sigma.
+
+  @param D1    First persistence diagram
+  @param D2    Second persistence diagram
+  @param sigma Smoothing parameter
+
+  @returns Value of the pseudo-metric
+*/
+
 template <class T> double multiScalePseudoMetric( const PersistenceDiagram<T>& D1,
                                                   const PersistenceDiagram<T>& D2,
                                                   double sigma )
@@ -97,6 +123,6 @@ template <class T> double multiScalePseudoMetric( const PersistenceDiagram<T>& D
   return std::sqrt( kxx + kyy - 2*kxy );
 }
 
-}
+} // namespace aleph
 
 #endif
