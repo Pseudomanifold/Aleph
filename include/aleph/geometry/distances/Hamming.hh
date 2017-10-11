@@ -1,5 +1,5 @@
 #ifndef ALEPH_GEOMETRY_DISTANCES_HAMMING_HH__
-#define ALEPH_GEOMETRY_DISTANCES_MANHATTAN_HH__
+#define ALEPH_GEOMETRY_DISTANCES_HAMMING_HH__
 
 #include <cstddef>
 #include <cmath>
