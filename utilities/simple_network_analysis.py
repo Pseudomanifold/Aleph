@@ -80,5 +80,5 @@ if __name__ == "__main__":
 
   classifiers = [ DecisionTreeClassifier(), LinearSVC(), LogisticRegression() ]
   for clf in classifiers:
-    scores = cross_val_score(clf, X, y, cv=10)
+    scores = cross_val_score(clf, X, y, cv=50)
     print("Accuracy: %0.2f (+/- %0.2f)" % (scores.mean(), scores.std() * 2))
