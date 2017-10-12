@@ -14,6 +14,8 @@
 
 template <class T> void test()
 {
+  ALEPH_TEST_BEGIN( "Simple adjacency matrix" );
+
   using DataType          = float;
   using VertexType        = T;
   using Simplex           = aleph::topology::Simplex<DataType, VertexType>;
@@ -38,6 +40,8 @@ template <class T> void test()
   ALEPH_ASSERT_THROW( degrees.empty() == false );
   ALEPH_ASSERT_EQUAL( degrees.size(), 3 );
   ALEPH_ASSERT_THROW( degrees == std::vector<unsigned>( { 2,2,2 } ) );
+
+  ALEPH_TEST_END();
 }
 
 int main(int, char**)

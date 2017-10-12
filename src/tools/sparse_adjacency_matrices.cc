@@ -137,10 +137,10 @@ int main( int argc, char** argv )
 
   for( auto&& K : simplicialComplexes )
   {
-    std::vector<DataType> degrees;
-    aleph::topology::filtrations::degrees( K, std::back_inserter( degrees ) );
+    std::vector<unsigned> degrees_;
+    aleph::topology::filtrations::degrees( K, std::back_inserter( degrees_ ) );
 
-    // TODO: check degree for isolated vertices?
+    std::vector<DataType> degrees( degrees_.begin(), degrees_.end() );
 
     if( !degrees.empty() )
     {
