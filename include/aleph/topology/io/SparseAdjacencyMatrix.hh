@@ -25,6 +25,22 @@ namespace topology
 namespace io
 {
 
+/**
+  @class SparseAdjacencyMatrixReader
+  @brief Parses files in sparse adjacency matrix format
+
+  The purpose of this class is to read complex networks and represent
+  them as simplicial complexes. The networks are assumed to be in the
+  *sparse adjacency matrix* format developed by Dortmund University.
+
+  The class has various optional settings for changing the way things
+  are parsed and/or selecting different kinds of information that has
+  to be retrieved from the graph.
+
+  @see https://ls11-www.cs.tu-dortmund.de/staff/morris/graphkerneldatasets
+  @see sparse_adjacency_matrices.cc
+*/
+
 class SparseAdjacencyMatrixReader
 {
 public:

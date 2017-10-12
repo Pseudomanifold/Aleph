@@ -1,3 +1,15 @@
+/**
+  @file  sparse_adjacency_matrices.cc
+  @brief Tool for calculating persistent homology of sparse adjacency matrices
+
+  This is a tool shipped by 'Aleph - A Library for Exploring Persistent
+  Homology'. It calculates the persistent homology of sparse adjacency
+  matrices, i.e. data sets containing *multiple* graphs, using either
+  a degree filtration or a filtration based on the *sum* of degrees.
+
+  Original author: Bastian Rieck
+*/
+
 #include <aleph/geometry/RipsExpander.hh>
 
 #include <aleph/math/KahanSummation.hh>
@@ -85,7 +97,7 @@ int main( int argc, char** argv )
   if( ( argc - optind ) < 1 )
     return -1;
 
-  std::string filename = argv[1];
+  std::string filename = argv[optind++];
 
   std::vector<SimplicialComplex> simplicialComplexes;
   std::vector<std::string> labels;
