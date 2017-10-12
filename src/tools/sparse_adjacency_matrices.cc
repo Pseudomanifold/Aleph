@@ -28,12 +28,14 @@
 
 #include <aleph/utilities/Filesystem.hh>
 #include <aleph/utilities/Format.hh>
+#include <aleph/utilities/String.hh>
 
 #include <getopt.h>
 
 #include <algorithm>
 #include <fstream>
 #include <iostream>
+#include <limits>
 #include <string>
 #include <vector>
 
@@ -70,20 +72,25 @@ int main( int argc, char** argv )
 {
   static option commandLineOptions[] =
   {
-    { "closeness-centrality", no_argument, nullptr, 'c' },
-    { "sum"                 , no_argument, nullptr, 's' },
-    { nullptr               , 0          , nullptr,  0  }
+    { "infinity"            , required_argument, nullptr, 'f' },
+    { "closeness-centrality", no_argument      , nullptr, 'c' },
+    { "sum"                 , no_argument      , nullptr, 's' },
+    { nullptr               , 0                , nullptr,  0  }
   };
 
   bool calculateClosenessCentrality = false;
   bool useSumOfDegrees              = false;
+  DataType infinity                 = DataType(2);
 
   {
     int option = 0;
-    while( ( option = getopt_long( argc, argv, "cs", commandLineOptions, nullptr ) ) != -1 )
+    while( ( option = getopt_long( argc, argv, "f:cs", commandLineOptions, nullptr ) ) != -1 )
     {
       switch( option )
       {
+      case 'f':
+        infinity = aleph::utilities::convert<DataType>( optarg );
+        break;
       case 'c':
         calculateClosenessCentrality = true;
         break;
@@ -221,7 +228,7 @@ int main( int argc, char** argv )
         for( auto&& point : diagram )
         {
           if( point.isUnpaired() )
-            out << point.x() << "\t" << 2 * maxDegree << "\n";
+            out << point.x() << "\t" << infinity * maxDegree << "\n";
           else
             out << point.x() << "\t" << point.y() << "\n";
         }
