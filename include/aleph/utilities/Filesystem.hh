@@ -16,6 +16,8 @@
   #define SOCKET_FILE_TYPE_QUERY_AVAILABLE
 #endif
 
+#include <fstream>
+
 namespace aleph
 {
 
@@ -95,7 +97,11 @@ bool isSocket( const std::string& path )
 /** Checks whether a path or a file exists */
 bool exists( const std::string& path )
 {
-  return isDirectory( path ) || isRegularFile( path ) || isSocket( path );
+  return    isDirectory( path )
+         || isRegularFile( path )
+         || isSocket( path )
+         || ( std::ifstream( path ) ); // fall-back in case no other queries are available;
+                                       // we just try to open the file instead
 }
 
 /** Returns the basename, i.e the filename portion, of a path */
