@@ -56,14 +56,24 @@ template <class T> std::vector<T> split( const T& sequence,
 }
 
 /**
-  Attempts to convert a sequence type $S$ to a non-sequence type $T$ by
-  using $std::stringstream$. This makes converting strings to different
+  Attempts to convert a sequence type `S` to a non-sequence type `T` by
+  using `std::stringstream`. This makes converting strings to different
   types such as numbers easier.
+
+  @tparam S Sequence type (e.g. `std::string`)
+  @tparam T Non-sequence type (e.g. `ìnt`)
+
+  @param sequence Sequence to convert
+  @param success  Flag indicating the success of the conversion
+
+  @returns Result of the conversion. Errors do *not* result in an error
+  being thrown. Use the \p success parameter to check for errors.
 */
 
-template <class T, class S> T convert( const S& sequence )
+template <class T, class S> T convert( const S& sequence, bool& success )
 {
   T result = T();
+  success  = false;
 
   std::istringstream converter( sequence );
   converter >> result;
@@ -84,9 +94,21 @@ template <class T, class S> T convert( const S& sequence )
       result = -std::numeric_limits<T>::infinity();
     else if( string == "nan" )
       result = std::numeric_limits<T>::quiet_NaN();
+
+    success = result != T();
   }
+  else
+    success = true;
 
   return result;
+
+}
+
+/** @overload convert() */
+template <class T, class S> T convert( const S& sequence )
+{
+  bool success = false;
+  return convert<T>( sequence, success );
 }
 
 } // namespace utilities
