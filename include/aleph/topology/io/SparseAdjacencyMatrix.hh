@@ -43,20 +43,16 @@ public:
 
     auto graphIndicatorFilename = getFilenameGraphIndicator( filename );
 
-#if 0
-    // TODO: implement?
-
     if( !aleph::utilities::exists( graphIndicatorFilename ) )
       throw std::runtime_error( "Missing required graph indicator file" );
-#endif
 
     // Stores *all* graph IDs. The set makes sense here because I want
     // to ensure that repeated calls to this function always yield the
     // same order.
     std::set<VertexType> graphIDs;
 
-    // Maps a node ID to a graph ID, i.e. yields the inex of the graph
-    // that should contain the node. All indices are starting at 1 but
+    // Maps a node ID to a graph ID, i.e. yields the index of the graph
+    // that should contain the node. All indices are starting at 1, but
     // will be mapped to 0 later on.
     std::unordered_map<VertexType, VertexType> node_id_to_graph_id;
 
@@ -87,6 +83,12 @@ public:
 
     {
       std::set<VertexType> vertices_( vertices.begin(), vertices.end() );
+
+      // Add also those nodes that are only defined implicitly because
+      // they are isolated. This requires traversing the map that maps
+      // node IDs to graph IDs.
+      for( auto&& pair : node_id_to_graph_id )
+        vertices_.insert( pair.first );
 
       IndexType index = IndexType();
 
@@ -187,6 +189,19 @@ public:
   // The following attributes configure how the parsing process works
   // and which attributes are being read.
 
+  void setSeparator( const std::string& separator ) noexcept
+  {
+    // I am not performing any sanity checks here. If the separator does
+    // not constitute a valid regular expression, the parsing process is
+    // just going to fail later on.
+    _separator = separator;
+  }
+
+  std::string separator() const noexcept
+  {
+    return _separator;
+  }
+
   void setReadGraphLabels( bool value = true )    noexcept { _readGraphLabels = value;    }
   void setReadNodeLabels( bool value = true )     noexcept { _readNodeLabels = value;     }
   void setReadNodeAttributes( bool value = true ) noexcept { _readNodeAttributes = value; }
@@ -253,11 +268,25 @@ private:
     return std::make_pair( vertices, edges );
   }
 
+  /**
+    Reads graph and node IDs from an input file. The node ID is
+    implicitly encoded by the current line number. Each line in
+    turn contains a graph identifier. This is usually a number,
+    but the function does not require IDs to be contiguous.
+
+    @param filename Input filename
+
+    @returns Pair that contains information stored in the graph. The
+    first entry contains the set of *all* graph IDs. The second item
+    contains a dictionary for mapping a node ID to its corresponding
+    graph ID.
+  */
+
   template <class VertexType>
     std::pair<
       std::set<VertexType>,
       std::unordered_map<VertexType, VertexType>
-    > readGraphAndNodeIDs( const std::string& filename )
+    > readGraphAndNodeIDs( const std::string& filename ) const
   {
     std::unordered_map<VertexType, VertexType> node_id_to_graph_id;
     std::set<VertexType> graphIDs;
@@ -274,7 +303,12 @@ private:
       using namespace aleph::utilities;
       line = trim( line );
 
-      auto graphID                    = convert<VertexType>( line );
+      bool success                    = false;
+      auto graphID                    = convert<VertexType>( line, success );
+
+      if( !success )
+        throw std::runtime_error( "Unable to convert graph ID to numerical type" );
+
       node_id_to_graph_id[ nodeID++ ] = graphID;
 
       graphIDs.insert( graphID );
@@ -443,7 +477,7 @@ private:
 
   std::vector< std::vector<double> > _edgeAttributes;
 
-  // TODO: make configurable
+  /** Default separator between edges. This works strings such as `1,2`. */
   std::string _separator = ",";
 };
 
