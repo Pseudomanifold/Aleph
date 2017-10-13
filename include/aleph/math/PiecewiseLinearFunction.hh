@@ -132,6 +132,40 @@ public:
     return f;
   }
 
+  /** Multiplies the given piecewise linear function with a scalar value */
+  PiecewiseLinearFunction& operator*=( Image lambda ) noexcept
+  {
+    for( auto&& pair : _data )
+      pair->second *= lambda;
+
+    return *this;
+  }
+
+  /** Multiplies the given piecewise linear function with a scalar value */
+  PiecewiseLinearFunction operator*( Image lambda ) const noexcept
+  {
+    auto f = *this;
+    f *= lambda;
+    return f;
+  }
+
+  /** Divides the given step function by a scalar value */
+  PiecewiseLinearFunction& operator/=( I lambda )
+  {
+    if( lambda == I() )
+      throw std::runtime_error( "Attempted division by zero" );
+
+    return this->operator*=( 1/lambda );
+  }
+
+  /** Divides the given step function by a scalar value */
+  PiecewiseLinearFunction& operator/( I lambda ) const noexcept
+  {
+    auto f = *this;
+    f /= lambda;
+    return f;
+  }
+
 private:
 
   /**
@@ -285,5 +319,18 @@ private:
 } // namespace math
 
 } // namespace aleph
+
+/** Multiplies a given piecewise linear function by a scalar value */
+template <class D, class I, class T> aleph::math::PiecewiseLinearFunction<D, I> operator*( T lambda, const aleph::math::PiecewiseLinearFunction<D, I>& f )
+{
+  return f * lambda;
+}
+
+/** Divides a given piecewise linear function by a scalar value */
+template <class D, class I, class T> aleph::math::PiecewiseLinearFunction<D, I> operator/( T lambda, const aleph::math::PiecewiseLinearFunction<D, I>& f )
+{
+  return f / lambda;
+}
+
 
 #endif
