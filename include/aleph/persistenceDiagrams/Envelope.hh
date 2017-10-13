@@ -1,6 +1,8 @@
 #ifndef ALEPH_PERSISTENCE_DIAGRAMS_ENVELOPE_HH__
 #define ALEPH_PERSISTENCE_DIAGRAMS_ENVELOPE_HH__
 
+#include <aleph/math/PiecewiseLinearFunction.hh>
+
 #include <aleph/persistenceDiagrams/PersistenceDiagram.hh>
 
 #include <algorithm>
@@ -9,9 +11,6 @@
 #include <vector>
 
 #include <cassert>
-
-// FIXME: remove after debugging
-#include <iostream>
 
 namespace aleph
 {
@@ -30,9 +29,23 @@ namespace aleph
 class Envelope
 {
 public:
-  template <class T> void operator()( const PersistenceDiagram<T>& D )
+
+  /**
+    Calculates the *envelope* of a given persistence diagram. i.e. the
+    curve connecting the extremal points in the diagram. One can alter
+    the functor settings in order to change the way *unpaired* points,
+    for example, are being handled.
+
+    @param D Input persistence diagram
+    @returns Piecewise linear envelope function
+  */
+
+  template <class T> aleph::math::PiecewiseLinearFunction<T> operator()( PersistenceDiagram<T> D )
   {
     using Point = typename PersistenceDiagram<T>::Point;
+
+    if( _removeUnpairedPoints )
+      D.removeUnpaired();
 
     std::vector<Point> P;
     P.reserve( D.size() );
@@ -60,6 +73,11 @@ public:
                       return p.x();
                     } );
 
+    using Coordinate              = std::pair<T, T>;
+    using PiecewiseLinearFunction = aleph::math::PiecewiseLinearFunction<T>;
+
+    std::vector<Coordinate> coordinates;
+
     auto it = P.begin();
     for( auto&& x : X )
     {
@@ -72,9 +90,19 @@ public:
 
       assert( x == it->x() );
 
-      std::cerr << "X = " << it->x() << ", Y = " << it->y() << "\n";
+      coordinates.push_back( std::make_pair( it->x(), it->y() ) );
     }
+
+    return PiecewiseLinearFunction( coordinates.begin(), coordinates.end() );
   }
+
+  void setRemoveUnpairedPoints( bool value = true ) { _removeUnpairedPoints = value; }
+  bool    removeUnpairedPoints() const noexcept     { return _removeUnpairedPoints;  }
+
+private:
+
+  /** Flag indicating whether unpaired points should be removed */
+  bool _removeUnpairedPoints = true;
 };
 
 } // namespace aleph
