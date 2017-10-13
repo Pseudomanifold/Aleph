@@ -10,9 +10,9 @@
 
 using namespace aleph::math;
 
-template <class T> void testBasicProperties()
+template <class T> void testBasic()
 {
-  ALEPH_TEST_BEGIN( "Piecewise linear function: Basic properties" );
+  ALEPH_TEST_BEGIN( "Piecewise linear function: Basic properties & operations" );
 
   std::vector< std::pair<T, T> > points1 = {
     {0,0},
@@ -37,11 +37,34 @@ template <class T> void testBasicProperties()
   ALEPH_ASSERT_THROW( g( T(0.2) ) <  0 );
   ALEPH_ASSERT_THROW( g( T(0.2) ) > -1 );
 
+  auto h = f+g;
+
+  ALEPH_ASSERT_EQUAL( h(0),   T(0) );
+  ALEPH_ASSERT_EQUAL( h(1),   T(1) );
+  ALEPH_ASSERT_EQUAL( h(0.5), T(-0.5) );
+
+  h -= g;
+
+  ALEPH_ASSERT_EQUAL( h(0), T(0) );
+  ALEPH_ASSERT_EQUAL( h(1), T(1) );
+  ALEPH_ASSERT_EQUAL( h( T(0.5) ),  0.5 );
+
+  h *= 2;
+
+  ALEPH_ASSERT_EQUAL( h(1), 2*T(1) );
+  ALEPH_ASSERT_EQUAL( h( T(0.5) ), 2*0.5 );
+
+  h /= 2;
+
+  ALEPH_ASSERT_EQUAL( h(0), T(0) );
+  ALEPH_ASSERT_EQUAL( h(1), T(1) );
+  ALEPH_ASSERT_EQUAL( h( T(0.5) ),  0.5 );
+
   ALEPH_TEST_END();
 }
 
 int main()
 {
-  testBasicProperties<float> ();
-  testBasicProperties<double>();
+  testBasic<float> ();
+  testBasic<double>();
 }
