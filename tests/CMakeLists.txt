@@ -95,6 +95,7 @@ ADD_EXECUTABLE( test_nearest_neighbours               test_nearest_neighbours.cc
 ADD_EXECUTABLE( test_persistence_diagrams             test_persistence_diagrams.cc )
 ADD_EXECUTABLE( test_persistent_homology_complete     test_persistent_homology_complete.cc )
 ADD_EXECUTABLE( test_persistent_intersection_homology test_persistent_intersection_homology.cc )
+ADD_EXECUTABLE( test_piecewise_linear_function        test_piecewise_linear_function.cc )
 ADD_EXECUTABLE( test_principal_component_analysis     test_principal_component_analysis.cc )
 ADD_EXECUTABLE( test_point_clouds                     test_point_clouds.cc )
 ADD_EXECUTABLE( test_rips_expansion                   test_rips_expansion.cc )
@@ -142,6 +143,7 @@ ADD_TEST( nearest_neighbours               test_nearest_neighbours )
 ADD_TEST( persistence_diagrams             test_persistence_diagrams )
 ADD_TEST( persistent_homology_complete     test_persistent_homology_complete )
 ADD_TEST( persistent_intersection_homology test_persistent_intersection_homology )
+ADD_TEST( piecewise_linear_function        test_piecewise_linear_function )
 ADD_TEST( principal_component_analysis     test_principal_component_analysis )
 ADD_TEST( point_clouds                     test_point_clouds )
 ADD_TEST( rips_expansion                   test_rips_expansion )
@@ -151,7 +153,7 @@ ADD_TEST( union_find                       test_union_find )
 ADD_TEST( witness_complex                  test_witness_complex )
 
 # These test are a little bit special because they depend on another
-# shared library so we need to adjust the interface if we are unable 
+# shared library so we need to adjust the interface if we are unable
 # to build them.
 IF( ALEPH_WITH_HDF5 )
   TARGET_INCLUDE_DIRECTORIES( test_io_gml SYSTEM PUBLIC ${HDF5_CXX_INCLUDE_DIRS} )
