@@ -51,6 +51,7 @@
 // parser interface.
 #include <getopt.h>
 
+#include <aleph/persistenceDiagrams/Envelope.hh>
 #include <aleph/persistenceDiagrams/PersistenceDiagram.hh>
 #include <aleph/persistenceDiagrams/PersistenceIndicatorFunction.hh>
 
@@ -65,6 +66,7 @@
 using DataType                     = double;
 using PersistenceDiagram           = aleph::PersistenceDiagram<DataType>;
 using PersistenceIndicatorFunction = aleph::math::StepFunction<DataType>;
+using EnvelopeFunction             = aleph::math::PiecewiseLinearFunction<DataType>;
 
 /*
   Auxiliary structure for describing a data set. I need this in order to
@@ -79,13 +81,14 @@ struct DataSet
 
   PersistenceDiagram persistenceDiagram;
   PersistenceIndicatorFunction persistenceIndicatorFunction;
+  EnvelopeFunction envelopeFunction;
 };
 
 /* Usage information */
 void usage()
 {
   std::cerr << "Usage: topological_distance [--power=POWER] [--kernel] [--exp] [--sigma]\n"
-            << "                            [--hausdorff|indicator|wasserstein]\n"
+            << "                            [--hausdorff|envelope|indicator|wasserstein]\n"
             << "                            [--clean] FILES\n"
             << "\n"
             << "Calculates distances between a set of persistence diagrams, stored\n"
@@ -108,6 +111,7 @@ void usage()
             << "Flags:\n"
             << "  -c: clean persistence diagrams (remove unpaired points)\n"
             << "  -e: use exponential weighting for kernel calculation\n"
+            << "  -E: calculate envelope function distances\n"
             << "  -h: calculate Hausdorff distances\n"
             << "  -i: calculate persistence indicator function distances\n"
             << "  -k: calculate kernel values instead of distances\n"
@@ -199,6 +203,50 @@ double distancePIF( const std::vector<DataSet>& dataSet1,
 }
 
 /*
+  Calculates the topological distance between two data sets using
+  envelope functions. This requires enumerating all dimensions in
+  order to find the corresponding envelope function. If no proper
+  function is found, the method defaults to calculating the norm.
+*/
+
+double distanceEnvelopeFunctions( const std::vector<DataSet>& dataSet1,
+                                  const std::vector<DataSet>& dataSet2,
+                                  unsigned minDimension,
+                                  unsigned maxDimension,
+                                  double power )
+{
+  auto getEnvelopeFunction = [] ( const std::vector<DataSet>& dataSet, unsigned dimension )
+  {
+    auto it = std::find_if( dataSet.begin(), dataSet.end(),
+                            [&dimension] ( const DataSet& dataSet )
+                            {
+                              return dataSet.dimension == dimension;
+                            } );
+
+    if( it != dataSet.end() )
+      return EnvelopeFunction( it->envelopeFunction );
+    else
+      return EnvelopeFunction();
+  };
+
+  double d = 0.0;
+
+  for( unsigned dimension = minDimension; dimension <= maxDimension; dimension++ )
+  {
+    auto f = getEnvelopeFunction( dataSet1, dimension );
+    auto g = getEnvelopeFunction( dataSet2, dimension );
+
+    g = -g;
+    if( power == 1.0 )
+      d = d + (f+g).abs().integral();
+    else
+      d = d + (f+g).abs().integral( power );
+  }
+
+  return d;
+}
+
+/*
   Calculates the topological distance between two data sets, using
   a standard distance between two persistence diagrams, for example
   the Hausdorff, Wasserstein, or bottleneck distance.
@@ -253,6 +301,7 @@ int main( int argc, char** argv )
     { "power"      , required_argument, nullptr, 'p' },
     { "sigma"      , required_argument, nullptr, 's' },
     { "clean"      , no_argument      , nullptr, 'c' },
+    { "envelope"   , no_argument      , nullptr, 'E' },
     { "exp"        , no_argument      , nullptr, 'e' },
     { "hausdorff"  , no_argument      , nullptr, 'h' },
     { "indicator"  , no_argument      , nullptr, 'i' },
@@ -266,13 +315,14 @@ int main( int argc, char** argv )
   double sigma                      = 1.0;
   bool cleanPersistenceDiagrams     = false;
   bool useExponentialFunction       = false;
+  bool useEnvelopeFunctionDistance  = false;
   bool useIndicatorFunctionDistance = false;
   bool normalize                    = false;
   bool calculateKernel              = false;
   bool useWassersteinDistance       = false;
 
   int option = 0;
-  while( ( option = getopt_long( argc, argv, "p:s:cehinkw", commandLineOptions, nullptr ) ) != -1 )
+  while( ( option = getopt_long( argc, argv, "p:s:ceEhinkw", commandLineOptions, nullptr ) ) != -1 )
   {
     switch( option )
     {
@@ -285,15 +335,22 @@ int main( int argc, char** argv )
     case 'c':
       cleanPersistenceDiagrams = true;
       break;
+    case 'E':
+      useEnvelopeFunctionDistance  = true;
+      useWassersteinDistance       = false;
+      useIndicatorFunctionDistance = false;
+      break;
     case 'e':
       useExponentialFunction = true;
       break;
     case 'h':
       useWassersteinDistance       = false;
       useIndicatorFunctionDistance = false;
+      useEnvelopeFunctionDistance  = false;
       break;
     case 'i':
       useIndicatorFunctionDistance = true;
+      useEnvelopeFunctionDistance  = false;
       useWassersteinDistance       = false;
       break;
     case 'k':
@@ -303,6 +360,7 @@ int main( int argc, char** argv )
       normalize = true;
       break;
     case 'w':
+      useEnvelopeFunctionDistance  = false;
       useIndicatorFunctionDistance = false;
       useWassersteinDistance       = true;
       break;
@@ -381,7 +439,7 @@ int main( int argc, char** argv )
           dimension = unsigned( std::stoul( matches[2] ) );
         }
 
-        dataSets.at( filenameMap[name] ).push_back( { name, filename, dimension, {}, {} } );
+        dataSets.at( filenameMap[name] ).push_back( { name, filename, dimension, {}, {}, {} } );
 
         minDimension = std::min( minDimension, dimension );
         maxDimension = std::max( maxDimension, dimension );
@@ -410,8 +468,8 @@ int main( int argc, char** argv )
           auto pd = dataSet.persistenceDiagram;
           pd.removeUnpaired();
 
-          dataSet.persistenceIndicatorFunction
-             = aleph::persistenceIndicatorFunction( pd );
+          dataSet.persistenceIndicatorFunction = aleph::persistenceIndicatorFunction( pd );
+          dataSet.envelopeFunction             = aleph::Envelope()( pd );
 
           std::cerr << "finished\n";
         }
@@ -455,7 +513,8 @@ int main( int argc, char** argv )
                                filename,
                                dimension,
                                diagram,
-                               aleph::persistenceIndicatorFunction( pd ) } );
+                               aleph::persistenceIndicatorFunction( pd ),
+                               aleph::Envelope()( pd ) } );
         }
 
         dataSets.push_back( dataSet );
@@ -466,25 +525,30 @@ int main( int argc, char** argv )
   // Setup distance functor --------------------------------------------
 
   std::function< double( const PersistenceDiagram&, const PersistenceDiagram&, double ) > functor
-    = !useIndicatorFunctionDistance ? useWassersteinDistance ? [] ( const PersistenceDiagram& D1, const PersistenceDiagram& D2, double p )
-                                                               {
-                                                                 return aleph::distances::wassersteinDistance( D1, D2, p );
-                                                               }
-                                                             : [] ( const PersistenceDiagram& D1, const PersistenceDiagram& D2, double p )
-                                                               {
-                                                                 return std::pow( aleph::distances::hausdorffDistance( D1, D2 ), p );
-                                                               }
-                                    : [] ( const PersistenceDiagram&, const PersistenceDiagram&, double )
-                                    {
-                                      return 0.0;
-                                    };
+    = !useIndicatorFunctionDistance && !useEnvelopeFunctionDistance ?
+        useWassersteinDistance ?
+          [] ( const PersistenceDiagram& D1, const PersistenceDiagram& D2, double p )
+               {
+                 return aleph::distances::wassersteinDistance( D1, D2, p );
+               }
+         : [] ( const PersistenceDiagram& D1, const PersistenceDiagram& D2, double p )
+              {
+                return std::pow( aleph::distances::hausdorffDistance( D1, D2 ), p );
+              }
+           : [] ( const PersistenceDiagram&, const PersistenceDiagram&, double )
+                  {
+                    return 0.0;
+                  };
 
   // Calculate all distances -------------------------------------------
 
   {
-    auto name = useIndicatorFunctionDistance ? "persistence indicator function"
-                                             : useWassersteinDistance ? "Wasserstein"
-                                                                      : "Hausdorff";
+    auto name = useEnvelopeFunctionDistance ? "envelope function"
+                                            : useIndicatorFunctionDistance
+                                              ? "persistence indicator function"
+                                              : useWassersteinDistance
+                                                ? "Wasserstein"
+                                                : "Hausdorff";
 
     auto type = calculateKernel ? "kernel values" : "distances";
 
@@ -507,6 +571,8 @@ int main( int argc, char** argv )
 
       if( useIndicatorFunctionDistance )
         d = distancePIF( dataSets.at(row), dataSets.at(col), minDimension, maxDimension, power, normalize );
+      else if( useEnvelopeFunctionDistance )
+        d = distanceEnvelopeFunctions( dataSets.at(row), dataSets.at(col), minDimension, maxDimension, power );
       else
         d = persistenceDiagramDistance( dataSets.at(row), dataSets.at(col), minDimension, maxDimension, power, functor );
 
