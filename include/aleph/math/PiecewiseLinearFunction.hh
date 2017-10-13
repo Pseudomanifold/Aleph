@@ -30,6 +30,9 @@ public:
   using Domain = D;
   using Image  = I;
 
+  /** Creates an empty piecewise linear function */
+  PiecewiseLinearFunction() = default;
+
   /**
     Creates a new piecewise linear function from a range of values. The values
     must consist of pairs that are convertible to double. Duplicates are not
@@ -60,6 +63,8 @@ public:
     if( !_data.empty() )
       this->insertIntersectionPoints();
   }
+
+  // Evaluation --------------------------------------------------------
 
   /**
     Evaluates the piecewise linear function at a certain position. The
@@ -92,6 +97,8 @@ public:
 
     return detail::lerp( x, left->first, left->second, right->first, right->second );
   }
+
+  // Operations --------------------------------------------------------
 
   /** Calculates the sum of two piecewise linear functions */
   PiecewiseLinearFunction& operator+=( const PiecewiseLinearFunction& rhs ) noexcept
@@ -127,7 +134,7 @@ public:
     PiecewiseLinearFunction f;
 
     for( auto&& pair : _data )
-      f._data.insert( std::make_pair( pair->first, -pair->second ) );
+      f._data.insert( std::make_pair( pair.first, -pair.second ) );
 
     return f;
   }
@@ -136,7 +143,7 @@ public:
   PiecewiseLinearFunction& operator*=( Image lambda ) noexcept
   {
     for( auto&& pair : _data )
-      pair->second *= lambda;
+      pair.second *= lambda;
 
     return *this;
   }
@@ -164,6 +171,61 @@ public:
     auto f = *this;
     f /= lambda;
     return f;
+  }
+
+  // Queries -----------------------------------------------------------
+
+  /** Copies the domain values to an output iterator */
+  template <class OutputIterator> void domain( OutputIterator result ) const noexcept
+  {
+    for( auto&& pair : _data )
+      *result++ = pair.first;
+  }
+
+  /** Copies the image values to an output iterator */
+  template <class OutputIterator> void image( OutputIterator result ) const noexcept
+  {
+    for( auto&& pair : _data )
+      *result++ = pair.second;
+  }
+
+  /**
+    Compares two piecewise linear functions. The functions are
+    considered to be *equal* when the take the same values for
+    the same interval. This method will evaluate the functions
+    over *all* points of the domain.
+
+    @param rhs Other function to compare against
+
+    @returns true if both functions are equal, regardless of whether one
+    of the functions has a subdivided range of values.
+  */
+
+  bool operator==( const PiecewiseLinearFunction& rhs ) const noexcept
+  {
+    std::set<Domain> domain;
+
+    this->domain( std::inserter( domain, domain.begin() ) );
+      rhs.domain( std::inserter( domain, domain.begin() ) );
+
+    bool result = true;
+
+    for( auto&& x : domain )
+    {
+      auto y0 = this->operator()( x );
+      auto y1 = rhs( x );
+
+      if( y0 != y1 )
+        return false;
+    }
+
+    return result;
+  }
+
+  /** Negates the comparison between two functions */
+  bool operator!=( const PiecewiseLinearFunction& rhs ) const noexcept
+  {
+    return !this->operator==( rhs );
   }
 
 private:
