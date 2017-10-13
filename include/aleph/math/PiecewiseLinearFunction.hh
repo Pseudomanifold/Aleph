@@ -1,6 +1,7 @@
 #ifndef ALEPH_MATH_PIECEWISE_LINEAR_FUNCTION_HH__
 #define ALEPH_MATH_PIECEWISE_LINEAR_FUNCTION_HH__
 
+#include <functional>
 #include <iterator>
 #include <map>
 #include <set>
@@ -90,6 +91,45 @@ public:
     auto left  = std::prev( begin );
 
     return detail::lerp( x, left->first, left->second, right->first, right->second );
+  }
+
+  /** Calculates the sum of two piecewise linear functions */
+  PiecewiseLinearFunction& operator+=( const PiecewiseLinearFunction& rhs ) noexcept
+  {
+    return this->apply( rhs, std::plus<Image>() );
+  }
+
+  /** Calculates the sum of two piecewise linear functions */
+  PiecewiseLinearFunction operator+( const PiecewiseLinearFunction& rhs ) const noexcept
+  {
+    auto lhs = *this;
+    lhs += rhs;
+    return lhs;
+  }
+
+  /** Calculates the difference of two piecewise linear functions */
+  PiecewiseLinearFunction& operator-=( const PiecewiseLinearFunction& rhs ) noexcept
+  {
+    return this->apply( rhs, std::minus<Image>() );
+  }
+
+  /** Calculates the difference of two piecewise linear functions */
+  PiecewiseLinearFunction operator-( const PiecewiseLinearFunction& rhs ) const noexcept
+  {
+    auto lhs = *this;
+    lhs -= rhs;
+    return lhs;
+  }
+
+  /** Unary minus: negates all values in the image of the piecewise linear function */
+  PiecewiseLinearFunction operator-() const noexcept
+  {
+    PiecewiseLinearFunction f;
+
+    for( auto&& pair : _data )
+      f._data.insert( std::make_pair( pair->first, -pair->second ) );
+
+    return f;
   }
 
 private:
