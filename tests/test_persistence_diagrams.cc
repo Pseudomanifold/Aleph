@@ -1,5 +1,6 @@
 #include <tests/Base.hh>
 
+#include <aleph/persistenceDiagrams/Envelope.hh>
 #include <aleph/persistenceDiagrams/Mean.hh>
 #include <aleph/persistenceDiagrams/Norms.hh>
 #include <aleph/persistenceDiagrams/PersistenceDiagram.hh>
@@ -82,6 +83,21 @@ template <class T> void testBottleneckDistance()
     ALEPH_ASSERT_EQUAL( d12, d21 );
     ALEPH_ASSERT_EQUAL( d21, T(9.9)-T(4.0) );
   }
+
+  ALEPH_TEST_END();
+}
+
+template <class T> void testEnvelope()
+{
+  ALEPH_TEST_BEGIN( "Persistence diagram envelope");
+
+  using PersistenceDiagram = aleph::PersistenceDiagram<T>;
+
+  PersistenceDiagram D1;
+  D1.add( T(0.9), T(1.0) );
+  D1.add( T(1.9), T(2.0) );
+  D1.add( T(2.9), T(3.0) );
+  D1.add( T(3.9), T(4.0) );
 
   ALEPH_TEST_END();
 }
