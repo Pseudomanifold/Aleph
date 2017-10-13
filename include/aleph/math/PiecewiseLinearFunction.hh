@@ -12,6 +12,17 @@ namespace aleph
 namespace math
 {
 
+namespace detail
+{
+
+/** Performs linear interpolation between two points */
+template <class D, class I> I lerp( D x, D x0, I y0, D x1, I y1 )
+{
+  return y0 + (y1-y0) * (x-x0) / (x1-x0);
+}
+
+} // namespace detail
+
 template <class D, class I = D> class PiecewiseLinearFunction
 {
 public:
@@ -49,7 +60,129 @@ public:
       this->insertIntersectionPoints();
   }
 
+  /**
+    Evaluates the piecewise linear function at a certain position. The
+    function must not be evaluated beyond its domain. This will result
+    in zeroes. For every other evaluation point, the function performs
+    interpolation between the nearest values.
+
+    @param x Coordinate at which to evaluate the function
+
+    @returns Interpolated y value
+  */
+
+  Image operator()( Domain x ) const noexcept
+  {
+    auto range = _data.equal_range( x );
+    auto begin = range.first;
+    auto end   = range.second;
+
+    // Beyond the domain
+    if( begin == _data.end() || end == _data.begin() )
+      return Image();
+
+    // One of the stored values
+    else if( begin->first == x )
+      return begin->second;
+
+    // Interpolation required
+    auto right = begin;
+    auto left  = std::prev( begin );
+
+    return detail::lerp( x, left->first, left->second, right->first, right->second );
+  }
+
 private:
+
+  /**
+    Applies a binary operation to the current piecewise linear function
+    and another function. To this, the domains of *both* functions will
+    be merged, and the operation will be applied to  their values, with
+    a suitable interpolation scheme in place.
+
+    @param other     Second piecewise linear function
+    @param operation Operation to apply to both functions
+
+    @returns Reference to modified piecewise linear function. The
+    original piecewise linear function ceases to exist.
+  */
+
+  template <class BinaryOperation> PiecewiseLinearFunction& apply( const PiecewiseLinearFunction& other,
+                                                                   BinaryOperation operation )
+  {
+    std::set<Domain> xValues;
+
+    for( auto&& pair : _data )
+      xValues.insert( pair.first );
+
+    for( auto&& pair : other._data )
+      xValues.insert( pair.first );
+
+    // Intersection handling. This is required to ensure that the combination of
+    // the two functions contains shared segments.
+    {
+      // This closure checks whether two line segments intersect. If this is the
+      // case, the intersection point needs to be stored as an additional point
+      // in the set of values.
+      auto intersection = []( Domain x0, Image y0, Domain x1, Image y1,
+                              Domain x2, Image y2, Domain x3, Image y3 )
+      {
+        auto s1x = x1 - x0;
+        auto s1y = y1 - y0;
+        auto s2x = x3 - x2;
+        auto s2y = y3 - y2;
+
+        auto s = ( -s1y * (x0-x2) + s1x * (y0-y2) ) / ( -s2x * s1y + s1x * s2y );
+        auto t = (  s2x * (y0-y2) - s2y * (x0-x2) ) / ( -s2x * s1y + s1x * s2y );
+
+        if( s >= 0 && s <= 1 && t >= 0 && t <= 1 )
+          return x0 + t * s1x;
+
+        return x0;
+      };
+
+      std::set<Domain> intersections;
+
+      auto current = xValues.begin();
+      auto next    = std::next( current );
+
+      for( ; next != xValues.end(); )
+      {
+        auto x0 = *current;
+        auto x1 = *next;
+
+        auto y0 = this->operator()( x0 );
+        auto y1 = this->operator()( x1 );
+        auto y2 = other( x0 );
+        auto y3 = other( x1 );
+
+        auto x = intersection( x0, y0, x1, y1, x0, y2, x1, y3 );
+
+        if( x != x0 )
+          intersections.insert( x );
+
+        current = next;
+        next    = std::next( current );
+      }
+
+      xValues.insert( intersections.begin(), intersections.end() );
+    }
+
+    // Apply the operation to all points -------------------------------
+
+    std::map<Domain, Image> data;
+
+    for( auto&& x : xValues )
+    {
+      auto y1 = this->operator()( x );
+      auto y2 =            other( x );
+
+      data.insert( std::make_pair( x, operation( y1, y2 ) ) );
+    }
+
+    _data.swap( data );
+    return *this;
+  }
 
   /**
     Checks the segments of the piecewise linear function for intersections with
