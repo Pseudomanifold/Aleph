@@ -99,7 +99,11 @@ template <class T> void testEnvelope()
   D1.add( T(2), T(4) );
 
   aleph::Envelope envelope;
-  envelope( D1 );
+  auto f = envelope( D1 );
+
+  ALEPH_ASSERT_EQUAL( f(1), T(1) );
+  ALEPH_ASSERT_EQUAL( f(5), T(3) );
+  ALEPH_ASSERT_EQUAL( f(6), T(2) );
 
   ALEPH_TEST_END();
 }
