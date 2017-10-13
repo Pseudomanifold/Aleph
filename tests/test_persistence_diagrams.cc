@@ -99,6 +99,9 @@ template <class T> void testEnvelope()
   D1.add( T(2.9), T(3.0) );
   D1.add( T(3.9), T(4.0) );
 
+  aleph::Envelope envelope;
+  envelope( D1 );
+
   ALEPH_TEST_END();
 }
 
@@ -108,7 +111,7 @@ template <class T> void testFrechetMean()
 
   ALEPH_TEST_BEGIN( "Persistence diagram mean");
 
-  unsigned n = 10;
+  unsigned n = 5;
 
   std::vector<PersistenceDiagram> diagrams;
   diagrams.reserve( n );
@@ -168,27 +171,6 @@ template <class T> void testPersistenceIndicatorFunction()
 
   for( unsigned i = 0; i < numSamples; i++ )
     indicatorFunctions.emplace_back( aleph::persistenceIndicatorFunction( diagrams.at(i) ) );
-
-  // FIXME: not sure what to do with these values...
-  for( unsigned i = 0; i < numSamples; i++ )
-  {
-    auto&& D1 = diagrams.at(i);
-    auto&& f1 = indicatorFunctions.at(i);
-
-    for( unsigned j = i+1; j < numSamples; j++ )
-    {
-      auto&& D2 = diagrams.at(j);
-      auto&& f2 = indicatorFunctions.at(j);
-
-      auto h  = aleph::distances::hausdorffDistance( D1, D2 );
-      auto w1 = aleph::distances::wassersteinDistance( D1, D2, T(1) );
-      auto d1 = (f1-f2).abs().integral();
-      auto p1 = aleph::totalPersistence( D1, 1.0 );
-      auto p2 = aleph::totalPersistence( D2, 1.0 );
-
-      std::cout << h << "," << w1 << "," << d1 << "," << p1 << "," << p2 << "\n";
-    }
-  }
 
   // Transform persistence diagrams to prove that the bound given by
   // the maximum of the two persistence values is strict.
