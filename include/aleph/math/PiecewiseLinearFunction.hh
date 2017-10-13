@@ -29,6 +29,20 @@ template <class D, class I> I lerp( D x, D x0, I y0, D x1, I y1 )
 
 } // namespace detail
 
+/**
+  @class PiecewiseLinearFunction
+  @brief Models a piecewise linear function
+
+  A piecewise linear function is fully defined by a set of pairs of
+  coordinates, specifying values in the *domain* and the *image* of
+  the function. This class permits various arithmetical operations,
+  such as addition and subtraction, with piecewise linear functions
+  and provides a number of other common operations.
+
+  @tparam D Type of the *domain* of the function
+  @tparam I Type of the *image* of the function
+*/
+
 template <class D, class I = D> class PiecewiseLinearFunction
 {
 public:
