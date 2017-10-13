@@ -1,11 +1,16 @@
 #ifndef ALEPH_MATH_PIECEWISE_LINEAR_FUNCTION_HH__
 #define ALEPH_MATH_PIECEWISE_LINEAR_FUNCTION_HH__
 
+#include <aleph/math/KahanSummation.hh>
+
 #include <functional>
 #include <iterator>
+#include <limits>
 #include <map>
 #include <set>
 #include <stdexcept>
+
+#include <cmath>
 
 namespace aleph
 {
@@ -226,6 +231,88 @@ public:
   bool operator!=( const PiecewiseLinearFunction& rhs ) const noexcept
   {
     return !this->operator==( rhs );
+  }
+
+  // Transformations ---------------------------------------------------
+
+  /** Calculates the absolute value of the function */
+  PiecewiseLinearFunction& abs() noexcept
+  {
+    for( auto&& pair : _data )
+      pair.second = std::abs( pair.second );
+
+    return *this;
+  }
+
+  /** Calculates the maximum (supremum) of the function */
+  Image max() const noexcept
+  {
+    if( _data.empty() )
+      return Image();
+
+    auto max = std::numeric_limits<Image>::lowest();
+
+    for( auto&& pair : _data )
+      max = std::max( max, pair.second );
+
+    return max;
+  }
+
+  /** Calculates the supremum (maximum) of the function */
+  Image sup() const noexcept
+  {
+    return this->max();
+  }
+
+  /**
+    Calculates the integral over the (absolute value of the) function,
+    raised to the \f$p\f$-th power.
+  */
+
+  Image integral( Image p = Image(1) ) const noexcept
+  {
+    if( _data.empty() )
+      return Image();
+
+    // The Kahan summation ensures that small parts of the integral do
+    // not disappear amidst the remaining values.
+    KahanSummation<Image> norm = Image();
+
+    auto previous = _data.begin();
+    auto current  = std::next( _data.begin() );
+
+    while( current != _data.end() )
+    {
+      // Coefficients of the line that connect the previous point and the current
+      // point.
+      auto x1 = previous->first;
+      auto y1 = previous->second;
+      auto x2 = current->first;
+      auto y2 = current->second;
+      auto m  = (y2 - y1) / (x2 - x1);
+      auto c  = y1 - m * x1;
+
+      // Evaluator for the integral. This is an application of Cavalieri's
+      // quadrature formula.
+      auto evaluator = [&]( Image x )
+      {
+        // Horizontal segments
+        if( m == Image() )
+          return std::pow( c, p ) * x;
+
+        // Regular lines
+        else
+          return std::pow( m*x + c, p+1 ) / ( m * (p+1) );
+      };
+
+      auto integral   = std::abs( evaluator( x2 ) - evaluator( x1 ) );
+      norm           += integral;
+
+      previous = current;
+      ++current;
+    }
+
+    return std::pow( norm, 1/p );
   }
 
 private:
