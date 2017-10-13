@@ -60,6 +60,24 @@ template <class T> void testBasic()
   ALEPH_ASSERT_EQUAL( h(1), T(1) );
   ALEPH_ASSERT_EQUAL( h( T(0.5) ),  0.5 );
 
+  h = -h;
+
+  ALEPH_ASSERT_EQUAL( h(0), T(0) );
+  ALEPH_ASSERT_EQUAL( h(1), -T(1) );
+  ALEPH_ASSERT_EQUAL( h( T(0.5) ), -0.5 );
+
+  ALEPH_ASSERT_THROW( h != -h );
+  ALEPH_ASSERT_THROW( h == -f );
+
+  ALEPH_ASSERT_THROW( h.abs() == f );
+
+  ALEPH_ASSERT_EQUAL( f.integral(), T(0.5) );
+  ALEPH_ASSERT_EQUAL( f.integral(), (-f).integral() );
+  ALEPH_ASSERT_EQUAL( g.integral(), T(0.25) );
+  ALEPH_ASSERT_EQUAL( f.integral(), h.integral() );
+
+  ALEPH_ASSERT_THROW( (f+g).integral() < (f.integral() + g.integral() ) );
+
   ALEPH_TEST_END();
 }
 
