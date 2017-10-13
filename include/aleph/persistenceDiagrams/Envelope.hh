@@ -34,9 +34,10 @@ public:
   {
     using Point = typename PersistenceDiagram<T>::Point;
 
-    std::vector<Point> P( D.size() );
+    std::vector<Point> P;
+    P.reserve( D.size() );
 
-    std::transform( D.begin(), D.end(), P.begin(),
+    std::transform( D.begin(), D.end(), std::back_inserter( P ),
                     [] ( const Point& p )
                     {
                       return Point( p.x() + p.y(), p.y() - p.x() );

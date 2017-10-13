@@ -94,10 +94,9 @@ template <class T> void testEnvelope()
   using PersistenceDiagram = aleph::PersistenceDiagram<T>;
 
   PersistenceDiagram D1;
-  D1.add( T(0.9), T(1.0) );
-  D1.add( T(1.9), T(2.0) );
-  D1.add( T(2.9), T(3.0) );
-  D1.add( T(3.9), T(4.0) );
+  D1.add( T(0), T(1) );
+  D1.add( T(1), T(4) );
+  D1.add( T(2), T(4) );
 
   aleph::Envelope envelope;
   envelope( D1 );
@@ -316,6 +315,9 @@ int main(int, char**)
 {
   testBottleneckDistance<float> ();
   testBottleneckDistance<double>();
+
+  testEnvelope<float> ();
+  testEnvelope<double>();
 
   testFrechetMean<float> ();
   testFrechetMean<double>();
