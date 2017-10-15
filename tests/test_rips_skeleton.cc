@@ -1,4 +1,3 @@
-#include <aleph/config/Base.hh>
 #include <aleph/config/FLANN.hh>
 
 #include <aleph/containers/PointCloud.hh>

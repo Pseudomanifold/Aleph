@@ -1,7 +1,5 @@
 #include <tests/Base.hh>
 
-#include <aleph/config/Base.hh>
-
 #include <aleph/persistenceDiagrams/PersistenceDiagram.hh>
 #include <aleph/persistenceDiagrams/io/JSON.hh>
 

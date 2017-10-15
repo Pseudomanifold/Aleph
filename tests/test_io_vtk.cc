@@ -1,5 +1,3 @@
-#include <aleph/config/Base.hh>
-
 #include <aleph/persistentHomology/ConnectedComponents.hh>
 
 #include <tests/Base.hh>

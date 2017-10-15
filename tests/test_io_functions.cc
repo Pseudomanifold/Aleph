@@ -1,5 +1,3 @@
-#include <aleph/config/Base.hh>
-
 #include <aleph/persistentHomology/Calculation.hh>
 #include <aleph/persistentHomology/ExtendedPersistenceHierarchy.hh>
 #include <aleph/persistenceDiagrams/PersistenceDiagram.hh>

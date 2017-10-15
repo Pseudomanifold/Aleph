@@ -2,6 +2,12 @@
 
 from aleph import *
 
+import unittest
+
+class TestSimplexMethods(unittest.TestCase):
+  def test_construction(self):
+    pass
+
 a   = Simplex( [0] )
 b   = Simplex( [1] )
 c   = Simplex( [2] )

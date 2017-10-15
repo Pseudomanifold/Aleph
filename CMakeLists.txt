@@ -134,7 +134,6 @@ ENDIF()
 # Configuration files
 ########################################################################
 
-CONFIGURE_FILE( ${CMAKE_SOURCE_DIR}/include/aleph/config/Base.hh.in ${CMAKE_SOURCE_DIR}/include/aleph/config/Base.hh )
 CONFIGURE_FILE( ${CMAKE_SOURCE_DIR}/include/aleph/config/Eigen.hh.in ${CMAKE_SOURCE_DIR}/include/aleph/config/Eigen.hh )
 CONFIGURE_FILE( ${CMAKE_SOURCE_DIR}/include/aleph/config/FLANN.hh.in ${CMAKE_SOURCE_DIR}/include/aleph/config/FLANN.hh )
 CONFIGURE_FILE( ${CMAKE_SOURCE_DIR}/include/aleph/config/HDF5.hh.in ${CMAKE_SOURCE_DIR}/include/aleph/config/HDF5.hh )

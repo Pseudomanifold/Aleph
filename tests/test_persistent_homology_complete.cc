@@ -1,5 +1,3 @@
-#include <aleph/config/Base.hh>
-
 #include <aleph/containers/PointCloud.hh>
 
 #include <aleph/geometry/BruteForce.hh>
