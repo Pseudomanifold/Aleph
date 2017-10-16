@@ -9,7 +9,9 @@
 #include <map>
 #include <set>
 #include <stdexcept>
+#include <vector>
 
+#include <cassert>
 #include <cmath>
 
 namespace aleph
@@ -495,5 +497,26 @@ template <class D, class I, class T> aleph::math::PiecewiseLinearFunction<D, I> 
   return f / lambda;
 }
 
+/**
+  Output operator of a piecewise linear function. Permits printing the
+  function values to an *output stream* in order to permit their usage
+  by other functions and/or programs.
+*/
+
+template <class D, class I> std::ostream& operator<<( std::ostream& o, const aleph::math::PiecewiseLinearFunction<D, I>& f )
+{
+  std::vector<D> X;
+  std::vector<I> Y;
+
+  f.domain( std::back_inserter(X) );
+  f.image ( std::back_inserter(Y) );
+
+  assert( X.size() == Y.size() );
+
+  for( std::size_t i = 0; i < X.size() && i < Y.size(); i++ )
+    o << X[i] << "\t" << Y[i] << "\n";
+
+  return o;
+}
 
 #endif
