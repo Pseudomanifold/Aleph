@@ -357,6 +357,12 @@ private:
     for( auto&& pair : other._data )
       xValues.insert( pair.first );
 
+    // Oherwise, the loop below will turn in an infinite loop since or
+    // the validity of the `current` iterator would have to be checked
+    // before-hand.
+    if( xValues.empty() )
+      return *this;
+
     // Intersection handling. This is required to ensure that the combination of
     // the two functions contains shared segments.
     {

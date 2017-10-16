@@ -78,6 +78,14 @@ template <class T> void testBasic()
 
   ALEPH_ASSERT_THROW( (f+g).integral() < (f.integral() + g.integral() ) );
 
+  {
+    auto f = PiecewiseLinearFunction<T>();
+
+    ALEPH_ASSERT_THROW( f == PiecewiseLinearFunction<T>() );
+    ALEPH_ASSERT_THROW( f+f == f );
+    ALEPH_ASSERT_EQUAL( f.integral(), PiecewiseLinearFunction<T>().integral() );
+  }
+
   ALEPH_TEST_END();
 }
 
