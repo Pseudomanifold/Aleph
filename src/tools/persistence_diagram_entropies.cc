@@ -22,6 +22,7 @@
 
 #include <aleph/math/KahanSummation.hh>
 
+#include <aleph/persistenceDiagrams/Entropy.hh>
 #include <aleph/persistenceDiagrams/PersistenceDiagram.hh>
 
 #include <aleph/persistenceDiagrams/io/Raw.hh>
@@ -174,56 +175,6 @@ DataType gridEntropy( const PointCloud& pc, unsigned n )
                                                 DataType() );
 }
 
-DataType nearestNeighbourAreaEntropy( const PointCloud& pc )
-{
-  NearestNeighbours nn( pc );
-
-  using ElementType = NearestNeighbours::ElementType;
-  using IndexType   = NearestNeighbours::IndexType;
-
-  std::vector< std::vector<IndexType> > indices;
-  std::vector< std::vector<ElementType> > distances;
-
-  nn.neighbourSearch( 2,  // the 1st nearest neighbour is the point itself
-                      indices,
-                      distances );
-
-  std::vector<ElementType> nearestNeigbourDistances;
-  nearestNeigbourDistances.reserve( pc.size() );
-
-  for( auto&& distance : distances )
-    nearestNeigbourDistances.push_back( distance.at(1) );
-
-  std::vector<ElementType> areas( pc.size() );
-
-  std::transform( nearestNeigbourDistances.begin(), nearestNeigbourDistances.end(),
-                  areas.begin(),
-                  [] ( ElementType radius )
-                  {
-                    return static_cast<ElementType>( radius * radius * 2 * M_PI );
-                  } );
-
-  auto totalArea
-    = aleph::math::accumulate_kahan_sorted( areas.begin(), areas.end(),
-                                            ElementType() );
-
-  std::vector<DataType> entropies( pc.size() );
-
-  std::transform( areas.begin(), areas.end(),
-                  entropies.begin(),
-                  [&totalArea] ( ElementType area )
-                  {
-                    DataType p = static_cast<ElementType>( area / totalArea );
-                    DataType e = p * log( p );
-
-                    return e;
-                  } );
-
-  return -aleph::math::accumulate_kahan_sorted( entropies.begin(),
-                                                entropies.end(),
-                                                DataType() );
-}
-
 void usage()
 {
 }
@@ -260,7 +211,7 @@ int main( int argc, char** argv )
 
   for( auto&& input : inputs )
   {
-    auto e_nn = nearestNeighbourAreaEntropy( input.pointCloud );
+    auto e_nn = aleph::nearestNeighbourAreaEntropy( input.persistenceDiagram );
     auto e_rg = gridEntropy( input.pointCloud, 20 );
 
     std::cout << e_nn << "\t" << e_rg << "\n";
