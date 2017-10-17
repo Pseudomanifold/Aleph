@@ -1,6 +1,8 @@
 #ifndef ALEPH_PERSISTENCE_DIAGRAMS_ENTROPY_HH__
 #define ALEPH_PERSISTENCE_DIAGRAMS_ENTROPY_HH__
 
+#include <aleph/containers/PointCloud.hh>
+
 #include <aleph/persistenceDiagrams/PersistenceDiagram.hh>
 
 #include <aleph/math/KahanSummation.hh>
@@ -12,6 +14,43 @@
 
 namespace aleph
 {
+
+namespace detail
+{
+
+/**
+  Converts a persistence diagram to a point cloud of the same data type.
+  The diagram is optionally transformed into another *coordinate system*
+  as suggested by Edelsbrunner et al. in the paper *Current Open Problems
+  in Discrete and Computational Geometry*.
+
+  @param diagram   Input persistence diagram
+  @param transform Flag indicating whether the input shall be transformed
+
+  @see http://www.mathnet.ru/eng/mais259
+*/
+
+template <class T> aleph::containers::PointCloud<T> makePointCloud( const aleph::PersistenceDiagram<T>& diagram, bool transform = false )
+{
+  aleph::containers::PointCloud<T> pc( diagram.size(), 2 );
+  std::size_t i = 0;
+
+  for( auto&& point : diagram )
+  {
+    std::vector<T> p;
+
+    if( transform )
+      p = { point.x() + point.y(), point.y() - point.x() };
+    else
+      p = { point.x(), point.y() };
+
+    pc.set(i++, p.begin(), p.end() );
+  }
+
+  return pc;
+}
+
+} // namespace detail
 
 /**
   Calculates the persistent entropy of a given persistence diagram. This
