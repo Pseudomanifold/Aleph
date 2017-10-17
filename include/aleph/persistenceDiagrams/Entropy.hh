@@ -154,8 +154,6 @@ template <class T> T persistentEntropy( const aleph::PersistenceDiagram<T>& D )
 {
   using Point = typename aleph::PersistenceDiagram<T>::Point;
 
-  aleph::math::KahanSummation<T> result = T();
-
   std::vector<T> persistenceValues;
   persistenceValues.reserve( D.size() );
 
@@ -166,7 +164,10 @@ template <class T> T persistentEntropy( const aleph::PersistenceDiagram<T>& D )
                     return p.persistence();
                   } );
 
-  auto totalPersistence = aleph::math::accumulate_kahan_sorted( persistenceValues.begin(), persistenceValues.end() );
+  auto totalPersistence
+    = aleph::math::accumulate_kahan_sorted(
+        persistenceValues.begin(), persistenceValues.end(),
+        T() );
 
   std::vector<T> probabilities;
   probabilities.reserve( D.size() );
@@ -178,6 +179,10 @@ template <class T> T persistentEntropy( const aleph::PersistenceDiagram<T>& D )
                     auto p = persistence / totalPersistence;
                     return p * std::log2( p );
                   } );
+
+  return -aleph::math::accumulate_kahan_sorted( probabilities.begin(),
+                                                probabilities.end(),
+                                                T() );
 }
 
 /**

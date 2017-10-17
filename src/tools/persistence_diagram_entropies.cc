@@ -65,7 +65,8 @@ int main( int argc, char** argv )
   {
     auto e_nn = aleph::nearestNeighbourAreaEntropy( input.persistenceDiagram );
     auto e_rg = aleph::gridEntropy( input.persistenceDiagram, 20 );
+    auto e_pe = aleph::persistentEntropy( input.persistenceDiagram );
 
-    std::cout << e_nn << "\t" << e_rg << "\n";
+    std::cout << e_nn << "\t" << e_rg << "\t" << e_pe << "\n";
   }
 }
