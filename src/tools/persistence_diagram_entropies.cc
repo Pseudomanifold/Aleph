@@ -8,26 +8,11 @@
   Original author: Bastian Rieck
 */
 
-#include <aleph/config/FLANN.hh>
-
-#ifdef ALEPH_WITH_FLANN
-  #include <aleph/geometry/FLANN.hh>
-#endif
-
-#include <aleph/containers/PointCloud.hh>
-
-#include <aleph/geometry/BruteForce.hh>
-
-#include <aleph/geometry/distances/Euclidean.hh>
-
-#include <aleph/math/KahanSummation.hh>
-
 #include <aleph/persistenceDiagrams/Entropy.hh>
 #include <aleph/persistenceDiagrams/PersistenceDiagram.hh>
 
 #include <aleph/persistenceDiagrams/io/Raw.hh>
 
-#include <algorithm>
 #include <iostream>
 #include <string>
 #include <vector>
@@ -36,92 +21,12 @@
 
 using DataType           = double;
 using PersistenceDiagram = aleph::PersistenceDiagram<DataType>;
-using PointCloud         = aleph::containers::PointCloud<DataType>;
-using Distance           = aleph::geometry::distances::Euclidean<DataType>;
-
-#ifdef ALEPH_WITH_FLANN
-  using NearestNeighbours = aleph::geometry::FLANN<PointCloud, Distance>;
-#else
-  using NearestNeighbours = aleph::geometry::BruteForce<PointCloud, Distance>;
-#endif
-
-class RegularGrid
-{
-public:
-  RegularGrid( unsigned width, unsigned height,
-               DataType x0, DataType x1,
-               DataType y0, DataType y1 )
-    : _width( width )
-    , _height( height )
-    , _x0( x0 ), _x1( x1 ), _xOffset( (_x1 - _x0) / ( _width - 1 ) )
-    , _y0( y0 ), _y1( y1 ), _yOffset( (_y1 - _y0) / ( _height - 1 ) )
-    , _cells( new unsigned[ _width * _height ] )
-  {
-    std::fill( this->begin(), this->end(), 0 );
-  }
-
-  unsigned* begin() { return _cells; }
-  unsigned* end()   { return _cells + _width * _height; }
-
-  unsigned& operator()( DataType x, DataType y )
-  {
-    x = x - _x0;
-    y = y - _y0;
-
-    unsigned i = unsigned( x / _xOffset );
-    unsigned j = unsigned( y / _yOffset );
-
-    return this->operator()(i,j);
-  }
-
-  unsigned& operator()( unsigned i, unsigned j )
-  {
-    return _cells[j * _width + i];
-  }
-
-  unsigned size() const noexcept
-  {
-    return _width * _height;
-  }
-
-private:
-  unsigned _width;
-  unsigned _height;
-
-  DataType _x0, _x1, _xOffset;
-  DataType _y0, _y1, _yOffset;
-
-  unsigned* _cells;
-};
 
 struct Input
 {
   std::string filename;
   PersistenceDiagram persistenceDiagram;
-  PointCloud pointCloud;
 };
-
-PointCloud makePointCloud( const PersistenceDiagram& diagram )
-{
-  PointCloud pc( diagram.size(), 2 );
-  std::size_t i = 0;
-
-  for( auto&& point : diagram )
-  {
-    std::vector<DataType> p = { point.x(), point.y() };
-    pc.set(i++, p.begin(), p.end() );
-  }
-
-  return pc;
-}
-
-template <class T> T log( T x )
-{
-  if( x == T() )
-    return T();
-  else
-    return std::log( x );
-}
 
 void usage()
 {
@@ -148,8 +53,7 @@ int main( int argc, char** argv )
 
     Input input = {
       filename,
-      diagram,
-      makePointCloud( diagram )
+      diagram
     };
 
     inputs.push_back( input );
