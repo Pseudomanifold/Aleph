@@ -55,6 +55,15 @@ template <class T> aleph::containers::PointCloud<T> makePointCloud( const aleph:
   return pc;
 }
 
+/**
+  Auxiliary function for calculating logarithms for a basis of `2`
+  while handling a value of zero gracefully. This follows the way
+  the logarithm is usually defined in statistics.
+
+  @param x Input value
+  @returns Logarithm of \p x to the basis of `2`
+*/
+
 template <class T> T log2( T x )
 {
   if( x == T() )
@@ -62,6 +71,70 @@ template <class T> T log2( T x )
   else
     return std::log2( x );
 }
+
+/**
+  @class RegularGrid
+  @brief Auxiliary class for representing a regular grid
+*/
+
+template <class T> class RegularGrid
+{
+public:
+  RegularGrid( unsigned width, unsigned height,
+               T x0, T x1,
+               T y0, T y1 )
+    : _width( width )
+    , _height( height )
+    , _x0( x0 ), _x1( x1 ), _xOffset( (_x1 - _x0) / ( _width - 1 ) )
+    , _y0( y0 ), _y1( y1 ), _yOffset( (_y1 - _y0) / ( _height - 1 ) )
+    , _cells( new unsigned[ _width * _height ] )
+  {
+    std::fill( this->begin(), this->end(), 0 );
+  }
+
+  ~RegularGrid()
+  {
+    delete[] _cells;
+  }
+
+  // I do not want to implement these functions because they are
+  // currently not required by the code below.
+  RegularGrid( const RegularGrid& other )            = delete;
+  RegularGrid& operator=( const RegularGrid& other ) = delete;
+
+  unsigned* begin() { return _cells; }
+  unsigned* end()   { return _cells + _width * _height; }
+
+  unsigned& operator()( T x, T y )
+  {
+    x = x - _x0;
+    y = y - _y0;
+
+    unsigned i = unsigned( x / _xOffset );
+    unsigned j = unsigned( y / _yOffset );
+
+    return this->operator()(i,j);
+  }
+
+  unsigned& operator()( unsigned i, unsigned j )
+  {
+    return _cells[j * _width + i];
+  }
+
+  unsigned size() const noexcept
+  {
+    return _width * _height;
+  }
+
+private:
+  unsigned _width;
+  unsigned _height;
+
+  T _x0, _x1, _xOffset;
+  T _y0, _y1, _yOffset;
+
+  unsigned* _cells;
+};
 
 } // namespace detail
 
@@ -176,7 +249,73 @@ template <class T> T nearestNeighbourAreaEntropy( const aleph::PersistenceDiagra
   return -aleph::math::accumulate_kahan_sorted( entropies.begin(),
                                                 entropies.end(),
                                                 T() );
+}
 
+/**
+  Calculates a spatial entropy measure based on gridding data (or
+  *quadrat counting*). Here, the idea is to measure the intensity
+  of every grid cell, i.e. the number of points it contains. This
+  quantity is then used as a probability. This probability can be
+  used to define a notion of entropy subsequently.
+
+  @param n Number of subdivisions of the grid in both directions
+  @returns Grid-based spatial entropy
+*/
+
+template <class T> T gridEntropy( const aleph::PersistenceDiagram<T>& diagram, unsigned n )
+{
+  // Transform the data first in order to align the grid better with the
+  // structure of the persistence points.
+  auto pc = detail::makePointCloud( diagram, true );
+
+  std::vector<T> X;
+  std::vector<T> Y;
+
+  X.reserve( pc.size() );
+  Y.reserve( pc.size() );
+
+  for( std::size_t i = 0; i < pc.size(); i++ )
+  {
+    auto&& p = pc[i];
+    auto   x = p.front();
+    auto   y = p.back();
+
+    X.push_back(  0.5 * std::sqrt(2) * x + 0.5 * std::sqrt(2) * y );
+    Y.push_back( -0.5 * std::sqrt(2) * x + 0.5 * std::sqrt(2) * y );
+  }
+
+  auto minmax_x = std::minmax_element( X.begin(), X.end() );
+  auto minmax_y = std::minmax_element( Y.begin(), Y.end() );
+
+  if( X.empty() || Y.empty() )
+    return T();
+
+  detail::RegularGrid<T> grid( n, n,
+                               *minmax_x.first, *minmax_x.second,
+                               *minmax_y.first, *minmax_y.second );
+
+  for( std::size_t i = 0; i < X.size(); i++ )
+    grid( X[i], Y[i] ) += 1;
+
+  std::vector<T> entropies( grid.size() );
+
+  std::transform( grid.begin(), grid.end(), entropies.begin(),
+                  [&pc] ( unsigned n )
+                  {
+                    if( n != 0 )
+                    {
+                      T p = n / static_cast<T>( pc.size() );
+                      T e = p * detail::log2( p );
+
+                      return e;
+                    }
+                    else
+                      return T();
+                  } );
+
+  return -aleph::math::accumulate_kahan_sorted( entropies.begin(),
+                                                entropies.end(),
+                                                T() );
 }
 
 } // namespace aleph
