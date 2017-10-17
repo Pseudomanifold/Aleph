@@ -107,6 +107,17 @@ template <class T> T persistentEntropy( const aleph::PersistenceDiagram<T>& D )
                   } );
 }
 
+/**
+  Calculates a spatial entropy measure based on the distance to the
+  nearest neighbour of every point in the diagram. This is based on
+  the idea that a *large* distance between neighbours is consistent
+  with a well-ordered diagram, whereas smaller distances indicate a
+  clustering or clumping process.
+
+  @param diagram Input diagram
+  @returns Nearest-neighbour entropy
+*/
+
 template <class T> T nearestNeighbourAreaEntropy( const aleph::PersistenceDiagram<T>& diagram )
 {
   using PointCloud = aleph::containers::PointCloud<T>;
