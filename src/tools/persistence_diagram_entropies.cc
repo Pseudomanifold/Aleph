@@ -123,58 +123,6 @@ template <class T> T log( T x )
     return std::log( x );
 }
 
-DataType gridEntropy( const PointCloud& pc, unsigned n )
-{
-  std::vector<DataType> X;
-  std::vector<DataType> Y;
-
-  X.reserve( pc.size() );
-  Y.reserve( pc.size() );
-
-  for( std::size_t i = 0; i < pc.size(); i++ )
-  {
-    auto&& p = pc[i];
-    auto   x = p.front();
-    auto   y = p.back();
-
-    X.push_back(  0.5 * std::sqrt(2) * x + 0.5 * std::sqrt(2) * y );
-    Y.push_back( -0.5 * std::sqrt(2) * x + 0.5 * std::sqrt(2) * y );
-  }
-
-  auto minmax_x = std::minmax_element( X.begin(), X.end() );
-  auto minmax_y = std::minmax_element( Y.begin(), Y.end() );
-
-  if( X.empty() || Y.empty() )
-    return DataType();
-
-  RegularGrid grid( n, n,
-                    *minmax_x.first, *minmax_x.second,
-                    *minmax_y.first, *minmax_y.second );
-
-  for( std::size_t i = 0; i < X.size(); i++ )
-    grid( X[i], Y[i] ) += 1;
-
-  std::vector<DataType> entropies( grid.size() );
-
-  std::transform( grid.begin(), grid.end(), entropies.begin(),
-                  [&pc] ( unsigned n )
-                  {
-                    if( n != 0 )
-                    {
-                      DataType p = n / static_cast<DataType>( pc.size() );
-                      DataType e = p * log( p );
-
-                      return e;
-                    }
-                    else
-                      return DataType();
-                  } );
-
-  return -aleph::math::accumulate_kahan_sorted( entropies.begin(),
-                                                entropies.end(),
-                                                DataType() );
-}
-
 void usage()
 {
 }
@@ -212,7 +160,7 @@ int main( int argc, char** argv )
   for( auto&& input : inputs )
   {
     auto e_nn = aleph::nearestNeighbourAreaEntropy( input.persistenceDiagram );
-    auto e_rg = gridEntropy( input.pointCloud, 20 );
+    auto e_rg = aleph::gridEntropy( input.persistenceDiagram, 20 );
 
     std::cout << e_nn << "\t" << e_rg << "\n";
   }
