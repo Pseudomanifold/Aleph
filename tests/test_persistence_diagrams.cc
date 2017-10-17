@@ -124,7 +124,7 @@ template <class T> void testFrechetMean()
 
   auto D = aleph::mean( diagrams.begin(), diagrams.end() );
   auto P = aleph::totalPersistence( D );
-  auto p = std::sqrt(25.0) * std::sqrt(0.50); // simple estimate of the mean value
+  auto p = std::sqrt(25.0) * std::sqrt(0.25); // simple estimate of the mean value
                                               // for the total persistence
 
   ALEPH_ASSERT_THROW( D.size() > 0 );
