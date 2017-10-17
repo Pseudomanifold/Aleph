@@ -204,7 +204,7 @@ template <class T> T nearestNeighbourAreaEntropy( const aleph::PersistenceDiagra
 #ifdef ALEPH_WITH_FLANN
   using NearestNeighbours = aleph::geometry::FLANN<PointCloud, Distance>;
 #else
-  using NearestNeighbours = aleph::geometry:::BruteForce<PointCloud, Distance>;
+  using NearestNeighbours = aleph::geometry::BruteForce<PointCloud, Distance>;
 #endif
 
   auto pc = detail::makePointCloud( diagram );
