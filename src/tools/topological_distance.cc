@@ -311,6 +311,33 @@ DataType getMaximum( const PersistenceDiagram& diagram )
   return max;
 }
 
+PersistenceDiagram postprocess( const PersistenceDiagram& diagram, bool clean, DataType infinityFactor )
+{
+  auto result = diagram;
+
+  if( clean )
+  {
+    result.removeDiagonal();
+    result.removeUnpaired();
+  }
+
+  if( infinityFactor != DataType() )
+  {
+    auto max = getMaximum( result );
+
+    std::transform( result.begin(), result.end(), result.begin(),
+                    [&infinityFactor, &max] ( const PersistenceDiagram::Point& p )
+                    {
+                      if( p.isUnpaired() )
+                        return PersistenceDiagram::Point( p.x(), infinityFactor * max );
+                      else
+                        return PersistenceDiagram::Point( p );
+                    } );
+  }
+
+  return result;
+}
+
 int main( int argc, char** argv )
 {
   static option commandLineOptions[] =
@@ -475,28 +502,10 @@ int main( int argc, char** argv )
         {
           std::cerr << "* Processing '" << dataSet.filename << "'...";
 
-          dataSet.persistenceDiagram = aleph::io::load<DataType>( dataSet.filename );
-
-          if( cleanPersistenceDiagrams )
-          {
-            dataSet.persistenceDiagram.removeDiagonal();
-            dataSet.persistenceDiagram.removeUnpaired();
-          }
-
-          if( infinityFactor != DataType() )
-          {
-            auto&& pd = dataSet.persistenceDiagram;
-            auto max  = getMaximum( pd );
-
-            std::transform( pd.begin(), pd.end(), pd.begin(),
-                            [&infinityFactor, &max] ( const PersistenceDiagram::Point& p )
-                            {
-                              if( p.isUnpaired() )
-                                return PersistenceDiagram::Point( p.x(), infinityFactor * max );
-                              else
-                                return PersistenceDiagram::Point( p );
-                            } );
-          }
+          dataSet.persistenceDiagram
+            = postprocess( aleph::io::load<DataType>( dataSet.filename ),
+                           cleanPersistenceDiagrams,
+                           infinityFactor );
 
           // FIXME: This is only required in order to ensure that the
           // persistence indicator function has a finite integral; it
@@ -518,13 +527,18 @@ int main( int argc, char** argv )
 
       for( auto&& filename : filenames )
       {
-        auto persistenceDiagrams = aleph::io::readJSON<DataType>( filename );
+        auto persistenceDiagrams= aleph::io::readJSON<DataType>( filename );
 
         std::vector<DataSet> dataSet;
         dataSet.reserve( persistenceDiagrams.size() );
 
         for( auto&& diagram : persistenceDiagrams )
         {
+          diagram
+            = postprocess( diagram,
+                           cleanPersistenceDiagrams,
+                           infinityFactor );
+
           auto dimension = static_cast<unsigned>( diagram.dimension() );
           minDimension   = std::min( minDimension, dimension );
           maxDimension   = std::max( maxDimension, dimension );
@@ -533,32 +547,12 @@ int main( int argc, char** argv )
           name      += "_";
           name      += "d" + std::to_string( diagram.dimension() );
 
-          if( infinityFactor != DataType() )
-          {
-            auto max  = getMaximum( diagram );
-
-            std::transform( diagram.begin(), diagram.end(), diagram.begin(),
-                            [&infinityFactor, &max] ( const PersistenceDiagram::Point& p )
-                            {
-                              if( p.isUnpaired() )
-                                return PersistenceDiagram::Point( p.x(), infinityFactor * max );
-                              else
-                                return PersistenceDiagram::Point( p );
-                            } );
-          }
-
           // FIXME: This is only required in order to ensure that the
           // persistence indicator function has a finite integral; it
           // can be solved more elegantly by using a special value to
           // indicate infinite intervals.
           auto pd = diagram;
           pd.removeUnpaired();
-
-          if( cleanPersistenceDiagrams )
-          {
-            diagram.removeDiagonal();
-            diagram.removeUnpaired();
-          }
 
           dataSet.push_back( { name,
                                filename,
