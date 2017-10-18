@@ -89,7 +89,7 @@ void usage()
 {
   std::cerr << "Usage: topological_distance [--power=POWER] [--kernel] [--exp] [--sigma]\n"
             << "                            [--hausdorff|envelope|indicator|wasserstein]\n"
-            << "                            [--clean] FILES\n"
+            << "                            [--clean] [--factor=FACTOR] FILES\n"
             << "\n"
             << "Calculates distances between a set of persistence diagrams, stored\n"
             << "in FILES. By default, this tool calculates Hausdorff distances for\n"
@@ -99,6 +99,10 @@ void usage()
             << "during the construction of a pairwise distance matrix. Furthermore\n"
             << "this tool can calculate kernels for use in kernel-based methods in\n"
             << "machine learning.\n"
+            << "\n"
+            << "Use --factor=FACTOR to specify the factor that will be used in the\n"
+            << "treatment of unpaired points. If set to any non-zero value, all of\n"
+            << "the unpaired points are multiplied by it.\n"
             << "\n"
             << "The distance matrix is written to STDOUT. Rows and columns will be\n"
             << "separated by whitespace.\n"
@@ -293,11 +297,25 @@ double persistenceDiagramDistance( const std::vector<DataSet>& dataSet1,
   return d;
 }
 
+DataType getMaximum( const PersistenceDiagram& diagram )
+{
+  DataType max = std::numeric_limits<DataType>::lowest();
+
+  for( auto&& p : diagram )
+  {
+    max = std::max( max, p.x() );
+    if( !p.isUnpaired() )
+      max = std::max( max, p.y() );
+  }
+
+  return max;
+}
 
 int main( int argc, char** argv )
 {
   static option commandLineOptions[] =
   {
+    { "factor"     , required_argument, nullptr, 'f' },
     { "power"      , required_argument, nullptr, 'p' },
     { "sigma"      , required_argument, nullptr, 's' },
     { "clean"      , no_argument      , nullptr, 'c' },
@@ -311,6 +329,7 @@ int main( int argc, char** argv )
     { nullptr      , 0                , nullptr,  0  }
   };
 
+  DataType infinityFactor           = DataType();
   double power                      = 2.0;
   double sigma                      = 1.0;
   bool cleanPersistenceDiagrams     = false;
@@ -322,10 +341,13 @@ int main( int argc, char** argv )
   bool useWassersteinDistance       = false;
 
   int option = 0;
-  while( ( option = getopt_long( argc, argv, "p:s:ceEhinkw", commandLineOptions, nullptr ) ) != -1 )
+  while( ( option = getopt_long( argc, argv, "f:p:s:ceEhinkw", commandLineOptions, nullptr ) ) != -1 )
   {
     switch( option )
     {
+    case 'f':
+      infinityFactor = static_cast<DataType>( std::stod( optarg ) );
+      break;
     case 'p':
       power = std::stod( optarg );
       break;
@@ -461,6 +483,21 @@ int main( int argc, char** argv )
             dataSet.persistenceDiagram.removeUnpaired();
           }
 
+          if( infinityFactor != DataType() )
+          {
+            auto&& pd = dataSet.persistenceDiagram;
+            auto max  = getMaximum( pd );
+
+            std::transform( pd.begin(), pd.end(), pd.begin(),
+                            [&infinityFactor, &max] ( const PersistenceDiagram::Point& p )
+                            {
+                              if( p.isUnpaired() )
+                                return PersistenceDiagram::Point( p.x(), infinityFactor * max );
+                              else
+                                return PersistenceDiagram::Point( p );
+                            } );
+          }
+
           // FIXME: This is only required in order to ensure that the
           // persistence indicator function has a finite integral; it
           // can be solved more elegantly by using a special value to
@@ -495,6 +532,20 @@ int main( int argc, char** argv )
           auto name  = aleph::utilities::stem( filename );
           name      += "_";
           name      += "d" + std::to_string( diagram.dimension() );
+
+          if( infinityFactor != DataType() )
+          {
+            auto max  = getMaximum( diagram );
+
+            std::transform( diagram.begin(), diagram.end(), diagram.begin(),
+                            [&infinityFactor, &max] ( const PersistenceDiagram::Point& p )
+                            {
+                              if( p.isUnpaired() )
+                                return PersistenceDiagram::Point( p.x(), infinityFactor * max );
+                              else
+                                return PersistenceDiagram::Point( p );
+                            } );
+          }
 
           // FIXME: This is only required in order to ensure that the
           // persistence indicator function has a finite integral; it
