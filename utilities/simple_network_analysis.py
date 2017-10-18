@@ -9,15 +9,17 @@
 #
 # Original author: Bastian Rieck
 
+from sklearn.decomposition   import PCA
 from sklearn.linear_model    import LogisticRegression
 from sklearn.model_selection import cross_val_score
 from sklearn.model_selection import train_test_split
 from sklearn.svm             import LinearSVC
-from sklearn.tree            import DecisionTreeClassifier
+from sklearn.tree            import DecisionTreeClassifier, export_graphviz
 
-import numpy    as np
-import networkx as nx
-import pandas   as pd
+import numpy             as np
+import networkx          as nx
+import pandas            as pd
+import matplotlib.pyplot as plt
 
 import os
 import sys
@@ -78,7 +80,35 @@ if __name__ == "__main__":
   X = df.values
   y = labels[:len(graphs)]
 
-  classifiers = [ DecisionTreeClassifier(), LinearSVC(), LogisticRegression() ]
-  for clf in classifiers:
-    scores = cross_val_score(clf, X, y, cv=50)
-    print("Accuracy: %0.2f (+/- %0.2f)" % (scores.mean(), scores.std() * 2))
+  #classifiers = [ DecisionTreeClassifier(), LinearSVC(C=10), LogisticRegression() ]
+  #for clf in classifiers:
+  #  scores = cross_val_score(clf, X, y, cv=10)
+  #  print("Accuracy: %0.4f (+/- %0.2f)" % (scores.mean(), scores.std() * 2))
+
+  ######################################################################
+  # Print feature importance for decision tree classifier
+  ######################################################################
+
+  X_train, X_test, y_train, y_test = train_test_split(X,y, test_size=0.20)
+
+  clf = DecisionTreeClassifier()
+  clf.fit(X_train, y_train)
+
+  with open("/tmp/clf.txt", "w") as f:
+    export_graphviz(clf, f)
+
+  print(clf.feature_importances_)
+
+  ######################################################################
+  # Visualize features using PCA
+  ######################################################################
+
+  clf = PCA(n_components=3)
+  X_  = clf.fit_transform(X)
+
+  for label in set(labels):
+    idx = y[0:,] == label
+    plt.scatter(X_[idx, 0], X_[idx, 1], label=label, alpha=0.25)
+
+  plt.legend()
+  plt.show()
