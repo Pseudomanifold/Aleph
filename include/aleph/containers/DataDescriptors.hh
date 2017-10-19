@@ -13,6 +13,7 @@
 #include <aleph/geometry/distances/Traits.hh>
 
 #include <aleph/math/KahanSummation.hh>
+#include <aleph/math/SymmetricMatrix.hh>
 
 namespace aleph
 {
@@ -165,6 +166,58 @@ template <
   }
 
   return densities;
+}
+
+template
+<
+  class Distance,
+  class Container
+>
+std::vector<unsigned> estimateLensDataDepth( const Container& container, Distance distance = Distance() )
+{
+  auto n = container.size();
+  auto d = container.dimension();
+
+  using ResultType = typename Distance::ResultType;
+
+  aleph::math::SymmetricMatrix<ResultType> distances( n );
+
+  for( decltype(n) i = 0; i < n; i++ )
+  {
+    for( decltype(n) j = i+1; j < n; j++ )
+    {
+      distances(i,j) = distance( container[i].begin(),
+                                 container[j].begin(),
+                                 d );
+    }
+  }
+
+  std::vector<unsigned> counts( n );
+
+  for( decltype(n) i = 0; i < n; i++ )
+  {
+    for( decltype(n) j = i+1; j < n; j++ )
+    {
+      auto criticalDistance = distances(i,j);
+
+      for( decltype(n) k = 0; k < n; k++ )
+      {
+        if( k == i || k == j )
+          continue;
+
+        auto distance_i = distances(i,k);
+        auto distance_j = distances(j,k);
+
+        // The maximum of the distance values is smaller than the
+        // distance between the points. Hence, the lune of points
+        // i and j contains point k.
+        if( std::max( distance_i, distance_j ) <= criticalDistance )
+          ++counts[k];
+      }
+    }
+  }
+
+  return counts;
 }
 
 } // namespace containers
