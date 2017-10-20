@@ -34,6 +34,14 @@ template <class T> void test()
 
   K.push_back( Simplex( {2,3}, 1 ) );
 
+  K.push_back( Simplex( {3,4,5}, 1 ) );
+  K.push_back( Simplex( {0,1,2}, 1 ) );
+
+  // Technically, this invalidates the simplicial complex, but I am only
+  // interested in figuring out whether the partition will *ignore* this
+  // simplex.
+  K.push_back( Simplex( {0,1,2,3}, 1 ) );
+
   auto complexes = bisect( K );
 
   ALEPH_ASSERT_EQUAL( complexes.size(), 2 );
