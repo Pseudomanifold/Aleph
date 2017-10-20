@@ -26,7 +26,7 @@ template <class SimplicialComplex> std::vector<SimplicialComplex> bisect( const 
 {
 #ifdef ALEPH_WITH_EIGEN
 
-  auto L = aleph::geometry::detail::weightedLaplacianMatrix( K );
+  auto L = aleph::geometry::weightedLaplacianMatrix( K );
 
   Eigen::SelfAdjointEigenSolver< decltype(L) > solver;
   solver.compute( L );
@@ -35,14 +35,21 @@ template <class SimplicialComplex> std::vector<SimplicialComplex> bisect( const 
   using VertexType = typename Simplex::VertexType;
   using DataType   = typename Simplex::DataType;
 
-  auto&& eigenvalues  = solver.eigenvalues(). template cast<T>();
-  auto&& eigenvectors = solver.eigenvectors().template cast<T>();
+  auto&& eigenvectors = solver.eigenvectors().template cast<DataType>();
 
   if( eigenvectors.size() < 2 )
     throw std::runtime_error( "Laplacian matrix dimensions are insufficient for bisection" );
 
-  auto fiedlerVector = eigenvectors[1];
-  auto median        = aleph::math::median( fiedlerVector.begin(), fiedlerVector.end() );
+  std::vector<DataType> fiedlerVector;
+
+  {
+    auto fiedlerVector_ = eigenvectors.col(1);
+
+    fiedlerVector.assign( fiedlerVector_.data(),
+                          fiedlerVector_.data() + fiedlerVector_.size() );
+  }
+
+  auto median = aleph::math::median( fiedlerVector.begin(), fiedlerVector.end() );
 
 #if EIGEN_VERSION_AT_LEAST(3,3,0)
   using IndexType  = Eigen::Index;
@@ -68,11 +75,11 @@ template <class SimplicialComplex> std::vector<SimplicialComplex> bisect( const 
 
   std::unordered_map<VertexType, bool> partition;
 
-  for( IndexType i = 0; i < fiedlerVector.size(); i++ )
+  for( IndexType i = 0; i < IndexType( fiedlerVector.size() ); i++ )
   {
     auto vertex = index_to_vertex.at(i);
 
-    if( fiedlerVector(i) < median )
+    if( fiedlerVector[i] < median )
       partition[vertex] = true;
     else
       partition[vertex] = false;
@@ -85,12 +92,12 @@ template <class SimplicialComplex> std::vector<SimplicialComplex> bisect( const 
     {
       // All vertices of the simplex need to be part of the same
       // partition with respect to the matrix.
-      return s.size() == std::count_if( s.begin(), s.end(),
+      return s.size() == std::size_t( std::count_if( s.begin(), s.end(),
         [&partition] ( VertexType v )
         {
           return partition.at(v);
         }
-      );
+      ) );
     }
   );
 
@@ -99,12 +106,12 @@ template <class SimplicialComplex> std::vector<SimplicialComplex> bisect( const 
     {
       // All vertices of the simplex need to be part of the same
       // partition with respect to the matrix.
-      return s.size() == std::count_if( s.begin(), s.end(),
+      return s.size() == std::size_t( std::count_if( s.begin(), s.end(),
         [&partition] ( VertexType v )
         {
           return !partition.at(v);
         }
-      );
+      ) );
     }
   );
 
