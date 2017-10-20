@@ -13,7 +13,7 @@ namespace math
 /** Calculates the median value of an input iterator range. */
 template <class InputIterator> typename std::iterator_traits<InputIterator>::value_type median( InputIterator begin, InputIterator end )
 {
-  auto m = std::distance( begin, end );
+  auto n = std::distance( begin, end );
   auto m = n / 2;
 
   // In order to avoid changing the original values, let's make a copy
