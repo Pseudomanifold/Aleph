@@ -18,7 +18,7 @@ template <class InputIterator> typename std::iterator_traits<InputIterator>::val
 
   // In order to avoid changing the original values, let's make a copy
   // of the range.
-  using T = typename std::iterator_traits<InputIterator>::value_Type;
+  using T = typename std::iterator_traits<InputIterator>::value_type;
   std::vector<T> values( begin, end );
 
   std::nth_element( values.begin(), values.begin() + m, values.end() );
