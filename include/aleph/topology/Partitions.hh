@@ -54,6 +54,7 @@ template <class SimplicialComplex> std::vector<SimplicialComplex> bisect( const 
 #if EIGEN_VERSION_AT_LEAST(3,3,0)
   using IndexType  = Eigen::Index;
 #else
+  using Matrix     = decltype(L);
   using IndexType  = typename Matrix::Index;
 #endif
 
