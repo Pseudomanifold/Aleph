@@ -49,14 +49,8 @@ template <class SimplicialComplex> std::vector<SimplicialComplex> bisect( const 
                           fiedlerVector_.data() + fiedlerVector_.size() );
   }
 
-  auto median = aleph::math::median( fiedlerVector.begin(), fiedlerVector.end() );
-
-#if EIGEN_VERSION_AT_LEAST(3,3,0)
-  using IndexType  = Eigen::Index;
-#else
-  using Matrix     = decltype(L);
-  using IndexType  = typename Matrix::Index;
-#endif
+  auto median     = aleph::math::median( fiedlerVector.begin(), fiedlerVector.end() );
+  using IndexType = typename std::vector<DataType>::size_type;
 
   // Prepare map from index to vertex ----------------------------------
 
@@ -76,7 +70,7 @@ template <class SimplicialComplex> std::vector<SimplicialComplex> bisect( const 
 
   std::unordered_map<VertexType, bool> partition;
 
-  for( IndexType i = 0; i < IndexType( fiedlerVector.size() ); i++ )
+  for( IndexType i = 0; i < fiedlerVector.size(); i++ )
   {
     auto vertex = index_to_vertex.at(i);
 
@@ -93,7 +87,7 @@ template <class SimplicialComplex> std::vector<SimplicialComplex> bisect( const 
     {
       // All vertices of the simplex need to be part of the same
       // partition with respect to the matrix.
-      return s.size() == std::size_t( std::count_if( s.begin(), s.end(),
+      return s.size() == IndexType( std::count_if( s.begin(), s.end(),
         [&partition] ( VertexType v )
         {
           return partition.at(v);
@@ -107,7 +101,7 @@ template <class SimplicialComplex> std::vector<SimplicialComplex> bisect( const 
     {
       // All vertices of the simplex need to be part of the same
       // partition with respect to the matrix.
-      return s.size() == std::size_t( std::count_if( s.begin(), s.end(),
+      return s.size() == IndexType( std::count_if( s.begin(), s.end(),
         [&partition] ( VertexType v )
         {
           return !partition.at(v);
@@ -123,6 +117,7 @@ template <class SimplicialComplex> std::vector<SimplicialComplex> bisect( const 
   return complexes;
 
 #else
+  (void) K;
   return {};
 #endif
 }
