@@ -23,14 +23,15 @@ template <class InputIterator> typename std::iterator_traits<InputIterator>::val
 
   std::nth_element( values.begin(), values.begin() + m, values.end() );
 
-  auto middle = values[m];
+  using IndexType = typename std::vector<T>::size_type;
+  auto middle     = values[ IndexType(m) ];
 
   if( n % 2 )
     return middle;
   else
   {
     std::nth_element( values.begin(), values.begin() + m - 1, values.end() );
-    return ( middle + values[m-1] ) / T(2);
+    return ( middle + values[ IndexType(m-1) ] ) / T(2);
   }
 }
 
