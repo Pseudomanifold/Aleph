@@ -56,6 +56,8 @@ template <class T> void test()
 
 int main( int, char** )
 {
+#ifdef ALEPH_WITH_EIGEN
   test<float> ();
   test<double>();
+#endif
 }
