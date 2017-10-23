@@ -20,9 +20,6 @@
 #include <unordered_map>
 #include <vector>
 
-// FIXME: remove after debugging
-#include <iostream>
-
 namespace aleph
 {
 
@@ -142,7 +139,9 @@ template <class Matrix, class T> std::vector< detail::Pair<T> > admissiblePairs(
   set of admissible pairs. A *general* Dowker complex contains a simplex
   if all of its vertices satisfy the admissibility condition.
 
-  @param pairs Set of admissible pairs
+  @param pairs     Set of admissible pairs
+  @param dimension Maximum dimension for expansion. If set to zero, will
+                   expand the complex to its maximum dimension.
 */
 
 template <class V, class D, class T>
@@ -206,8 +205,6 @@ std::pair<
 
     for( auto&& pair : map )
     {
-      std::cout << "BASE POINT: " << pair.first << "\n";
-
       auto vertices            = pair.second;
       std::size_t maxDimension = 0;
 
@@ -234,15 +231,10 @@ std::pair<
             else
               simplex_to_weight[s] = std::min( simplex_to_weight[s], getWeight(first, last) );
 
-            if( s.dimension() == 2 )
-              std::cout << "  - " << s << "\n" << getWeight( first, last ) << "\n";
-
             return false;
           }
         );
       }
-
-      std::cout << "\n";
     }
 
     for( auto&& pair : simplex_to_weight )
@@ -252,8 +244,6 @@ std::pair<
 
       simplices.push_back( s );
     }
-
-    std::cout << "\n\n";
 
     return simplices;
   };
