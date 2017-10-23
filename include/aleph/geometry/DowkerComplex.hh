@@ -206,6 +206,8 @@ std::pair<
 
     for( auto&& pair : map )
     {
+      std::cout << "BASE POINT: " << pair.first << "\n";
+
       auto vertices            = pair.second;
       std::size_t maxDimension = 0;
 
@@ -232,10 +234,15 @@ std::pair<
             else
               simplex_to_weight[s] = std::min( simplex_to_weight[s], getWeight(first, last) );
 
+            if( s.dimension() == 2 )
+              std::cout << "  - " << s << "\n" << getWeight( first, last ) << "\n";
+
             return false;
           }
         );
       }
+
+      std::cout << "\n";
     }
 
     for( auto&& pair : simplex_to_weight )
@@ -246,10 +253,12 @@ std::pair<
       simplices.push_back( s );
     }
 
+    std::cout << "\n\n";
+
     return simplices;
   };
 
-  auto sourceEdges = makeSimplices( sourceBasePointMap );
+  auto sourceEdges = makeSimplices( sinkBasePointMap );
   auto sinkEdges   = makeSimplices( sinkBasePointMap );
 
   SimplicialComplex dowkerSourceComplex( sourceEdges.begin(), sourceEdges.end() );
