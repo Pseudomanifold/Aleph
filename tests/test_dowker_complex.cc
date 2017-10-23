@@ -34,6 +34,8 @@ template <class T> void test()
   ALEPH_ASSERT_THROW( X_pairs.empty() == false );
   ALEPH_ASSERT_THROW( Y_pairs.empty() == false );
 
+  ALEPH_ASSERT_EQUAL( X.size(), Y.size() );
+
   ALEPH_TEST_END();
 }
 

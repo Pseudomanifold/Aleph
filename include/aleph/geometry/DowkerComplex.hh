@@ -4,11 +4,13 @@
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/graph/graph_traits.hpp>
 
+#include <boost/graph/floyd_warshall_shortest.hpp>
+#include <boost/graph/johnson_all_pairs_shortest.hpp>
+
 #include <vector>
 
 // FIXME: remove after debugging
 #include <iostream>
-#include <boost/graph/graphviz.hpp>
 
 namespace aleph
 {
@@ -76,10 +78,37 @@ template <class Matrix, class T> std::vector<detail::Pair> admissiblePairs( cons
     }
   }
 
-  (void) R;
+  double density
+    = static_cast<double>( boost::num_edges(G) ) / static_cast<double>( boost::num_vertices(G) * ( boost::num_vertices(G) - 1 ) );
 
-  boost::write_graphviz( std::cout, G );
-  return {};
+  // This 'pseudo-matrix' contains the completion of the weight function
+  // specified by the input matrix.
+  std::vector< std::vector<double> > D( boost::num_vertices(G),
+                                        std::vector<double>( boost::num_vertices(G) ) );
+
+  if( density >= 0.5 )
+    boost::floyd_warshall_all_pairs_shortest_paths( G, D );
+  else
+    boost::johnson_all_pairs_shortest_paths( G, D );
+
+  std::vector<Pair> pairs;
+
+  // Create admissible pairs -------------------------------------------
+  //
+  // A pair is admissible if it satisfies a reachability property,
+  // meaning that the induced graph distance permits to reach both
+  // vertices under the specified distance threshold.
+
+  for( IndexType i = 0; i < n; i++ )
+  {
+    for( IndexType j = 0; j < n; j++ )
+    {
+      if( D[i][j] <= R )
+        pairs.push_back( std::make_pair(i,j) );
+    }
+  }
+
+  return pairs;
 }
 
 } // namespace geometry
