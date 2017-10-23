@@ -42,9 +42,12 @@ using Graph = boost::adjacency_list<
 
 using VertexDescriptor = boost::graph_traits<Graph>::vertex_descriptor;
 
-// FIXME: the index type should be configurable as an additional
-// template parameter.
-using Pair = std::pair<std::size_t, std::size_t>;
+template <class T, class I = std::size_t> struct Pair
+{
+  I p; // first index
+  I q; // second index
+  T w; // weight
+};
 
 } // namespace detail
 
@@ -57,7 +60,7 @@ using Pair = std::pair<std::size_t, std::size_t>;
   @param R Maximum weight
 */
 
-template <class Matrix, class T> std::vector<detail::Pair> admissiblePairs( const Matrix& W, T R )
+template <class Matrix, class T> std::vector< detail::Pair<T> > admissiblePairs( const Matrix& W, T R )
 {
   using namespace detail;
 
@@ -96,7 +99,7 @@ template <class Matrix, class T> std::vector<detail::Pair> admissiblePairs( cons
   else
     boost::johnson_all_pairs_shortest_paths( G, D );
 
-  std::vector<Pair> pairs;
+  std::vector< Pair<T> > pairs;
 
   // Create admissible pairs -------------------------------------------
   //
@@ -109,7 +112,7 @@ template <class Matrix, class T> std::vector<detail::Pair> admissiblePairs( cons
     for( IndexType j = 0; j < n; j++ )
     {
       if( D[i][j] <= R )
-        pairs.push_back( std::make_pair(i,j) );
+        pairs.push_back( {i, j, static_cast<T>( D[i][j] ) } );
     }
   }
 
@@ -121,17 +124,15 @@ template <class Matrix, class T> std::vector<detail::Pair> admissiblePairs( cons
   set of admissible pairs. A *general* Dowker complex contains a simplex
   if all of its vertices satisfy the admissibility condition.
 
-  At present, this function only calculates the one-dimensional skeleton
-  of the complexes.
-
   @param pairs Set of admissible pairs
 */
 
-template <class V, class D>
+template <class V, class D, class T>
 std::pair<
   topology::SimplicialComplex< topology::Simplex<D, V> >,
   topology::SimplicialComplex< topology::Simplex<D, V> >
-> buildDowkerSinkSourceComplexes( const std::vector<detail::Pair>& pairs )
+> buildDowkerSinkSourceComplexes( const std::vector<detail::Pair<T> >& pairs,
+                                  unsigned dimension = 0 )
 {
   using Simplex           = topology::Simplex<D, V>;
   using SimplicialComplex = topology::SimplicialComplex<Simplex>;
@@ -141,24 +142,23 @@ std::pair<
 
   for( auto&& pair : pairs )
   {
-    maxVertex = std::max(maxVertex, VertexType(pair.first ) );
-    maxVertex = std::max(maxVertex, VertexType(pair.second) );
+    maxVertex = std::max(maxVertex, VertexType(pair.p) );
+    maxVertex = std::max(maxVertex, VertexType(pair.q) );
   }
 
-  // Keep track of the mapping induces by fixing either the source
+  // Keep track of the mapping induced by fixing either the source
   // points or the sink points.
   std::unordered_map< VertexType, std::vector<VertexType> > sourceBasePointMap;
   std::unordered_map< VertexType, std::vector<VertexType> > sinkBasePointMap;
 
   for( auto&& pair : pairs )
   {
-    auto&& p = pair.first;
-    auto&& q = pair.second;
+    auto&& p = pair.p;
+    auto&& q = pair.q;
 
     sourceBasePointMap[ VertexType(p) ].push_back( VertexType(q) );
     sinkBasePointMap[ VertexType(q) ].push_back( VertexType(p) );
   }
-
 
   auto makeEdges = [] ( const std::unordered_map< VertexType, std::vector<VertexType> >& map )
   {
@@ -177,6 +177,7 @@ std::pair<
     return edges;
   };
 
+  (void) dimension;
 
   auto sourceEdges = makeEdges( sourceBasePointMap );
   auto sinkEdges   = makeEdges( sinkBasePointMap );
