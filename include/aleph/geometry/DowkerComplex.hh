@@ -1,12 +1,16 @@
 #ifndef ALEPH_GEOMETRY_DOWKER_COMPLEX_HH__
 #define ALEPH_GEOMETRY_DOWKER_COMPLEX_HH__
 
+#include <aleph/topology/Simplex.hh>
+#include <aleph/topology/SimplicialComplex.hh>
+
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/graph/graph_traits.hpp>
 
 #include <boost/graph/floyd_warshall_shortest.hpp>
 #include <boost/graph/johnson_all_pairs_shortest.hpp>
 
+#include <unordered_map>
 #include <vector>
 
 // FIXME: remove after debugging
@@ -109,6 +113,78 @@ template <class Matrix, class T> std::vector<detail::Pair> admissiblePairs( cons
   }
 
   return pairs;
+}
+
+/**
+  Creates a Dowker sink complex and a Dowker source complex from a given
+  set of admissible pairs. A *general* Dowker complex contains a simplex
+  if all of its vertices satisfy the admissibility condition.
+
+  At present, this function only calculates the one-dimensional skeleton
+  of the complexes.
+
+  @param pairs Set of admissible pairs
+*/
+
+template <class V, class D>
+std::pair<
+  topology::SimplicialComplex< topology::Simplex<D, V> >,
+  topology::SimplicialComplex< topology::Simplex<D, V> >
+> buildDowkerSinkSourceComplexes( const std::vector<detail::Pair>& pairs )
+{
+  using Simplex           = topology::Simplex<D, V>;
+  using SimplicialComplex = topology::SimplicialComplex<Simplex>;
+
+  using VertexType     = V;
+  VertexType maxVertex = VertexType();
+
+  for( auto&& pair : pairs )
+  {
+    maxVertex = std::max(maxVertex, pair.first );
+    maxVertex = std::max(maxVertex, pair.second);
+  }
+
+  // Keep track of the mapping induces by fixing either the source
+  // points or the sink points.
+  std::unordered_map< VertexType, std::vector<VertexType> > sourceBasePointMap;
+  std::unordered_map< VertexType, std::vector<VertexType> > sinkBasePointMap;
+
+  for( auto&& pair : pairs )
+  {
+    auto&& p = pair.first;
+    auto&& q = pair.second;
+
+    sourceBasePointMap[ VertexType(p) ].push_back( VertexType(q) );
+    sinkBasePointMap[ VertexType(q) ].push_back( VertexType(p) );
+  }
+
+
+  auto makeEdges = [] ( const std::unordered_map< VertexType, std::vector<VertexType> >& map )
+  {
+    std::vector<Simplex> edges;
+
+    for( auto&& pair : map )
+    {
+      auto&& p        = pair.first;
+      auto&& vertices = pair.second;
+
+      // TODO: what about the weights?
+      for( auto it1 = vertices.begin(); it1 = vertices.end(); ++it1 )
+        for( auto it2 = it1 + 1; it2 = vertices.end(); ++it2 )
+          edges.push_back( Simplex( { *it1, *it2 } ) );
+    }
+
+    return edges;
+  };
+
+
+  auto sourceEdges = makeEdges( sourceBasePointMap );
+  auto sinkEdges   = makeEdges( sinkBasePointMap );
+
+  SimplicialComplex dowkerSourceComplex( sourceEdges.begin(), sourceEdges.end() );
+  SimplicialComplex dowkerSinkComplex  ( sinkEdges.begin()  , sinkEdges.end()   );
+
+  return std::make_pair( dowkerSourceComplex, dowkerSinkComplex );
 }
 
 } // namespace geometry
