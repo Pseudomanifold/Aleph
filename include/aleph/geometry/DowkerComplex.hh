@@ -1,6 +1,8 @@
 #ifndef ALEPH_GEOMETRY_DOWKER_COMPLEX_HH__
 #define ALEPH_GEOMETRY_DOWKER_COMPLEX_HH__
 
+#include <aleph/topology/filtrations/Data.hh>
+
 #include <aleph/topology/Simplex.hh>
 #include <aleph/topology/SimplicialComplex.hh>
 
@@ -47,6 +49,12 @@ template <class T, class I = std::size_t> struct Pair
   I p; // first index
   I q; // second index
   T w; // weight
+};
+
+template <class D, class V> struct Vertex
+{
+  V p; // vertex index
+  D w; // weight
 };
 
 } // namespace detail
@@ -134,6 +142,8 @@ std::pair<
 > buildDowkerSinkSourceComplexes( const std::vector<detail::Pair<T> >& pairs,
                                   unsigned dimension = 0 )
 {
+  using namespace detail;
+
   using Simplex           = topology::Simplex<D, V>;
   using SimplicialComplex = topology::SimplicialComplex<Simplex>;
 
@@ -146,44 +156,58 @@ std::pair<
     maxVertex = std::max(maxVertex, VertexType(pair.q) );
   }
 
+  using Vertex = Vertex<D, V>;
+
   // Keep track of the mapping induced by fixing either the source
   // points or the sink points.
-  std::unordered_map< VertexType, std::vector<VertexType> > sourceBasePointMap;
-  std::unordered_map< VertexType, std::vector<VertexType> > sinkBasePointMap;
+  std::unordered_map< VertexType, std::vector<Vertex> > sourceBasePointMap;
+  std::unordered_map< VertexType, std::vector<Vertex> > sinkBasePointMap;
 
   for( auto&& pair : pairs )
   {
     auto&& p = pair.p;
     auto&& q = pair.q;
 
-    sourceBasePointMap[ VertexType(p) ].push_back( VertexType(q) );
-    sinkBasePointMap[ VertexType(q) ].push_back( VertexType(p) );
+    sourceBasePointMap[ VertexType(p) ].push_back( { VertexType(q), pair.w } );
+    sinkBasePointMap[ VertexType(q) ].push_back( { VertexType(p), pair.w } );
   }
 
-  auto makeEdges = [] ( const std::unordered_map< VertexType, std::vector<VertexType> >& map )
+  auto makeSimplices = [] ( const std::unordered_map< VertexType, std::vector<Vertex> >& map )
   {
-    std::vector<Simplex> edges;
+    std::vector<Simplex> simplices;
+    std::unordered_map<VertexType, T> vertexWeights;
 
     for( auto&& pair : map )
     {
       auto&& vertices = pair.second;
 
-      // TODO: what about the weights?
       for( auto it1 = vertices.begin(); it1 != vertices.end(); ++it1 )
+      {
         for( auto it2 = it1 + 1; it2 != vertices.end(); ++it2 )
-          edges.push_back( Simplex( { *it1, *it2 } ) );
+          simplices.push_back( Simplex( { it1->p, it2->p }, std::max( it1->w, it2->w ) ) );
+
+        // Use the *earliest* weight at which the vertices were created
+        // in the data set.
+        vertexWeights[ it1->p ] = std::min( vertexWeights[ it1->p ], it1->w );
+      }
     }
 
-    return edges;
+    for( auto&& pair : vertexWeights )
+      simplices.push_back( Simplex( pair.first, pair.second ) );
+
+    return simplices;
   };
 
   (void) dimension;
 
-  auto sourceEdges = makeEdges( sourceBasePointMap );
-  auto sinkEdges   = makeEdges( sinkBasePointMap );
+  auto sourceEdges = makeSimplices( sourceBasePointMap );
+  auto sinkEdges   = makeSimplices( sinkBasePointMap );
 
   SimplicialComplex dowkerSourceComplex( sourceEdges.begin(), sourceEdges.end() );
   SimplicialComplex dowkerSinkComplex  ( sinkEdges.begin()  , sinkEdges.end()   );
+
+  dowkerSourceComplex.sort( topology::filtrations::Data<Simplex>() );
+  dowkerSinkComplex.sort( topology::filtrations::Data<Simplex>() );
 
   return std::make_pair( dowkerSourceComplex, dowkerSinkComplex );
 }
