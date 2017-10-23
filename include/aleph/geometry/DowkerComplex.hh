@@ -248,7 +248,7 @@ std::pair<
     return simplices;
   };
 
-  auto sourceEdges = makeSimplices( sinkBasePointMap );
+  auto sourceEdges = makeSimplices( sourceBasePointMap );
   auto sinkEdges   = makeSimplices( sinkBasePointMap );
 
   SimplicialComplex dowkerSourceComplex( sourceEdges.begin(), sourceEdges.end() );

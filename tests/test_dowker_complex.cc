@@ -2,6 +2,8 @@
 
 #include <aleph/geometry/DowkerComplex.hh>
 
+#include <aleph/persistentHomology/Calculation.hh>
+
 #include <vector>
 
 template <class T> void test()
@@ -44,7 +46,37 @@ template <class T> void test()
   auto Y_source = Y_dowkerComplexes.first;
   auto Y_sink   = Y_dowkerComplexes.second;
 
-  std::cerr << X_source << "\n" << Y_source << "\n";
+  ALEPH_ASSERT_EQUAL( X_source.size(), Y_source.size() );
+  ALEPH_ASSERT_EQUAL( X_sink.size(),   Y_sink.size()   );
+
+  auto X_source_diagrams = aleph::calculatePersistenceDiagrams( X_source );
+  auto X_sink_diagrams   = aleph::calculatePersistenceDiagrams( X_sink   );
+  auto Y_source_diagrams = aleph::calculatePersistenceDiagrams( Y_source );
+  auto Y_sink_diagrams   = aleph::calculatePersistenceDiagrams( Y_sink   );
+
+  ALEPH_ASSERT_EQUAL( X_source_diagrams.size(), X_sink_diagrams.size() );
+  ALEPH_ASSERT_EQUAL( Y_source_diagrams.size(), Y_sink_diagrams.size() );
+
+  for( auto&& D : X_source_diagrams )
+    D.removeDiagonal();
+
+  for( auto&& D : X_sink_diagrams )
+    D.removeDiagonal();
+
+  for( auto&& D : Y_source_diagrams )
+    D.removeDiagonal();
+
+  for( auto&& D : Y_sink_diagrams )
+    D.removeDiagonal();
+
+  ALEPH_ASSERT_EQUAL( X_source_diagrams.size(), Y_source_diagrams.size() );
+  ALEPH_ASSERT_EQUAL( X_sink_diagrams.size()  , Y_sink_diagrams.size() );
+
+  ALEPH_ASSERT_EQUAL( X_source_diagrams.size(), 2 );
+  ALEPH_ASSERT_EQUAL( Y_source_diagrams.size(), 2 );
+
+  ALEPH_ASSERT_THROW( X_source_diagrams.front() == Y_source_diagrams.front() );
+  ALEPH_ASSERT_THROW( X_source_diagrams.back()  != Y_source_diagrams.back() );
 
   ALEPH_TEST_END();
 }
