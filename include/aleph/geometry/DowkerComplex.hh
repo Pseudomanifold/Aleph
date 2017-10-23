@@ -213,9 +213,11 @@ std::pair<
       else
         maxDimension = dimension + 1;
 
+      using DifferenceType = typename decltype(vertices)::difference_type;
+
       for( std::size_t d = std::min( vertices.size(), maxDimension ); d >= 1; d-- )
       {
-        math::for_each_combination( vertices.begin(), vertices.begin() + d, vertices.end(),
+        math::for_each_combination( vertices.begin(), vertices.begin() + DifferenceType(d), vertices.end(),
           [&simplex_to_weight, &getWeight] ( Iterator first, Iterator last )
           {
             std::vector<V> vertices_;
