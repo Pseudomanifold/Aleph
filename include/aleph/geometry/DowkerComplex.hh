@@ -1,6 +1,8 @@
 #ifndef ALEPH_GEOMETRY_DOWKER_COMPLEX_HH__
 #define ALEPH_GEOMETRY_DOWKER_COMPLEX_HH__
 
+#include <aleph/math/Combinations.hh>
+
 #include <aleph/topology/filtrations/Data.hh>
 
 #include <aleph/topology/Simplex.hh>
@@ -13,6 +15,8 @@
 #include <boost/graph/johnson_all_pairs_shortest.hpp>
 
 #include <algorithm>
+#include <iterator>
+#include <limits>
 #include <unordered_map>
 #include <vector>
 
@@ -56,6 +60,12 @@ template <class D, class V> struct Vertex
   V p; // vertex index
   D w; // weight
 };
+
+template <class D, class V> void swap( Vertex<D, V>& first, Vertex<D, V>& second )
+{
+  std::swap( first.p, second.p );
+  std::swap( first.w, second.w );
+}
 
 } // namespace detail
 
@@ -172,33 +182,72 @@ std::pair<
     sinkBasePointMap[ VertexType(q) ].push_back( { VertexType(p), pair.w } );
   }
 
-  auto makeSimplices = [] ( const std::unordered_map< VertexType, std::vector<Vertex> >& map )
+  // Auxiliary weight calculation lambda function ----------------------
+  //
+  // This function calculates the *maximum* weight of a range of
+  // vertices. It is used to determine the weight of a simplex.
+
+  using Iterator = typename std::vector<Vertex>::const_iterator;
+  auto getWeight = [] ( Iterator begin, Iterator end )
+  {
+    using DataType  = D;
+    DataType weight = std::numeric_limits<DataType>::lowest();
+
+    for( auto it = begin; it != end; ++it )
+      weight = std::max( weight, it->w );
+
+    return weight;
+  };
+
+  auto makeSimplices = [&dimension, &getWeight] ( const std::unordered_map< VertexType, std::vector<Vertex> >& map )
   {
     std::vector<Simplex> simplices;
-    std::unordered_map<VertexType, T> vertexWeights;
+    std::unordered_map<Simplex, D> simplex_to_weight;
 
     for( auto&& pair : map )
     {
-      auto&& vertices = pair.second;
+      auto vertices            = pair.second;
+      std::size_t maxDimension = 0;
 
-      for( auto it1 = vertices.begin(); it1 != vertices.end(); ++it1 )
+      if( dimension == 0 )
+        maxDimension = vertices.size();
+      else
+        maxDimension = dimension + 1;
+
+      for( std::size_t d = std::min( vertices.size(), maxDimension ); d >= 1; d-- )
       {
-        for( auto it2 = it1 + 1; it2 != vertices.end(); ++it2 )
-          simplices.push_back( Simplex( { it1->p, it2->p }, std::max( it1->w, it2->w ) ) );
+        math::for_each_combination( vertices.begin(), vertices.begin() + d, vertices.end(),
+          [&simplex_to_weight, &getWeight] ( Iterator first, Iterator last )
+          {
+            std::vector<V> vertices_;
+            vertices_.reserve( std::distance( first, last ) );
 
-        // Use the *earliest* weight at which the vertices were created
-        // in the data set.
-        vertexWeights[ it1->p ] = std::min( vertexWeights[ it1->p ], it1->w );
+            for( auto it = first; it != last; ++it )
+              vertices_.push_back( it->p );
+
+            Simplex s( vertices_.begin(), vertices_.end() );
+
+            if( simplex_to_weight.find(s) == simplex_to_weight.end() )
+              simplex_to_weight[s] = getWeight(first, last);
+            else
+              simplex_to_weight[s] = std::min( simplex_to_weight[s], getWeight(first, last) );
+
+            return false;
+          }
+        );
       }
     }
 
-    for( auto&& pair : vertexWeights )
-      simplices.push_back( Simplex( pair.first, pair.second ) );
+    for( auto&& pair : simplex_to_weight )
+    {
+      auto s = pair.first;
+      s.setData( pair.second );
+
+      simplices.push_back( s );
+    }
 
     return simplices;
   };
-
-  (void) dimension;
 
   auto sourceEdges = makeSimplices( sourceBasePointMap );
   auto sinkEdges   = makeSimplices( sinkBasePointMap );
