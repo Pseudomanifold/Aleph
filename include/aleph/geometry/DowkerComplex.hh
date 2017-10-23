@@ -219,7 +219,7 @@ std::pair<
           [&simplex_to_weight, &getWeight] ( Iterator first, Iterator last )
           {
             std::vector<V> vertices_;
-            vertices_.reserve( std::distance( first, last ) );
+            vertices_.reserve( typename std::vector<V>::size_type( std::distance( first, last ) ) );
 
             for( auto it = first; it != last; ++it )
               vertices_.push_back( it->p );
