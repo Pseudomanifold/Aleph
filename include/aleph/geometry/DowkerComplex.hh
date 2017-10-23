@@ -10,6 +10,7 @@
 #include <boost/graph/floyd_warshall_shortest.hpp>
 #include <boost/graph/johnson_all_pairs_shortest.hpp>
 
+#include <algorithm>
 #include <unordered_map>
 #include <vector>
 
@@ -140,8 +141,8 @@ std::pair<
 
   for( auto&& pair : pairs )
   {
-    maxVertex = std::max(maxVertex, pair.first );
-    maxVertex = std::max(maxVertex, pair.second);
+    maxVertex = std::max(maxVertex, VertexType(pair.first ) );
+    maxVertex = std::max(maxVertex, VertexType(pair.second) );
   }
 
   // Keep track of the mapping induces by fixing either the source
@@ -165,12 +166,11 @@ std::pair<
 
     for( auto&& pair : map )
     {
-      auto&& p        = pair.first;
       auto&& vertices = pair.second;
 
       // TODO: what about the weights?
-      for( auto it1 = vertices.begin(); it1 = vertices.end(); ++it1 )
-        for( auto it2 = it1 + 1; it2 = vertices.end(); ++it2 )
+      for( auto it1 = vertices.begin(); it1 != vertices.end(); ++it1 )
+        for( auto it2 = it1 + 1; it2 != vertices.end(); ++it2 )
           edges.push_back( Simplex( { *it1, *it2 } ) );
     }
 

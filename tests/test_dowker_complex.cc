@@ -36,6 +36,17 @@ template <class T> void test()
 
   ALEPH_ASSERT_EQUAL( X.size(), Y.size() );
 
+  auto X_dowkerComplexes = aleph::geometry::buildDowkerSinkSourceComplexes<unsigned, T>( X_pairs );
+  auto Y_dowkerComplexes = aleph::geometry::buildDowkerSinkSourceComplexes<unsigned, T>( Y_pairs );
+
+  auto X_source = X_dowkerComplexes.first;
+  auto X_sink   = X_dowkerComplexes.second;
+  auto Y_source = Y_dowkerComplexes.first;
+  auto Y_sink   = Y_dowkerComplexes.second;
+
+  std::cerr << X_source << "\n" << Y_source << "\n";
+
+
   ALEPH_TEST_END();
 }
 
