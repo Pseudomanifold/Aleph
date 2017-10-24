@@ -262,6 +262,147 @@ std::pair<
   return std::make_pair( dowkerSourceComplex, dowkerSinkComplex );
 }
 
+/**
+  Given a matrix and a maximum radius, creates a Dowker source complex that
+  contains a simplex if all of its vertices are admissible.
+
+  @param matrix    Matrix of weighted adjacencies. The matrix is *not*
+                   assumed to be symmetric.
+
+  @param epsilon   Maximum radius for expansion. I refer to this as epsilon
+                   in order to show the connection to other simplicial complex
+                   creation algorithms.
+
+  @param dimension Maximum dimension for expansion. If set to zero, will
+                   expand the complex to its maximum dimension.
+*/
+
+template
+<
+  class Matrix,
+  class VertexType,
+  class DataType
+> topology::SimplicialComplex< topology::Simplex<DataType, VertexType> >
+    buildDowkerSourceCompplex( const Matrix& matrix,
+                               DataType epsilon,
+                               unsigned dimension = 0 )
+{
+  using namespace detail;
+
+  auto pairs = admissiblePairs( matrix, epsilon );
+
+  using Simplex           = topology::Simplex<DataType, VertexType>;
+  using SimplicialComplex = topology::SimplicialComplex<Simplex>;
+
+  VertexType maxVertex = VertexType();
+
+  for( auto&& pair : pairs )
+  {
+    maxVertex = std::max(maxVertex, VertexType(pair.p) );
+    maxVertex = std::max(maxVertex, VertexType(pair.q) );
+  }
+
+  using Vertex = Vertex<DataType, VertexType>;
+
+  // Keep track of the mapping induced by fixing the source points. In
+  // essence, this is a adjacency list representation of a matrix that
+  // tracks the admissibility of vertices.
+  std::unordered_map< VertexType, std::vector<Vertex> > sourceBasePointMap;
+
+  for( auto&& pair : pairs )
+  {
+    auto&& p = pair.p;
+    auto&& q = pair.q;
+
+    sourceBasePointMap[ VertexType(p) ].push_back( { VertexType(q), pair.w } );
+  }
+
+  // Auxiliary weight calculation lambda function ----------------------
+  //
+  // This function calculates the *maximum* weight of a range of
+  // vertices. It is used to determine the weight of a simplex.
+
+  using Iterator = typename std::vector<Vertex>::const_iterator;
+  auto getWeight = [] ( Iterator begin, Iterator end )
+  {
+    DataType weight = std::numeric_limits<DataType>::lowest();
+
+    for( auto it = begin; it != end; ++it )
+      weight = std::max( weight, it->w );
+
+    return weight;
+  };
+
+  // Create all valid simplices ----------------------------------------
+  //
+  // All valid simplices with respect to the source point are created
+  // by generating all combinations of admissible pairs, with respect
+  // to the given source point.
+  //
+  std::vector<Simplex> simplices;
+
+  {
+    // The same simplex may occur multiple times because it is
+    // 'observed' by multiple source points. We need to obtain
+    // the *earliest* weight at which the simplex occurs!
+    std::unordered_map<Simplex, DataType> simplex_to_weight;
+
+    for( auto&& pair : sourceBasePointMap )
+    {
+      auto vertices            = pair.second;
+      std::size_t maxDimension = 0;
+
+      if( dimension == 0 )
+        maxDimension = vertices.size();
+      else
+        maxDimension = dimension + 1;
+
+      using DifferenceType = typename decltype(vertices)::difference_type;
+
+      for( std::size_t d = std::min( vertices.size(), maxDimension ); d >= 1; d-- )
+      {
+        math::for_each_combination( vertices.begin(), vertices.begin() + DifferenceType(d), vertices.end(),
+          [&simplex_to_weight, &getWeight] ( Iterator first, Iterator last )
+          {
+            std::vector<VertexType> vertices_;
+            vertices_.reserve( typename std::vector<VertexType>::size_type( std::distance( first, last ) ) );
+
+            for( auto it = first; it != last; ++it )
+              vertices_.push_back( it->p );
+
+            Simplex s( vertices_.begin(), vertices_.end() );
+
+            // Ensures that we do not take the default weight, which is
+            // zero, as the weight of the simplex---there does not seem
+            // to be a way to solve this more efficiently...
+            if( simplex_to_weight.find(s) == simplex_to_weight.end() )
+              simplex_to_weight[s] = getWeight(first, last);
+            else
+              simplex_to_weight[s] = std::min( simplex_to_weight[s], getWeight(first, last) );
+
+            return false;
+          }
+        );
+      }
+    }
+
+    // Set the weights of all simplices prior to inserting them into the
+    // simplicial complex.
+    for( auto&& pair : simplex_to_weight )
+    {
+      auto s = pair.first;
+      s.setData( pair.second );
+
+      simplices.push_back( s );
+    }
+  }
+
+  SimplicialComplex K( simplices.begin(), simplices.end() );
+  K.sort( topology::filtrations::Data<Simplex>() );
+
+  return K;
+}
+
 } // namespace geometry
 
 } // namespace aleph
