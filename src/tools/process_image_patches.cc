@@ -14,6 +14,7 @@
 
 #include <algorithm>
 #include <iostream>
+#include <iterator>
 #include <string>
 
 #include <cmath>
@@ -27,6 +28,38 @@ template <class T> T log( T x )
     return T();
   else
     return std::log10( x );
+}
+
+template <class InputIterator> DataType contrastNorm( InputIterator begin, InputIterator end )
+{
+  using T = typename std::iterator_traits<InputIterator>::value_type;
+  std::vector<T> data( begin, end );
+
+  unsigned n = static_cast<unsigned>( std::sqrt( data.size() ) );
+
+  aleph::math::KahanSummation<T> difference = T();
+
+  for( unsigned i = 0; i < n; i++ )
+  {
+    for( unsigned j = 0; j < n; j++ )
+    {
+      auto index = n * i + j;
+
+      if( j+1 <  n )
+        difference += std::pow( data.at(index) - data.at(index+1), T(2) );
+
+      if( j   >= 1 )
+        difference += std::pow( data.at(index) - data.at(index-1), T(2) );
+
+      if( i+1 <  n )
+        difference += std::pow( data.at(index) - data.at(index+n), T(2) );
+
+      if( i-1 <  n )
+        difference += std::pow( data.at(index) - data.at(index-n), T(2) );
+    }
+  }
+
+  return static_cast<DataType>( difference );
 }
 
 int main( int argc, char** argv )
@@ -51,6 +84,7 @@ int main( int argc, char** argv )
   //
   // 1. Replace values by their logarithm
   // 2. Subtract mean
+  // 3. Normalize by the contrast norm
 
   using IndexType                = decltype( pointCloud.size() );
   PointCloud processedPointCloud = PointCloud( pointCloud.size(), pointCloud.dimension() );
@@ -74,7 +108,17 @@ int main( int argc, char** argv )
                       return x - mean;
                     } );
 
+    auto norm = contrastNorm( p.begin(), p.end() );
+
+    if( norm > DataType() )
+    {
+      std::transform( p.begin(), p.end(), p.begin(),
+                      [&norm] ( DataType x )
+                      {
+                        return x / norm;
+                      } );
+    }
+
     processedPointCloud.set( i, p.begin(), p.end() );
   }
-
 }
