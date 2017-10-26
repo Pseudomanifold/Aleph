@@ -86,6 +86,8 @@ int main( int argc, char** argv )
   // 2. Subtract mean
   // 3. Normalize by the contrast norm
 
+  std::cerr << "* Pre-processing...";
+
   using IndexType                = decltype( pointCloud.size() );
   PointCloud processedPointCloud = PointCloud( pointCloud.size(), pointCloud.dimension() );
 
@@ -126,10 +128,14 @@ int main( int argc, char** argv )
     processedPointCloud.set( i, p.begin(), p.end() );
   }
 
+  std::cerr << "finished\n";
+
   // Filter patches based on norm --------------------------------------
   //
   // In the original paper, only the top 20% of the contrast norms are
   // being kept. This tool uses a configurable threshold.
+
+  std::cerr << "* Filtering...";
 
   {
     auto contrastNorms_          = contrastNorms;
@@ -161,4 +167,39 @@ int main( int argc, char** argv )
 
     swap( processedPointCloud, filteredPointCloud );
   }
+
+  std::cerr << "finished\n";
+
+  // Further processing ------------------------------------------------
+  //
+  // 1. Subtract the mean of the normalized vectors in order to make
+  //    different images better comparable.
+  //
+  // 2. Divide by the Euclidean norm of the vector to place them on
+  //    a high-dimensional sphere.
+
+  std::cerr << "* Final processing and normalization...";
+
+  for( IndexType i = 0; i < pointCloud.size(); i++ )
+  {
+    auto p     = processedPointCloud[i];
+    auto mean  = aleph::math::accumulate_kahan_sorted( p.begin(), p.end(), DataType() );
+    mean      /= static_cast<DataType>( pointCloud.dimension() );
+
+    std::transform( p.begin(), p.end(), p.begin(),
+                    [&mean] ( DataType x )
+                    {
+                      return x - mean;
+                    } );
+
+    auto norm = std::sqrt( std::inner_product( p.begin(), p.end(), p.begin(), 0 ) );
+
+    std::transform( p.begin(), p.end(), p.begin(),
+                    [&norm] ( DataType x )
+                    {
+                      return x / norm;
+                    } );
+  }
+
+  std::cerr << "finished\n";
 }
