@@ -11,6 +11,7 @@ IF( BUILD_EXAMPLES )
   ADD_EXECUTABLE( vtk                              vtk.cc                              )
   ADD_EXECUTABLE( vietoris_rips                    vietoris_rips.cc                    )
   ADD_EXECUTABLE( vietoris_rips_eccentricity       vietoris_rips_eccentricity.cc       )
+  ADD_EXECUTABLE( witness_complex                  witness_complex.cc                  )
 
   ENABLE_IF_SUPPORTED( CMAKE_CXX_FLAGS "-O3" )
 ELSE()
