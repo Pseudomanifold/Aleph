@@ -15,6 +15,7 @@
 #include <algorithm>
 #include <iostream>
 #include <iterator>
+#include <numeric>
 #include <string>
 
 #include <cmath>
@@ -199,7 +200,14 @@ int main( int argc, char** argv )
                     {
                       return x / norm;
                     } );
+
+    processedPointCloud.set( i, p.begin(), p.end() );
   }
 
   std::cerr << "finished\n";
+
+  // Output ------------------------------------------------------------
+
+  std::cerr << "* Processed point cloud has " << processedPointCloud.size() << " points\n";
+  std::cout << processedPointCloud << "\n";
 }
