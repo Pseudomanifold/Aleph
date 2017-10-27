@@ -137,7 +137,8 @@ std::ostream& operator<<( std::ostream& o, const Perversity p )
 
 template <class Simplex> auto calculateIntersectionHomology( const aleph::topology::SimplicialComplex<Simplex>& K,
                                                              const std::vector< aleph::topology::SimplicialComplex<Simplex> >& X,
-                                                             const Perversity& p ) -> std::vector< PersistenceDiagram<typename Simplex::DataType> >
+                                                             const Perversity& p,
+                                                             bool useOriginalIndexing = false ) -> std::vector< PersistenceDiagram<typename Simplex::DataType> >
 {
   // 0. Check consistency of strata
   // 1. Create allowability function based on the dimensionality of the
@@ -178,7 +179,10 @@ template <class Simplex> auto calculateIntersectionHomology( const aleph::topolo
     {
       bool admissible = true;
 
-      for( std::size_t k = 1; k <= d; k++ )
+      // Note that I am letting the index start at $k = 2$ because this
+      // is in consistent with the original definition given by Goresky
+      // and MacPherson. By default, this behaviour is *not* active.
+      for( std::size_t k = useOriginalIndexing ? 2 : 1; k <= d; k++ )
       {
         // The notation follows Bendich and Harer, so $i$ is actually
         // referring to a dimension instead of an index. Beware!
