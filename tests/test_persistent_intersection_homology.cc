@@ -618,7 +618,8 @@ template <class T> void testTorus()
     ALEPH_ASSERT_EQUAL( D1[3].betti(), 1 ); // Z
   }
 
-#if 0
+  // Intersection homology ---------------------------------------------
+
   SimplicialComplex L = K;
 
   {
@@ -629,16 +630,27 @@ template <class T> void testTorus()
 
   aleph::topology::Skeleton skeleton;
   auto X0 = skeleton(0, K);
-  auto X1 = X0;
+  auto X1 = skeleton(1, K);
   auto X2 = K;
+  auto X3 = K;
 
-  auto D2 = aleph::calculateIntersectionHomology( L, {X0,X1,X2}, aleph::Perversity( {0} ) );
+  bool useOriginalIndexing = true;
 
-  ALEPH_ASSERT_EQUAL( D2.size(), 3 );
-  ALEPH_ASSERT_EQUAL( D2[0].betti(), 1 );
-  ALEPH_ASSERT_EQUAL( D2[1].betti(), 0 );
-  ALEPH_ASSERT_EQUAL( D2[2].betti(), 1 );
-#endif
+  auto D2 = aleph::calculateIntersectionHomology( L, {X0,X1,X2,X3}, aleph::PerversityGM( {0,0} ), useOriginalIndexing );
+  auto D3 = aleph::calculateIntersectionHomology( L, {X0,X1,X2,X3}, aleph::PerversityGM( {0,1} ), useOriginalIndexing );
+
+  ALEPH_ASSERT_EQUAL( D2.size(), 4 );
+  ALEPH_ASSERT_EQUAL( D3.size(), 4 );
+
+  ALEPH_ASSERT_EQUAL( D2[0].betti(), 1 ); // Z
+  ALEPH_ASSERT_EQUAL( D2[1].betti(), 2 ); // Z+Z
+  ALEPH_ASSERT_EQUAL( D2[2].betti(), 0 ); // 0
+  ALEPH_ASSERT_EQUAL( D2[3].betti(), 1 ); // Z
+
+  ALEPH_ASSERT_EQUAL( D3[0].betti(), 1 ); // Z
+  ALEPH_ASSERT_EQUAL( D3[1].betti(), 0 ); // 0
+  ALEPH_ASSERT_EQUAL( D3[2].betti(), 2 ); // Z+Z
+  ALEPH_ASSERT_EQUAL( D3[3].betti(), 1 ); // Z
 
   ALEPH_TEST_END();
 }
