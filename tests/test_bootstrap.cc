@@ -105,7 +105,7 @@ void testStandardError()
     samples.begin(), samples.end(),
     meanCalculation );
 
-  ALEPH_ASSERT_THROW( std::abs( se - 3.50 ) < 1e-1 );
+  ALEPH_ASSERT_THROW( std::abs( se - 3.50 ) < 0.5 );
 
   ALEPH_TEST_END();
 }
