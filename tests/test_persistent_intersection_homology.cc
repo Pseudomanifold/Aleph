@@ -330,10 +330,10 @@ template <class T> void testPinchedTorus()
     //{3,4,5},
     {1,4,5},
     {1,2,5},
-    {0,3,4},
-    {0,1,4},
     {0,3,5},
-    {0,3,2}
+    {0,2,5},
+    {0,1,4},
+    {0,3,4}
   };
 
   K.createMissingFaces();
@@ -351,7 +351,10 @@ template <class T> void testPinchedTorus()
         auto u = simplex[0];
         auto v = simplex[1];
 
-        simplices.push_back( {u,v,VertexType(6) } );
+        // check that the simplex is only spanning a single triangle at
+        // either the end or the beginning of the space
+        if( std::max(u,v) <= 2 || std::min(u,v) >= 3 )
+          simplices.push_back( {u,v,VertexType(6) } );
       }
     }
 
@@ -362,8 +365,6 @@ template <class T> void testPinchedTorus()
     K.sort();
   }
 
-  std::cerr << K << "\n";
-
   bool dualize                    = true;
   bool includeAllUnpairedCreators = true;
 
@@ -371,8 +372,8 @@ template <class T> void testPinchedTorus()
 
   ALEPH_ASSERT_EQUAL( D1.size(), 3 );
   ALEPH_ASSERT_EQUAL( D1[0].betti(), 1 ); // Z
-  //ALEPH_ASSERT_EQUAL( D1[1].betti(), 1 ); // Z
-  //ALEPH_ASSERT_EQUAL( D1[2].betti(), 1 ); // Z
+  ALEPH_ASSERT_EQUAL( D1[1].betti(), 1 ); // Z
+  ALEPH_ASSERT_EQUAL( D1[2].betti(), 1 ); // Z
 
   ALEPH_TEST_END();
 }
