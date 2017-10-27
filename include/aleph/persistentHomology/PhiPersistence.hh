@@ -57,10 +57,11 @@ template <class Simplex, class Function> std::pair<topology::SimplicialComplex<S
 
 /**
   @class Perversity
-  @brief Perversity model in the sense of intersection homology
+  @brief Perversity model in the sense of persistent intersection homology
 
-  Models a perversity in the sense of intersection homology. The class
-  ensures that all values satisfy
+  Models a perversity in the sense of persistent intersection homology,
+  following the definitions of Bendich. The class ensures that all
+  values satisfy
 
   \f
     -1 \leq p_k \leq k-1
@@ -118,6 +119,67 @@ private:
   std::vector<int> _values;
 };
 
+/**
+  @class PerversityGM
+  @brief Perversity model in the sense of intersection homology
+
+  Models a perversity in the sense of intersection homology, following
+  Goresky and MacPherson. The class ensures that all values satisfy
+
+  \f
+    p_{k+1} = p_k \mathrm{ or } p_{k+1} = p_k + 1
+  \f
+
+  and \f$p_2 = 0\f$.
+*/
+
+class PerversityGM
+{
+public:
+
+  /**
+    Creates a new perversity from a range of values. The values must be
+    at least implicitly convertible to integers.
+  */
+
+  template <class InputIterator> PerversityGM( InputIterator begin, InputIterator end )
+    : _values( begin, end )
+  {
+    for( std::size_t k = 1; k < _values.size(); k++ )
+    {
+      if( _values[k] != _values[k-1] && _values[k] != _values[k-1] + 1 )
+        _values[k] = _values[k-1] + 1;
+    }
+  }
+
+  /** Creates a new perversity from an initializer list of values */
+  PerversityGM( std::initializer_list<int> values )
+    : PerversityGM( values.begin(), values.end() )
+  {
+  }
+
+  /**
+    Queries the perversity value in a given dimension \p d. Invalid
+    dimension values only cause the function to return a zero.
+  */
+
+  unsigned operator()( std::size_t d ) const noexcept
+  {
+    if( d < _values.size() + 2 )
+      return _values[ static_cast<std::size_t>( d-2 ) ];
+    else
+      return 0;
+  }
+
+  using const_iterator = typename std::vector<unsigned>::const_iterator;
+
+  const_iterator begin() const noexcept { return _values.begin(); }
+  const_iterator end()   const noexcept { return _values.end();   }
+
+private:
+  std::vector<unsigned> _values;
+};
+
 std::ostream& operator<<( std::ostream& o, const Perversity p )
 {
   o << "[";
@@ -135,10 +197,11 @@ std::ostream& operator<<( std::ostream& o, const Perversity p )
   return o;
 }
 
-template <class Simplex> auto calculateIntersectionHomology( const aleph::topology::SimplicialComplex<Simplex>& K,
-                                                             const std::vector< aleph::topology::SimplicialComplex<Simplex> >& X,
-                                                             const Perversity& p,
-                                                             bool useOriginalIndexing = false ) -> std::vector< PersistenceDiagram<typename Simplex::DataType> >
+template <class Simplex, class Perversity>
+auto calculateIntersectionHomology( const aleph::topology::SimplicialComplex<Simplex>& K,
+                                    const std::vector< aleph::topology::SimplicialComplex<Simplex> >& X,
+                                    const Perversity& p,
+                                    bool useOriginalIndexing = false ) -> std::vector< PersistenceDiagram<typename Simplex::DataType> >
 {
   // 0. Check consistency of strata
   // 1. Create allowability function based on the dimensionality of the
