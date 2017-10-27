@@ -22,6 +22,7 @@
 
 #include <aleph/topology/filtrations/Data.hh>
 
+#include <algorithm>
 #include <random>
 #include <unordered_map>
 #include <vector>
@@ -501,6 +502,147 @@ template <class T> void testSphere()
   ALEPH_TEST_END();
 }
 
+template <class T> void testTorus()
+{
+  ALEPH_TEST_BEGIN( "Persistent intersection homology: torus" );
+
+  using Simplex           = aleph::topology::Simplex<T>;
+  using SimplicialComplex = aleph::topology::SimplicialComplex<Simplex>;
+
+  SimplicialComplex K = {
+    {0, 1, 5}, {0, 4, 5}, { 1, 2, 6}, { 1, 5, 6}, {2,3, 7}, {2, 6, 7}, {4,5,9}, {4,8,9},
+    {5, 6,10}, {5, 9,10}, { 6, 7,11}, { 6,10,11}, {8,9,13}, {8,12,13},
+    {9,10,14}, {9,13,14}, {10,11,15}, {10,14,15}
+  };
+
+  ALEPH_ASSERT_EQUAL( K.size(), 18 );
+
+  // Identify faces (top and bottom) -----------------------------------
+
+  {
+    std::vector<Simplex> simplices( K.begin(), K.end() );
+
+    std::transform( simplices.begin(), simplices.end(), simplices.begin(),
+      [] ( const Simplex& s )
+      {
+        using VertexType = typename Simplex::VertexType;
+
+        std::map<VertexType, VertexType> vertexMap = {
+          {12,0},
+          {13,1},
+          {14,2},
+          {15,3},
+        };
+
+        std::vector<VertexType> vertices( s.begin(), s.end() );
+
+        for( auto&& v : vertices )
+        {
+          if( vertexMap.find(v) != vertexMap.end() )
+            v = vertexMap.at(v);
+        }
+
+        return Simplex( vertices.begin(), vertices.end() );
+      }
+    );
+
+    K = SimplicialComplex( simplices.begin(), simplices.end() );
+  }
+
+  // Identify faces (left and right) -----------------------------------
+
+  {
+    std::vector<Simplex> simplices( K.begin(), K.end() );
+
+    std::transform( simplices.begin(), simplices.end(), simplices.begin(),
+      [] ( const Simplex& s )
+      {
+        using VertexType = typename Simplex::VertexType;
+
+        std::map<VertexType, VertexType> vertexMap = {
+          { 3,0},
+          { 7,4},
+          {11,8},
+        };
+
+        std::vector<VertexType> vertices( s.begin(), s.end() );
+
+        for( auto&& v : vertices )
+        {
+          if( vertexMap.find(v) != vertexMap.end() )
+            v = vertexMap.at(v);
+        }
+
+        return Simplex( vertices.begin(), vertices.end() );
+      }
+    );
+
+    K = SimplicialComplex( simplices.begin(), simplices.end() );
+  }
+
+  K.createMissingFaces();
+  K.sort();
+
+  bool dualize                    = true;
+  bool includeAllUnpairedCreators = true;
+
+  // Sanity check ------------------------------------------------------
+  //
+  // Ensures that this is a proper triangulation of a torus, at least
+  // from a homological point of view.
+
+  {
+    auto D1 = aleph::calculatePersistenceDiagrams(K, dualize, includeAllUnpairedCreators);
+
+    ALEPH_ASSERT_EQUAL( D1.size(), 3 );
+    ALEPH_ASSERT_EQUAL( D1[0].betti(), 1 ); // Z
+    ALEPH_ASSERT_EQUAL( D1[1].betti(), 2 ); // Z+Z
+    ALEPH_ASSERT_EQUAL( D1[2].betti(), 1 ); // Z
+  }
+
+  K = aleph::topology::suspension( K );
+  K.sort();
+
+  // Sanity check ------------------------------------------------------
+  //
+  // Ensures that we have the expected homology groups for the suspended
+  // torus data set.
+
+  {
+    auto D1 = aleph::calculatePersistenceDiagrams(K, dualize, includeAllUnpairedCreators);
+
+    ALEPH_ASSERT_EQUAL( D1.size(), 3 );
+    ALEPH_ASSERT_EQUAL( D1[0].betti(), 1 ); // Z
+    ALEPH_ASSERT_EQUAL( D1[1].betti(), 2 ); // Z+Z
+    ALEPH_ASSERT_EQUAL( D1[2].betti(), 1 ); // Z
+  }
+
+#if 0
+  SimplicialComplex L = K;
+
+  {
+    aleph::topology::BarycentricSubdivision subdivision;
+    L = subdivision( L );
+    L.sort();
+  }
+
+  aleph::topology::Skeleton skeleton;
+  auto X0 = skeleton(0, K);
+  auto X1 = X0;
+  auto X2 = K;
+
+  auto D2 = aleph::calculateIntersectionHomology( L, {X0,X1,X2}, aleph::Perversity( {0} ) );
+
+  ALEPH_ASSERT_EQUAL( D2.size(), 3 );
+  ALEPH_ASSERT_EQUAL( D2[0].betti(), 1 );
+  ALEPH_ASSERT_EQUAL( D2[1].betti(), 0 );
+  ALEPH_ASSERT_EQUAL( D2[2].betti(), 1 );
+#endif
+
+  ALEPH_TEST_END();
+}
+
+
 template <class T> void testWedgeOfTwoCircles()
 {
   ALEPH_TEST_BEGIN( "Persistent intersection homology: wedge of two circles" );
@@ -573,6 +715,9 @@ int main(int, char**)
 
   testSphere<float> ();
   testSphere<double>();
+
+  testTorus<float> ();
+  testTorus<double>();
 
   testWedgeOfTwoCircles<float> ();
   testWedgeOfTwoCircles<double>();
