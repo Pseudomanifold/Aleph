@@ -18,6 +18,7 @@
 #include <aleph/topology/QuotientSpaces.hh>
 #include <aleph/topology/Simplex.hh>
 #include <aleph/topology/SimplicialComplex.hh>
+#include <aleph/topology/Skeleton.hh>
 
 #include <aleph/topology/filtrations/Data.hh>
 
@@ -326,8 +327,6 @@ template <class T> void testPinchedTorus()
   using SimplicialComplex = aleph::topology::SimplicialComplex<Simplex>;
 
   SimplicialComplex K = {
-    //{0,1,2},
-    //{3,4,5},
     {1,4,5},
     {1,2,5},
     {0,3,5},
@@ -374,6 +373,26 @@ template <class T> void testPinchedTorus()
   ALEPH_ASSERT_EQUAL( D1[0].betti(), 1 ); // Z
   ALEPH_ASSERT_EQUAL( D1[1].betti(), 1 ); // Z
   ALEPH_ASSERT_EQUAL( D1[2].betti(), 1 ); // Z
+
+  SimplicialComplex L = K;
+
+  {
+    aleph::topology::BarycentricSubdivision subdivision;
+    L = subdivision( L );
+    L.sort();
+  }
+
+  aleph::topology::Skeleton skeleton;
+  auto X0 = skeleton(0, K);
+  auto X1 = X0;
+  auto X2 = K;
+
+  auto D2 = aleph::calculateIntersectionHomology( L, {X0,X1,X2}, aleph::Perversity( {0} ) );
+
+  ALEPH_ASSERT_EQUAL( D2.size(), 3 );
+  ALEPH_ASSERT_EQUAL( D2[0].betti(), 1 );
+  ALEPH_ASSERT_EQUAL( D2[1].betti(), 0 );
+  ALEPH_ASSERT_EQUAL( D2[2].betti(), 1 );
 
   ALEPH_TEST_END();
 }
