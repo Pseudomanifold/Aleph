@@ -40,6 +40,8 @@
 #include <string>
 #include <vector>
 
+#include <getopt.h>
+
 using namespace aleph;
 using namespace containers;
 using namespace geometry;
@@ -60,22 +62,46 @@ void usage()
 
 int main( int argc, char** argv )
 {
-  if( argc <= 1 )
+  // We first have to specify the data type to use for the subsequent
+  // expansion of the witness complex, as well as a distance functor,
+  // as this influences the point cloud data type.
+  using DataType   = double;
+  using PointCloud = PointCloud<DataType>;
+  using Distance   = Euclidean<DataType>;
+
+  static option commandLineOptions[] =
+  {
+    { "nu"            , required_argument, nullptr, 'n' },
+    { "radius"        , required_argument, nullptr, 'r' },
+    { nullptr         , 0                , nullptr,  0  }
+  };
+
+  unsigned nu     = 2;
+  DataType radius = DataType();
+
+  {
+    int option = 0;
+    while( ( option = getopt_long( argc, argv, "n:r:", commandLineOptions, nullptr ) ) != -1 )
+    {
+      switch( option )
+      {
+      case 'n':
+        nu = unsigned( std::stoul( optarg ) );
+        break;
+      case 'r':
+        radius = DataType( std::stod( optarg) );
+        break;
+      }
+    }
+  }
+
+  if( ( argc - optind ) <= 1 )
   {
     usage();
     return -1;
   }
 
-  // We first have to specify the data type to use for the subsequent
-  // expansion of the witness complex.
-  //
-  // Moreover, we specify a distance functor to use for the subsequent
-  // expansion process.
-  using DataType   = double;
-  using PointCloud = PointCloud<DataType>;
-  using Distance   = Euclidean<DataType>;
-
-  std::string input = argv[1];
+  std::string input = argv[optind++];
 
   // This loads the point cloud from an unstructured file. The point
   // cloud loader is smart enough to handle things such as different
@@ -90,8 +116,8 @@ int main( int argc, char** argv )
   //  - landmark selection process
   //  - number of landmarks
 
-  if( argc >= 2 )
-    dimension = static_cast<unsigned>( std::stoul( argv[2] ) );
+  if( ( argc - optind ) >= 2 )
+    dimension = static_cast<unsigned>( std::stoul( argv[optind++] ) );
 
   std::cerr << "* Generating landmarks using max--min strategy...";
 
@@ -103,7 +129,7 @@ int main( int argc, char** argv )
 
   std::cerr << "finished\n";
 
-  std::cerr << "* Calculating witness complex with d=" << dimension << "...";
+  std::cerr << "* Calculating witness complex with nu=" << nu << ", R=" << radius << ", and d=" << dimension << "...";
 
   // Aleph gives you some options for detecting optional features such
   // as the wrapper for neighbourhood calculations. I would recommend
