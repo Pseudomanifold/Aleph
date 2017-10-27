@@ -611,10 +611,11 @@ template <class T> void testTorus()
   {
     auto D1 = aleph::calculatePersistenceDiagrams(K, dualize, includeAllUnpairedCreators);
 
-    ALEPH_ASSERT_EQUAL( D1.size(), 3 );
+    ALEPH_ASSERT_EQUAL( D1.size(), 4 );
     ALEPH_ASSERT_EQUAL( D1[0].betti(), 1 ); // Z
-    ALEPH_ASSERT_EQUAL( D1[1].betti(), 2 ); // Z+Z
-    ALEPH_ASSERT_EQUAL( D1[2].betti(), 1 ); // Z
+    ALEPH_ASSERT_EQUAL( D1[1].betti(), 0 ); // 0
+    ALEPH_ASSERT_EQUAL( D1[2].betti(), 2 ); // Z+Z
+    ALEPH_ASSERT_EQUAL( D1[3].betti(), 1 ); // Z
   }
 
 #if 0
