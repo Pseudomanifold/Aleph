@@ -318,6 +318,65 @@ template <class T> void testDiskWithFlares()
   ALEPH_TEST_END();
 }
 
+template <class T> void testPinchedTorus()
+{
+  ALEPH_TEST_BEGIN( "Persistent intersection homology: pinched torus" );
+
+  using Simplex           = aleph::topology::Simplex<T>;
+  using SimplicialComplex = aleph::topology::SimplicialComplex<Simplex>;
+
+  SimplicialComplex K = {
+    //{0,1,2},
+    //{3,4,5},
+    {1,4,5},
+    {1,2,5},
+    {0,3,4},
+    {0,1,4},
+    {0,3,5},
+    {0,3,2}
+  };
+
+  K.createMissingFaces();
+  K.sort();
+
+  using VertexType = typename Simplex::VertexType;
+  K.push_back( {6} );
+
+  {
+    std::vector<Simplex> simplices;
+    for( auto&& simplex : K )
+    {
+      if( simplex.dimension() == 1 )
+      {
+        auto u = simplex[0];
+        auto v = simplex[1];
+
+        simplices.push_back( {u,v,VertexType(6) } );
+      }
+    }
+
+    for( auto&& simplex : simplices )
+      K.push_back( simplex );
+
+    K.createMissingFaces();
+    K.sort();
+  }
+
+  std::cerr << K << "\n";
+
+  bool dualize                    = true;
+  bool includeAllUnpairedCreators = true;
+
+  auto D1 = aleph::calculatePersistenceDiagrams(K, dualize, includeAllUnpairedCreators);
+
+  ALEPH_ASSERT_EQUAL( D1.size(), 3 );
+  ALEPH_ASSERT_EQUAL( D1[0].betti(), 1 ); // Z
+  //ALEPH_ASSERT_EQUAL( D1[1].betti(), 1 ); // Z
+  //ALEPH_ASSERT_EQUAL( D1[2].betti(), 1 ); // Z
+
+  ALEPH_TEST_END();
+}
+
 template <class T> void testQuotientSpaces()
 {
   ALEPH_TEST_BEGIN( "Persistent intersection homology: quotient spaces" );
@@ -485,6 +544,9 @@ int main(int, char**)
 
   testDiskWithFlares<float> ();
   testDiskWithFlares<double>();
+
+  testPinchedTorus<float> ();
+  testPinchedTorus<double>();
 
   testQuotientSpaces<float> ();
   testQuotientSpaces<double>();
