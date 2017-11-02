@@ -69,9 +69,15 @@ int main( int argc, char** argv )
 
   std::cerr << "* Obtained Vietoris--Rips complex with " << K.size() << " simplices\n";
 
+  std::cerr << "* Calculating skeletons...";
+
   auto K0 = aleph::topology::Skeleton()( 0, K );
   auto K1 = aleph::topology::Skeleton()( 1, K );
   auto K2 = aleph::topology::Skeleton()( 2, K );
+
+  std::cerr << "finished\n";
+
+  std::cerr << "* Performing barycentric subdivision...";
 
   // Barycentric subdivision to ensure that the resulting complex is
   // flaglike in the sense of MacPherson et al.
@@ -86,10 +92,21 @@ int main( int argc, char** argv )
     L.sort( aleph::topology::filtrations::Data<typename decltype(L)::ValueType>() ); // FIXME
   }
 
+  std::cerr << "finished\n";
+
   bool useOriginalIndexing = true;
 
+  std::cerr << "* Calculating persistent homology...";
+
   auto D1 = aleph::calculatePersistenceDiagrams( L );
+
+  std::cerr << "finished\n";
+
+  std::cerr << "* Calculating intersection homology...";
+
   auto D2 = aleph::calculateIntersectionHomology( L, {K0,K1,K2}, aleph::PerversityGM( {0} ), useOriginalIndexing );
+
+  std::cerr << "finished\n";
 
   {
     std::ofstream out0( "/tmp/D_0_IH.txt" );
