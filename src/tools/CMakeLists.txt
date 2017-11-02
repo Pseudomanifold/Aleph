@@ -16,6 +16,8 @@ IF( BUILD_TOOLS )
   ADD_EXECUTABLE( rips_distributions                             rips_distributions.cc )
   ADD_EXECUTABLE( sparse_adjacency_matrices                      sparse_adjacency_matrices.cc )
   ADD_EXECUTABLE( topological_distance                           topological_distance.cc )
+
+  ADD_EXECUTABLE( persistent_intersection_homology               persistent_intersection_homology.cc )
   ADD_EXECUTABLE( wicked_triangulations                          wicked_triangulations.cc )
 
   ENABLE_IF_SUPPORTED( CMAKE_CXX_FLAGS "-O3" )
