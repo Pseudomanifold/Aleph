@@ -63,7 +63,7 @@ int main( int argc, char** argv )
   auto K
     = aleph::geometry::buildVietorisRipsComplex(
         NearestNeighbours( pointCloud ),
-        DataType( 0.70 ), // FIXME: make configurable
+        DataType( 0.50 ), // FIXME: make configurable
         2                 // FIXME: make configurable
   );
 
@@ -92,7 +92,8 @@ int main( int argc, char** argv )
     L.sort( aleph::topology::filtrations::Data<typename decltype(L)::ValueType>() ); // FIXME
   }
 
-  std::cerr << "finished\n";
+  std::cerr << "finished\n"
+            << "* Subdivided simplicial complex has " << L.size() << " simplices\n";
 
   bool useOriginalIndexing = true;
 
