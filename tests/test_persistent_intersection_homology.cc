@@ -499,6 +499,16 @@ template <class T> void testSphere()
   ALEPH_ASSERT_EQUAL( D2.front().dimension(), 0 );
   ALEPH_ASSERT_EQUAL( D2.front().betti(),     1 );
 
+  bool useOriginalIndexing = true;
+
+  auto D3 = aleph::calculateIntersectionHomology( L, {X0,X0,K}, aleph::PerversityGM( {0} ), useOriginalIndexing );
+
+  ALEPH_ASSERT_EQUAL( D3.size(),         3 );
+  ALEPH_ASSERT_EQUAL( D3[0].dimension(), 0 );
+  ALEPH_ASSERT_EQUAL( D3[0].betti(),     1 );
+  ALEPH_ASSERT_EQUAL( D3[1].betti(),     0 );
+  ALEPH_ASSERT_EQUAL( D3[2].betti(),     1 );
+
   ALEPH_TEST_END();
 }
 
