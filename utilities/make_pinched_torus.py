@@ -16,8 +16,8 @@ import matplotlib.pyplot as plt
 import scipy.stats       as ss
 
 n = 4096
-m = 128
-o = 32
+m = 256
+o = 16
 R = 10
 r = 1
 
