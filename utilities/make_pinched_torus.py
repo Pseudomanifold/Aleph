@@ -16,7 +16,8 @@ import matplotlib.pyplot as plt
 import scipy.stats       as ss
 
 n = 4096
-m = int(sqrt(n))
+m = 128
+o = 32
 R = 10
 r = 1
 
@@ -29,9 +30,9 @@ Y = list()
 Z = list()
 
 for i in range(m):
-  for j in range(m):
+  for j in range(o):
     phi   = 2*pi * i / (m-1)
-    theta = 2*pi * j / (m-1)
+    theta = 2*pi * j / (o-1)
 
     # Angular distance to gap. The tube radius of the torus is modified
     # if this distance is smaller than the gap size.
@@ -71,7 +72,7 @@ kernel = ss.gaussian_kde(np.concatenate([X,Y,Z]),bw_method='silverman')
 values = kernel(np.concatenate([X,Y,Z]))
 
 for x,y,z,w in zip(X,Y,Z,values):
-  print(x,y,z,w)
+  print("{:0.8f}\t{:0.8f}\t{:0.8f}".format(x,y,z))
 
 sns.pairplot(df, diag_kind="kde")
 
