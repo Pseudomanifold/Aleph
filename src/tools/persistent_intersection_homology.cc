@@ -99,7 +99,7 @@ int main( int argc, char** argv )
 
   std::cerr << "* Calculating persistent homology...";
 
-  auto D1 = aleph::calculatePersistenceDiagrams( L );
+  auto D1 = aleph::calculatePersistenceDiagrams( K );
 
   std::cerr << "finished\n";
 
@@ -110,8 +110,8 @@ int main( int argc, char** argv )
   std::cerr << "finished\n";
 
   {
-    std::ofstream out0( "/tmp/D_0_IH.txt" );
-    std::ofstream out1( "/tmp/D_0_PH.txt" );
+    std::ofstream out0( "/tmp/D_0_PH.txt" );
+    std::ofstream out1( "/tmp/D_0_IH.txt" );
 
     D1.front().removeDiagonal();
     D2.front().removeDiagonal();
@@ -121,8 +121,8 @@ int main( int argc, char** argv )
   }
 
   {
-    std::ofstream out0( "/tmp/D_1_IH.txt" );
-    std::ofstream out1( "/tmp/D_1_PH.txt" );
+    std::ofstream out0( "/tmp/D_1_PH.txt" );
+    std::ofstream out1( "/tmp/D_1_IH.txt" );
 
     D1.back().removeDiagonal();
     D2.back().removeDiagonal();
