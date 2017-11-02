@@ -71,9 +71,9 @@ int main( int argc, char** argv )
 
   std::cerr << "* Calculating skeletons...";
 
-  auto K0 = aleph::topology::Skeleton()( 0, K );
-  auto K1 = aleph::topology::Skeleton()( 1, K );
-  auto K2 = aleph::topology::Skeleton()( 2, K );
+  auto&& K0 = aleph::topology::Skeleton()( 0, K );
+  auto&& K1 = K0;
+  auto&& K2 = K;
 
   std::cerr << "finished\n";
 
