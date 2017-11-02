@@ -8,10 +8,12 @@
 
 from math import cos, sin, fmod, pi, sqrt
 
+import numpy   as np
 import pandas  as pd
 import seaborn as sns
 
 import matplotlib.pyplot as plt
+import scipy.stats       as ss
 
 n = 4096
 m = int(sqrt(n))
@@ -50,8 +52,6 @@ for i in range(m):
     Y.append(y)
     Z.append(z)
 
-    print(x,y,z)
-
 df = pd.DataFrame(
   {
    'x' : X,
@@ -60,6 +60,19 @@ df = pd.DataFrame(
   }
 )
 
-sns.pairplot(df)
+xmin = min(X)
+xmax = max(X)
+ymin = min(Y)
+ymax = max(Y)
+zmin = min(Z)
+zmax = max(Z)
+
+kernel = ss.gaussian_kde(np.concatenate([X,Y,Z]),bw_method='silverman')
+values = kernel(np.concatenate([X,Y,Z]))
+
+for x,y,z,w in zip(X,Y,Z,values):
+  print(x,y,z,w)
+
+sns.pairplot(df, diag_kind="kde")
 
 plt.show()
