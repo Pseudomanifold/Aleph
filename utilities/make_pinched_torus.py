@@ -1,19 +1,26 @@
 #!/usr/bin/env python3
+#
+# This file is part of the utilities shipped with 'Aleph - A Library for
+# Exploring Persistent Homology'. It contains test code to parametrize a
+# 'pinched torus'.
+#
+# Original author: Bastian Rieck
 
-from math import cos
-from math import pi
-from math import sin
-from math import sqrt
+from math import cos, sin, fmod, pi, sqrt
 
 import pandas  as pd
 import seaborn as sns
 
 import matplotlib.pyplot as plt
 
-n = 1024
+n = 4096
 m = int(sqrt(n))
 R = 10
 r = 1
+
+# Gap size in angular coordinates. This is to be seen as the radius for
+# which the 'pinch' is relevant.
+gap_size = pi / 180.0 * 90
 
 X = list()
 Y = list()
@@ -24,15 +31,26 @@ for i in range(m):
     phi   = 2*pi * i / (m-1)
     theta = 2*pi * j / (m-1)
 
-    x = (R+r*cos(theta))*cos(phi)
-    y = (R+r*cos(theta))*sin(phi)
-    z =  r * sin(theta)
+    # Angular distance to gap. The tube radius of the torus is modified
+    # if this distance is smaller than the gap size.
+    dist  = abs(fmod(2*pi+phi,2*pi) - pi)
 
-    print(x,y,z)
+    if dist <= gap_size:
+      # Use a simple linear model to decrease the radius as we are
+      # coming towards the gap.
+      r_= r / gap_size * dist
+    else:
+      r_ = r
+
+    x = (R+r_*cos(theta))*cos(phi)
+    y = (R+r_*cos(theta))*sin(phi)
+    z =  r_ * sin(theta)
 
     X.append(x)
     Y.append(y)
     Z.append(z)
+
+    print(x,y,z)
 
 df = pd.DataFrame(
   {
