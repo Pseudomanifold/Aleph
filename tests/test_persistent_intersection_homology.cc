@@ -763,6 +763,28 @@ template <class T> void testWeightedTriangle()
   for( auto&& D : D1 )
     std::cerr << D << "\n";
 
+  // Brute-force calculation of admissibility condition ----------------
+  //
+  // We have p(k) = 0 since we are using a Goresky--MacPherson
+  // perversity. Moreover, only k=2 is relevant because K only
+  // has 2-dimensional top simplices. This ensures that we use
+  // X0 = K0, i.e the 0-skeleton of the complex.
+
+  std::map<Simplex, bool> phi;
+
+  for( auto&& s : L )
+  {
+    auto i            = s.dimension();
+    auto intersection = aleph::topology::lastLexicographicalIntersection( X0, s );
+    auto dimension    = intersection.empty() ? -1 : static_cast<long>( intersection.dimension() );
+    bool admissible   = intersection.empty() ? true : static_cast<long>( dimension ) <= ( long(i) - long(2) );
+
+    phi[s] = admissible;
+  }
+
+  for( auto&& pair : phi )
+    std::cerr << pair.first << ": " << pair.second << "\n";
+
   ALEPH_TEST_END();
 }
 
