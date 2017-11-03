@@ -719,6 +719,53 @@ template <class T> void testWedgeOfTwoCircles()
   ALEPH_TEST_END();
 }
 
+template <class T> void testWeightedTriangle()
+{
+  ALEPH_TEST_BEGIN( "Weighted triangle" );
+
+  using DataType          = float;
+  using VertexType        = T;
+  using Simplex           = aleph::topology::Simplex<DataType, VertexType>;
+  using SimplicialComplex = aleph::topology::SimplicialComplex<Simplex>;
+
+  SimplicialComplex K = {
+   {0},
+   {1},
+   {2},
+   Simplex( {0,1},   DataType(1) ), Simplex( {0,2}, DataType(2) ),
+   Simplex( {1,2},   DataType(1) ),
+   Simplex( {0,1,2}, DataType(2) )
+  };
+
+  aleph::topology::BarycentricSubdivision Sd;
+
+  auto L = Sd(K, [] ( std::size_t dimension ) { return dimension == 0 ? 0 : 0.5; } );
+
+  {
+    bool useMaximum                  = true;
+    bool skipOneDimensionalSimplices = true;
+
+    L.recalculateWeights( useMaximum, skipOneDimensionalSimplices );
+    L.sort( aleph::topology::filtrations::Data<Simplex>() );
+  }
+
+  ALEPH_ASSERT_THROW( L.empty() == false );
+  ALEPH_ASSERT_THROW( K.size() < L.size() );
+  ALEPH_ASSERT_EQUAL( L.size(), 25 );
+
+  auto X0 = SimplicialComplex( { {0}, {1}, {2} } );
+  auto X1 = X0;
+  auto X2 = K;
+
+  bool useOriginalIndexing = true;
+  auto D1 = aleph::calculateIntersectionHomology( L, {X0,X1,X2}, aleph::PerversityGM( {0} ), useOriginalIndexing );
+
+  for( auto&& D : D1 )
+    std::cerr << D << "\n";
+
+  ALEPH_TEST_END();
+}
+
 int main(int, char**)
 {
   test<float> ();
@@ -744,4 +791,7 @@ int main(int, char**)
 
   testWedgeOfTwoCircles<float> ();
   testWedgeOfTwoCircles<double>();
+
+  testWeightedTriangle<float> ();
+  testWeightedTriangle<double>();
 }
