@@ -22,6 +22,7 @@
 #include <aleph/persistentHomology/PhiPersistence.hh>
 
 #include <aleph/topology/BarycentricSubdivision.hh>
+#include <aleph/topology/Filter.hh>
 #include <aleph/topology/Simplex.hh>
 #include <aleph/topology/SimplicialComplex.hh>
 #include <aleph/topology/Skeleton.hh>
@@ -141,6 +142,26 @@ int main( int argc, char** argv )
   // original data sets because they are too close to a singularity.
   else
   {
+    aleph::topology::Filter filter;
+    K0 = filter( K,
+      [&singularityValues] ( auto s )
+      {
+        if( s.dimension() == 0 )
+        {
+          auto v = s[0];
+          auto x = singularityValues.at(v);
+
+          // FIXME: obviously, this should be selectable somewhere...
+          return x < 0.00007;
+        }
+
+        return false;
+      }
+    );
+
+    K1 = K0;
+    K2 = K;
+    L  = K;
   }
 
   bool useOriginalIndexing = true;
