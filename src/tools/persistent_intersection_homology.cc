@@ -51,11 +51,12 @@ using PersistenceDiagram = aleph::PersistenceDiagram<DataType>;
 
 int main( int argc, char** argv )
 {
-  if( argc <= 2 )
+  if( argc <= 3 )
     return -1;
 
   std::string inputPointCloud = argv[1];
   std::string inputCurvatures = argv[2];
+  DataType epsilon            = static_cast<DataType>( std::stod( argv[3] ) );
 
   auto pointCloud = aleph::containers::load<DataType>( inputPointCloud );
   auto curvatures = aleph::containers::load<DataType>( inputCurvatures );
@@ -63,8 +64,8 @@ int main( int argc, char** argv )
   auto K
     = aleph::geometry::buildVietorisRipsComplex(
         NearestNeighbours( pointCloud ),
-        DataType( 0.50 ), // FIXME: make configurable
-        2                 // FIXME: make configurable
+        epsilon,
+        2 // FIXME: make configurable
   );
 
   std::cerr << "* Obtained Vietoris--Rips complex with " << K.size() << " simplices\n";
