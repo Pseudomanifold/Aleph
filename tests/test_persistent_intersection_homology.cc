@@ -782,8 +782,26 @@ template <class T> void testWeightedTriangle()
     phi[s] = admissible;
   }
 
+  unsigned numAdmissible0Simplices = 0;
+  unsigned numAdmissible1Simplices = 0;
+  unsigned numAdmissible2Simplices = 0;
+
   for( auto&& pair : phi )
-    std::cerr << pair.first << ": " << pair.second << "\n";
+  {
+    if( pair.second )
+    {
+      if( pair.first.dimension() == 0 )
+        ++numAdmissible0Simplices;
+      else if( pair.first.dimension() == 1 )
+        ++numAdmissible1Simplices;
+      else
+        ++numAdmissible2Simplices;
+    }
+  }
+
+  ALEPH_ASSERT_EQUAL( numAdmissible0Simplices, 4 );
+  ALEPH_ASSERT_EQUAL( numAdmissible1Simplices, 3 );
+  ALEPH_ASSERT_EQUAL( numAdmissible2Simplices, 6 );
 
   ALEPH_TEST_END();
 }
