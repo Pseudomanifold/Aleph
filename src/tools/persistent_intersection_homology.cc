@@ -121,14 +121,15 @@ int main( int argc, char** argv )
     out1 << D2.front() << "\n";
   }
 
+  if( D1.size() >= 2 && D2.size() >= 2 )
   {
     std::ofstream out0( "/tmp/D_1_PH.txt" );
     std::ofstream out1( "/tmp/D_1_IH.txt" );
 
-    D1.back().removeDiagonal();
-    D2.back().removeDiagonal();
+    D1[1].removeDiagonal();
+    D2[1].removeDiagonal();
 
-    out0 << D1.back() << "\n";
-    out1 << D2.back() << "\n";
+    out0 << D1[1] << "\n";
+    out1 << D2[1] << "\n";
   }
 }
