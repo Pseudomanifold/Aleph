@@ -31,6 +31,7 @@
 #include <algorithm>
 #include <fstream>
 #include <iostream>
+#include <numeric>
 #include <set>
 #include <vector>
 
@@ -49,17 +50,48 @@ using PersistenceDiagram = aleph::PersistenceDiagram<DataType>;
   using NearestNeighbours = aleph::geometry::BruteForce<PointCloud, Distance>;
 #endif
 
+template <class Functor> std::vector<DataType> extract( const PointCloud& pointCloud, Functor f )
+{
+  std::vector<DataType> values;
+  values.reserve( pointCloud.size() );
+
+  for( std::size_t i = 0; i < pointCloud.size(); i++ )
+  {
+    auto p = pointCloud[i];
+    auto x = f( p.begin(), p.end() );
+
+    values.push_back(x);
+  }
+
+  return values;
+}
+
 int main( int argc, char** argv )
 {
-  if( argc <= 3 )
+  if( argc <= 2 )
     return -1;
 
   std::string inputPointCloud = argv[1];
-  std::string inputCurvatures = argv[2];
-  DataType epsilon            = static_cast<DataType>( std::stod( argv[3] ) );
+  std::string inputCurvatures = "";
+  DataType epsilon            = static_cast<DataType>( std::stod( argv[2] ) );
+
+  if( argc >= 3 )
+    inputCurvatures = argv[3];
 
   auto pointCloud = aleph::containers::load<DataType>( inputPointCloud );
-  auto curvatures = aleph::containers::load<DataType>( inputCurvatures );
+
+  std::vector<DataType> singularityValues;
+  singularityValues.reserve( pointCloud.size() );
+
+  if( inputCurvatures.empty() == false )
+  {
+    auto curvatures   = aleph::containers::load<DataType>( inputCurvatures );
+    singularityValues = extract( curvatures,
+                                  [] ( auto begin, auto end )
+                                  {
+                                    return std::accumulate( begin, end, DataType() );
+                                  } );
+  }
 
   auto K
     = aleph::geometry::buildVietorisRipsComplex(
@@ -70,31 +102,46 @@ int main( int argc, char** argv )
 
   std::cerr << "* Obtained Vietoris--Rips complex with " << K.size() << " simplices\n";
 
-  std::cerr << "* Calculating skeletons...";
+  decltype(K) K0, K1, K2, L;
 
-  auto K0 = aleph::topology::Skeleton()( 0, K );
-  auto K1 = K0;
-  auto K2 = K;
-
-  std::cerr << "finished\n";
-
-  std::cerr << "* Performing barycentric subdivision...";
-
-  // Barycentric subdivision to ensure that the resulting complex is
-  // flaglike in the sense of MacPherson et al.
-  auto L
-    = aleph::topology::BarycentricSubdivision()( K, [] ( std::size_t dimension ) { return dimension == 0 ? 0 : 0.5; } );
-
+  // Determine stratification ------------------------------------------
+  //
+  // There are two modes of operation here. First, if no singularity
+  // values have been specified by the user, we employ the canonical
+  // stratification based on skeletons.
+  if( singularityValues.empty() )
   {
-    bool useMaximum                  = true;
-    bool skipOneDimensionalSimplices = true;
+    std::cerr << "* Calculating skeletons...";
 
-    L.recalculateWeights( useMaximum, skipOneDimensionalSimplices );
-    L.sort( aleph::topology::filtrations::Data<typename decltype(L)::ValueType>() ); // FIXME
+    K0 = aleph::topology::Skeleton()( 0, K );
+    K1 = K0;
+    K2 = K;
+
+    std::cerr << "finished\n";
+
+    std::cerr << "* Performing barycentric subdivision...";
+
+    // Barycentric subdivision to ensure that the resulting complex is
+    // flaglike in the sense of MacPherson et al.
+    L = aleph::topology::BarycentricSubdivision()( K, [] ( std::size_t dimension ) { return dimension == 0 ? 0 : 0.5; } );
+
+    {
+      bool useMaximum                  = true;
+      bool skipOneDimensionalSimplices = true;
+
+      L.recalculateWeights( useMaximum, skipOneDimensionalSimplices );
+      L.sort( aleph::topology::filtrations::Data<typename decltype(L)::ValueType>() ); // FIXME
+    }
+
+    std::cerr << "finished\n"
+              << "* Subdivided simplicial complex has " << L.size() << " simplices\n";
   }
 
-  std::cerr << "finished\n"
-            << "* Subdivided simplicial complex has " << L.size() << " simplices\n";
+  // Else, we use the supplied singularity values to forbid parts of the
+  // original data sets because they are too close to a singularity.
+  else
+  {
+  }
 
   bool useOriginalIndexing = true;
 

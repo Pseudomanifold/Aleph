@@ -22,10 +22,11 @@ IF( BUILD_TOOLS )
 
   ENABLE_IF_SUPPORTED( CMAKE_CXX_FLAGS "-O3" )
 
-# The confidence set calculation requires the availability of generic
-# lambdas.
+  # The confidence set calculation requires the availability of generic
+  # lambdas. Ditto for persistent intersection homology.
   SET_SOURCE_FILES_PROPERTIES(
     persistence_indicator_function_confidence_sets.cc
+    persistent_intersection_homology.cc
     PROPERTIES COMPILE_FLAGS "-std=c++14"
   )
 
