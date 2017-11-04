@@ -76,7 +76,7 @@ public:
     std::vector< std::vector<ElementType> > distances;
 
     // FIXME: make configurable
-    auto k = 10;
+    unsigned k = 10;
 
     nearestNeighbours.neighbourSearch( k,
                                        indices,
@@ -92,25 +92,25 @@ public:
       // This coordinate matrix will contain the differences to the
       // centroid coordinate. The matrix will be transformed via an
       // SVD.
-      Matrix M = Matrix::Zero(k,d);
+      Matrix M = Matrix::Zero( Index(k), Index(d) );
 
       // Centroid calculation ------------------------------------------
 
-      Vector centroid  = Vector::Zero(1,d);
+      Vector centroid  = Vector::Zero(1, Index(d) );
 
       for( std::size_t j = 0; j < indices[i].size(); j++ )
       {
         auto&& neighbourIndex = indices[i][j];
         auto p                = container[neighbourIndex];
-        Vector v              = Vector::Zero(1,d);
+        Vector v              = Vector::Zero(1, Index(d) );
 
         // copy (and transform!) the vector; there's an implicit type
         // conversion going on here
         for( std::size_t l = 0; l < d; l++ )
-          v(l) = p[l];
+          v( Index(l) ) = p[l];
 
-        centroid += v;
-        M.row(j)  = v;
+        centroid          += v;
+        M.row( Index(j) )  = v;
       }
 
       centroid /= static_cast<T>( indices.size() );
@@ -122,18 +122,18 @@ public:
       Eigen::JacobiSVD<Matrix> svd( M, Eigen::ComputeThinV );
 
       LocalTangentSpace lts;
-      lts.tangents = Matrix::Zero( d, d - 1 );
+      lts.tangents = Matrix::Zero( Index(d), Index(d - 1) );
 
       // The singular vectors of all but the *smallest* singular value
       // form the tangential directions of the tangent space.
 
       auto&& V = svd.matrixV();
 
-      for( std::size_t j = 0; j < d - 1; j++ )
+      for( Index j = 0; j < Index( d - 1 ); j++ )
         lts.tangents.col(j) = V.col(j);
 
-      lts.normal = Matrix::Zero( 1, d );
-      lts.normal = V.col(d-1);
+      lts.normal = Matrix::Zero( Index(1), Index(d) );
+      lts.normal = V.col( Index(d-1) );
 
       localTangentSpaces.push_back( lts );
 
