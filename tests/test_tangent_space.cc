@@ -14,18 +14,15 @@ using namespace geometry;
 
 template <class T> void testCircle()
 {
-  auto n = 100;
-  auto k = 5;
-
-  // FIXME: use for tangent space estimation
-  (void) k;
+  auto n = 200;
+  auto k =  10;
 
   using PointCloud = PointCloud<T>;
   PointCloud pc( n, 2 );
 
   for( int i = 0; i < n; i++ )
   {
-    auto phi = T(2*M_PI*i/n);
+    auto phi = T(2*M_PI*i/(n-1));
     auto r   = T(1.0);
     auto x   = r * std::cos( phi );
     auto y   = r * std::sin( phi );
@@ -35,7 +32,12 @@ template <class T> void testCircle()
 
 #ifdef ALEPH_WITH_EIGEN
   TangentSpace ts;
-  ts( pc );
+  auto curvature = ts( pc, k );
+
+  ALEPH_ASSERT_EQUAL( curvature.size(), std::size_t(n) );
+
+  // TODO: more tests for curvature here...
+
 #endif
 }
 
@@ -47,7 +49,7 @@ template <class T> void test()
   PointCloud pc = load<T>( CMAKE_SOURCE_DIR + std::string( "/tests/input/Iris_colon_separated.txt" ) );
 
   TangentSpace ts;
-  ts( pc );
+  ts( pc, 10 );
 #endif
 }
 
@@ -56,6 +58,6 @@ int main( int, char** )
   testCircle<float> ();
   testCircle<double>();
 
-  //test<float> ();
-  //test<double>();
+  test<float> ();
+  test<double>();
 }
