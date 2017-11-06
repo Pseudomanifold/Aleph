@@ -10,6 +10,7 @@
 
 #ifdef ALEPH_WITH_EIGEN
   #include <Eigen/Core>
+  #include <Eigen/Cholesky>
   #include <Eigen/SVD>
 #endif
 
@@ -211,7 +212,12 @@ public:
         }
       }
 
-      std::cout << A << "," << b << "\n";
+      // Solve the linear system ---------------------------------------
+
+      using Solver = Eigen::LDLT<Matrix>;
+      Solver solver(A);
+
+      auto u = solver.solve( b.transpose() );
     }
   }
 
