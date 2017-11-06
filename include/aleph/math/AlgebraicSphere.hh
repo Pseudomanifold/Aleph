@@ -2,7 +2,10 @@
 #define ALEPH_MATH_ALGEBRAIC_SPHERE_HH__
 
 #include <algorithm>
+#include <numeric>
 #include <vector>
+
+#include <cmath>
 
 namespace aleph
 {
@@ -36,15 +39,20 @@ public:
 
   T radius() const noexcept
   {
+    auto c = this->centre();
+    auto n = std::inner_product( c.begin(), c.end(), c.begin(), T() );
 
+    return std::sqrt( n - _coefficients.front() / _coefficients.back() );
   }
 
   T gaussianCurvature() const
   {
+    return 1 / ( this->radius() * this->radius() );
   }
 
   T meanCurvature() const
   {
+    return 1 / this->radius();
   }
 
 private:
