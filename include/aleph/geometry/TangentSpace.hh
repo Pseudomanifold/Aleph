@@ -9,6 +9,7 @@
 #include <aleph/geometry/distances/Euclidean.hh>
 
 #include <aleph/math/AlgebraicSphere.hh>
+#include <aleph/math/KahanSummation.hh>
 
 #ifdef ALEPH_WITH_EIGEN
   #include <Eigen/Core>
@@ -199,11 +200,46 @@ public:
 
       auto&& indices = lts.indices;
 
+      // Pre-processing --------------------------------------------------
+      //
+      // Choose a value for the beta parameter, based on the weighted
+      // neighbourhood sizes of *all* points. This requires iterating
+      // over all points prior to calculating anything else.
+
+      T beta = T();
+
+      {
+        std::vector<T> W;
+        std::vector<T> H;
+        W.reserve( container.size() );
+        H.reserve( container.size() );
+
+        for( auto&& index : indices )
+        {
+          auto&& neighbour = getPosition( container, index );
+          W.emplace_back( phi( ( lts.position - neighbour ).norm() / lts.localFeatureSize ) );
+          H.emplace_back( lts.localFeatureSize );
+        }
+
+        // Sum of weights *before* applying the local feature size
+        // multiplier; we need to save this result because it will
+        // be required below.
+        auto ws = math::accumulate_kahan_sorted( W.begin(), W.end(), T() );
+
+        // Apply weights to local feature size estimates; afterwards we
+        // can finally obtain the scaling factor from this weighted sum
+        for( std::size_t i = 0; i < W.size(); i++ )
+          W[i] = W[i] * H[i];
+
+        // TODO: make initial guess for beta (10e6) configurable?
+        auto h = math::accumulate_kahan_sorted( W.begin(), W.end(), T() ) / ws;
+        beta   = 10e6 * h * h;
+      }
+
       for( auto&& index : indices )
       {
         auto neighbour           = getPosition( container, index );
         auto squaredNeigbourNorm = neighbour.squaredNorm();
-        auto _beta               = 10e6; // FIXME: how to obtain estimates?
         w                        = phi( ( lts.position - neighbour ).norm() / lts.localFeatureSize );
 
         A(   0,   0) += w;
@@ -212,17 +248,17 @@ public:
 
         for( Index(i) = 1; i < d+1; i++ )
         {
-          A(  i,   i) += w * ( neighbour(i-1)*neighbour(i-1) + 1 ) * _beta;
+          A(  i,   i) += w * ( neighbour(i-1)*neighbour(i-1) + 1 ) * beta;
           A(  i,   0) += w * ( neighbour(i-1) );
-          A(d+1,   i) += w * ( neighbour(i-1)*squaredNeigbourNorm + 2 * _beta * neighbour(i-1) );
-          A(d+1, d+1) += w * ( 4*neighbour(i-1)*neighbour(i-1) ) * _beta;
+          A(d+1,   i) += w * ( neighbour(i-1)*squaredNeigbourNorm + 2 * beta * neighbour(i-1) );
+          A(d+1, d+1) += w * ( 4*neighbour(i-1)*neighbour(i-1) ) * beta;
 
           // re-establish symmetry
           A(  0,   i)  = A(i,0);
           A(  i, d+1)  = A(d+1, i);
 
-          b(i  ) +=       _beta * w * lts.normal(i-1);
-          b(d+1) += 2.0 * _beta * w * lts.normal(i-1) * neighbour(i-1);
+          b(i  ) +=       beta * w * lts.normal(i-1);
+          b(d+1) += 2.0 * beta * w * lts.normal(i-1) * neighbour(i-1);
 
           for( Index(j) = i+1; j < d+1; j++ )
           {
