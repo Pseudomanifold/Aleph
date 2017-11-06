@@ -73,8 +73,15 @@ public:
     std::vector<double> curvature;
     curvature.reserve( container.size() );
 
-    auto lts = localTangentSpaces( container );
-    fitSpheres( container, lts );
+    auto lts     = localTangentSpaces( container );
+    auto spheres = fitSpheres( container, lts );
+
+    std::transform( spheres.begin(), spheres.end(), std::back_inserter( curvature ),
+      [] ( const Sphere& sphere )
+      {
+        return sphere.meanCurvature();
+      }
+    );
 
     return curvature;
   }
