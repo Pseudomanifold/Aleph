@@ -8,6 +8,8 @@
 
 #include <aleph/geometry/distances/Euclidean.hh>
 
+#include <aleph/math/AlgebraicSphere.hh>
+
 #ifdef ALEPH_WITH_EIGEN
   #include <Eigen/Core>
   #include <Eigen/Cholesky>
@@ -48,6 +50,8 @@ public:
 
   using Matrix = Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>;
   using Vector = Eigen::Matrix<T, 1, Eigen::Dynamic>;
+
+  using Sphere = math::AlgebraicSphere<T>;
 
 #if EIGEN_VERSION_AT_LEAST(3,3,0)
   using Index = Eigen::Index;
@@ -163,10 +167,14 @@ public:
     return localTangentSpaces;
   }
 
-  template <class Container> void fitSpheres( const Container& container,
-                                              const std::vector<LocalTangentSpace>& localTangentSpaces )
+  template <class Container>
+    std::vector<Sphere> fitSpheres( const Container& container,
+                                    const std::vector<LocalTangentSpace>& localTangentSpaces )
   {
     using namespace detail;
+
+    std::vector<Sphere> spheres;
+    spheres.reserve( container.size() );
 
     for( auto&& lts : localTangentSpaces )
     {
@@ -213,12 +221,19 @@ public:
       }
 
       // Solve the linear system ---------------------------------------
+      //
+      // The solution of the system Ax = b is used to obtain the
+      // coefficients of the algebraic sphere.
 
       using Solver = Eigen::LDLT<Matrix>;
       Solver solver(A);
 
-      auto u = solver.solve( b.transpose() );
+      Vector u = solver.solve( b.transpose() );
+
+      spheres.emplace_back( Sphere( u.data(), u.data() + u.size() ) );
     }
+
+    return spheres;
   }
 
 private:
