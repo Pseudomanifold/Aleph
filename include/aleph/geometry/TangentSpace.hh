@@ -65,15 +65,16 @@ public:
     Vector normal;
     Vector position;
 
+    T localFeatureSize;
     std::vector<std::size_t> indices;
   };
 
-  template <class Container> std::vector<T> operator()( const Container& container )
+  template <class Container> std::vector<T> operator()( const Container& container, unsigned k )
   {
     std::vector<double> curvature;
     curvature.reserve( container.size() );
 
-    auto lts     = localTangentSpaces( container );
+    auto lts     = localTangentSpaces( container, k );
     auto spheres = fitSpheres( container, lts );
 
     std::transform( spheres.begin(), spheres.end(), std::back_inserter( curvature ),
@@ -86,7 +87,7 @@ public:
     return curvature;
   }
 
-  template <class Container> std::vector<LocalTangentSpace> localTangentSpaces( const Container& container )
+  template <class Container> std::vector<LocalTangentSpace> localTangentSpaces( const Container& container, unsigned k )
   {
     using ElementType = typename Container::ElementType;
     using Distance    = distances::Euclidean<ElementType>;
@@ -102,9 +103,6 @@ public:
 
     std::vector< std::vector<IndexType> > indices;
     std::vector< std::vector<ElementType> > distances;
-
-    // FIXME: make configurable
-    unsigned k = 10;
 
     nearestNeighbours.neighbourSearch( k,
                                        indices,
@@ -160,10 +158,18 @@ public:
       for( Index j = 0; j < Index( d - 1 ); j++ )
         lts.tangents.col(j) = V.col(j);
 
-      lts.normal   = Matrix::Zero( Index(1), Index(d) );
-      lts.normal   = V.col( Index(d-1) );
-      lts.position = getPosition( container, i );
-      lts.indices  = indices[i];
+      lts.normal           = Matrix::Zero( Index(1), Index(d) );
+      lts.normal           = V.col( Index(d-1) );
+      lts.position         = getPosition( container, i );
+      lts.indices          = indices[i];
+
+      // Take the *maximum distance* in which we can find all of the
+      // neighbours as a *rough*  approximation to the local feature
+      // size.
+      lts.localFeatureSize
+        = distances[i].empty() == false ?
+            *std::max_element( distances[i].begin(), distances[i].end() )
+          : T();
 
       localTangentSpaces.push_back( lts );
 
@@ -197,9 +203,8 @@ public:
       {
         auto neighbour           = getPosition( container, index );
         auto squaredNeigbourNorm = neighbour.squaredNorm();
-        auto localFeatureSize    = 1.0; // FIXME: how to obtain estimates?
-        auto _beta               = 1.0; // FIXME: how to obtain estimates?
-        w                        = phi( ( lts.position - neighbour ).norm() / localFeatureSize );
+        auto _beta               = 10e6; // FIXME: how to obtain estimates?
+        w                        = phi( ( lts.position - neighbour ).norm() / lts.localFeatureSize );
 
         A(   0,   0) += w;
         A( d+1,   0) += w * squaredNeigbourNorm;
