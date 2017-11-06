@@ -21,11 +21,23 @@ namespace aleph
 namespace geometry
 {
 
-#ifdef ALEPH_WITH_EIGEN
-
-class LocalTangentSpace
+namespace detail
 {
-};
+
+/**
+  Model of a smooth decreasing weight function according to the
+  original paper *Algebraic Point Set Surfaces* by Guennebaud &
+  Gross.
+*/
+
+template <class T> T phi( T x )
+{
+  return x < 1 ? std::pow( 1 - x*x, T(4) ) : T();
+}
+
+} // namespace detail
+
+#ifdef ALEPH_WITH_EIGEN
 
 class TangentSpace
 {
@@ -46,6 +58,9 @@ public:
   {
     Matrix tangents;
     Vector normal;
+    Vector position;
+
+    std::vector<std::size_t> indices;
   };
 
   template <class Container> std::vector<T> operator()( const Container& container )
@@ -53,7 +68,8 @@ public:
     std::vector<double> curvature;
     curvature.reserve( container.size() );
 
-    localTangentSpaces( container );
+    auto lts = localTangentSpaces( container );
+    fitSpheres( container, lts );
 
     return curvature;
   }
@@ -132,8 +148,10 @@ public:
       for( Index j = 0; j < Index( d - 1 ); j++ )
         lts.tangents.col(j) = V.col(j);
 
-      lts.normal = Matrix::Zero( Index(1), Index(d) );
-      lts.normal = V.col( Index(d-1) );
+      lts.normal   = Matrix::Zero( Index(1), Index(d) );
+      lts.normal   = V.col( Index(d-1) );
+      lts.position = getPosition( container, i );
+      lts.indices  = indices[i];
 
       localTangentSpaces.push_back( lts );
 
@@ -142,6 +160,80 @@ public:
     }
 
     return localTangentSpaces;
+  }
+
+  template <class Container> void fitSpheres( const Container& container,
+                                              const std::vector<LocalTangentSpace>& localTangentSpaces )
+  {
+    using namespace detail;
+
+    for( auto&& lts : localTangentSpaces )
+    {
+      auto d = Index( container.dimension() );
+      auto w = 1.0;
+
+      Matrix A = Matrix::Zero( d+2, d+2 );
+      Vector b = Vector::Zero( 1,   d+2 );
+
+      auto&& indices = lts.indices;
+
+      for( auto&& index : indices )
+      {
+        auto neighbour           = getPosition( container, index );
+        auto squaredNeigbourNorm = neighbour.squaredNorm();
+        auto localFeatureSize    = 1.0; // FIXME: how to obtain estimates?
+        auto _beta               = 1.0; // FIXME: how to obtain estimates?
+        w                        = phi( ( lts.position - neighbour ).norm() / localFeatureSize );
+
+        A(   0,   0) += w;
+        A( d+1,   0) += w * squaredNeigbourNorm;
+        A( d+1, d+1) += w * squaredNeigbourNorm * squaredNeigbourNorm;
+
+        for( Index(i) = 1; i < d+1; i++ )
+        {
+          A(  i,   i) += w * ( neighbour(i-1)*neighbour(i-1) + 1 ) * _beta;
+          A(  i,   0) += w * ( neighbour(i-1) );
+          A(d+1,   i) += w * ( neighbour(i-1)*squaredNeigbourNorm + 2 * _beta * neighbour(i-1) );
+          A(d+1, d+1) += w * ( 4*neighbour(i-1)*neighbour(i-1) ) * _beta;
+
+          // re-establish symmetry
+          A(  0,   i)  = A(i,0);
+          A(  i, d+1)  = A(d+1, i);
+
+          b(i  ) +=       _beta * w * lts.normal(i-1);
+          b(d+1) += 2.0 * _beta * w * lts.normal(i-1) * neighbour(i-1);
+
+          for( Index(j) = i+1; j < d+1; j++ )
+          {
+            A(j, i) += w * neighbour(i-1) * neighbour(j-1);
+            A(i, j)  = A(j,i);
+          }
+        }
+      }
+
+      std::cout << A << "," << b << "\n";
+    }
+  }
+
+private:
+
+  /**
+    Auxiliary function for extracting and converting a position from
+    a given container, storing it as a (mathematical) vector.
+  */
+
+  template <class Container> Vector getPosition( const Container& container, std::size_t i )
+  {
+    auto d   = container.dimension();
+    auto p   = container[i];
+    Vector v = Vector::Zero(1, Index(d) );
+
+    // copy (and transform!) the vector; there's an implicit type
+    // conversion going on here
+    for( std::size_t l = 0; l < d; l++ )
+      v( Index(l) ) = p[l];
+
+    return v;
   }
 };
 
