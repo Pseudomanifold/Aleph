@@ -165,7 +165,8 @@ private:
       for( Index j = 0; j < Index( d - 1 ); j++ )
         lts.tangents.col(j) = V.col(j);
 
-      lts.normal           = V.col( Index(d-1) );
+      lts.normal           = Matrix::Zero( Index(1), Index(d) );
+      lts.normal           = V.col( Index(d-1) ).normalized();
       lts.position         = getPosition( container, i );
       lts.indices          = indices[i];
 
