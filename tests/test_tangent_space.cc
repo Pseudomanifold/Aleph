@@ -15,7 +15,6 @@ using namespace geometry;
 template <class T> void testCircle()
 {
   unsigned n = 200;
-  unsigned k =  10;
 
   using PointCloud = PointCloud<T>;
   PointCloud pc( n, 2 );
@@ -33,6 +32,8 @@ template <class T> void testCircle()
 #ifdef ALEPH_WITH_EIGEN
 #if EIGEN_VERSION_AT_LEAST(3,3,0)
   TangentSpace ts;
+
+  unsigned k     = 10;
   auto curvature = ts( pc, k );
 
   ALEPH_ASSERT_EQUAL( curvature.size(), std::size_t(n) );
