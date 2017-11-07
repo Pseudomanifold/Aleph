@@ -31,6 +31,7 @@ template <class T> void testCircle()
   }
 
 #ifdef ALEPH_WITH_EIGEN
+#if EIGEN_VERSION_AT_LEAST(3,3,0)
   TangentSpace ts;
   auto curvature = ts( pc, k );
 
@@ -38,18 +39,23 @@ template <class T> void testCircle()
 
   // TODO: more tests for curvature here...
 
+  for( auto&& c : curvature )
+    std::cout << c << "\n";
+#endif
 #endif
 }
 
 template <class T> void test()
 {
 #ifdef ALEPH_WITH_EIGEN
+#if EIGEN_VERSION_AT_LEAST(3,3,0)
   using PointCloud = PointCloud<T>;
 
   PointCloud pc = load<T>( CMAKE_SOURCE_DIR + std::string( "/tests/input/Iris_colon_separated.txt" ) );
 
   TangentSpace ts;
   ts( pc, 10 );
+#endif
 #endif
 }
 
