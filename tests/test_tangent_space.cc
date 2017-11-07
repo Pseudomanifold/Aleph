@@ -14,13 +14,13 @@ using namespace geometry;
 
 template <class T> void testCircle()
 {
-  auto n = 200;
-  auto k =  10;
+  unsigned n = 200;
+  unsigned k =  10;
 
   using PointCloud = PointCloud<T>;
   PointCloud pc( n, 2 );
 
-  for( int i = 0; i < n; i++ )
+  for( unsigned i = 0; i < n; i++ )
   {
     auto phi = T(2*M_PI*i/(n-1));
     auto r   = T(1.0);
