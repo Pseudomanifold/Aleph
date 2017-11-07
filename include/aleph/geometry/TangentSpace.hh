@@ -43,6 +43,8 @@ template <class T> T phi( T x )
 
 } // namespace detail
 
+#ifdef ALEPH_WITH_EIGEN
+
 // Previous versions of Eigen have a bug that occurs when mixing dynamic
 // and fixed-sized vectors:
 //
@@ -50,12 +52,11 @@ template <class T> T phi( T x )
 //
 // Until a workaround has been identified, tangent space estimation will
 // not be enabled for older versions.
-#if defined(ALEPH_WITH_EIGEN) && EIGEN_VERSION_AT_LEAST(3,2,0)
+#if EIGEN_VERSION_AT_LEAST(3,3,0)
 
 class TangentSpace
 {
 public:
-
   using T        = double;
 
   using Matrix = Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>;
@@ -295,18 +296,13 @@ private:
           {
             D( i*(d+1)+j+1, j+1 ) = 1;
             D( i*(d+1)+j+1, d+1 ) = 2 * neighbour(j);
-            c( i*(d+1)+j+1, 0   ) = lts.normal(j); //localTangentSpaces.at(index).normal(j);
+            c( i*(d+1)+j+1, 0   ) = localTangentSpaces.at(index).normal(j);
           }
 
           ++i;
         }
 
       }
-
-      auto A_ = D.transpose() * W * D;
-      std::cerr << "A_ = " << A_ << "\n";
-
-      std::cerr << "b_ = " << D.transpose() * W * c << "\n";
 
       for( auto&& index : indices )
       {
@@ -329,8 +325,8 @@ private:
           A(  0,   i)  = A(i,0);
           A(  i, d+1)  = A(d+1, i);
 
-          b(i  ) +=       beta * w * lts.normal(i-1);
-          b(d+1) += 2.0 * beta * w * lts.normal(i-1) * neighbour(i-1);
+          b(i  ) +=       beta * w * localTangentSpaces.at(index).normal(i-1);
+          b(d+1) += 2.0 * beta * w * localTangentSpaces.at(index).normal(i-1) * neighbour(i-1);
 
           for( Index(j) = i+1; j < d+1; j++ )
           {
@@ -342,9 +338,6 @@ private:
         // re-establish symmetry
         A(0, d+1) = A(d+1, 0);
       }
-
-      std::cerr << "A = " << A << "\n";
-      std::cerr << "b = " << b << "\n";
 
       // Solve the linear system ---------------------------------------
       //
@@ -381,6 +374,8 @@ private:
     return v;
   }
 };
+
+#endif
 
 #endif
 
