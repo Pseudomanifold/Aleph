@@ -14,6 +14,7 @@
 #ifdef ALEPH_WITH_EIGEN
   #include <Eigen/Core>
   #include <Eigen/Cholesky>
+  #include <Eigen/Eigenvalues>
   #include <Eigen/SVD>
 #endif
 
@@ -176,7 +177,6 @@ private:
       for( Index j = 0; j < Index( d - 1 ); j++ )
         lts.tangents.col(j) = V.col(j);
 
-      lts.normal           = Matrix::Zero( Index(1), Index(d) );
       lts.normal           = V.col( Index(d-1) ).normalized();
       lts.position         = getPosition( container, i );
       lts.indices          = indices[i];
@@ -303,7 +303,6 @@ private:
 
           ++i;
         }
-
       }
 
       for( auto&& index : indices )
@@ -356,6 +355,73 @@ private:
 
     return spheres;
   }
+
+  template <class Container>
+    std::vector<Sphere> fitSpheresWithoutNormals( const Container& container,
+                                                  const std::vector<LocalTangentSpace>& localTangentSpaces )
+  {
+    using namespace detail;
+
+    std::vector<Sphere> spheres;
+    spheres.reserve( container.size() );
+
+    for( auto&& lts : localTangentSpaces )
+    {
+      auto&& indices = lts.indices;
+      auto d         = Index( container.dimension() );
+      auto k         = Index( indices.size() );
+
+      Matrix W = Matrix::Zero(k,k  );
+      Matrix D = Matrix::Zero(k,d+2);
+      Matrix C = Matrix::Identity(d+2,d+2);
+
+      C(0  ,  0) =  0;
+      C(0  ,d+1) = -2;
+      C(d+1,  0) = -2;
+
+      {
+        Index i = Index();
+        for( auto&& index : indices )
+        {
+          auto neighbour = getPosition( container, index );
+          W(i,  i)       = phi( ( lts.position - neighbour ).norm() / lts.localFeatureSize );
+          D(i,  0)       = 1;
+          D(i,d+1)       = neighbour * neighbour.transpose();
+
+          for( Index j = 0; j < d; j++ )
+            D(i,j+1) = neighbour(j);
+
+          ++i;
+        }
+      }
+
+      // Solve the linear system ---------------------------------------
+      //
+      // The solution of the system Ax = b is used to obtain the
+      // coefficients of the algebraic sphere.
+
+      using Solver = Eigen::GeneralizedSelfAdjointEigenSolver<Matrix>;
+      Solver solver;
+      solver.compute( D.transpose() * W *D, C );
+
+      auto eigenvalues = solver.eigenvalues();
+      Vector u         = Vector::Zero( 1, d+2 );
+
+      for( Index i = 0; i < d+2; i++ )
+      {
+        if( eigenvalues(i) > 0 )
+        {
+          u = solver.eigenvectors().col(i);
+          break;
+        }
+      }
+
+      spheres.emplace_back( Sphere( u.data(), u.data() + u.size() ) );
+    }
+
+    return spheres;
+  }
+
 
   void propagateOrientation( std::vector<LocalTangentSpace>& localTangentSpaces )
   {
