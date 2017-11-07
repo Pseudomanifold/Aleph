@@ -17,6 +17,8 @@
   #include <Eigen/SVD>
 #endif
 
+#include <cassert>
+
 #include <vector>
 
 namespace aleph
@@ -203,9 +205,7 @@ private:
 
     for( auto&& lts : localTangentSpaces )
     {
-      auto d = Index( container.dimension() );
-      auto w = 1.0;
-
+      auto d   = Index( container.dimension() );
       Matrix A = Matrix::Zero( d+2, d+2 );
       Vector b = Vector::Zero( 1,   d+2 );
 
@@ -247,11 +247,62 @@ private:
         beta   = 10e6 * h * h;
       }
 
+      Index k  = Index( indices.size() );
+      Matrix W = Matrix::Zero( (d+1)*k, (d+1)*k );
+      Matrix D = Matrix::Zero( (d+1)*k, (d+2)   );
+      Vector c = Vector::Zero(       1, (d+1)*k );
+
+      {
+        Index i = Index();
+
+        for( auto&& index : indices )
+        {
+          auto neighbour       = getPosition( container, index );
+          auto w               = phi( ( lts.position - neighbour ).norm() / lts.localFeatureSize );
+          W( i*(d+1),i*(d+1) ) = w;
+
+          for( Index(j) = 0; j < d; j++ )
+          {
+            assert( W( i*(d+1)+j+1, i*(d+1)+j+1 ) == 0 );
+            W( i*(d+1)+j+1, i*(d+1)+j+1 ) = beta * w;
+          }
+
+          ++i;
+        }
+      }
+
+      {
+        Index i = Index();
+
+        for( auto&& index : indices )
+        {
+          auto neighbour       = getPosition( container, index );
+          D( i*(d+1), 0 )      = 1.0;
+
+          for( Index(j) = 0; j < d; j++ )
+            D( i*(d+1), j+1 ) = neighbour(j);
+
+          D( i*(d+1), d+1) = neighbour * neighbour.transpose();
+
+          for( Index(j) = 0; j < d; j++ )
+          {
+            D( i*(d+1)+j+1, j+1 ) = 1;
+            D( i*(d+1)+j+1, d+1 ) = 2 * neighbour(j);
+          }
+
+          ++i;
+        }
+
+      }
+
+      auto A_ = D.transpose() * W * D;
+      std::cerr << "A_ = " << A_ << "\n";
+
       for( auto&& index : indices )
       {
         auto neighbour           = getPosition( container, index );
         auto squaredNeigbourNorm = neighbour.squaredNorm();
-        w                        = phi( ( lts.position - neighbour ).norm() / lts.localFeatureSize );
+        auto w                   = phi( ( lts.position - neighbour ).norm() / lts.localFeatureSize );
 
         A(   0,   0) += w;
         A( d+1,   0) += w * squaredNeigbourNorm;
@@ -277,7 +328,12 @@ private:
             A(i, j)  = A(j,i);
           }
         }
+
+        // re-establish symmetry
+        A(0, d+1) = A(d+1, 0);
       }
+
+      std::cerr << "A = " << A << "\n";
 
       // Solve the linear system ---------------------------------------
       //
