@@ -3,4 +3,28 @@
 
 #cmakedefine ALEPH_WITH_EIGEN
 
+// Ensures that this macro is *always* defined, regardless of whether
+// the library has been found or not.
+#ifndef ALEPH_WITH_EIGEN
+
+  // Bogus version number to make all version checks work irrespective
+  // of the presence of the library. This simplifies test cases.
+
+  #ifndef EIGEN_WORLD_VERSION
+    #define EIGEN_WORLD_VERSION 0
+  #endif
+
+  #ifndef EIGEN_MAJOR_VERSION
+    #define EIGEN_MAJOR_VERSION 0
+  #endif
+
+  #ifndef EIGEN_MINOR_VERSION
+    #define EIGEN_MINOR_VERSION 0
+  #endif
+
+  #ifndef EIGEN_VERSION_AT_LEAST
+    #define EIGEN_VERSION_AT_LEAST(x,y,z) false
+  #endif
+#endif
+
 #endif
