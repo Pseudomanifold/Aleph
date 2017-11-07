@@ -128,13 +128,7 @@ public:
       for( std::size_t j = 0; j < indices[i].size(); j++ )
       {
         auto&& neighbourIndex = indices[i][j];
-        auto p                = container[neighbourIndex];
-        Vector v              = Vector::Zero(1, Index(d) );
-
-        // copy (and transform!) the vector; there's an implicit type
-        // conversion going on here
-        for( std::size_t l = 0; l < d; l++ )
-          v( Index(l) ) = p[l];
+        auto v                = getPosition( container, neighbourIndex );
 
         centroid          += v;
         M.row( Index(j) )  = v;
