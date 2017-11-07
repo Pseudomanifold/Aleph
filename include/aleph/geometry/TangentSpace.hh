@@ -88,7 +88,7 @@ public:
     curvature.reserve( container.size() );
 
     auto lts     = localTangentSpaces( container, k );
-    auto spheres = fitSpheres( container, lts );
+    auto spheres = fitSpheresWithoutNormals( container, lts );
 
     std::transform( spheres.begin(), spheres.end(), std::back_inserter( curvature ),
       [] ( const Sphere& sphere )
@@ -378,6 +378,7 @@ private:
       C(0  ,  0) =  0;
       C(0  ,d+1) = -2;
       C(d+1,  0) = -2;
+      C(d+1,d+1) =  0;
 
       {
         Index i = Index();
@@ -400,18 +401,18 @@ private:
       // The solution of the system Ax = b is used to obtain the
       // coefficients of the algebraic sphere.
 
-      using Solver = Eigen::GeneralizedSelfAdjointEigenSolver<Matrix>;
+      using Solver = Eigen::GeneralizedEigenSolver<Matrix>;
       Solver solver;
-      solver.compute( D.transpose() * W *D, C );
+      solver.compute( D.transpose() * W * D, C );
 
       auto eigenvalues = solver.eigenvalues();
       Vector u         = Vector::Zero( 1, d+2 );
 
       for( Index i = 0; i < d+2; i++ )
       {
-        if( eigenvalues(i) > 0 )
+        if( eigenvalues(i).real() > 0 && eigenvalues(i).imag() == 0 )
         {
-          u = solver.eigenvectors().col(i);
+          u = solver.eigenvectors().real().col(i);
           break;
         }
       }
