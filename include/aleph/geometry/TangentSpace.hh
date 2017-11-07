@@ -19,6 +19,7 @@
 
 #include <cassert>
 
+#include <set>
 #include <vector>
 
 namespace aleph
@@ -199,6 +200,7 @@ private:
       //    whether this will improve the results or not.
     }
 
+    propagateOrientation( localTangentSpaces );
     return localTangentSpaces;
   }
 
@@ -353,6 +355,34 @@ private:
     }
 
     return spheres;
+  }
+
+  void propagateOrientation( std::vector<LocalTangentSpace>& localTangentSpaces )
+  {
+    using Edge = std::pair<std::size_t, std::size_t>;
+
+    std::set<Edge> edges;
+    for( std::size_t i = 0; i < localTangentSpaces.size(); i++ )
+    {
+      for( auto&& index : localTangentSpaces.at(i).indices )
+      {
+        if( i < index )
+          edges.insert( std::make_pair(i,index) );
+        else
+          edges.insert( std::make_pair(index,i) );
+      }
+    }
+
+    for( auto&& edge : edges )
+    {
+      auto i    = edge.first;
+      auto&& ni = localTangentSpaces.at(i).normal;
+      auto j    = edge.second;
+      auto&& nj = localTangentSpaces.at(j).normal;
+
+      if( ni * nj.transpose() < 0 )
+        nj = -nj;
+    }
   }
 
   /**
