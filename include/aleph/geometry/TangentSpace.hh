@@ -43,7 +43,14 @@ template <class T> T phi( T x )
 
 } // namespace detail
 
-#ifdef ALEPH_WITH_EIGEN
+// Previous versions of Eigen have a bug that occurs when mixing dynamic
+// and fixed-sized vectors:
+//
+//   http://eigen.tuxfamily.org/bz/show_bug.cgi?id=654
+//
+// Until a workaround has been identified, tangent space estimation will
+// not be enabled for older versions.
+#if defined(ALEPH_WITH_EIGEN) && EIGEN_VERSION_AT_LEAST(3,2,0)
 
 class TangentSpace
 {
@@ -250,7 +257,7 @@ private:
       Index k  = Index( indices.size() );
       Matrix W = Matrix::Zero( (d+1)*k, (d+1)*k );
       Matrix D = Matrix::Zero( (d+1)*k, (d+2)   );
-      Vector c = Vector::Zero(       1, (d+1)*k );
+      Matrix c = Matrix::Zero( (d+1)*k, 1       );
 
       {
         Index i = Index();
@@ -288,6 +295,7 @@ private:
           {
             D( i*(d+1)+j+1, j+1 ) = 1;
             D( i*(d+1)+j+1, d+1 ) = 2 * neighbour(j);
+            c( i*(d+1)+j+1, 0   ) = lts.normal(j); //localTangentSpaces.at(index).normal(j);
           }
 
           ++i;
@@ -297,6 +305,8 @@ private:
 
       auto A_ = D.transpose() * W * D;
       std::cerr << "A_ = " << A_ << "\n";
+
+      std::cerr << "b_ = " << D.transpose() * W * c << "\n";
 
       for( auto&& index : indices )
       {
@@ -334,6 +344,7 @@ private:
       }
 
       std::cerr << "A = " << A << "\n";
+      std::cerr << "b = " << b << "\n";
 
       // Solve the linear system ---------------------------------------
       //
