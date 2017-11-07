@@ -88,6 +88,18 @@ public:
     return curvature;
   }
 
+private:
+
+  /**
+    Given a container and a number for determining the local
+    neighbourhood of points, this function estimates (!) the
+    tangent space structure around every point, resulting in
+    a set of normal vectors and tangent vectors.
+
+    @param container Container
+    @param k         Local neighbourhood size
+  */
+
   template <class Container> std::vector<LocalTangentSpace> localTangentSpaces( const Container& container, unsigned k )
   {
     using ElementType = typename Container::ElementType;
@@ -153,7 +165,6 @@ public:
       for( Index j = 0; j < Index( d - 1 ); j++ )
         lts.tangents.col(j) = V.col(j);
 
-      lts.normal           = Matrix::Zero( Index(1), Index(d) );
       lts.normal           = V.col( Index(d-1) );
       lts.position         = getPosition( container, i );
       lts.indices          = indices[i];
@@ -168,8 +179,13 @@ public:
 
       localTangentSpaces.push_back( lts );
 
-      // TODO: calculate raw approximation (reconstruction) error by
-      // assessing how well the space fits the original data set
+      // TODO:
+      //
+      // 1. Calculate raw approximation (reconstruction) error by
+      //    assessing how well the space fits the original data
+      //
+      // 2. Make normal orientation consistent. I am unsure as to
+      //    whether this will improve the results or not.
     }
 
     return localTangentSpaces;
@@ -277,8 +293,6 @@ public:
 
     return spheres;
   }
-
-private:
 
   /**
     Auxiliary function for extracting and converting a position from
