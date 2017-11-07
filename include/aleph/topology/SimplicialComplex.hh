@@ -609,6 +609,17 @@ public:
   }
 
   /**
+    Permits simplex removal by value. The function does *not* check
+    whether additional co-faces will have to be removed. Hence, the
+    complex may be invalid afterwards.
+  */
+
+  void remove_without_validation( const Simplex& simplex )
+  {
+    _simplices.template get<index_t>().remove( simplex );
+  }
+
+  /**
     Creates all missing faces of the current simplicial complex. When
     this function is finished, all of the faces for all simplices are
     part of the simplicial complex.
