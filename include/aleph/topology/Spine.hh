@@ -73,6 +73,23 @@ template <class SimplicialComplex, class Simplex> bool isAdmissible( const Simpl
   return admissible;
 }
 
+/**
+  Performs one step of an elementary simplicial collapse in a given
+  simplicial complex. The function assumes that the given simplices
+  are *valid* for performing the collapse.
+*/
+
+template <class SimplicialComplex, class Simplex> SimplicialComplex elementarySimplicialCollapse(
+  const Simplex& sigma,
+  const Simplex& delta,
+  const SimplicialComplex& K )
+{
+  auto L = K;
+
+  L.remove_without_validation( sigma );
+  L.remove_without_validation( delta );
+}
+
 } // namespace topology
 
 } // namespace aleph
