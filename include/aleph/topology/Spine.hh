@@ -3,7 +3,11 @@
 
 #include <aleph/topology/Intersections.hh>
 
+#include <unordered_map>
 #include <vector>
+
+// FIXME: remove after debugging
+#include <iostream>
 
 namespace aleph
 {
@@ -88,6 +92,85 @@ template <class SimplicialComplex, class Simplex> SimplicialComplex elementarySi
 
   L.remove_without_validation( sigma );
   L.remove_without_validation( delta );
+}
+
+/**
+  Performs an iterated elementary simplicial collapse until *all* of the
+  admissible simplices have been collapsed. This leads to the *spine* of
+  the simplicial complex.
+
+  @see S. Matveev, "Algorithmic Topology and Classification of 3-Manifolds"
+*/
+
+template <class SimplicialComplex, class Simplex> SimplicialComplex spine( const SimplicialComplex& K )
+{
+  auto L = K;
+  L.sort();
+
+  std::unordered_map<Simplex, bool> admissible;
+
+  // Step 1: determine free faces --------------------------------------
+  //
+  // This first checks which simplices have at least one free face,
+  // meaning that they may be potentially admissible.
+
+  for( auto it = L.begin(); it != L.end(); ++it )
+  {
+    if( it->dimension() == 0 )
+      continue;
+
+    // The range of the complex M is sufficient because we have
+    // already encountered all lower-dimensional simplices that
+    // precede the current one given by `it`.
+    //
+    // This complex will be used for testing free faces.
+    SimplicialComplex M( L.begin(), it );
+
+    bool hasFreeFace = false;
+    for( auto itFace = it->begin_boundary(); itFace != it->end_boundary(); ++itFace )
+    {
+      for( auto&& simplex : M )
+      {
+        if( itFace->dimension() + 1 == simplex.dimension() )
+        {
+          // The current face must *not* be a face of another simplex in
+          // the simplicial complex.
+          if( intersect( *itFace, simplex ) != *itFace )
+          {
+            hasFreeFace = true;
+            break;
+          }
+
+          // This simplex can *never* be a free face, so let's precede
+          // to the next face.
+          else
+            break;
+        }
+      }
+    }
+
+    if( hasFreeFace )
+      admissible[ *it ] = true;
+  }
+
+  // Step 2: determine principality ------------------------------------
+  //
+  // All simplices that are faces of higher-dimensional simplices are
+  // now removed from the map of admissible simplices.
+
+  for( auto&& s : L )
+  {
+    for( auto itFace = s.begin_boundary(); itFace != s.end_boundary(); ++itFace )
+      admissible[ *itFace ] = false;
+  }
+
+  std::cerr << "ADMISSIBLE SIMPLICES:\n";
+
+  for( auto&& pair : admissible )
+    if( pair.second )
+      std::cerr << pair.first << "\n";
+
+  return L;
 }
 
 } // namespace topology
