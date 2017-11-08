@@ -3,7 +3,7 @@
 
 #include <aleph/topology/Intersections.hh>
 
-#include <unordered_map>
+#include <unordered_set>
 #include <vector>
 
 // FIXME: remove after debugging
@@ -51,7 +51,7 @@ template <class SimplicialComplex, class Simplex> bool isAdmissible( const Simpl
   // Check whether a free face exists ----------------------------------
 
   std::vector<Simplex> faces( s.begin_boundary(), s.end_boundary() );
-  std::vector<bool> admissible( faces.size(), false );
+  std::vector<bool> admissible( faces.size(), true );
 
   std::size_t i = 0;
 
@@ -72,6 +72,39 @@ template <class SimplicialComplex, class Simplex> bool isAdmissible( const Simpl
     }
 
     ++i;
+  }
+
+  return std::find( admissible.begin(), admissible.end(), true ) != admissible.end();
+}
+
+/**
+  Checks whether a pair of a simplex and its face are admissible, i.e.
+  the simplex is *principal* and the face is free.
+*/
+
+template <class SimplicialComplex, class Simplex> bool isAdmissible( const Simplex& sigma, const Simplex& delta, const SimplicialComplex& K )
+{
+  if( !isPrincipal(sigma,K) )
+    return false;
+
+  // Check whether the face is free ------------------------------------
+
+  bool admissible = true;
+
+  // TODO: the traversal could be sped up by only taking at a look at
+  // the *relevant* dimension of the simplicial complex.
+  for( auto&& s : K )
+  {
+    // This check assumes that the simplicial complex is valid, so it
+    // suffices to search faces in one dimension _below_ delta.
+    if( delta.dimension()+1 == s.dimension() && s != sigma )
+    {
+      if( intersect(delta, s) == delta )
+      {
+        admissible = false;
+        break;
+      }
+    }
   }
 
   return admissible;
@@ -109,7 +142,7 @@ template <class SimplicialComplex> SimplicialComplex spine( const SimplicialComp
   auto L = K;
   L.sort();
 
-  std::unordered_map<Simplex, bool> admissible;
+  std::unordered_set<Simplex> admissible;
 
   // Step 1: determine free faces --------------------------------------
   //
@@ -152,7 +185,7 @@ template <class SimplicialComplex> SimplicialComplex spine( const SimplicialComp
     }
 
     if( hasFreeFace )
-      admissible[ *it ] = true;
+      admissible.insert( *it );
   }
 
   // Step 2: determine principality ------------------------------------
@@ -163,14 +196,59 @@ template <class SimplicialComplex> SimplicialComplex spine( const SimplicialComp
   for( auto&& s : L )
   {
     for( auto itFace = s.begin_boundary(); itFace != s.end_boundary(); ++itFace )
-      admissible[ *itFace ] = false;
+      admissible.erase( *itFace );
   }
 
-  std::cerr << "ADMISSIBLE SIMPLICES:\n";
+  // Step 3: collapse until no admissible simplices are left -----------
 
-  for( auto&& pair : admissible )
-    if( pair.second )
-      std::cerr << pair.first << "\n";
+  while( !admissible.empty() )
+  {
+    auto s = *admissible.begin();
+
+    // TODO: this check could be simplified by *storing* the free face
+    // along with the given simplex
+    for( auto itFace = s.begin_boundary(); itFace != s.end_boundary(); ++itFace )
+    {
+      if( isAdmissible( s, *itFace, L ) )
+      {
+        std::cerr << "COLLAPSING (" << s << "," << *itFace << ")\n";
+
+        L.remove_without_validation( s );
+        L.remove_without_validation( *itFace );
+
+        admissible.erase( s );
+
+        // New simplices -----------------------------------------------
+        //
+        // Add new admissible simplices that may potentially have been
+        // spawned by the removal of s.
+
+        std::vector<Simplex> faces( s.begin_boundary(), s.end_boundary() );
+
+        std::for_each( faces.begin(), faces.end(),
+          [&itFace, &L, &admissible] ( const Simplex& s )
+          {
+            if( *itFace != s && isAdmissible( s, L ) )
+              admissible.insert( s );
+          }
+        );
+
+        faces.assign( itFace->begin_boundary(), itFace->end_boundary() );
+
+        std::for_each( faces.begin(), faces.end(),
+          [&L, &admissible] ( const Simplex& s )
+          {
+            if( isAdmissible( s, L ) )
+              admissible.insert( s );
+          }
+        );
+
+        std::cerr << "BREAK\n";
+
+        break;
+      }
+    }
+  }
 
   return L;
 }
