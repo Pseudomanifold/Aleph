@@ -23,6 +23,7 @@ template <class T> void testTriangle()
   auto L = aleph::topology::spine( K );
 
   ALEPH_ASSERT_THROW( L.size() < K.size() );
+  ALEPH_ASSERT_EQUAL( L.size(), 1 );
 }
 
 int main( int, char** )

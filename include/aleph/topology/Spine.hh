@@ -6,9 +6,6 @@
 #include <unordered_set>
 #include <vector>
 
-// FIXME: remove after debugging
-#include <iostream>
-
 namespace aleph
 {
 
@@ -209,12 +206,12 @@ template <class SimplicialComplex> SimplicialComplex spine( const SimplicialComp
     // along with the given simplex
     for( auto itFace = s.begin_boundary(); itFace != s.end_boundary(); ++itFace )
     {
-      if( isAdmissible( s, *itFace, L ) )
-      {
-        std::cerr << "COLLAPSING (" << s << "," << *itFace << ")\n";
+      auto t = *itFace;
 
+      if( isAdmissible( s, t, L ) )
+      {
         L.remove_without_validation( s );
-        L.remove_without_validation( *itFace );
+        L.remove_without_validation( t );
 
         admissible.erase( s );
 
@@ -226,14 +223,14 @@ template <class SimplicialComplex> SimplicialComplex spine( const SimplicialComp
         std::vector<Simplex> faces( s.begin_boundary(), s.end_boundary() );
 
         std::for_each( faces.begin(), faces.end(),
-          [&itFace, &L, &admissible] ( const Simplex& s )
+          [&t, &L, &admissible] ( const Simplex& s )
           {
-            if( *itFace != s && isAdmissible( s, L ) )
+            if( t != s && isAdmissible( s, L ) )
               admissible.insert( s );
           }
         );
 
-        faces.assign( itFace->begin_boundary(), itFace->end_boundary() );
+        faces.assign( t.begin_boundary(), t.end_boundary() );
 
         std::for_each( faces.begin(), faces.end(),
           [&L, &admissible] ( const Simplex& s )
@@ -242,8 +239,6 @@ template <class SimplicialComplex> SimplicialComplex spine( const SimplicialComp
               admissible.insert( s );
           }
         );
-
-        std::cerr << "BREAK\n";
 
         break;
       }
