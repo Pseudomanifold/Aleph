@@ -131,24 +131,24 @@ template <class SimplicialComplex> SimplicialComplex spine( const SimplicialComp
     bool hasFreeFace = false;
     for( auto itFace = it->begin_boundary(); itFace != it->end_boundary(); ++itFace )
     {
+      bool isFace = false;
       for( auto&& simplex : M )
       {
         if( itFace->dimension() + 1 == simplex.dimension() )
         {
           // The current face must *not* be a face of another simplex in
           // the simplicial complex.
-          if( intersect( *itFace, simplex ) != *itFace )
+          if( intersect( *itFace, simplex ) == *itFace )
           {
-            hasFreeFace = true;
+            isFace = true;
             break;
           }
-
-          // This simplex can *never* be a free face, so let's precede
-          // to the next face.
-          else
-            break;
         }
       }
+
+      hasFreeFace = !isFace;
+      if( hasFreeFace )
+        break;
     }
 
     if( hasFreeFace )
