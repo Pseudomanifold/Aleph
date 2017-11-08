@@ -102,8 +102,10 @@ template <class SimplicialComplex, class Simplex> SimplicialComplex elementarySi
   @see S. Matveev, "Algorithmic Topology and Classification of 3-Manifolds"
 */
 
-template <class SimplicialComplex, class Simplex> SimplicialComplex spine( const SimplicialComplex& K )
+template <class SimplicialComplex> SimplicialComplex spine( const SimplicialComplex& K )
 {
+  using Simplex = typename SimplicialComplex::value_type;
+
   auto L = K;
   L.sort();
 
