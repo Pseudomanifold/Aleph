@@ -164,8 +164,6 @@ int main( int argc, char** argv )
     L  = K;
   }
 
-  bool useOriginalIndexing = true;
-
   std::cerr << "* Calculating persistent homology...";
 
   auto D1 = aleph::calculatePersistenceDiagrams( K );
@@ -174,7 +172,7 @@ int main( int argc, char** argv )
 
   std::cerr << "* Calculating intersection homology...";
 
-  auto D2 = aleph::calculateIntersectionHomology( L, {K0,K1,K2}, aleph::PerversityGM( {0} ), useOriginalIndexing );
+  auto D2 = aleph::calculateIntersectionHomology( L, {K0,K1,K2}, aleph::PerversityGM( {0} ) );
 
   std::cerr << "finished\n";
 

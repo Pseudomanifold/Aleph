@@ -13,6 +13,7 @@
 #include <map>
 #include <ostream>
 #include <stdexcept>
+#include <type_traits>
 #include <utility>
 #include <vector>
 
@@ -180,6 +181,13 @@ private:
   std::vector<unsigned> _values;
 };
 
+// Provide a simple form of tag dispatching in order to detect whether
+// a perversity uses the 'original' intersection homology framework as
+// described by Goresky and MacPherson.
+template <typename>   struct is_goresky_macpherson_perversity_base              : std::false_type {};
+template <>           struct is_goresky_macpherson_perversity_base<PerversityGM>: std::true_type {};
+template <typename T> struct is_goresky_macpherson_perversity                   : is_goresky_macpherson_perversity_base<typename std::decay<T>::type> {};
+
 std::ostream& operator<<( std::ostream& o, const Perversity p )
 {
   o << "[";
@@ -200,13 +208,16 @@ std::ostream& operator<<( std::ostream& o, const Perversity p )
 template <class Simplex, class Perversity>
 auto calculateIntersectionHomology( const aleph::topology::SimplicialComplex<Simplex>& K,
                                     const std::vector< aleph::topology::SimplicialComplex<Simplex> >& X,
-                                    const Perversity& p,
-                                    bool useOriginalIndexing = false ) -> std::vector< PersistenceDiagram<typename Simplex::DataType> >
+                                    const Perversity& p ) -> std::vector< PersistenceDiagram<typename Simplex::DataType> >
 {
-  // 0. Check consistency of strata
-  // 1. Create allowability function based on the dimensionality of the
-  //    intersection of simplices with individual strata.
-  // 2. Calculate $phi$-persistence
+  // The use of Goresky--MacPherson perversities requires using the
+  // original indexing, starting from k=2.
+  bool useOriginalIndexing = is_goresky_macpherson_perversity<Perversity>::value;
+
+  // 0. Check consistency of strata.
+  // 1. Create permissibility function based on the dimensionality of
+  //    the intersection of simplices with individual strata.
+  // 2. Calculate $\phi$-persistence
   // 3. Convert the result into a persistence diagram.
 
   // Check consistency of filtration -----------------------------------
