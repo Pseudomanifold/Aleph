@@ -205,6 +205,35 @@ std::ostream& operator<<( std::ostream& o, const Perversity p )
   return o;
 }
 
+/**
+  Given a simplicial complex, a stratification (a filtration), and
+  a perversity function, this function calculates the persistent
+  intersection homology of the data set.
+
+  Depending on the selected perversity, the stratification is set
+  up differently and needs to satisfy certain constraints. Hence,
+  if a Goresky--MacPherson perversity is being used, we have
+
+  \f[
+    X_{n-1} = X_{n-2}
+  \f]
+
+  and
+
+  \f[
+    X_n = K.
+  \f]
+
+  The function does *not* check the last condition, though, since one
+  can also use it with a barycentric subdivision of a given complex.
+
+  @param K Simplicial complex
+  @param X Stratification/filtration (sequence of simplicial complexes)
+  @param p Perversity function
+
+  @returns Persistent intersection homology diagram
+*/
+
 template <class Simplex, class Perversity>
 auto calculateIntersectionHomology( const aleph::topology::SimplicialComplex<Simplex>& K,
                                     const std::vector< aleph::topology::SimplicialComplex<Simplex> >& X,
@@ -226,12 +255,6 @@ auto calculateIntersectionHomology( const aleph::topology::SimplicialComplex<Sim
     if( *(X.rbegin()+1) != *(X.rbegin()+2) )
       throw std::runtime_error( "Stratification must satisfy requirements by Goresky & MacPherson" );
   }
-
-  // 0. Check consistency of strata.
-  // 1. Create permissibility function based on the dimensionality of
-  //    the intersection of simplices with individual strata.
-  // 2. Calculate $\phi$-persistence
-  // 3. Convert the result into a persistence diagram.
 
   // Check consistency of filtration -----------------------------------
   //
