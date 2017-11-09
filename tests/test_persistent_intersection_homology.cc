@@ -639,7 +639,7 @@ template <class T> void testTorus()
   aleph::topology::Skeleton skeleton;
   auto X0 = skeleton(0, K);
   auto X1 = skeleton(1, K);
-  auto X2 = K;
+  auto X2 = X1;
   auto X3 = K;
 
   auto D2 = aleph::calculateIntersectionHomology( L, {X0,X1,X2,X3}, aleph::PerversityGM( {0,0} ) );

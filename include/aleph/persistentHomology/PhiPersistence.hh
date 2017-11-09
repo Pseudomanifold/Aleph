@@ -214,6 +214,19 @@ auto calculateIntersectionHomology( const aleph::topology::SimplicialComplex<Sim
   // original indexing, starting from k=2.
   bool useOriginalIndexing = is_goresky_macpherson_perversity<Perversity>::value;
 
+  if( useOriginalIndexing )
+  {
+    // Consistency check: The stratification must have sufficiently many
+    // simplicial complexes.
+    if( X.size() <= 2 )
+      throw std::runtime_error( "Insufficient number of simplicial complexes for stratification" );
+
+    // Consistency check: The strata need to satisfy $X_{n-1} = X_{n-2}$
+    // for a proper Goresky--MacPherson stratification.
+    if( *(X.rbegin()+1) != *(X.rbegin()+2) )
+      throw std::runtime_error( "Stratification must satisfy requirements by Goresky & MacPherson" );
+  }
+
   // 0. Check consistency of strata.
   // 1. Create permissibility function based on the dimensionality of
   //    the intersection of simplices with individual strata.
