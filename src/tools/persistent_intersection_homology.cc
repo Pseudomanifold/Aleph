@@ -76,7 +76,7 @@ int main( int argc, char** argv )
   std::string inputCurvatures = "";
   DataType epsilon            = static_cast<DataType>( std::stod( argv[2] ) );
 
-  if( argc >= 3 )
+  if( argc > 3 )
     inputCurvatures = argv[3];
 
   auto pointCloud = aleph::containers::load<DataType>( inputPointCloud );
