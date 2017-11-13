@@ -174,10 +174,15 @@ private:
 
       auto&& V = svd.matrixV();
 
-      for( Index j = 0; j < Index( d - 1 ); j++ )
+      // Actual or "effective" dimensionality of the input data. If the
+      // matrix is rectangular (and most input matrices will be), there
+      // is not a full system of singular vectors available.
+      auto dEffective  = std::min( Index(d-1), Index(k-1) );
+
+      for( Index j = 0; j < dEffective; j++ )
         lts.tangents.col(j) = V.col(j);
 
-      lts.normal           = V.col( Index(d-1) ).normalized();
+      lts.normal           = V.col( dEffective  ).normalized();
       lts.position         = getPosition( container, i );
       lts.indices          = indices[i];
 
