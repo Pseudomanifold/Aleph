@@ -15,6 +15,8 @@
 
 #include <aleph/geometry/distances/Euclidean.hh>
 
+#include <aleph/math/Statistics.hh>
+
 #include <aleph/persistenceDiagrams/PersistenceDiagram.hh>
 #include <aleph/persistenceDiagrams/distances/Bottleneck.hh>
 
@@ -69,6 +71,22 @@ template <class Functor> std::vector<DataType> extract( const PointCloud& pointC
   return values;
 }
 
+std::vector<DataType> standardizeValues( const std::vector<DataType>& data )
+{
+  auto mean   = aleph::math::sampleMean( data.begin(), data.end() );
+  auto sdev   = aleph::math::sampleStandardDeviation( data.begin(), data.end() );
+  auto result = data;
+
+  std::transform( data.begin(), data.end(), result.begin(),
+    [&mean, &sdev] ( DataType x )
+    {
+      return ( x - mean ) / sdev;
+    }
+  );
+
+  return result;
+}
+
 int main( int argc, char** argv )
 {
   DataType filterThreshold = DataType();
@@ -104,8 +122,6 @@ int main( int argc, char** argv )
   std::string inputCurvatures = "";
   DataType epsilon            = static_cast<DataType>( std::stod( argv[optind++] ) );
 
-  std::cerr << optind << "," << argc << "\n";
-
   if( ( argc - optind ) >= 1 )
     inputCurvatures = argv[optind++];
 
@@ -116,12 +132,25 @@ int main( int argc, char** argv )
 
   if( inputCurvatures.empty() == false )
   {
+    std::cerr << "* Loading singularity values...";
+
     auto curvatures   = aleph::containers::load<DataType>( inputCurvatures );
     singularityValues = extract( curvatures,
                                   [] ( auto begin, auto end )
                                   {
                                     return std::accumulate( begin, end, DataType() );
                                   } );
+
+    std::cerr << "finished\n";
+
+    if( standardize )
+    {
+      std::cerr << "* Standardizing singularity values...";
+
+      singularityValues = standardizeValues( singularityValues );
+
+      std::cerr << "finished\n";
+    }
   }
 
   auto K
@@ -183,8 +212,7 @@ int main( int argc, char** argv )
           auto v = s[0];
           auto x = singularityValues.at(v);
 
-          // FIXME: obviously, this should be selectable somewhere...
-          return x < 0.00007;
+          return x < filterThreshold;
         }
 
         return false;
