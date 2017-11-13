@@ -4,6 +4,7 @@
 
 #include <aleph/geometry/TangentSpace.hh>
 
+#include <iostream>
 #include <string>
 
 using namespace aleph;
@@ -22,11 +23,20 @@ int main( int argc, char** argv )
   std::string filename = argv[1];
   unsigned k           = unsigned( std::stoul( argv[2] ) );
 
+  std::cerr << "* Loading point cloud...";
+
   auto pc = load<DataType>( filename );
+
+  std::cerr << "finished\n"
+            << "* Loaded point cloud with " << pc.size() << " points of dimension " << pc.dimension() << "\n";
+
+  std::cerr << "* Calculating curvature estimates with k=" << k << "...";
 
   TangentSpace ts;
   auto curvature = ts( pc, k );
   auto n         = pc.size();
+
+  std::cerr << "finished\n";
 
   for( decltype(n) i = 0; i < n; i++ )
   {
