@@ -36,6 +36,8 @@
 #include <set>
 #include <vector>
 
+#include <getopt.h>
+
 using DataType           = double;
 using VertexType         = unsigned;
 using Distance           = aleph::geometry::distances::Euclidean<DataType>;
@@ -69,15 +71,43 @@ template <class Functor> std::vector<DataType> extract( const PointCloud& pointC
 
 int main( int argc, char** argv )
 {
-  if( argc <= 2 )
+  DataType filterThreshold = DataType();
+  bool standardize         = false;
+
+  {
+    static option commandLineOptions[] =
+    {
+      { "filter"     , required_argument, nullptr, 'f' },
+      { "standardize", no_argument      , nullptr, 's' },
+      { nullptr      , 0                , nullptr,  0  }
+    };
+
+    int option = 0;
+    while( ( option = getopt_long( argc, argv, "f:s", commandLineOptions, nullptr ) ) != -1 )
+    {
+      switch( option )
+      {
+      case 'f':
+        filterThreshold = static_cast<DataType>( std::stod(optarg) );
+        break;
+      case 's':
+        standardize = true;
+        break;
+      }
+    }
+  }
+
+  if( ( argc - optind ) < 2 )
     return -1;
 
-  std::string inputPointCloud = argv[1];
+  std::string inputPointCloud = argv[optind++];
   std::string inputCurvatures = "";
-  DataType epsilon            = static_cast<DataType>( std::stod( argv[2] ) );
+  DataType epsilon            = static_cast<DataType>( std::stod( argv[optind++] ) );
 
-  if( argc > 3 )
-    inputCurvatures = argv[3];
+  std::cerr << optind << "," << argc << "\n";
+
+  if( ( argc - optind ) >= 1 )
+    inputCurvatures = argv[optind++];
 
   auto pointCloud = aleph::containers::load<DataType>( inputPointCloud );
 
@@ -142,9 +172,11 @@ int main( int argc, char** argv )
   // original data sets because they are too close to a singularity.
   else
   {
+    std::cerr << "* Using singularity values to filter complex...";
+
     aleph::topology::Filter filter;
     K0 = filter( K,
-      [&singularityValues] ( auto s )
+      [&filterThreshold,&singularityValues] ( auto s )
       {
         if( s.dimension() == 0 )
         {
@@ -158,6 +190,9 @@ int main( int argc, char** argv )
         return false;
       }
     );
+
+    std::cerr << "finished\n"
+              << "* Filtered 0-dimensional complex has " << K0.size() << " simplices\n";
 
     K1 = K0;
     K2 = K;
