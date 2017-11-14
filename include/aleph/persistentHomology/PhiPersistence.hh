@@ -300,6 +300,11 @@ auto calculateIntersectionHomology( const aleph::topology::SimplicialComplex<Sim
         auto intersection = aleph::topology::lastLexicographicalIntersection( X.at( d - k ), s );
         auto dimension    = intersection.empty() ? -1 : static_cast<long>( intersection.dimension() );
         admissible        = admissible && intersection.empty() ? true : static_cast<long>( dimension ) <= ( long(i) - long(k) + long( p(k) ) );
+
+        // Early abort as soon as we are sure that the simplex cannot
+        // become admissible again.
+        if( !admissible )
+          break;
       }
 
       phi[s] = admissible;
