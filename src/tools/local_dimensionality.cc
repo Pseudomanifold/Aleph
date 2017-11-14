@@ -51,7 +51,7 @@ std::vector<double> smoothValues( const PointCloud& pointCloud, const std::vecto
   for( unsigned iteration = 0; iteration < n; iteration++ )
   {
     std::vector<double> values_;
-    values_.reserve( values.size() );
+    values_.resize( values.size() );
 
     for( std::size_t i = 0; i < pointCloud.size(); i++ )
     {
