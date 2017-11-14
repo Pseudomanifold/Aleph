@@ -90,23 +90,28 @@ std::vector<DataType> standardizeValues( const std::vector<DataType>& data )
 int main( int argc, char** argv )
 {
   DataType filterThreshold = DataType();
+  bool invert              = false;
   bool standardize         = false;
 
   {
     static option commandLineOptions[] =
     {
       { "filter"     , required_argument, nullptr, 'f' },
+      { "invert"     , no_argument      , nullptr, 'i' },
       { "standardize", no_argument      , nullptr, 's' },
       { nullptr      , 0                , nullptr,  0  }
     };
 
     int option = 0;
-    while( ( option = getopt_long( argc, argv, "f:s", commandLineOptions, nullptr ) ) != -1 )
+    while( ( option = getopt_long( argc, argv, "f:is", commandLineOptions, nullptr ) ) != -1 )
     {
       switch( option )
       {
       case 'f':
         filterThreshold = static_cast<DataType>( std::stod(optarg) );
+        break;
+      case 'i':
+        invert = true;
         break;
       case 's':
         standardize = true;
@@ -205,14 +210,17 @@ int main( int argc, char** argv )
 
     aleph::topology::Filter filter;
     K0 = filter( K,
-      [&filterThreshold,&singularityValues] ( auto s )
+      [&filterThreshold,&invert,&singularityValues] ( auto s )
       {
         if( s.dimension() == 0 )
         {
           auto v = s[0];
           auto x = singularityValues.at(v);
 
-          return x < filterThreshold;
+          if( invert )
+            return x > filterThreshold;
+          else
+            return x < filterThreshold;
         }
 
         return false;
