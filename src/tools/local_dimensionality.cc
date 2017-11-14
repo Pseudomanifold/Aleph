@@ -16,6 +16,7 @@
 #include <aleph/geometry/distances/Euclidean.hh>
 
 #include <iostream>
+#include <stdexcept>
 #include <string>
 #include <vector>
 
@@ -35,22 +36,27 @@ int main( int argc, char** argv )
 {
   std::string method = "pca";
   unsigned k         = 8;
+  unsigned K         = 0;
 
   {
     static option commandLineOptions[] =
     {
       { "k"          , required_argument, nullptr, 'k' },
+      { "K"          , required_argument, nullptr, 'K' },
       { "method"     , required_argument, nullptr, 'm' },
       { nullptr      , 0                , nullptr,  0  }
     };
 
     int option = 0;
-    while( ( option = getopt_long( argc, argv, "k:m:", commandLineOptions, nullptr ) ) != -1 )
+    while( ( option = getopt_long( argc, argv, "k:K:m:", commandLineOptions, nullptr ) ) != -1 )
     {
       switch( option )
       {
       case 'k':
         k = static_cast<unsigned>( std::stoull( optarg ) );
+        break;
+      case 'K':
+        K = static_cast<unsigned>( std::stoull( optarg ) );
         break;
       case 'm':
         method = optarg;
@@ -75,6 +81,8 @@ int main( int argc, char** argv )
 
   if( method == "pca" )
   {
+    std::cerr << "* Estimating local dimensionality using PCA (k=" << k << ")...";
+
     auto result
       = aleph::containers::estimateLocalDimensionalityPCA<Distance, PointCloud, NearestNeighbours>( pc, k );
 
@@ -82,4 +90,44 @@ int main( int argc, char** argv )
     // manually
     dimensionalities.assign( result.begin(), result.end() );
   }
+  else if( method == "nn" )
+  {
+    if( K == 0 )
+    {
+      std::cerr << "* Estimating local dimensionality using nearest neighbours (k=" << k << ")...";
+
+      dimensionalities
+        = aleph::containers::estimateLocalDimensionalityNearestNeighbours<Distance, PointCloud, NearestNeighbours>(
+          pc, k );
+    }
+    else if( k <= K )
+    {
+      std::cerr << "* Estimating local dimensionality using nearest neighbours (k=" << k << ", K=" << K << ")...";
+
+      dimensionalities
+        = aleph::containers::estimateLocalDimensionalityNearestNeighbours<Distance, PointCloud, NearestNeighbours>(
+        pc, k, K );
+    }
+  }
+  else if( method == "mle" )
+  {
+    std::cerr << "* Estimating local dimensionality using nearest neighbours and MLE (k=" << k << ")...";
+
+    if( k > K )
+      throw std::runtime_error( "Missing maximum parameter for nearest neighbours" );
+
+    dimensionalities
+      = aleph::containers::estimateLocalDimensionalityNearestNeighboursMLE<Distance, PointCloud, NearestNeighbours>(
+      pc, k, K
+    );
+  }
+  else if( method == "mst" )
+  {
+    std::cerr << "* Estimating local dimensionality using MST...";
+
+    dimensionalities
+      = aleph::containers::estimateLocalDimensionalityNearestNeighbours<Distance>( pc );
+  }
+
+  std::cerr << "finished\n";
 }
