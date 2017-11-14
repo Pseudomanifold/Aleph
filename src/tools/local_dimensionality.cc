@@ -64,7 +64,7 @@ std::vector<double> smoothValues( const PointCloud& pointCloud, const std::vecto
       for( std::size_t j = 0; j < neighbours_.size(); j++ )
       {
         auto index    = neighbours_[j];
-        auto weight   = 1.0 / ( distances_[j] * distances_[j] );
+        auto weight   = distances_[j] > 0 ? 1.0 / ( distances_[j] * distances_[j] ) : 1.0;
         value        += result[ index ] * weight;
         sumOfWeights += weight;
       }
