@@ -130,4 +130,9 @@ int main( int argc, char** argv )
   }
 
   std::cerr << "finished\n";
+
+  // Output ------------------------------------------------------------
+
+  for( auto&& d : dimensionalities )
+    std::cout << d << "\n";
 }
