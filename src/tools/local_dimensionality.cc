@@ -84,6 +84,7 @@ int main( int argc, char** argv )
   std::string method = "pca";
   unsigned k         = 8;
   unsigned K         = 0;
+  unsigned n         = 1;
   bool smooth        = false;
 
   {
@@ -92,12 +93,13 @@ int main( int argc, char** argv )
       { "k"          , required_argument, nullptr, 'k' },
       { "K"          , required_argument, nullptr, 'K' },
       { "method"     , required_argument, nullptr, 'm' },
+      { "n"          , required_argument, nullptr, 'n' },
       { "smooth"     , no_argument      , nullptr, 's' },
       { nullptr      , 0                , nullptr,  0  }
     };
 
     int option = 0;
-    while( ( option = getopt_long( argc, argv, "k:K:m:s", commandLineOptions, nullptr ) ) != -1 )
+    while( ( option = getopt_long( argc, argv, "k:K:m:n:s", commandLineOptions, nullptr ) ) != -1 )
     {
       switch( option )
       {
@@ -109,6 +111,9 @@ int main( int argc, char** argv )
         break;
       case 'm':
         method = optarg;
+        break;
+      case 'n':
+        n = static_cast<unsigned>( std::stoull( optarg ) );
         break;
       case 's':
         smooth = true;
@@ -186,7 +191,17 @@ int main( int argc, char** argv )
   // Output ------------------------------------------------------------
 
   if( smooth )
-    dimensionalities = smoothValues( pc, dimensionalities, k );
+  {
+    std::cerr << "* Performing smoothing operation with k=" << k << " and n=" << n << "...";
+
+    dimensionalities
+      = smoothValues( pc,
+                      dimensionalities,
+                      k,
+                      n );
+
+    std::cerr << "\n";
+  }
 
   for( auto&& d : dimensionalities )
     std::cout << d << "\n";
