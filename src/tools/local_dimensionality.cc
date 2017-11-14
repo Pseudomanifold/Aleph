@@ -15,6 +15,9 @@
 
 #include <aleph/geometry/distances/Euclidean.hh>
 
+#include <aleph/math/KahanSummation.hh>
+
+#include <algorithm>
 #include <iostream>
 #include <stdexcept>
 #include <string>
@@ -32,11 +35,62 @@ using Distance   = aleph::geometry::distances::Euclidean<DataType>;
   using NearestNeighbours = aleph::geometry::BruteForce<PointCloud, Distance>;
 #endif
 
+std::vector<double> smoothValues( const PointCloud& pointCloud, const std::vector<double>& values, unsigned k, unsigned n = 1 )
+{
+  using IndexType   = typename NearestNeighbours::IndexType;
+  using ElementType = typename NearestNeighbours::ElementType;
+
+  std::vector< std::vector<IndexType> > indices;
+  std::vector< std::vector<ElementType> > distances;
+
+  NearestNeighbours nn( pointCloud );
+  nn.neighbourSearch( k+1, indices, distances );
+
+  std::vector<double> result = values;
+
+  for( unsigned iteration = 0; iteration < n; iteration++ )
+  {
+    std::vector<double> values_;
+    values_.reserve( values.size() );
+
+    for( std::size_t i = 0; i < pointCloud.size(); i++ )
+    {
+      auto&& neighbours_  = indices[i];
+      auto&& distances_   = distances[i];
+      auto maxDistance    = *std::max_element( distances_.begin(), distances_.end() );
+      auto sumOfDistances = aleph::math::accumulate_kahan_sorted( distances_.begin(), distances_.end(), ElementType() );
+      sumOfDistances      = double( distances[i].size() ) * maxDistance - sumOfDistances;
+
+      aleph::math::KahanSummation<double> value = 0.0;
+      aleph::math::KahanSummation<double> test  = 0.0;
+
+      for( std::size_t j = 0; j < neighbours_.size(); j++ )
+      {
+        auto index  = neighbours_[j];
+        value      += result[ index ] * ( maxDistance - distances_[j] ) / sumOfDistances;
+
+        std::cerr << ( maxDistance - distances_[j] ) / sumOfDistances << "\n";
+
+        test += ( maxDistance - distances_[j] ) / sumOfDistances;
+      }
+
+      std::cerr << "RESULT = " << test << "\n";
+
+      values_[i] = value;
+    }
+
+    result.swap( values_ );
+  }
+
+  return result;
+}
+
 int main( int argc, char** argv )
 {
   std::string method = "pca";
   unsigned k         = 8;
   unsigned K         = 0;
+  bool smooth        = false;
 
   {
     static option commandLineOptions[] =
@@ -44,11 +98,12 @@ int main( int argc, char** argv )
       { "k"          , required_argument, nullptr, 'k' },
       { "K"          , required_argument, nullptr, 'K' },
       { "method"     , required_argument, nullptr, 'm' },
+      { "smooth"     , no_argument      , nullptr, 's' },
       { nullptr      , 0                , nullptr,  0  }
     };
 
     int option = 0;
-    while( ( option = getopt_long( argc, argv, "k:K:m:", commandLineOptions, nullptr ) ) != -1 )
+    while( ( option = getopt_long( argc, argv, "k:K:m:s", commandLineOptions, nullptr ) ) != -1 )
     {
       switch( option )
       {
@@ -60,6 +115,9 @@ int main( int argc, char** argv )
         break;
       case 'm':
         method = optarg;
+        break;
+      case 's':
+        smooth = true;
         break;
       }
     }
@@ -132,6 +190,9 @@ int main( int argc, char** argv )
   std::cerr << "finished\n";
 
   // Output ------------------------------------------------------------
+
+  if( smooth )
+    dimensionalities = smoothValues( pc, dimensionalities, k );
 
   for( auto&& d : dimensionalities )
     std::cout << d << "\n";
