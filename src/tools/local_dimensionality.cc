@@ -65,7 +65,7 @@ int main( int argc, char** argv )
     }
   }
 
-  if( ( argc - optind ) <= 1 )
+  if( ( argc - optind ) < 1 )
     return -1;
 
   std::string filename = argv[ optind++ ];
