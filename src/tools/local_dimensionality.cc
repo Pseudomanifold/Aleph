@@ -57,26 +57,20 @@ std::vector<double> smoothValues( const PointCloud& pointCloud, const std::vecto
     {
       auto&& neighbours_  = indices[i];
       auto&& distances_   = distances[i];
-      auto maxDistance    = *std::max_element( distances_.begin(), distances_.end() );
-      auto sumOfDistances = aleph::math::accumulate_kahan_sorted( distances_.begin(), distances_.end(), ElementType() );
-      sumOfDistances      = double( distances[i].size() ) * maxDistance - sumOfDistances;
 
-      aleph::math::KahanSummation<double> value = 0.0;
-      aleph::math::KahanSummation<double> test  = 0.0;
+      aleph::math::KahanSummation<double> value        = 0.0;
+      aleph::math::KahanSummation<double> sumOfWeights = 0.0;
 
       for( std::size_t j = 0; j < neighbours_.size(); j++ )
       {
-        auto index  = neighbours_[j];
-        value      += result[ index ] * ( maxDistance - distances_[j] ) / sumOfDistances;
-
-        std::cerr << ( maxDistance - distances_[j] ) / sumOfDistances << "\n";
-
-        test += ( maxDistance - distances_[j] ) / sumOfDistances;
+        auto index    = neighbours_[j];
+        auto weight   = 1.0 / ( distances_[j] * distances_[j] );
+        value        += result[ index ] * weight;
+        sumOfWeights += weight;
       }
 
-      std::cerr << "RESULT = " << test << "\n";
-
-      values_[i] = value;
+      value      /= sumOfWeights;
+      values_[i]  = value;
     }
 
     result.swap( values_ );
