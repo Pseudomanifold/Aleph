@@ -479,9 +479,8 @@ template <class T> void testSphere()
 
   // This demonstrates that the triangulation does not have any
   // allowable vertices. Hence, no intersection homology exists
-  // in dimension 0.
-  ALEPH_ASSERT_EQUAL( D1.size(),              1 );
-  ALEPH_ASSERT_EQUAL( D1.front().dimension(), 2 );
+  // in dimension 0 (likewise for dimension 1).
+  ALEPH_ASSERT_EQUAL( D1.size(), 0 );
 
   SimplicialComplex L = K;
 
