@@ -132,6 +132,25 @@ template <
   return pairing;
 }
 
+/**
+  Calculates a set of persistence diagrams from a simplicial complex in
+  filtration order, while permitting some additional parameters. Notice
+  that this is a *convenience* function that performs *all* conversions
+  automatically.
+
+  @param K                          Simplicial complex
+  @param dualize                    Indicates that boundary matrix dualization is desired
+  @param includeAllUnpairedCreators Indicates that *all* unpaired creators detected during a single pass
+                                    of the simplicial complex should be included. This is useful when it
+                                    is clear that the simplicial complex models a topological object for
+                                    which top-level simplices are meaningful. For Vietoris--Rips complex
+                                    calculations, this is usually *not* the case.
+
+  @tparam ReductionAlgorithm Algorithm for reducing the boundary matrix
+  @tparam Representation     Representation of the boundary matrix
+  @tparam Simplex            Simplex data type (usually inferred from the other parameters)
+*/
+
 template <
   class ReductionAlgorithm = defaults::ReductionAlgorithm,
   class Representation     = defaults::Representation,
