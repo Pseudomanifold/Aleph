@@ -12,6 +12,7 @@
 #include <aleph/topology/SimplicialComplex.hh>
 
 #include <algorithm>
+#include <limits>
 #include <tuple>
 #include <unordered_set>
 #include <vector>
@@ -40,7 +41,8 @@ namespace aleph
   @param max                        Optional maximum index after which simplices are not
                                     considered any more. If the pairing of a simplex has
                                     an index larger than the maximum one, such simplices
-                                    will not be considered in the pairing.
+                                    will not be considered in the pairing. All simplices
+                                    are used by default.
 
   @tparam ReductionAlgorithm Specifies a reduction algorithm to use for reducing
                              the input matrix. Aleph provides a default value in
@@ -56,7 +58,7 @@ template <
   class Representation
 > PersistencePairing<typename Representation::Index> calculatePersistencePairing( const topology::BoundaryMatrix<Representation>& M,
                                                                                   bool includeAllUnpairedCreators    = false,
-                                                                                  typename Representation::Index max = typename Representation::Index() )
+                                                                                  typename Representation::Index max = std::numeric_limits<typename Representation::Index()>::max() )
 {
   using namespace topology;
 
@@ -70,7 +72,7 @@ template <
 
   PersistencePairing pairing;
 
-  auto numColumns = max ? max : B.getNumColumns();
+  auto numColumns = max <= B.getNumColumns() ? max : B.getNumColumns();
 
   std::unordered_set<Index> creators;
 
@@ -96,7 +98,7 @@ template <
         v  = numColumns - 1 - w; // Yes, this is correct!
       }
 
-      if( !max || i < max )
+      if( max > B.getNumColumns() || i < max )
         pairing.add( u, v );
     }
 
