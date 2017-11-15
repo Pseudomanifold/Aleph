@@ -294,6 +294,13 @@ auto calculateIntersectionHomology( const aleph::topology::SimplicialComplex<Sim
       // and MacPherson. By default, this behaviour is *not* active.
       for( std::size_t k = useOriginalIndexing ? 2 : 1; k <= d; k++ )
       {
+        // Since the dimension of the intersection cannot be larger
+        // than the dimension of the simplex, we know that it shall
+        // be *always* admissible if the perversity does not impose
+        // any condition here.
+        if( long( p(k) ) - long(k) >= 0 )
+          continue;
+
         // The notation follows Bendich and Harer, so $i$ is actually
         // referring to a dimension instead of an index. Beware!
         auto i            = s.dimension();
