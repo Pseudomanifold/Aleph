@@ -58,7 +58,7 @@ template <
   class Representation
 > PersistencePairing<typename Representation::Index> calculatePersistencePairing( const topology::BoundaryMatrix<Representation>& M,
                                                                                   bool includeAllUnpairedCreators    = false,
-                                                                                  typename Representation::Index max = std::numeric_limits<typename Representation::Index()>::max() )
+                                                                                  typename Representation::Index max = std::numeric_limits<typename Representation::Index>::max() )
 {
   using namespace topology;
 
