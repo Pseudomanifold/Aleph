@@ -21,7 +21,7 @@ namespace aleph
 {
 
 /**
-  Partitions a simplicial complex according to its $\phi$-persistence
+  Partitions a simplicial complex according to \f$\phi\f$-persistence
   values. This follows the persistent intersection homology algorithm
   in:
 
@@ -299,7 +299,7 @@ auto calculateIntersectionHomology( const aleph::topology::SimplicialComplex<Sim
         auto i            = s.dimension();
         auto intersection = aleph::topology::lastLexicographicalIntersection( X.at( d - k ), s );
         auto dimension    = intersection.empty() ? -1 : static_cast<long>( intersection.dimension() );
-        admissible        = admissible && intersection.empty() ? true : static_cast<long>( dimension ) <= ( long(i) - long(k) + long( p(k) ) );
+        admissible        = admissible && ( intersection.empty() ? true : static_cast<long>( dimension ) <= ( long(i) - long(k) + long( p(k) ) ) );
 
         // Early abort as soon as we are sure that the simplex cannot
         // become admissible again.
