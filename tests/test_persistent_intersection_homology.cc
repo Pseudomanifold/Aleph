@@ -224,7 +224,7 @@ template <class T> void testCircleWithWhisker()
   SimplicialComplex Y1 = L;
 
   auto D1 = aleph::calculateIntersectionHomology( K, {X0,X1}, aleph::Perversity( {-1} ) );
-  auto D2 = aleph::calculateIntersectionHomology( K, {X0,X1}, aleph::Perversity( {-1} ) );
+  auto D2 = aleph::calculateIntersectionHomology( K, {X0,X1}, aleph::Perversity( { 0} ) );
   auto D3 = aleph::calculateIntersectionHomology( L, {Y0,Y1}, aleph::Perversity( {-1} ) );
   auto D4 = aleph::calculateIntersectionHomology( L, {Y0,Y1}, aleph::Perversity( { 0} ) );
 
@@ -659,7 +659,6 @@ template <class T> void testTorus()
 
   ALEPH_TEST_END();
 }
-
 
 template <class T> void testWedgeOfTwoCircles()
 {
