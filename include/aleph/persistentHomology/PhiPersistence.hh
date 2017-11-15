@@ -323,6 +323,9 @@ auto calculateIntersectionHomology( const aleph::topology::SimplicialComplex<Sim
                          } );
 
   // Calculate persistent intersection homology ------------------------
+  //
+  // TODO: make dualization configurable? It is vital that the index
+  // denoting admissible simplices is set correctly here.
 
   auto boundaryMatrix             = aleph::topology::makeBoundaryMatrix( L, s );
   using IndexType                 = typename decltype(boundaryMatrix)::Index;
