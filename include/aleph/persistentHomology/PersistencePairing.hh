@@ -2,6 +2,7 @@
 #define ALEPH_PERSISTENCE_PAIRING_HH__
 
 #include <algorithm>
+#include <iosfwd>
 #include <limits>
 #include <utility>
 #include <vector>
@@ -137,6 +138,25 @@ public:
 private:
   ContainerType _pairs;
 };
+
+/**
+  Debug output operator to take a look at a persistence pairing. This is
+  usually not required for users, though.
+
+  @param o       Output stream
+  @param pairing Persistence pairing
+*/
+
+template <class Index> std::ostream& operator<<( std::ostream& o, const PersistencePairing<Index>& pairing )
+{
+  o << std::string( 72, '-' ) << "\n";
+
+  for( auto&& pair : pairing )
+    o << pair.first << "," << pair.second << "\n";
+
+  o << std::string( 72, '-' ) << "\n";
+  return o;
+}
 
 } // namespace aleph
 
