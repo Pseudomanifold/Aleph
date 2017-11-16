@@ -250,11 +250,29 @@ private:
 
 // ---------------------------------------------------------------------
 
+/**
+  Permits sending a boundary matrix to an output stream. This is only
+  meant as a debugging aid. Usually, there is no need to print any of
+  these matrices since they are not visible to the client.
+
+  @param o Output stream
+  @param M Matrix
+*/
+
 template <class Representation> std::ostream& operator<< ( std::ostream& o, const BoundaryMatrix<Representation>& M )
 {
   using Index = typename Representation::Index;
 
   auto numColumns = M.getNumColumns();
+
+  o << std::string( 72, '-' ) << "\n\n";
+
+  o << "Number of columns: " << numColumns << "\n";
+
+  for( Index j = Index(0); j < numColumns; ++j )
+    o << "Dimension [" << j << "]: " << M.getDimension(j) << "\n";
+
+  o << "\n";
 
   for( Index j = Index(0); j < numColumns; ++j )
   {
@@ -271,6 +289,7 @@ template <class Representation> std::ostream& operator<< ( std::ostream& o, cons
     o << "\n";
   }
 
+  o << std::string( 72, '-' ) << "\n\n";
   return o;
 }
 
