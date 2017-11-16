@@ -265,9 +265,10 @@ template <class Representation> std::ostream& operator<< ( std::ostream& o, cons
 
   auto numColumns = M.getNumColumns();
 
-  o << std::string( 72, '-' ) << "\n\n";
+  o << std::string( 72, '-' ) << "\n";
 
-  o << "Number of columns: " << numColumns << "\n";
+  o << "Number of columns: " << numColumns << "\n"
+    << "Dimension: " << M.getDimension() << "\n";
 
   for( Index j = Index(0); j < numColumns; ++j )
     o << "Dimension [" << j << "]: " << M.getDimension(j) << "\n";
@@ -289,7 +290,7 @@ template <class Representation> std::ostream& operator<< ( std::ostream& o, cons
     o << "\n";
   }
 
-  o << std::string( 72, '-' ) << "\n\n";
+  o << std::string( 72, '-' ) << "\n";
   return o;
 }
 
