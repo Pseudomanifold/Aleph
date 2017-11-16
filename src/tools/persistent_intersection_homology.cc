@@ -162,12 +162,12 @@ int main( int argc, char** argv )
     = aleph::geometry::buildVietorisRipsComplex(
         NearestNeighbours( pointCloud ),
         epsilon,
-        2 // FIXME: make configurable
+        3 // FIXME: make configurable
   );
 
   std::cerr << "* Obtained Vietoris--Rips complex with " << K.size() << " simplices\n";
 
-  decltype(K) K0, K1, K2, L;
+  decltype(K) K0, K1, K2, K3, L;
 
   // Determine stratification ------------------------------------------
   //
@@ -230,8 +230,39 @@ int main( int argc, char** argv )
     std::cerr << "finished\n"
               << "* Filtered 0-dimensional complex has " << K0.size() << " simplices\n";
 
-    K1 = K0;
-    K2 = K;
+    K1 = filter( K,
+      [&filterThreshold,&invert,&singularityValues] ( auto s )
+      {
+        if( s.dimension() == 0 )
+        {
+          auto v = s[0];
+          auto x = singularityValues.at(v);
+
+          if( invert )
+            return x > filterThreshold;
+          else
+            return x < filterThreshold;
+        }
+        else if( s.dimension() == 1 )
+        {
+          auto u = s[0];
+          auto v = s[1];
+
+          auto x = singularityValues.at(u);
+          auto y = singularityValues.at(v);
+
+          if( invert )
+            return std::max(x,y) > filterThreshold;
+          else
+            return std::max(x,y) < filterThreshold;
+        }
+
+        return false;
+      }
+    );
+
+    K2 = K1;
+    K3 = K;
     L  = K;
   }
 
@@ -243,7 +274,7 @@ int main( int argc, char** argv )
 
   std::cerr << "* Calculating intersection homology...";
 
-  auto D2 = aleph::calculateIntersectionHomology( L, {K0,K1,K2}, aleph::PerversityGM( {0} ) );
+  auto D2 = aleph::calculateIntersectionHomology( L, {K0,K1,K2,K3}, aleph::PerversityGM( {0,1} ) );
 
   std::cerr << "finished\n";
 
@@ -268,5 +299,19 @@ int main( int argc, char** argv )
 
     out0 << D1[1] << "\n";
     out1 << D2[1] << "\n";
+  }
+
+  std::cerr << D1.size() << "," << D2.size() << "\n";
+
+  if( D1.size() >= 3 && D2.size() >= 3 )
+  {
+    std::ofstream out0( "/tmp/D_2_PH.txt" );
+    std::ofstream out1( "/tmp/D_2_IH.txt" );
+
+    D1[2].removeDiagonal();
+    D2[2].removeDiagonal();
+
+    out0 << D1[2] << "\n";
+    out1 << D2[2] << "\n";
   }
 }
