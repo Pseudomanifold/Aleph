@@ -2,9 +2,10 @@
 #define ALEPH_PERSISTENCE_PAIRING_HH__
 
 #include <algorithm>
-#include <iosfwd>
 #include <limits>
+#include <ostream>
 #include <utility>
+#include <string>
 #include <vector>
 
 namespace aleph
