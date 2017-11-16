@@ -320,6 +320,105 @@ template <class T> void testDiskWithFlares()
   ALEPH_TEST_END();
 }
 
+template <class T> void testDualization()
+{
+  // This follows the example given by Bendich in "Persistent
+  // Intersection Homology" on page 315.
+
+  ALEPH_TEST_BEGIN( "Persistent intersection homology: simple example (dualized)" );
+
+  using Simplex           = aleph::topology::Simplex<T>;
+  using SimplicialComplex = aleph::topology::SimplicialComplex<Simplex>;
+
+  std::vector<Simplex> simplices =
+  {
+    {0},
+    {1},
+    {2},
+    {3},
+    {4},
+    {0,3}, {1,2}, {3,4}, {0,4}, {0,1}, {2,3}, {1,4}, {2,4},
+    {0,3,4}, // A
+    {1,2,4}, // B
+    {0,1,4}, // C
+    {2,3,4}  // E
+  };
+
+  ALEPH_ASSERT_EQUAL( simplices.size(), 5 + 8 + 4 );
+
+  std::map<Simplex, bool> phi;
+
+  for( auto&& simplex : simplices )
+  {
+    if( simplex.contains(4) == false || simplex.dimension() == 2 )
+      phi[simplex] = true;
+    else
+      phi[simplex] = false;
+  }
+
+  SimplicialComplex K( simplices.begin(), simplices.end() );
+  SimplicialComplex L;
+
+  std::size_t s    = 0;
+  std::tie( L, s ) =
+    aleph::partition( K,
+                      [&phi] ( const Simplex& s )
+                      {
+                        return phi.at(s);
+                      } );
+
+  ALEPH_ASSERT_EQUAL( K.size(), L.size() );
+
+  auto boundaryMatrix = aleph::topology::makeBoundaryMatrix( L, s );
+  auto indexA         = L.index( {0,3,4} );
+
+  using IndexType     = typename decltype(boundaryMatrix)::Index;
+  auto columnA        = boundaryMatrix.getColumn( static_cast<IndexType>( indexA ) );
+
+  ALEPH_ASSERT_EQUAL( columnA.size(), 3 );
+
+  auto M = boundaryMatrix;
+
+  std::cerr << M << "\n";
+
+  aleph::persistentHomology::algorithms::Standard algorithm;
+  algorithm( M );
+
+  std::cerr << M << "\n";
+
+  auto MT = boundaryMatrix.dualize();
+
+  algorithm( MT );
+
+  std::cerr << MT << "\n";
+
+  unsigned numAllowableChains    = 0;
+  unsigned numAllowableTwoChains = 0;
+
+  for( IndexType i = 0; i < M.getNumColumns(); i++ )
+  {
+    auto lowestOne = M.getMaximumIndex( i );
+    if( lowestOne.second && lowestOne.first <= s )
+    {
+      ++numAllowableChains;
+
+      if( L.at(i).dimension() == 2 )
+        ++numAllowableTwoChains;
+    }
+  }
+
+  ALEPH_ASSERT_THROW( numAllowableChains >= numAllowableTwoChains );
+  ALEPH_ASSERT_EQUAL( numAllowableTwoChains, 1 );
+
+  auto pairing1 = aleph::calculatePersistencePairing<aleph::persistentHomology::algorithms::Standard>( boundaryMatrix,           false );
+  auto pairing2 = aleph::calculatePersistencePairing<aleph::persistentHomology::algorithms::Standard>( boundaryMatrix.dualize(), false );
+
+  std::cerr << pairing1 << "\n"
+            << pairing2 << "\n";
+
+  ALEPH_TEST_END();
+}
+
 template <class T> void testPinchedTorus()
 {
   ALEPH_TEST_BEGIN( "Persistent intersection homology: pinched torus" );
@@ -803,6 +902,9 @@ int main(int, char**)
 {
   test<float> ();
   test<double>();
+
+  testDualization<float> ();
+  testDualization<double>();
 
   testCircleWithWhisker<float> ();
   testCircleWithWhisker<double>();
