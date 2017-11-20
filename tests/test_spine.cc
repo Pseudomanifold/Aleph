@@ -140,7 +140,7 @@ template <class T> void testS1vS1()
 
   ALEPH_ASSERT_EQUAL( D3.size(),         3  );
   ALEPH_ASSERT_EQUAL( D3[0].dimension(), 0  );
-  ALEPH_ASSERT_EQUAL( D3[0].betti(),     55 );
+  ALEPH_ASSERT_EQUAL( D3[0].betti(),     56 );
 }
 
 template <class T> void testTriangle()
