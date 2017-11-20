@@ -55,7 +55,7 @@ template <class T> void testDisk()
   std::cerr << "L = " << L << "\n";
 
   ALEPH_ASSERT_THROW( L.size() < K.size() );
-  ALEPH_ASSERT_EQUAL( L.size(), 1 );
+  ALEPH_ASSERT_EQUAL( L.size(), 5 );
 
   ALEPH_TEST_END();
 }
@@ -165,6 +165,9 @@ template <class T> void testTriangle()
 
 int main( int, char** )
 {
+  testDisk<short>   ();
+  testDisk<unsigned>();
+
   testS1vS1<float> ();
   testS1vS1<double>();
 

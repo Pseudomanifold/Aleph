@@ -201,6 +201,11 @@ template <class SimplicialComplex> SimplicialComplex spine( const SimplicialComp
 
   // Step 3: collapse until no admissible simplices are left -----------
 
+  // Contains all candidates of simplices that are already principal and
+  // may become admissible in the future because they suddenly have
+  // a free face.
+  std::unordered_set<Simplex> candidates;
+
   while( !admissible.empty() )
   {
     auto s           = *admissible.begin();
@@ -252,7 +257,19 @@ template <class SimplicialComplex> SimplicialComplex spine( const SimplicialComp
     // The admissible simplex does not have a free face, so it must not
     // be used.
     if( !hasFreeFace )
+    {
       admissible.erase( s );
+      candidates.insert( s );
+    }
+
+    // Shift candidates to admissible set if necessary; this could be
+    // solved more intelligently---actually, one should check multiple
+    // times whether some simplex is or is not admissible.
+    if( admissible.empty() )
+    {
+      admissible.insert( candidates.begin(), candidates.end() );
+      candidates.clear();
+    }
   }
 
   return L;
