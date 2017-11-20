@@ -45,17 +45,13 @@ template <class T> void testDisk()
 
   SimplicialComplex K( simplices.begin(), simplices.end() );
 
-  std::cerr << "K =" << K << "\n";
-
   K.createMissingFaces();
   K.sort();
 
   auto L = aleph::topology::spine( K );
 
-  std::cerr << "L = " << L << "\n";
-
   ALEPH_ASSERT_THROW( L.size() < K.size() );
-  ALEPH_ASSERT_EQUAL( L.size(), 5 );
+  ALEPH_ASSERT_EQUAL( L.size(), 1 );
 
   ALEPH_TEST_END();
 }
@@ -140,7 +136,7 @@ template <class T> void testS1vS1()
 
   ALEPH_ASSERT_EQUAL( D3.size(),         3  );
   ALEPH_ASSERT_EQUAL( D3[0].dimension(), 0  );
-  ALEPH_ASSERT_EQUAL( D3[0].betti(),     56 );
+  ALEPH_ASSERT_EQUAL( D3[0].betti(),     43 );
 }
 
 template <class T> void testTriangle()
