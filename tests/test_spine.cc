@@ -64,8 +64,9 @@ template <class T> void testPinchedTorus()
 
   ALEPH_TEST_BEGIN( "Spine: pinched torus" );
 
-  unsigned n = 400;
-  PointCloud pc( n, 3 );
+  unsigned n =  40;
+  unsigned m =  20;
+  PointCloud pc( n*m, 3 );
 
   auto g = [] ( T x, T y )
   {
@@ -77,18 +78,19 @@ template <class T> void testPinchedTorus()
 
   std::normal_distribution<DataType> noise( T(0), T(0.05) );
 
-  for( unsigned i = 0; i < static_cast<unsigned>( std::sqrt(n) ); i++ )
+  unsigned k = 0;
+  for( unsigned i = 0; i < n; i++ )
   {
-    auto x = T( 2*M_PI / std::sqrt(n) * i );
-    for( unsigned j = 0; j < static_cast<unsigned>( std::sqrt(n) ); j++ )
+    auto x = T( 2*M_PI / n * i );
+    for( unsigned j = 0; j < m; j++ )
     {
-      auto y = T( 2*M_PI / std::sqrt(n) * j );
+      auto y = T( 2*M_PI / m * j );
 
       auto x0 = g(x,y) * std::cos(x)        + noise( rng );
       auto x1 = g(x,y) * std::sin(x)        + noise( rng );
       auto x2 = std::sin(x/2) * std::sin(y) + noise( rng );
 
-      pc.set(static_cast<unsigned>( std::sqrt(n) ) * i + j, {x0,x1,x2} );
+      pc.set(k++, {x0,x1,x2} );
     }
   }
 
@@ -98,7 +100,7 @@ template <class T> void testPinchedTorus()
   auto K
     = aleph::geometry::buildVietorisRipsComplex(
       NearestNeighbours( pc ),
-      DataType( 0.75 ),
+      DataType( 0.640 ),
       2
   );
 
@@ -112,6 +114,24 @@ template <class T> void testPinchedTorus()
   ALEPH_ASSERT_EQUAL( D1[0].dimension(), 0 );
   ALEPH_ASSERT_EQUAL( D1[1].dimension(), 1 );
   ALEPH_ASSERT_EQUAL( D1[1].betti(),     1 );
+
+#if 0
+
+  // FIXME: this is still too large to be easily processed by the
+  // algorithm...
+
+  auto L  = aleph::topology::spine( K );
+
+  ALEPH_ASSERT_THROW( L.size() < K.size() );
+
+  auto K0 = aleph::topology::Skeleton()(0, K);
+  auto K1 = K0;
+  auto K2 = K;
+  auto D2 = aleph::calculateIntersectionHomology( L, {K0,K1,K2}, aleph::PerversityGM( {0} ) );
+
+  ALEPH_ASSERT_EQUAL( D2.size(), 3 );
+
+#endif
 
   ALEPH_TEST_END();
 }
