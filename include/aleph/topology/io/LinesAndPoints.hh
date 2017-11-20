@@ -71,7 +71,7 @@ public:
       auto p = container[u]; // coordinate
 
       if( p.size() >= 2 )
-        out << p[0] << "\t" << p[1] << "\n";
+        write( out, p );
       else
         throw std::runtime_error( "Insufficient number of dimensions for storing coordinates" );
     }
@@ -90,12 +90,24 @@ public:
 
       if( p.size() >= 2 && q.size() >= 2 )
       {
-        out << p[0] << "\t" << p[1] << "\n"
-            << q[0] << "\t" << q[1] << "\n\n";
+        write(out, p);
+        write(out, q);
+
+        out << "\n";
       }
       else
         throw std::runtime_error( "Insufficient number of dimensions for storing coordinates" );
     }
+  }
+private:
+  template <class Container> void write( std::ostream& out, Container& p )
+  {
+    out << p[0] << "\t" << p[1] << " ";
+
+    if( p.size() >= 3 )
+      out << p[2];
+
+    out << "\n";
   }
 };
 
