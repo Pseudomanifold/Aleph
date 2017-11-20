@@ -22,6 +22,44 @@
 
 #include <cmath>
 
+template <class T> void testDisk()
+{
+  ALEPH_TEST_BEGIN( "Spine: disk" );
+
+  using DataType   = bool;
+  using VertexType = T;
+
+  using Simplex           = aleph::topology::Simplex<DataType, VertexType>;
+  using SimplicialComplex = aleph::topology::SimplicialComplex<Simplex>;
+
+  std::vector<Simplex> simplices;
+
+  unsigned n = 7;
+  for( unsigned i = 0; i < n; i++ )
+  {
+    if( i+1 < n )
+      simplices.push_back( Simplex( {T(0),T(i+1),T(i+2)} ) );
+    else
+      simplices.push_back( Simplex( {T(0),T(i+1),T(  1)} ) );
+  }
+
+  SimplicialComplex K( simplices.begin(), simplices.end() );
+
+  std::cerr << "K =" << K << "\n";
+
+  K.createMissingFaces();
+  K.sort();
+
+  auto L = aleph::topology::spine( K );
+
+  std::cerr << "L = " << L << "\n";
+
+  ALEPH_ASSERT_THROW( L.size() < K.size() );
+  ALEPH_ASSERT_EQUAL( L.size(), 1 );
+
+  ALEPH_TEST_END();
+}
+
 template <class T> void testS1vS1()
 {
   using DataType   = T;
