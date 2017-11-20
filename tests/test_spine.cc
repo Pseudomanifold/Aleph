@@ -145,18 +145,26 @@ template <class T> void testS1vS1()
 
   unsigned n = 50;
 
-  PointCloud pc( 2*n, 2 );
+  PointCloud pc( 2*n - 1, 2 );
 
+  unsigned k = 0;
   for( unsigned i = 0; i < n; i++ )
   {
     auto x0 = DataType( std::cos( 2*M_PI / n * i ) );
     auto y0 = DataType( std::sin( 2*M_PI / n * i ) );
 
-    auto x1 = x0 + 2;
-    auto y1 = y0;
+    if( x0 > -1 )
+    {
+      auto x1 = x0 + 2;
+      auto y1 = y0;
 
-    pc.set(2*i  , {x0, y0});
-    pc.set(2*i+1, {x1, y1});
+      pc.set(k++, {x0, y0});
+      pc.set(k++, {x1, y1});
+    }
+
+    // prevent duplication of singular point
+    else
+      pc.set(k++, {x0, y0} );
   }
 
   using Distance          = aleph::geometry::distances::Euclidean<DataType>;
@@ -210,9 +218,16 @@ template <class T> void testS1vS1()
   ALEPH_ASSERT_THROW( M.size() < K .size() );
   ALEPH_TEST_END();
 
+  {
+    std::ofstream out( "/tmp/M.txt" );
+    aleph::topology::io::LinesAndPoints lap;
+    lap( out, M, pc );
+  }
+
   L       = aleph::topology::BarycentricSubdivision()( M, [] ( std::size_t dimension ) { return dimension == 0 ? 0 : 0.5; } );
-  K0      = aleph::topology::Skeleton()(0, M);
-  auto D3 = aleph::calculateIntersectionHomology( L, {K0,M}, aleph::Perversity( {0} ) );
+  K0      = { {0} };
+  auto K1 = aleph::topology::Skeleton()( 2, M );
+  auto D3 = aleph::calculateIntersectionHomology( L, {K0,M}, aleph::Perversity( {-1,0} ) );
 
   ALEPH_ASSERT_EQUAL( D3.size(),         3  );
   ALEPH_ASSERT_EQUAL( D3[0].dimension(), 0  );
