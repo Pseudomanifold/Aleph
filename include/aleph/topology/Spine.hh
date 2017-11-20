@@ -135,9 +135,7 @@ template <class SimplicialComplex, class Simplex> SimplicialComplex elementarySi
 template <class SimplicialComplex> SimplicialComplex spine( const SimplicialComplex& K )
 {
   using Simplex = typename SimplicialComplex::value_type;
-
-  auto L = K;
-  L.sort();
+  auto L        = K;
 
   std::unordered_set<Simplex> admissible;
 
@@ -200,7 +198,8 @@ template <class SimplicialComplex> SimplicialComplex spine( const SimplicialComp
 
   while( !admissible.empty() )
   {
-    auto s = *admissible.begin();
+    auto s           = *admissible.begin();
+    bool hasFreeFace = false;
 
     // TODO: this check could be simplified by *storing* the free face
     // along with the given simplex
@@ -240,9 +239,15 @@ template <class SimplicialComplex> SimplicialComplex spine( const SimplicialComp
           }
         );
 
+        hasFreeFace = true;
         break;
       }
     }
+
+    // The admissible simplex does not have a free face, so it must not
+    // be used.
+    if( !hasFreeFace )
+      admissible.erase( s );
   }
 
   return L;
