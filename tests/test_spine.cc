@@ -225,9 +225,10 @@ template <class T> void testS1vS1()
   }
 
   L       = aleph::topology::BarycentricSubdivision()( M, [] ( std::size_t dimension ) { return dimension == 0 ? 0 : 0.5; } );
+  L.sort();
+
   K0      = { {0} };
-  auto K1 = aleph::topology::Skeleton()( 2, M );
-  auto D3 = aleph::calculateIntersectionHomology( L, {K0,M}, aleph::Perversity( {-1,0} ) );
+  auto D3 = aleph::calculateIntersectionHomology( L, {K0,M}, aleph::Perversity( {0,0} ) );
 
   ALEPH_ASSERT_EQUAL( D3.size(),         3  );
   ALEPH_ASSERT_EQUAL( D3[0].dimension(), 0  );
