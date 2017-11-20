@@ -16,6 +16,8 @@
 #include <aleph/topology/Skeleton.hh>
 #include <aleph/topology/Spine.hh>
 
+#include <aleph/topology/io/LinesAndPoints.hh>
+
 #include <vector>
 
 #include <cmath>
@@ -58,7 +60,7 @@ template <class T> void testS1vS1()
   // Persistent homology -----------------------------------------------
   //
   // This should not be surprising: it is possible to extract the two
-  // circles from the data set.
+  // circles from the data set. They form one connected component.
 
   ALEPH_ASSERT_EQUAL( D1.size(),     2 );
   ALEPH_ASSERT_EQUAL( D1[0].betti(), 1 );
@@ -71,14 +73,36 @@ template <class T> void testS1vS1()
 
   auto L  = aleph::topology::BarycentricSubdivision()( K, [] ( std::size_t dimension ) { return dimension == 0 ? 0 : 0.5; } );
   auto K0 = aleph::topology::Skeleton()( 0, K );
-  auto K2 = aleph::topology::Skeleton()( 2, K );
-
   auto D2 = aleph::calculateIntersectionHomology( L, {K0,K}, aleph::Perversity( {-1} ) );
 
-  ALEPH_ASSERT_EQUAL( D2.size(),     3 );
-  ALEPH_ASSERT_EQUAL( D2[0].betti(), 1 );
+  ALEPH_ASSERT_EQUAL( D2.size(),         3 );
+  ALEPH_ASSERT_EQUAL( D2[0].dimension(), 0 );
+  ALEPH_ASSERT_EQUAL( D2[0].betti(),     1 );
 
+  // Spine calculation -------------------------------------------------
+
+  auto M = aleph::topology::spine( K );
+
+  {
+    auto D = aleph::calculatePersistenceDiagrams( M );
+
+    ALEPH_ASSERT_EQUAL( D.size()    ,     2 );
+    ALEPH_ASSERT_EQUAL( D[0].dimension(), 0 );
+    ALEPH_ASSERT_EQUAL( D[1].dimension(), 1 );
+    ALEPH_ASSERT_EQUAL( D[0].betti(),     1 );
+    ALEPH_ASSERT_EQUAL( D[1].betti(),     2 );
+  }
+
+  ALEPH_ASSERT_THROW( M.size() < K .size() );
   ALEPH_TEST_END();
+
+  L       = aleph::topology::BarycentricSubdivision()( M, [] ( std::size_t dimension ) { return dimension == 0 ? 0 : 0.5; } );
+  K0      = aleph::topology::Skeleton()(0, M);
+  auto D3 = aleph::calculateIntersectionHomology( L, {K0,M}, aleph::Perversity( {0} ) );
+
+  ALEPH_ASSERT_EQUAL( D3.size(),         3  );
+  ALEPH_ASSERT_EQUAL( D3[0].dimension(), 0  );
+  ALEPH_ASSERT_EQUAL( D3[0].betti(),     55 );
 }
 
 template <class T> void testTriangle()
