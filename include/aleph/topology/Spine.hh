@@ -19,6 +19,11 @@ namespace topology
 
 template <class SimplicialComplex, class Simplex> bool isPrincipal( const Simplex& s, const SimplicialComplex& K )
 {
+  // Individual vertices cannot be considered to be principal because
+  // they do not have a free face.
+  if( s.dimension() == 0 )
+    return false;
+
   bool principal = true;
 
   for( auto&& t : K )
