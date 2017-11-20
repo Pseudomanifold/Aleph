@@ -11,6 +11,40 @@
 
 #include <vector>
 
+template <class T> void testNonSquare()
+{
+  ALEPH_TEST_BEGIN( "Boundary matrix reduction for non-square matrices" );
+
+  using namespace aleph;
+  using namespace topology;
+  using namespace representations;
+
+  using Representation = Vector<T>;
+  using Matrix         = BoundaryMatrix<Representation>;
+  using Index          = typename Matrix::Index;
+
+  Matrix M;
+  M.setNumColumns( Index(4) );
+
+  std::vector<T> columnA = { 1+4, 3+4, 4+4      };
+  std::vector<T> columnB = { 2+4, 7+4, 8+4      };
+  std::vector<T> columnC = { 5+4, 4+4, 7+4      };
+  std::vector<T> columnE = { 1+4, 2+4, 5+4, 6+4 };
+
+  M.setColumn( 0, columnA.begin(), columnA.end() );
+  M.setColumn( 1, columnB.begin(), columnB.end() );
+  M.setColumn( 2, columnC.begin(), columnC.end() );
+  M.setColumn( 3, columnE.begin(), columnE.end() );
+
+  using StandardAlgorithm = aleph::persistentHomology::algorithms::Standard;
+  StandardAlgorithm algorithm;
+  algorithm( M );
+
+  std::cout << M << "\n";
+
+  ALEPH_TEST_END();
+}
+
 template <class M> void reduceBoundaryMatrix( const M& m )
 {
   ALEPH_TEST_BEGIN( "Boundary matrix reduction" );
@@ -79,4 +113,9 @@ int main()
   setupBoundaryMatrix<unsigned long>();
   setupBoundaryMatrix<int>();
   setupBoundaryMatrix<long>();
+
+  testNonSquare<int>          ();
+  testNonSquare<long>         ();
+  testNonSquare<unsigned int> ();
+  testNonSquare<unsigned long>();
 }
