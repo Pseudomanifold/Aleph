@@ -3,7 +3,7 @@
 
 #include <aleph/topology/Intersections.hh>
 
-#include <unordered_set>
+#include <set>
 #include <vector>
 
 namespace aleph
@@ -142,7 +142,7 @@ template <class SimplicialComplex> SimplicialComplex spine( const SimplicialComp
   using Simplex = typename SimplicialComplex::value_type;
   auto L        = K;
 
-  std::unordered_set<Simplex> admissible;
+  std::set<Simplex> admissible;
 
   // Step 1: determine free faces --------------------------------------
   //
