@@ -18,6 +18,7 @@
 
 #include <aleph/topology/io/LinesAndPoints.hh>
 
+#include <random>
 #include <vector>
 
 #include <cmath>
@@ -52,6 +53,65 @@ template <class T> void testDisk()
 
   ALEPH_ASSERT_THROW( L.size() < K.size() );
   ALEPH_ASSERT_EQUAL( L.size(), 1 );
+
+  ALEPH_TEST_END();
+}
+
+template <class T> void testPinchedTorus()
+{
+  using DataType   = T;
+  using PointCloud = aleph::containers::PointCloud<DataType>;
+
+  ALEPH_TEST_BEGIN( "Spine: pinched torus" );
+
+  unsigned n = 400;
+  PointCloud pc( n, 3 );
+
+  auto g = [] ( T x, T y )
+  {
+    return T(2) + std::sin(x/2) * std::cos(y);
+  };
+
+  std::random_device rd;
+  std::mt19937 rng( rd() );
+
+  std::normal_distribution<DataType> noise( T(0), T(0.05) );
+
+  for( unsigned i = 0; i < static_cast<unsigned>( std::sqrt(n) ); i++ )
+  {
+    auto x = T( 2*M_PI / std::sqrt(n) * i );
+    for( unsigned j = 0; j < static_cast<unsigned>( std::sqrt(n) ); j++ )
+    {
+      auto y = T( 2*M_PI / std::sqrt(n) * j );
+
+      auto x0 = g(x,y) * std::cos(x)        + noise( rng );
+      auto x1 = g(x,y) * std::sin(x)        + noise( rng );
+      auto x2 = std::sin(x/2) * std::sin(y) + noise( rng );
+
+      pc.set(static_cast<unsigned>( std::sqrt(n) ) * i + j, {x0,x1,x2} );
+    }
+  }
+
+  using Distance          = aleph::geometry::distances::Euclidean<DataType>;
+  using NearestNeighbours = aleph::geometry::BruteForce<PointCloud, Distance>;
+
+  auto K
+    = aleph::geometry::buildVietorisRipsComplex(
+      NearestNeighbours( pc ),
+      DataType( 0.75 ),
+      2
+  );
+
+  std::ofstream out( "/tmp/Pinched_torus.txt" );
+  aleph::topology::io::LinesAndPoints lap;
+  lap( out, K, pc );
+
+  auto D1 = aleph::calculatePersistenceDiagrams( K );
+
+  ALEPH_ASSERT_EQUAL( D1.size(), 2 );
+  ALEPH_ASSERT_EQUAL( D1[0].dimension(), 0 );
+  ALEPH_ASSERT_EQUAL( D1[1].dimension(), 1 );
+  ALEPH_ASSERT_EQUAL( D1[1].betti(),     1 );
 
   ALEPH_TEST_END();
 }
@@ -163,6 +223,9 @@ int main( int, char** )
 {
   testDisk<short>   ();
   testDisk<unsigned>();
+
+  testPinchedTorus<float> ();
+  testPinchedTorus<double>();
 
   testS1vS1<float> ();
   testS1vS1<double>();
