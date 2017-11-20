@@ -230,9 +230,9 @@ template <class T> void testS1vS1()
   K0      = { {0} };
   auto D3 = aleph::calculateIntersectionHomology( L, {K0,M}, aleph::Perversity( {0,0} ) );
 
-  ALEPH_ASSERT_EQUAL( D3.size(),         3  );
-  ALEPH_ASSERT_EQUAL( D3[0].dimension(), 0  );
-  ALEPH_ASSERT_EQUAL( D3[0].betti(),     43 );
+  ALEPH_ASSERT_EQUAL( D3.size(),         3 );
+  ALEPH_ASSERT_EQUAL( D3[0].dimension(), 0 );
+  ALEPH_ASSERT_EQUAL( D3[0].betti(),     1 );
 }
 
 template <class T> void testTriangle()
