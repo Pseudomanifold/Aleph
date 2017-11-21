@@ -85,6 +85,8 @@ template <class T> void testNonSquare()
 
     if( valid )
       std::cerr << j << ": " << i << "\n";
+    else
+      std::cerr << j << ": -" << "\n";
   }
 
 
@@ -103,10 +105,9 @@ template <class T> void testNonSquare()
     std::tie( i, valid ) = N2.getMaximumIndex( j );
 
     if( valid )
-    {
-      std::cerr << j << ": " << i << "\n"
-                << 12 - 1 - j << ": " << 12 - 1 - i << "\n";
-    }
+      std::cerr << 12 - 1 - i << ": " << 12 - 1 - j << "\n";
+    else
+      std::cerr << 12 - 1 - j << ": -" << "\n";
   }
 
   ALEPH_TEST_END();
