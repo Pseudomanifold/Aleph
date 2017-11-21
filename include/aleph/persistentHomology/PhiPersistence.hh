@@ -231,13 +231,17 @@ std::ostream& operator<<( std::ostream& o, const Perversity p )
   @param X Stratification/filtration (sequence of simplicial complexes)
   @param p Perversity function
 
+  @param dualize Flag indicating whether matrix dualization should be
+  performed in order to improve performance.
+
   @returns Persistent intersection homology diagram
 */
 
 template <class Simplex, class Perversity>
 auto calculateIntersectionHomology( const aleph::topology::SimplicialComplex<Simplex>& K,
                                     const std::vector< aleph::topology::SimplicialComplex<Simplex> >& X,
-                                    const Perversity& p ) -> std::vector< PersistenceDiagram<typename Simplex::DataType> >
+                                    const Perversity& p,
+                                    bool dualize = true ) -> std::vector< PersistenceDiagram<typename Simplex::DataType> >
 {
   // The use of Goresky--MacPherson perversities requires using the
   // original indexing, starting from k=2.
@@ -330,14 +334,11 @@ auto calculateIntersectionHomology( const aleph::topology::SimplicialComplex<Sim
                          } );
 
   // Calculate persistent intersection homology ------------------------
-  //
-  // TODO: make dualization configurable? It is vital that the index
-  // denoting admissible simplices is set correctly here.
 
   auto boundaryMatrix             = aleph::topology::makeBoundaryMatrix( L, s );
   using IndexType                 = typename decltype(boundaryMatrix)::Index;
   bool includeAllUnpairedCreators = true;
-  auto pairing                    = aleph::calculatePersistencePairing( boundaryMatrix, includeAllUnpairedCreators, static_cast<IndexType>(s) );
+  auto pairing                    = aleph::calculatePersistencePairing( dualize ? boundaryMatrix.dualize() : boundaryMatrix, includeAllUnpairedCreators, static_cast<IndexType>(s) );
   auto persistenceDiagrams        = aleph::makePersistenceDiagrams( pairing, L );
 
   return persistenceDiagrams;

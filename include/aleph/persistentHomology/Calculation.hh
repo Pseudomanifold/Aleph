@@ -124,7 +124,7 @@ template <
 
   for( auto&& creator : creators )
   {
-    auto c = B.isDualized() ? numColumns - 1 - creator : creator;
+    auto c = B.isDualized() ? ( numColumns - 1 - creator ) : creator;
 
     // Again, check whether the transformed index value needs to be
     // included in the data. We are not interested in keeping track
