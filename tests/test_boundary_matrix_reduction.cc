@@ -23,6 +23,8 @@ template <class T> void testNonSquare()
   using Matrix         = BoundaryMatrix<Representation>;
   using Index          = typename Matrix::Index;
 
+  // Rectangular matrix reduction --------------------------------------
+
   Matrix M;
   M.setNumColumns( Index(4) );
 
@@ -38,6 +40,7 @@ template <class T> void testNonSquare()
 
   using StandardAlgorithm = aleph::persistentHomology::algorithms::StandardRectangular;
   StandardAlgorithm algorithm;
+
   algorithm( M );
 
   Index i;
@@ -47,6 +50,64 @@ template <class T> void testNonSquare()
 
   ALEPH_ASSERT_EQUAL( valid, true  );
   ALEPH_ASSERT_EQUAL( i    ,   6+4 );
+
+  // Quadratic matrix reduction w/ constraints -------------------------
+
+  Matrix N;
+  N.setNumColumns( Index(12) );
+
+  columnA = { 1+3, 3+3, 4+3      };
+  columnB = { 2+3, 7+3, 8+3      };
+  columnC = { 5+3, 4+3, 7+3      };
+  columnE = { 1+3, 2+3, 5+3, 6+3 };
+
+  N.setColumn( 0, columnA.begin(), columnA.end() );
+  N.setColumn( 1, columnB.begin(), columnB.end() );
+  N.setColumn( 2, columnC.begin(), columnC.end() );
+  N.setColumn( 3, columnE.begin(), columnE.end() );
+
+  auto N1 = N;
+
+  algorithm( N1 );
+
+  std::tie( i, valid ) = N1.getMaximumIndex( 3 );
+
+  ALEPH_ASSERT_EQUAL( valid, true  );
+  ALEPH_ASSERT_EQUAL( i    ,   6+3 );
+
+  std::cerr << std::string( 72, '-' ) << "\n"
+            << "Original space:\n"
+            << std::string( 72, '-' ) << "\n\n";
+
+  for( Index j = 0; j < N1.getNumColumns(); j++ )
+  {
+    std::tie( i, valid ) = N1.getMaximumIndex( j );
+
+    if( valid )
+      std::cerr << j << ": " << i << "\n";
+  }
+
+
+  auto N2 = N.dualize();
+
+  algorithm( N2 );
+
+  std::cerr << N2 << "\n";
+
+  std::cerr << std::string( 72, '-' ) << "\n"
+            << "Dual space:\n"
+            << std::string( 72, '-' ) << "\n\n";
+
+  for( Index j = 0; j < N2.getNumColumns(); j++ )
+  {
+    std::tie( i, valid ) = N2.getMaximumIndex( j );
+
+    if( valid )
+    {
+      std::cerr << j << ": " << i << "\n"
+                << 12 - 1 - j << ": " << 12 - 1 - i << "\n";
+    }
+  }
 
   ALEPH_TEST_END();
 }
