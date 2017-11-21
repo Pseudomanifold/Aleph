@@ -141,6 +141,29 @@ template <class T> void testNonSquare()
     if( pair.first <= 4 )
       std::cerr << pair.first << ": " << pair.second << "\n";
 
+  // Quadratic matrix with partition -----------------------------------
+
+  Matrix P;
+  P.setNumColumns( Index(12) );
+
+  columnA = { 1-1, 5-1+4, 6-1+4 };
+  columnB = { 2-1, 7-1+4, 8-1+4 };
+  columnC = { 3-1, 6-1+4, 7-1+4 };
+  columnE = { 4-1, 5-1+4, 8-1+4 };
+
+  P.setColumn( 4, columnA.begin(), columnA.end() );
+  P.setColumn( 5, columnB.begin(), columnB.end() );
+  P.setColumn( 6, columnC.begin(), columnC.end() );
+  P.setColumn( 7, columnE.begin(), columnE.end() );
+
+  pairing = calculatePersistencePairing( P.dualize(), false );
+
+  std::cerr << "Pairing (quadratic, with partion-based re-ordering):\n";
+
+  for( auto&& pair : pairing )
+    if( pair.first <= 7 )
+      std::cerr << pair.first << ": " << pair.second << "\n";
+
   ALEPH_TEST_END();
 }
 
