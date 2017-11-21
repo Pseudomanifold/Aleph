@@ -164,6 +164,11 @@ template <class T> void testNonSquare()
     if( pair.first <= 7 )
       std::cerr << pair.first << ": " << pair.second << "\n";
 
+  pairing = calculatePersistencePairing( P.dualize(), false, 8 );
+
+  std::cerr << "Pairing (quadratic, with partion-based re-ordering and cut-off):\n"
+            << pairing << "\n";
+
   ALEPH_TEST_END();
 }
 
