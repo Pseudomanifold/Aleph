@@ -379,18 +379,12 @@ template <class T> void testDualization()
 
   auto M = boundaryMatrix;
 
-  std::cerr << M << "\n";
-
   aleph::persistentHomology::algorithms::Standard algorithm;
   algorithm( M );
-
-  std::cerr << M << "\n";
 
   auto MT = boundaryMatrix.dualize();
 
   algorithm( MT );
-
-  std::cerr << MT << "\n";
 
   unsigned numAllowableChains    = 0;
   unsigned numAllowableTwoChains = 0;
@@ -410,11 +404,14 @@ template <class T> void testDualization()
   ALEPH_ASSERT_THROW( numAllowableChains >= numAllowableTwoChains );
   ALEPH_ASSERT_EQUAL( numAllowableTwoChains, 1 );
 
-  auto pairing1 = aleph::calculatePersistencePairing<aleph::persistentHomology::algorithms::Standard>( boundaryMatrix,           false );
-  auto pairing2 = aleph::calculatePersistencePairing<aleph::persistentHomology::algorithms::Standard>( boundaryMatrix.dualize(), false );
+  auto pairing1 = aleph::calculatePersistencePairing<aleph::persistentHomology::algorithms::Standard>( boundaryMatrix          , false, IndexType(s) );
+  auto pairing2 = aleph::calculatePersistencePairing<aleph::persistentHomology::algorithms::Standard>( boundaryMatrix.dualize(), false, IndexType(s) );
+  auto pairing3 = aleph::calculatePersistencePairing<aleph::persistentHomology::algorithms::Twist>   ( boundaryMatrix          , false, IndexType(s) );
+  auto pairing4 = aleph::calculatePersistencePairing<aleph::persistentHomology::algorithms::Twist>   ( boundaryMatrix.dualize(), false, IndexType(s) );
 
-  std::cerr << pairing1 << "\n"
-            << pairing2 << "\n";
+  ALEPH_ASSERT_THROW( pairing1 == pairing2 );
+  ALEPH_ASSERT_THROW( pairing3 == pairing4 );
+  ALEPH_ASSERT_THROW( pairing4 == pairing1 );
 
   ALEPH_TEST_END();
 }
