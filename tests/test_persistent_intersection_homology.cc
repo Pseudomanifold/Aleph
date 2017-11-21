@@ -312,11 +312,6 @@ template <class T> void testDiskWithFlares()
   ALEPH_ASSERT_EQUAL( diagramsIH_1.front().dimension(), 0 );
   ALEPH_ASSERT_EQUAL( diagramsIH_2.front().dimension(), 0 );
 
-  std::cerr << "Betti numbers:\n"
-            << "  - PH  : " << diagramsPH.front().betti() << "\n"
-            << "  - IH_1: " << diagramsIH_1.front().betti() << "\n"
-            << "  - IH_2: " << diagramsIH_2.front().betti() << "\n";
-
   ALEPH_TEST_END();
 }
 
@@ -848,9 +843,6 @@ template <class T> void testWeightedTriangle()
   auto X2 = K;
 
   auto D1 = aleph::calculateIntersectionHomology( L, {X0,X1,X2}, aleph::PerversityGM( {0} ) );
-
-  for( auto&& D : D1 )
-    std::cerr << D << "\n";
 
   // Brute-force calculation of admissibility condition ----------------
   //
