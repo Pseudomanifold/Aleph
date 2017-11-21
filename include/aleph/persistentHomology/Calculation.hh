@@ -70,11 +70,10 @@ template <
   ReductionAlgorithm reductionAlgorithm;
   reductionAlgorithm( B );
 
-  PersistencePairing pairing;
+  PersistencePairing pairing;         // resulting pairing
+  std::unordered_set<Index> creators; // keeps track of (potential) creators
 
-  auto numColumns = max <= B.getNumColumns() ? max : B.getNumColumns();
-
-  std::unordered_set<Index> creators;
+  auto numColumns = B.getNumColumns();
 
   for( Index j = Index(0); j < numColumns; j++ )
   {
@@ -98,7 +97,10 @@ template <
         v  = numColumns - 1 - w; // Yes, this is correct!
       }
 
-      if( max > B.getNumColumns() || i < max )
+      // u is checked here because it contains the correct index of
+      // a simplex with respect to its simplicial complex. Even for
+      // a dualized matrix, this index is correctly transformed.
+      if( max > numColumns || u < max )
         pairing.add( u, v );
     }
 
@@ -122,10 +124,13 @@ template <
 
   for( auto&& creator : creators )
   {
-    if( B.isDualized() )
-      pairing.add( numColumns - 1 - creator );
-    else
-      pairing.add( creator );
+    auto c = B.isDualized() ? numColumns - 1 - creator : creator;
+
+    // Again, check whether the transformed index value needs to be
+    // included in the data. We are not interested in keeping track
+    // of simplices that are not allowable (with respect to `max`).
+    if( max > numColumns || c < max )
+      pairing.add( c );
   }
 
   std::sort( pairing.begin(), pairing.end() );
