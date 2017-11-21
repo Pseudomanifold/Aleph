@@ -75,6 +75,11 @@ template <class T> void testNonSquare()
   ALEPH_ASSERT_EQUAL( valid, true  );
   ALEPH_ASSERT_EQUAL( i    ,   6+3 );
 
+  {
+    auto pairing = calculatePersistencePairing( N, false );
+    std::cerr << "PAIRING: " << pairing << "\n";
+  }
+
   std::cerr << std::string( 72, '-' ) << "\n"
             << "Original space:\n"
             << std::string( 72, '-' ) << "\n\n";
@@ -109,6 +114,32 @@ template <class T> void testNonSquare()
     else
       std::cerr << 12 - 1 - j << ": -" << "\n";
   }
+
+  auto N3      = N.dualize();
+  auto pairing = calculatePersistencePairing( N3, false );
+
+  // Quadratic matrix with re-ordering ---------------------------------
+
+  Matrix O;
+  O.setNumColumns( Index(12) );
+
+  columnA = { 1-1, 5-1, 6-1 };
+  columnB = { 2-1, 7-1, 8-1 };
+  columnC = { 3-1, 6-1, 7-1 };
+  columnE = { 4-1, 5-1, 8-1 };
+
+  O.setColumn( 8, columnA.begin(), columnA.end() );
+  O.setColumn( 9, columnB.begin(), columnB.end() );
+  O.setColumn(10, columnC.begin(), columnC.end() );
+  O.setColumn(11, columnE.begin(), columnE.end() );
+
+  pairing = calculatePersistencePairing( O, false );
+
+  std::cerr << "Pairing (quadratic, with re-ordering):\n";
+
+  for( auto&& pair : pairing )
+    if( pair.first <= 4 )
+      std::cerr << pair.first << ": " << pair.second << "\n";
 
   ALEPH_TEST_END();
 }
