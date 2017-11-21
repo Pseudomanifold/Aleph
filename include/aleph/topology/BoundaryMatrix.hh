@@ -100,6 +100,15 @@ public:
 
   // Dualization -------------------------------------------------------
 
+  /**
+    Calculates the anti-transpose of the matrix in order to obtain its
+    *dual* variant. Note that this function is *only* defined when the
+    matrix is quadratic. Else, the conversion will fail.
+
+    @see https://arxiv.org/pdf/1107.5665.pdf
+    @returns Dual boundary matrix
+  */
+
   BoundaryMatrix dualize() const
   {
     auto&& numColumns = this->getNumColumns();
