@@ -36,11 +36,17 @@ template <class T> void testNonSquare()
   M.setColumn( 2, columnC.begin(), columnC.end() );
   M.setColumn( 3, columnE.begin(), columnE.end() );
 
-  using StandardAlgorithm = aleph::persistentHomology::algorithms::Standard;
+  using StandardAlgorithm = aleph::persistentHomology::algorithms::StandardRectangular;
   StandardAlgorithm algorithm;
   algorithm( M );
 
-  std::cout << M << "\n";
+  Index i;
+  bool valid;
+
+  std::tie( i, valid ) = M.getMaximumIndex( 3 );
+
+  ALEPH_ASSERT_EQUAL( valid, true  );
+  ALEPH_ASSERT_EQUAL( i    ,   6+4 );
 
   ALEPH_TEST_END();
 }
