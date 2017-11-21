@@ -165,6 +165,22 @@ template <
   return makePersistenceDiagrams( pairing, K );
 }
 
+/**
+  Calculates a persistence diagram from a boundary matrix and a set of
+  function values. This function is meant to permit quick calculations
+  for one-dimensional functions where a matrix and a vector of values,
+  denoting the \f$y\f$-values of the function, are sufficient.
+
+  @param boundaryMatrix Boundary matrix to reduce
+  @param functionValues Vector of values to assign to the persistence diagram
+
+  @returns Persistence diagram
+
+  @tparam ReductionAlgorithm Algorithm for reducing the boundary matrix
+  @tparam Representation     Representation of the boundary matrix
+  @tparam DataType           Data type (usually inferred from the other parameters)
+*/
+
 template <
   class ReductionAlgorithm = defaults::ReductionAlgorithm,
   class Representation     = defaults::Representation,
