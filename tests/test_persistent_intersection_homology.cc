@@ -225,7 +225,7 @@ template <class T> void testCircleWithWhisker()
 
   auto D1 = aleph::calculateIntersectionHomology( K, {X0,X1}, aleph::Perversity( {-1} ) );
   auto D2 = aleph::calculateIntersectionHomology( K, {X0,X1}, aleph::Perversity( { 0} ) );
-  auto D3 = aleph::calculateIntersectionHomology( L, {Y0,Y1}, aleph::Perversity( {-1} ) );
+  auto D3 = aleph::calculateIntersectionHomology( L, {Y0,Y1}, aleph::Perversity( {-1} ), true );
   auto D4 = aleph::calculateIntersectionHomology( L, {Y0,Y1}, aleph::Perversity( { 0} ) );
 
   ALEPH_ASSERT_THROW( D1.empty() == false );
@@ -472,6 +472,13 @@ template <class T> void testPinchedTorus()
     aleph::topology::BarycentricSubdivision subdivision;
     L = subdivision( L );
     L.sort();
+
+    auto D = aleph::calculatePersistenceDiagrams(L, dualize, includeAllUnpairedCreators);
+
+    ALEPH_ASSERT_EQUAL( D.size(), 3 );
+    ALEPH_ASSERT_EQUAL( D[0].betti(), 1 ); // Z
+    ALEPH_ASSERT_EQUAL( D[1].betti(), 1 ); // Z
+    ALEPH_ASSERT_EQUAL( D[2].betti(), 1 ); // Z
   }
 
   aleph::topology::Skeleton skeleton;
@@ -479,7 +486,7 @@ template <class T> void testPinchedTorus()
   auto X1 = X0;
   auto X2 = K;
 
-  auto D2 = aleph::calculateIntersectionHomology( L, {X0,X1,X2}, aleph::PerversityGM( {0} ) );
+  auto D2 = aleph::calculateIntersectionHomology( L, {X0,X1,X2}, aleph::PerversityGM( {0} ), false );
 
   ALEPH_ASSERT_EQUAL( D2.size(), 3 );
   ALEPH_ASSERT_EQUAL( D2[0].betti(), 1 );
@@ -589,7 +596,7 @@ template <class T> void testSphere()
   ALEPH_ASSERT_EQUAL( D2.front().dimension(), 0 );
   ALEPH_ASSERT_EQUAL( D2.front().betti(),     1 );
 
-  auto D3 = aleph::calculateIntersectionHomology( L, {X0,X0,K}, aleph::PerversityGM( {0} ) );
+  auto D3 = aleph::calculateIntersectionHomology( L, {X0,X0,K}, aleph::PerversityGM( {0} ), false );
 
   ALEPH_ASSERT_EQUAL( D3.size(),         3 );
   ALEPH_ASSERT_EQUAL( D3[0].dimension(), 0 );
@@ -732,8 +739,8 @@ template <class T> void testTorus()
   auto X2 = X1;
   auto X3 = K;
 
-  auto D2 = aleph::calculateIntersectionHomology( L, {X0,X1,X2,X3}, aleph::PerversityGM( {0,0} ) );
-  auto D3 = aleph::calculateIntersectionHomology( L, {X0,X1,X2,X3}, aleph::PerversityGM( {0,1} ) );
+  auto D2 = aleph::calculateIntersectionHomology( L, {X0,X1,X2,X3}, aleph::PerversityGM( {0,0} ), false );
+  auto D3 = aleph::calculateIntersectionHomology( L, {X0,X1,X2,X3}, aleph::PerversityGM( {0,1} ), false );
 
   ALEPH_ASSERT_EQUAL( D2.size(), 4 );
   ALEPH_ASSERT_EQUAL( D3.size(), 4 );
@@ -784,9 +791,9 @@ template <class T> void testWedgeOfTwoCircles()
   SimplicialComplex Y0 = { {0}, {2} };
   SimplicialComplex Y1 = K;
 
-  auto D1 = aleph::calculateIntersectionHomology( K, {X0,X1}, aleph::Perversity( {-1} ) );
-  auto D2 = aleph::calculateIntersectionHomology( K, {X0,X1}, aleph::Perversity( { 0} ) );
-  auto D3 = aleph::calculateIntersectionHomology( K, {Y0,Y1}, aleph::Perversity( {-1} ) );
+  auto D1 = aleph::calculateIntersectionHomology( K, {X0,X1}, aleph::Perversity( {-1} ), false );
+  auto D2 = aleph::calculateIntersectionHomology( K, {X0,X1}, aleph::Perversity( { 0} ), false );
+  auto D3 = aleph::calculateIntersectionHomology( K, {Y0,Y1}, aleph::Perversity( {-1} ), false );
 
   ALEPH_ASSERT_EQUAL( D1.size(), 1 );
   ALEPH_ASSERT_EQUAL( D2.size(), 2 );

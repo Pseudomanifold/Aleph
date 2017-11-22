@@ -77,7 +77,8 @@ template <class T> void testNonSquare()
 
   {
     auto pairing = calculatePersistencePairing( N, false );
-    std::cerr << "PAIRING: " << pairing << "\n";
+    std::cerr << "Pairing (quadratic, original):\n"
+              << pairing << "\n";
   }
 
   std::cerr << std::string( 72, '-' ) << "\n"
@@ -155,6 +156,14 @@ template <class T> void testNonSquare()
   P.setColumn( 5, columnB.begin(), columnB.end() );
   P.setColumn( 6, columnC.begin(), columnC.end() );
   P.setColumn( 7, columnE.begin(), columnE.end() );
+
+  pairing = calculatePersistencePairing( P, false );
+
+  std::cerr << "Pairing (quadratic, with partion-based re-ordering [singular]):\n";
+
+  for( auto&& pair : pairing )
+    if( pair.first <= 7 )
+      std::cerr << pair.first << ": " << pair.second << "\n";
 
   pairing = calculatePersistencePairing( P.dualize(), false );
 
