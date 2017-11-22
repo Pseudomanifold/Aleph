@@ -177,7 +177,7 @@ template <class T> void testNonSquare()
   };
 
   {
-    auto pairing1 = calculatePersistencePairing<aleph::persistentHomology::algorithms::Standard>( P, false );
+    auto pairing1 = calculatePersistencePairing( P, false );
     pairing1.erase( std::remove_if( pairing1.begin(), pairing1.end(), RemoveNeutral ), pairing1.end() );
 
     auto pairing2 = calculatePersistencePairing( P, true );
