@@ -59,10 +59,11 @@ template <class SimplicialComplex, class Simplex> bool isAdmissible( const Simpl
   std::vector<bool> admissible( faces.size(), true );
 
   std::size_t i = 0;
+  auto itPair   = K.range( s.dimension() ); // valid range for searches, viz. *all*
+                                            // faces in "one dimension up"
 
   for( auto&& face : faces )
   {
-    auto itPair = K.range( face.dimension() + 1 );
     for( auto it = itPair.first; it != itPair.second; ++it )
     {
       auto&& t = *it;
