@@ -16,6 +16,29 @@ namespace topology
 {
 
 /**
+  Calculates the size of the intersection of two simplices. This is
+  useful when one quickly wants to check whether a given simplex is
+  a direct face of another simplex.
+*/
+
+template <class Simplex> std::size_t sizeOfIntersection( const Simplex& s, const Simplex& t ) noexcept
+{
+  using VertexType = typename Simplex::VertexType;
+
+  std::set<VertexType> sVertices( s.begin(), s.end() );
+  std::set<VertexType> tVertices( t.begin(), t.end() );
+
+  std::vector<VertexType> stVertices;
+  stVertices.reserve( std::min( s.size(), t.size() ) );
+
+  std::set_intersection( sVertices.begin(), sVertices.end(),
+                         tVertices.begin(), tVertices.end(),
+                         std::back_inserter( stVertices ) );
+
+  return stVertices.size();
+}
+
+/**
   Intersects two simplices with each other. If the intersection is
   empty, the function returns the empty simplex. The data value of
   the simplex is left unspecified. It should be set by the client.

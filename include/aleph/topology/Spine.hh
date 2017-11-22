@@ -25,16 +25,19 @@ template <class SimplicialComplex, class Simplex> bool isPrincipal( const Simple
     return false;
 
   bool principal = true;
+  auto itPair    = K.range( s.dimension() + 1 );
 
-  for( auto&& t : K )
+  for( auto it = itPair.first; it != itPair.second; ++it )
   {
+    auto&& t = *it;
+
     // This check assumes that the simplicial complex is valid, so it
-    // suffices to search faces in one dimension _below_ s..
-    if( s.dimension()+1 == t.dimension() )
-    {
-      if( intersect(s,t) == s )
-        principal = false;
-    }
+    // suffices to search faces in one dimension _below_ s. Note that
+    // the check only has to evaluate the *size* of the intersection,
+    // as this is sufficient to determine whether a simplex is a face
+    // of another simplex.
+    if( sizeOfIntersection(s,t) == s.size() )
+      principal = false;
   }
 
   return principal;
