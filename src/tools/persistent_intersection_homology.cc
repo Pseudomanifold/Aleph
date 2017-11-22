@@ -162,7 +162,7 @@ int main( int argc, char** argv )
     = aleph::geometry::buildVietorisRipsComplex(
         NearestNeighbours( pointCloud ),
         epsilon,
-        3 // FIXME: make configurable
+        2 // FIXME: make configurable
   );
 
   std::cerr << "* Obtained Vietoris--Rips complex with " << K.size() << " simplices\n";
@@ -261,8 +261,17 @@ int main( int argc, char** argv )
       }
     );
 
-    K2 = K1;
-    K3 = K;
+    if( K.dimension() == 2 )
+    {
+      K1 = K0;
+      K2 = K;
+    }
+    else
+    {
+      K2 = K1;
+      K3 = K;
+    }
+
     L  = K;
   }
 
@@ -274,7 +283,11 @@ int main( int argc, char** argv )
 
   std::cerr << "* Calculating intersection homology...";
 
-  auto D2 = aleph::calculateIntersectionHomology( L, {K0,K1,K2,K3}, aleph::PerversityGM( {0,1} ) );
+  auto D2 = D1;
+  if( K.dimension() == 2 )
+    D2 = aleph::calculateIntersectionHomology( L, {K0,K1,K2}, aleph::PerversityGM( {0} ) );
+  else
+    D2 = aleph::calculateIntersectionHomology( L, {K0,K1,K2,K3}, aleph::PerversityGM( {0,1} ) );
 
   std::cerr << "finished\n";
 
