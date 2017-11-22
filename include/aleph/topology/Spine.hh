@@ -62,13 +62,17 @@ template <class SimplicialComplex, class Simplex> bool isAdmissible( const Simpl
 
   for( auto&& face : faces )
   {
-    for( auto&& t : K )
+    auto itPair = K.range( face.dimension() + 1 );
+    for( auto it = itPair.first; it != itPair.second; ++it )
     {
-      // This check assumes that the simplicial complex is valid, so it
-      // suffices to search faces in one dimension _below_ t.
-      if( face.dimension()+1 == t.dimension() && t != s )
+      auto&& t = *it;
+
+      // We do not have to check for intersections with the original
+      // simplex from which we started---we already know that we are
+      // a face.
+      if( t != s )
       {
-        if( intersect(face,t) == face )
+        if( sizeOfIntersection(face,t) == face.size() )
         {
           admissible[i] = false;
           break;
@@ -79,6 +83,7 @@ template <class SimplicialComplex, class Simplex> bool isAdmissible( const Simpl
     ++i;
   }
 
+  // TODO: return free face along with admissibility condition
   return std::find( admissible.begin(), admissible.end(), true ) != admissible.end();
 }
 
