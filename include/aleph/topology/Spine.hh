@@ -95,16 +95,17 @@ template <class SimplicialComplex, class Simplex> bool isAdmissible( const Simpl
   // Check whether the face is free ------------------------------------
 
   bool admissible = true;
+  auto itPair     = K.range( delta.dimension() + 1 );
 
-  // TODO: the traversal could be sped up by only taking at a look at
-  // the *relevant* dimension of the simplicial complex.
-  for( auto&& s : K )
+  for( auto it = itPair.first; it != itPair.second; ++it )
   {
-    // This check assumes that the simplicial complex is valid, so it
-    // suffices to search faces in one dimension _below_ delta.
-    if( delta.dimension()+1 == s.dimension() && s != sigma )
+    auto&& s = *it;
+
+    // The simplex we are looking for should be a free face of sigma, so
+    // we must skip it when checking for other co-faces.
+    if( s != sigma )
     {
-      if( intersect(delta, s) == delta )
+      if( sizeOfIntersection(delta, s) == delta.size() )
       {
         admissible = false;
         break;
