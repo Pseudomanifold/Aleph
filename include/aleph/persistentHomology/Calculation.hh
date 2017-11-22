@@ -70,8 +70,9 @@ template <
   ReductionAlgorithm reductionAlgorithm;
   reductionAlgorithm( B );
 
-  PersistencePairing pairing;         // resulting pairing
-  std::unordered_set<Index> creators; // keeps track of (potential) creators
+  PersistencePairing pairing;           // resulting pairing
+  std::unordered_set<Index> creators;   // keeps track of (potential) creators
+  std::unordered_set<Index> destroyers; // keeps track of destroyers
 
   auto numColumns = B.getNumColumns();
 
@@ -96,6 +97,10 @@ template <
         u  = numColumns - 1 - v;
         v  = numColumns - 1 - w; // Yes, this is correct!
       }
+
+      // v is now a destroyer and may not be used as a creator, even
+      // if its column is empty.
+      destroyers.insert( v );
 
       // u is checked here because it contains the correct index of
       // a simplex with respect to its simplicial complex. Even for
@@ -125,6 +130,9 @@ template <
   for( auto&& creator : creators )
   {
     auto c = B.isDualized() ? ( numColumns - 1 - creator ) : creator;
+
+    if( destroyers.find( c ) != destroyers.end() )
+      continue;
 
     // Again, check whether the transformed index value needs to be
     // included in the data. We are not interested in keeping track
