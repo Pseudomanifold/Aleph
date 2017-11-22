@@ -9,6 +9,7 @@
 #include <aleph/topology/representations/Set.hh>
 #include <aleph/topology/representations/Vector.hh>
 
+#include <algorithm>
 #include <vector>
 
 template <class T> void testNonSquare()
@@ -152,31 +153,41 @@ template <class T> void testNonSquare()
   columnC = { 3-1, 6-1+4, 7-1+4 };
   columnE = { 4-1, 5-1+4, 8-1+4 };
 
+  P.setDimension( 0, 1 );
+  P.setDimension( 1, 1 );
+  P.setDimension( 2, 1 );
+  P.setDimension( 3, 1 );
+
   P.setColumn( 4, columnA.begin(), columnA.end() );
   P.setColumn( 5, columnB.begin(), columnB.end() );
   P.setColumn( 6, columnC.begin(), columnC.end() );
   P.setColumn( 7, columnE.begin(), columnE.end() );
 
-  pairing = calculatePersistencePairing( P, false );
+  P.setDimension( 8, 1 );
+  P.setDimension( 9, 1 );
+  P.setDimension(10, 1 );
+  P.setDimension(11, 1 );
 
-  std::cerr << "Pairing (quadratic, with partion-based re-ordering [singular]):\n";
+  using Pairing = decltype(pairing);
+  using Pair    = typename Pairing::ValueType;
 
-  for( auto&& pair : pairing )
-    if( pair.first <= 7 )
-      std::cerr << pair.first << ": " << pair.second << "\n";
+  auto RemoveNeutral = [] ( const Pair& pair )
+  {
+    return pair.first >= 8;
+  };
 
-  pairing = calculatePersistencePairing( P.dualize(), false );
+  {
+    auto pairing1 = calculatePersistencePairing<aleph::persistentHomology::algorithms::Standard>( P, false );
+    pairing1.erase( std::remove_if( pairing1.begin(), pairing1.end(), RemoveNeutral ), pairing1.end() );
 
-  std::cerr << "Pairing (quadratic, with partion-based re-ordering):\n";
+    auto pairing2 = calculatePersistencePairing( P, true );
+    pairing2.erase( std::remove_if( pairing2.begin(), pairing2.end(), RemoveNeutral ), pairing2.end() );
 
-  for( auto&& pair : pairing )
-    if( pair.first <= 7 )
-      std::cerr << pair.first << ": " << pair.second << "\n";
+    auto pairing3 = calculatePersistencePairing( P, true, 8 );
 
-  pairing = calculatePersistencePairing( P.dualize(), false, 8 );
-
-  std::cerr << "Pairing (quadratic, with partion-based re-ordering and cut-off):\n"
-            << pairing << "\n";
+    ALEPH_ASSERT_THROW( pairing1 == pairing2 );
+    ALEPH_ASSERT_THROW( pairing2 == pairing3 );
+  }
 
   ALEPH_TEST_END();
 }
