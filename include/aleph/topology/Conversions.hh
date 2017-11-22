@@ -54,22 +54,24 @@ template <
 
   for( auto&& itSimplex = K.begin(); itSimplex != K.end(); ++itSimplex )
   {
-    std::vector<Index> column;
-    column.reserve( itSimplex->size() );
-
-    for( auto&& itBoundary = itSimplex->begin_boundary();
-         itBoundary != itSimplex->end_boundary();
-         ++itBoundary )
+    if( !max || j < max )
     {
-      column.push_back( simplex_to_index[ *itBoundary ] );
-    }
+      std::vector<Index> column;
+      column.reserve( itSimplex->size() );
 
-    M.setColumn( j, column.begin(), column.end() );
+      for( auto&& itBoundary = itSimplex->begin_boundary();
+           itBoundary != itSimplex->end_boundary();
+           ++itBoundary )
+      {
+        column.push_back( simplex_to_index[ *itBoundary ] );
+      }
+
+      M.setColumn( j, column.begin(), column.end() );
+    }
+    else
+      M.setDimension( j, static_cast<Index>( itSimplex->dimension() ) );
 
     ++j;
-
-    if( max && j >= max )
-      break;
   }
 
   return M;
