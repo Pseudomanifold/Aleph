@@ -139,8 +139,8 @@ public:
     Node node;
     Edge edge;
 
-    std::regex reAttribute = std::regex( "([[:alpha:]]+)[[:space:]]*.*" );
-    std::regex reKeyValue  = std::regex( "([[:alpha:]]+)[[:space:]]+([[:alnum:]\\.]+)" );
+    std::regex reAttribute = std::regex( "([_\\|[:alpha:]]+)[[:space:]]*.*" );
+    std::regex reKeyValue  = std::regex( "([_\\|[:alpha:]]+)[[:space:]]+([[:alnum:]\\.]+)" );
     std::regex reLabel     = std::regex( "(label)[[:space:]]+\"([^\"]+)\"" );
 
     while( std::getline( in, line ) )
@@ -239,9 +239,18 @@ public:
             else
              dict->operator[]( name ) = value;
           }
-          // Skip unknown attributes...
+
+          // Attempt key--value matching for the unknown attribute and
+          // store it in the dictionary.
           else
           {
+            std::regex_match( line, matches, reKeyValue );
+
+            if( matches.size() >= 3 )
+            {
+              auto value               = matches[2];
+              dict->operator[]( name ) = value;
+            }
           }
         }
       }
