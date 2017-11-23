@@ -84,6 +84,19 @@ int main( int argc, char** argv )
     }
 
     std::cerr << "\n";
+
+    attributes = reader.getEdgeAttributeNames();
+
+    std::cerr << "* Available edge attributes: ";
+
+    for( auto&& attribute : attributes )
+    {
+      std::cerr << attribute;
+      if( attribute != attributes.back() )
+        std::cerr << ", ";
+    }
+
+    std::cerr << "\n";
   }
 
   // Data assignment ---------------------------------------------------
