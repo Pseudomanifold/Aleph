@@ -316,6 +316,34 @@ public:
     K      = SimplicialComplex( simplices.begin(), simplices.end() );
   }
 
+  /** Retrieves attribute names for the node attributes. */
+  std::vector<std::string> getNodeAttributeNames() const
+  {
+    std::set<std::string> names;
+
+    for( auto&& node : _nodes )
+    {
+      for( auto&& pair : node.dict )
+        names.insert( pair.first );
+    }
+
+    return { names.begin(), names.end() };
+  }
+
+  /** Retrieves attribute names for the edge attributes */
+  std::vector<std::string> getEdgeAttributeNames() const
+  {
+    std::set<std::string> names;
+
+    for( auto&& edge : _edges )
+    {
+      for( auto&& pair : edge.dict )
+        names.insert( pair.first );
+    }
+
+    return { names.begin(), names.end() };
+  }
+
   /**
     Retrieves a map of attribute values for each node. The attributes
     will be assigned to the node ID. Empty attributes signify that no
