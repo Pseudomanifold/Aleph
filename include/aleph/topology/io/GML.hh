@@ -366,6 +366,41 @@ public:
   }
 
   /**
+    Retrieves a given edge attribute for a specified edge. Notice that
+    this is not the most efficient way of doing so. The interface this
+    function provides is most simple, though, as the lookup does *not*
+    require many lines of code.
+
+    @param source    ID of source node
+    @param target    ID of target node
+    @param attribute Queried attribute
+
+    @returns Queried attribute (or an empty string if no such attribute
+    exists).
+  */
+
+  std::string getEdgeAttribute( const std::string& source,
+                                const std::string& target,
+                                const std::string& attribute ) const
+  {
+    auto itEdge = std::find_if( _edges.begin(), _edges.end(),
+      [&source, &target] ( const Edge& edge )
+      {
+        return edge.source == source && edge.target == target;
+      }
+    );
+
+    if( itEdge != _edges.end() )
+    {
+      auto itAttribute = itEdge->dict.find( attribute );
+      if( itAttribute != itEdge->dict.end() )
+        return itAttribute->second;
+    }
+
+    return {};
+  }
+
+  /**
     Returns a map that maps a node ID to an index. It corresponds
     to the order in which node IDs were allocated. It is *always*
     zero-indexed.
