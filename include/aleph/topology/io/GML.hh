@@ -415,7 +415,7 @@ public:
     std::map<std::string, VertexType> result;
 
     for( auto&& node : _nodes )
-      result[ node.id ] = static_cast<VertexType>( getID( nodeIDs, node.id ) );
+      result[ node.id ] = static_cast<VertexType>( std::distance( nodeIDs.begin(), nodeIDs.find( node.id ) ) );
 
     return result;
   }
