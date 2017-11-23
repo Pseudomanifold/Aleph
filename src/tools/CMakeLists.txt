@@ -3,6 +3,7 @@ IF( BUILD_TOOLS )
 
   ADD_EXECUTABLE( clique_communities_to_json                     clique_communities_to_json.cc )
   ADD_EXECUTABLE( clique_persistence_diagram                     clique_persistence_diagram.cc )
+  ADD_EXECUTABLE( fragmentation_analysis                         fragmentation_analysis.cc )
   ADD_EXECUTABLE( interlevel_set_persistence_hierarchy           interlevel_set_persistence_hierarchy.cc )
   ADD_EXECUTABLE( local_dimensionality                           local_dimensionality.cc )
   ADD_EXECUTABLE( mean_curvature                                 mean_curvature.cc )
