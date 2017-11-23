@@ -133,6 +133,60 @@ int main( int argc, char** argv )
     std::cerr << "finished\n";
   }
 
+  if( not edgeAttribute.empty() )
+  {
+    std::cerr << "* Using edge attribute '" << edgeAttribute << "' to assign weights...";
+
+    // TODO: simplex traversal could be optimized by only taking edges
+    // into account
+    for( auto it = K.begin(); it != K.end(); ++it )
+    {
+      if( it->dimension() == 1 )
+      {
+        // Make a copy of the simplex because the container
+        // configuration does not permit direct replacement
+        // of any simplex.
+        auto simplex = *it;
+        auto source  = std::to_string( simplex[0] );
+        auto target  = std::to_string( simplex[1] );
+
+        // TODO: this is stupid and wasteful; the lookup could be
+        // improved for larger graphs
+        auto value1 = reader.getEdgeAttribute( source, target, edgeAttribute );
+        auto value2 = reader.getEdgeAttribute( target, source, edgeAttribute );
+
+        DataType w   = DataType();
+        bool success = false;
+
+        if( not value1.empty() )
+          w = aleph::utilities::convert<DataType>( value1, success );
+        else if( not value2.empty() )
+          w = aleph::utilities::convert<DataType>( value2, success );
+        else
+          throw std::runtime_error( "Unable to find edge attribute" );
+
+        if( not success )
+          throw std::runtime_error( "Unable to convert edge attribute to data type" );
+
+        simplex.setData( w );
+        success = K.replace( it, simplex );
+
+        if( !success )
+          throw std::runtime_error( "Unable to replace simplex in simplicial complex" );
+      }
+    }
+
+    // Recalculate all weights in the simplicial complex. This should
+    // *not* be necessary for low-dimensional complexes, i.e. graphs,
+    // but it might be useful later and I do not want this as a bug.
+    bool useMaximum                  = true;
+    bool skipOneDimensionalSimplices = true;
+
+    K.recalculateWeights( useMaximum, skipOneDimensionalSimplices );
+
+    std::cerr << "finished\n";
+  }
+
   // Filtration --------------------------------------------------------
 
   K.sort(
