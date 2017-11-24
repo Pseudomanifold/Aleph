@@ -27,8 +27,8 @@ if __name__ == "__main__":
       t             = matches.group(1)
       num_cycles    = len(basis)
       cycle_lengths = [len(cycle) for cycle in basis]
-      row           = [num_cycles]
-      row.extend(cycle_lengths)
+      row           = [t, num_cycles]
+      row.append(" ".join( str(length) for length in cycle_lengths))
 
       # Output to STDOUT; this is more flexible and permits us to use
       # information in a variety of scripts.
