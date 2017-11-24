@@ -7,6 +7,7 @@
 #
 # Original author: Bastian Rieck
 
+import matplotlib.cm     as cm
 import matplotlib.pyplot as plt
 import numpy             as np
 
@@ -53,7 +54,7 @@ if __name__ == "__main__":
   num_time_steps = len(data)
   num_rows       = max_length - min_length + 1
   num_cols       = num_time_steps
-  data_array     = np.zeros((num_rows, num_cols), dtype=int)
+  data_array     = np.zeros((num_rows, num_cols), dtype=float)
 
   for index,t in enumerate(sorted(data.keys())):
     cycle_lengths = data[t].cycle_lengths
@@ -63,6 +64,8 @@ if __name__ == "__main__":
 
       data_array[row_index, col_index] += 1
 
+  data_array = ( data_array - np.min(data_array, axis=0) ) / np.max(data_array, axis=0)
+
   plt.yticks(np.arange(0, max_length-min_length+1,1), np.arange(min_length, max_length+1,1))
-  plt.imshow(data_array, origin="lower", aspect=15)
+  plt.imshow(data_array, origin="lower", aspect=10, cmap=cm.magma)
   plt.show()
