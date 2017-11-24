@@ -1,6 +1,7 @@
 IF( BUILD_TOOLS )
   MESSAGE( STATUS "Building tools" )
 
+  ADD_EXECUTABLE( betti_numbers                                  betti_numbers.cc )
   ADD_EXECUTABLE( clique_communities_to_json                     clique_communities_to_json.cc )
   ADD_EXECUTABLE( clique_persistence_diagram                     clique_persistence_diagram.cc )
   ADD_EXECUTABLE( fragmentation_analysis                         fragmentation_analysis.cc )
