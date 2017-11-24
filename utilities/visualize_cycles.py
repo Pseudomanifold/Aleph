@@ -28,28 +28,42 @@ class Entry:
     return output
 
 if __name__ == "__main__":
-  filename   = sys.argv[1]
+  filenames  = sys.argv[1:]
   t_min      =   sys.maxsize  # first time step
   t_max      =  -sys.maxsize  # last time step
   min_length =   sys.maxsize  # minimum cycle length
   max_length =  -sys.maxsize  # maximum cycle length
 
-  with open(filename) as f:
-    reader = csv.reader(f)
+  # Global data, aggregated over *all* files. No normalization will be
+  # performed when performing the aggregation per file.
+  data = dict()
 
-    # Stores individual entries from the CSV file along with their
-    # properties such as the number of cycles.
-    data = dict()
-    for row in reader:
-      t             = int(row[0])
-      num_cycles    = int(row[1])
-      cycle_lengths = [int(length) for length in row[2].split()]
-      t_min         = min(t, t_min)
-      t_max         = max(t, t_max)
-      min_length    = min(min_length, min(cycle_lengths))
-      max_length    = max(max_length, max(cycle_lengths))
+  for filename in filenames:
+    print("Processing file '{}'...".format(filename))
+    with open(filename) as f:
+      reader = csv.reader(f)
 
-      data[t] = Entry(t, num_cycles, cycle_lengths)
+      # Stores individual entries from the CSV file along with their
+      # properties such as the number of cycles.
+      local_data = dict()
+      for row in reader:
+        t             = int(row[0])
+        num_cycles    = int(row[1])
+        cycle_lengths = [int(length) for length in row[2].split()]
+        t_min         = min(t, t_min)
+        t_max         = max(t, t_max)
+        min_length    = min(min_length, min(cycle_lengths))
+        max_length    = max(max_length, max(cycle_lengths))
+
+        local_data[t] = Entry(t, num_cycles, cycle_lengths)
+
+        # Aggregate local data and global data
+        if t not in data.keys():
+          data[t] = local_data[t]
+        else:
+          num_cycles    = data[t].num_cycles + local_data[t].num_cycles
+          cycle_lengths = data[t].cycle_lengths + local_data[t].cycle_lengths
+          data[t]       = Entry(t, num_cycles, cycle_lengths)
 
   num_time_steps = len(data)
   num_rows       = max_length - min_length + 1
@@ -67,5 +81,5 @@ if __name__ == "__main__":
   data_array = ( data_array - np.min(data_array, axis=0) ) / np.max(data_array, axis=0)
 
   plt.yticks(np.arange(0, max_length-min_length+1,1), np.arange(min_length, max_length+1,1))
-  plt.imshow(data_array, origin="lower", aspect=10, cmap=cm.magma)
+  plt.imshow(data_array, origin="lower", aspect=5, cmap=cm.magma)
   plt.show()
