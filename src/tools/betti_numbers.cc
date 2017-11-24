@@ -60,9 +60,9 @@ int main( int argc, char** argv )
     std::regex reDataSetSuffix( "\\D*([[:digit:]]+).*" );
     std::smatch matches;
 
-    if( std::regex_match( filename, matches, reDataSetSuffix ) )
+    if( std::regex_match( basename, matches, reDataSetSuffix ) )
     {
-      unsigned id     = static_cast<unsigned>( std::stoull( matches[1] ) );
+      unsigned id = static_cast<unsigned>( std::stoull( matches[1] ) );
 
       if( diagrams.size() >= 2 )
         id_to_betti[id] = static_cast<unsigned>( diagrams[1].betti() );
@@ -72,6 +72,8 @@ int main( int argc, char** argv )
     else
       throw std::runtime_error( "Unable to identify ID" );
   }
+
+  std::cerr << "* Obtained " << id_to_betti.size() << " data sets\n";
 
   for( auto&& pair : id_to_betti )
     std::cout << pair.first << "\t" << pair.second << "\n";
