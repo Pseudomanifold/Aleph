@@ -77,4 +77,6 @@ int main( int argc, char** argv )
 
   for( auto&& pair : id_to_betti )
     std::cout << pair.first << "\t" << pair.second << "\n";
+
+  std::cout << "\n\n";
 }
