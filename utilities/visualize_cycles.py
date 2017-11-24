@@ -63,5 +63,6 @@ if __name__ == "__main__":
 
       data_array[row_index, col_index] += 1
 
+  plt.yticks(np.arange(0, max_length-min_length+1,1), np.arange(min_length, max_length+1,1))
   plt.imshow(data_array, origin="lower", aspect=15)
   plt.show()
