@@ -52,9 +52,6 @@ int main( int argc, char** argv )
                                              dualize,
                                              includeAllUnpairedCreators );
 
-    if( diagrams.size() != 2 )
-      throw std::runtime_error( "Graph must have at least one edge" );
-
     std::cerr << "finished\n";
 
     auto basename
@@ -66,7 +63,11 @@ int main( int argc, char** argv )
     if( std::regex_match( filename, matches, reDataSetSuffix ) )
     {
       unsigned id     = static_cast<unsigned>( std::stoull( matches[1] ) );
-      id_to_betti[id] = static_cast<unsigned>( diagrams[1].betti() );
+
+      if( diagrams.size() >= 2 )
+        id_to_betti[id] = static_cast<unsigned>( diagrams[1].betti() );
+      else
+        id_to_betti[id] = static_cast<unsigned>( 0 );
     }
     else
       throw std::runtime_error( "Unable to identify ID" );
