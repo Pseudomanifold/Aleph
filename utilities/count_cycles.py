@@ -10,6 +10,7 @@
 
 import networkx as nx
 
+import csv
 import os
 import re
 import sys
@@ -23,5 +24,13 @@ if __name__ == "__main__":
     matches = re.match(r'[^0-9]+(\d+).*', os.path.basename(filename))
 
     if matches:
-      t = matches.group(1)
-      print("{}\t{}".format(t,len(basis)))
+      t             = matches.group(1)
+      num_cycles    = len(basis)
+      cycle_lengths = [len(cycle) for cycle in basis]
+      row           = [num_cycles]
+      row.extend(cycle_lengths)
+
+      # Output to STDOUT; this is more flexible and permits us to use
+      # information in a variety of scripts.
+      writer = csv.writer(sys.stdout)
+      writer.writerow(row)
