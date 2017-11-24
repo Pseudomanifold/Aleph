@@ -52,8 +52,9 @@ if __name__ == "__main__":
         cycle_lengths = [int(length) for length in row[2].split()]
         t_min         = min(t, t_min)
         t_max         = max(t, t_max)
-        min_length    = min(min_length, min(cycle_lengths))
-        max_length    = max(max_length, max(cycle_lengths))
+        if cycle_lengths:
+          min_length    = min(min_length, min(cycle_lengths))
+          max_length    = max(max_length, max(cycle_lengths))
 
         local_data[t] = Entry(t, num_cycles, cycle_lengths)
 
@@ -80,6 +81,9 @@ if __name__ == "__main__":
 
   data_array = ( data_array - np.min(data_array, axis=0) ) / np.max(data_array, axis=0)
 
+  fig, axes = plt.subplots()
+
   plt.yticks(np.arange(0, max_length-min_length+1,1), np.arange(min_length, max_length+1,1))
   plt.imshow(data_array, origin="lower", aspect=5, cmap=cm.magma)
+  plt.colorbar()
   plt.show()
