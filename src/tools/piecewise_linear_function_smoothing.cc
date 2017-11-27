@@ -133,7 +133,7 @@ int main( int argc, char** argv )
 
   std::sort( theta.begin(), theta.end() );
 
-  auto quantile = theta.at( index( numBootstrapSamples, alpha / 2 ) );
+  auto quantile = theta.at( bootstrap.index( numBootstrapSamples, alpha / 2 ) );
   auto fLower   = empiricalMean - quantile / std::sqrt( functions.size() );
   auto fUpper   = empiricalMean + quantile / std::sqrt( functions.size() );
 
