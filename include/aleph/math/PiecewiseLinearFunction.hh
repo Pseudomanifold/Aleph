@@ -135,6 +135,19 @@ public:
     return lhs;
   }
 
+  /** Adds a given value to all points in the image of the function */
+  PiecewiseLinearFunction operator+( Image lambda ) const noexcept
+  {
+    auto f = *this;
+    return f.apply( lambda, std::plus<Image>() );
+  }
+
+  /** Adds a given value to all points in the image of the function */
+  PiecewiseLinearFunction& operator+=( Image lambda ) const noexcept
+  {
+    return this->apply( lambda, std::plus<Image>() );
+  }
+
   /** Calculates the difference of two piecewise linear functions */
   PiecewiseLinearFunction& operator-=( const PiecewiseLinearFunction& rhs ) noexcept
   {
@@ -158,6 +171,19 @@ public:
       f._data.insert( std::make_pair( pair.first, -pair.second ) );
 
     return f;
+  }
+
+  /** Subtracts a given value from all points in the image of the function */
+  PiecewiseLinearFunction operator-( Image lambda ) const noexcept
+  {
+    auto f = *this;
+    return f.apply( lambda, std::minus<Image>() );
+  }
+
+  /** Subtracts a given value from all points in the image of the function */
+  PiecewiseLinearFunction& operator-=( Image lambda ) const noexcept
+  {
+    return this->apply( lambda, std::minus<Image>() );
   }
 
   /** Multiplies the given piecewise linear function with a scalar value */
@@ -332,6 +358,23 @@ public:
   }
 
 private:
+
+  /**
+    Applies a binary operation to the current piecewise linear function
+    and a given scalar. This is tantamount to *broadcasting* the result
+    to a function that is entirely constant over a range of values. The
+    operation does not require conversions or merges of the *domain* or
+    the *range* of the input because only a scalar is involved.
+  */
+
+  template <class BinaryOperation> PiecewiseLinearFunction& apply( Image lambda,
+                                                                   BinaryOperation operation )
+  {
+    for( auto&& pair : _data )
+      pair.second = operation( pair.second, lambda );
+
+    return *this;
+  }
 
   /**
     Applies a binary operation to the current piecewise linear function
