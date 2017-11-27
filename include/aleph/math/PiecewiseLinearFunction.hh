@@ -187,7 +187,7 @@ public:
   }
 
   /** Divides the given step function by a scalar value */
-  PiecewiseLinearFunction& operator/( I lambda ) const noexcept
+  PiecewiseLinearFunction operator/( I lambda ) const noexcept
   {
     auto f = *this;
     f /= lambda;
