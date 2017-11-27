@@ -93,16 +93,24 @@ int main( int argc, char** argv )
 
   // Load functions ----------------------------------------------------
 
+  std::cerr << "* Loading functions...";
+
   std::vector<Function> functions;
 
   for( int i = optind; i < argc; i++ )
     functions.push_back( load( argv[i] ) );
 
+  std::cerr << "finished\n";
+
   // Calculate mean ----------------------------------------------------
+
+  std::cerr << "* Calculating empirical mean...";
 
   // This is the empirical mean that we obtain directly from the input
   // data. We do *not* make any assumptions about its distribution.
   auto empiricalMean = meanCalculation( functions.begin(), functions.end() );
+
+  std::cerr << "finished\n";
 
   // These are the bootstrap replicates of the mean function. There's
   // one for every bootstrap sample.
@@ -111,16 +119,22 @@ int main( int argc, char** argv )
 
   aleph::math::Bootstrap bootstrap;
 
+  std::cerr << "* Calculating bootstrap replicates (n=" << numBootstrapSamples << ", m=" << functions.size() << ")...";
+
   bootstrap.makeReplicates( numBootstrapSamples,
                             functions.begin(), functions.end(),
                             meanCalculation,
                             std::back_inserter( meanReplicates ) );
+
+  std::cerr << "finished\n";
 
   // This contains the population parameter of the corresponding
   // empirical process, viz. the *supremum* of the difference in
   // empirical mean and bootstrapped mean.
   std::vector<DataType> theta;
   theta.reserve( numBootstrapSamples );
+
+  std::cerr << "* Calculating confidence band information...";
 
   for( auto&& meanReplicate : meanReplicates )
   {
@@ -132,6 +146,8 @@ int main( int argc, char** argv )
   }
 
   std::sort( theta.begin(), theta.end() );
+
+  std::cerr << "finished\n";
 
   auto quantile = theta.at( bootstrap.index( numBootstrapSamples, alpha / 2 ) );
   auto fLower   = empiricalMean - quantile / std::sqrt( functions.size() );
