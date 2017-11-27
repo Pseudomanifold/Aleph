@@ -222,8 +222,6 @@ public:
     return std::make_pair( theta - tl * se, theta - tu * se );
   }
 
-private:
-
   /** Calculates index at a certain percentile of the data */
   static unsigned index( unsigned int samples, double alpha )
   {
