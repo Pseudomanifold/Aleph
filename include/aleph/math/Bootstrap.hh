@@ -229,7 +229,7 @@ public:
     // the product samples * alpha is an integer or not. Note the
     // offset of -1. It is required because, say, the 100th value
     // is at index 99 of the vector.
-    return static_cast<unsigned>( samples * alpha + 0.5 ) - 1;
+    return static_cast<unsigned>( std::ceil( samples * alpha ) ) - 1;
   }
 };
 
