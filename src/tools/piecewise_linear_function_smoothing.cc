@@ -5,12 +5,15 @@
 
 #include <fstream>
 #include <iostream>
+#include <iterator>
 #include <stdexcept>
 #include <sstream>
 #include <string>
 #include <vector>
 
 #include <getopt.h>
+
+#include <cmath>
 
 using DataType = double;
 using Function = aleph::math::PiecewiseLinearFunction<DataType>;
@@ -47,9 +50,17 @@ Function load( const std::string& filename )
   return Function( data.begin(), data.end() );
 }
 
+auto meanCalculation = [] ( auto begin, auto end )
+{
+  using T  = typename std::iterator_traits<decltype(begin)>::value_type;
+  auto sum = std::accumulate( begin, end, T() );
+
+  return sum / static_cast<double>( std::distance(begin, end) );
+};
+
 int main( int argc, char** argv )
 {
-  DataType alpha               = 0.95;
+  DataType alpha               = 0.05;
   unsigned numBootstrapSamples = 10;
 
   {
@@ -86,4 +97,47 @@ int main( int argc, char** argv )
 
   for( int i = optind; i < argc; i++ )
     functions.push_back( load( argv[i] ) );
+
+  // Calculate mean ----------------------------------------------------
+
+  // This is the empirical mean that we obtain directly from the input
+  // data. We do *not* make any assumptions about its distribution.
+  auto empiricalMean = meanCalculation( functions.begin(), functions.end() );
+
+  // These are the bootstrap replicates of the mean function. There's
+  // one for every bootstrap sample.
+  std::vector<Function> meanReplicates;
+  meanReplicates.reserve( numBootstrapSamples );
+
+  aleph::math::Bootstrap bootstrap;
+
+  bootstrap.makeReplicates( numBootstrapSamples,
+                            functions.begin(), functions.end(),
+                            meanCalculation,
+                            std::back_inserter( meanReplicates ) );
+
+  // This contains the population parameter of the corresponding
+  // empirical process, viz. the *supremum* of the difference in
+  // empirical mean and bootstrapped mean.
+  std::vector<DataType> theta;
+  theta.reserve( numBootstrapSamples );
+
+  for( auto&& meanReplicate : meanReplicates )
+  {
+    auto n = functions.size();
+    auto f = std::sqrt( n ) * ( meanReplicate - empiricalMean );
+    f      = f.abs();
+
+    theta.push_back( f.sup() );
+  }
+
+  std::sort( theta.begin(), theta.end() );
+
+  auto quantile = theta.at( index( numBootstrapSamples, alpha / 2 ) );
+  auto fLower   = empiricalMean - quantile / std::sqrt( functions.size() );
+  auto fUpper   = empiricalMean + quantile / std::sqrt( functions.size() );
+
+  std::cout << empiricalMean << "\n\n"
+            << fUpper        << "\n\n"
+            << fLower        << "\n";
 }

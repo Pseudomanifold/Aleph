@@ -28,10 +28,11 @@ IF( BUILD_TOOLS )
   ENABLE_IF_SUPPORTED( CMAKE_CXX_FLAGS "-O3" )
 
   # The confidence set calculation requires the availability of generic
-  # lambdas. Ditto for persistent intersection homology.
+  # lambdas. Ditto for persistent intersection homology and smoothing.
   SET_SOURCE_FILES_PROPERTIES(
     persistence_indicator_function_confidence_sets.cc
     persistent_intersection_homology.cc
+    piecewise_linear_function_smoothing.cc
     PROPERTIES COMPILE_FLAGS "-std=c++14"
   )
 
