@@ -80,6 +80,7 @@ int main( int argc, char** argv )
 
   std::vector<std::string> filenames;
   std::map<std::string, unsigned> filename_to_id;
+  std::map<unsigned, unsigned>    id_to_id;
 
   for( int i = 1; i < argc; i++ )
   {
@@ -97,6 +98,17 @@ int main( int argc, char** argv )
     }
     else
       throw std::runtime_error( "Unable to identify ID" );
+  }
+
+  {
+    std::set<unsigned> ids;
+
+    for( auto&& pair : filename_to_id )
+      ids.insert( pair.second );
+
+    unsigned i = 0;
+    for( auto&& id : ids )
+      id_to_id[ id ] = i++;
   }
 
   aleph::topology::io::GMLReader reader;
@@ -141,7 +153,7 @@ int main( int argc, char** argv )
       for( decltype( eigenvalues.size() ) i = 0; i < eigenvalues.size(); i++ )
         data.push_back( eigenvalues( i ) );
 
-      spectra.at( filename_to_id[filename] ) = Spectrum( data.begin(), data.end() );
+      spectra.at( id_to_id[ filename_to_id[filename] ] ) = Spectrum( data.begin(), data.end() );
     }
 
     std::cerr << "finished\n";
