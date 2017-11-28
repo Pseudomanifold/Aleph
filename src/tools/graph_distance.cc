@@ -94,6 +94,18 @@ int main( int argc, char** argv )
     SimplicialComplex K;
     reader( filename, K );
 
+    // Fall back to adding uniform edge weights ------------------------
+
+    for( auto it = K.begin(); it != K.end(); ++it )
+    {
+      auto simplex = *it;
+      if( simplex.dimension() == 1 )
+      {
+        simplex.setData( 1 );
+        K.replace( it, simplex );
+      }
+    }
+
     K.sort();
 
     // TODO:
@@ -117,6 +129,15 @@ int main( int argc, char** argv )
     }
 
     std::cerr << "finished\n";
+
+    auto numEdges = std::count_if( K.begin(), K.end(),
+      [] ( const Simplex& s )
+      {
+        return s.dimension() == 1;
+      }
+    );
+
+    std::cerr << "* Extracted graph has " << numEdges << " edges\n";
   }
 
   // Calculate spectral distances --------------------------------------
