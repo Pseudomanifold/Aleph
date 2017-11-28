@@ -1,3 +1,5 @@
+#include <aleph/config/Eigen.hh>
+
 #include <aleph/geometry/HeatKernel.hh>
 
 #include <aleph/topology/io/GML.hh>
@@ -6,6 +8,10 @@
 #include <aleph/topology/SimplicialComplex.hh>
 
 #include <aleph/utilities/Filesystem.hh>
+
+#ifdef ALEPH_WITH_EIGEN
+  #include <Eigen/Eigenvalues>
+#endif
 
 #include <algorithm>
 #include <iostream>
@@ -41,8 +47,8 @@ public:
     spectrum1.resize( std::max(n,m) );
     spectrum2.resize( std::max(n,m) );
 
-    std::sort( spectrum1.begin(), spectrum1.end() );
-    std::sort( spectrum2.begin(), spectrum2.end() );
+    std::sort( spectrum1.begin(), spectrum1.end(), std::greater<T>() );
+    std::sort( spectrum2.begin(), spectrum2.end(), std::greater<T>() );
 
     // Squared Euclidean distance
     return std::inner_product( spectrum1.begin(), spectrum1.end(),
@@ -69,6 +75,7 @@ int main( int argc, char** argv )
   using VertexType        = unsigned short;
   using Simplex           = aleph::topology::Simplex<DataType, VertexType>;
   using SimplicialComplex = aleph::topology::SimplicialComplex<Simplex>;
+  using Spectrum          = Spectrum<DataType>;
 
   std::vector<std::string> filenames;
 
@@ -76,6 +83,9 @@ int main( int argc, char** argv )
     filenames.push_back( argv[i] );
 
   aleph::topology::io::GMLReader reader;
+
+  std::vector<Spectrum> spectra;
+  spectra.reserve( filenames.size() );
 
   for( auto&& filename : filenames )
   {
@@ -90,7 +100,21 @@ int main( int argc, char** argv )
     //  - Extract vertex data
     //  - Use vertex data in Laplacian matrix
 
-    auto L = aleph::geometry::weightedLaplacianMatrix( K );
+    auto L           = aleph::geometry::weightedLaplacianMatrix( K );
+    using MatrixType = decltype(L);
+
+    Eigen::SelfAdjointEigenSolver<MatrixType> solver;
+    solver.compute( L );
+
+    auto eigenvalues = solver.eigenvalues();
+
+    {
+      std::vector<DataType> data;
+      for( decltype( eigenvalues.size() ) i = 0; i < eigenvalues.size(); i++ )
+        data.push_back( eigenvalues( i ) );
+
+      spectra.push_back( Spectrum( data.begin(), data.end() ) );
+    }
 
     std::cerr << "finished\n";
   }
