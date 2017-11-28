@@ -118,4 +118,33 @@ int main( int argc, char** argv )
 
     std::cerr << "finished\n";
   }
+
+  // Calculate spectral distances --------------------------------------
+
+  std::vector< std::vector<DataType> > distances( spectra.size(),
+    std::vector<DataType>( spectra.size() ) );
+
+  for( std::size_t i = 0; i < spectra.size(); i++ )
+  {
+    for( std::size_t j = i+1; j < spectra.size(); j++ )
+    {
+      distances[i][j] = spectra[i].distance( spectra[j] );
+      distances[j][i] = distances[i][j];
+    }
+  }
+
+  for( std::size_t i = 0; i < spectra.size(); i++ )
+  {
+    for( std::size_t j = 0; j < spectra.size(); j++ )
+    {
+      if( j != 0 )
+        std::cout << " ";
+
+      std::cout << distances[i][j];
+    }
+
+    std::cout << "\n";
+  }
+
+  std::cout << "\n\n";
 }
