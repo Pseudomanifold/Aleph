@@ -1,11 +1,14 @@
 #include <aleph/config/Eigen.hh>
 
 #include <aleph/geometry/HeatKernel.hh>
+#include <aleph/geometry/RipsExpander.hh>
 
 #include <aleph/topology/io/GML.hh>
 
 #include <aleph/topology/Simplex.hh>
 #include <aleph/topology/SimplicialComplex.hh>
+
+#include <aleph/topology/filtrations/Data.hh>
 
 #include <aleph/utilities/Filesystem.hh>
 
@@ -20,6 +23,8 @@
 #include <regex>
 #include <string>
 #include <vector>
+
+#include <getopt.h>
 
 // Auxiliary class for storing the spectrum of a graph, i.e. the set of
 // eigenvalues. This class offers a simple distance calculation.
@@ -69,7 +74,37 @@ private:
 
 int main( int argc, char** argv )
 {
-  if( argc <= 1 )
+  std::string nodeAttribute;
+  bool reverseFiltration = false;
+
+  {
+    static option commandLineOptions[] =
+    {
+      { "node-attribute"    , required_argument, nullptr, 'n' },
+      { "reverse-filtration", no_argument      , nullptr, 'r' },
+      { nullptr             , 0                , nullptr,  0  }
+    };
+
+    int option = 0;
+    while( ( option = getopt_long( argc, argv, "n:", commandLineOptions, nullptr ) ) != -1 )
+    {
+      switch( option )
+      {
+      case 'n':
+        nodeAttribute = optarg;
+        break;
+
+      case 'r':
+        reverseFiltration = true;
+        break;
+
+      default:
+        break;
+      }
+    }
+  }
+
+  if( argc - optind <= 0 )
     return -1;
 
   using DataType          = double;
@@ -82,7 +117,7 @@ int main( int argc, char** argv )
   std::map<std::string, unsigned> filename_to_id;
   std::map<unsigned, unsigned>    id_to_id;
 
-  for( int i = 1; i < argc; i++ )
+  for( int i = optind; i < argc; i++ )
   {
     filenames.push_back( argv[i] );
 
@@ -122,23 +157,57 @@ int main( int argc, char** argv )
     SimplicialComplex K;
     reader( filename, K );
 
-    // Fall back to adding uniform edge weights ------------------------
-
-    for( auto it = K.begin(); it != K.end(); ++it )
+    // Node node attribute has been specified, so we fall back to adding
+    // uniform weights to all edges.
+    if( nodeAttribute.empty() )
     {
-      auto simplex = *it;
-      if( simplex.dimension() == 1 )
+      for( auto it = K.begin(); it != K.end(); ++it )
       {
-        simplex.setData( 1 );
-        K.replace( it, simplex );
+        auto simplex = *it;
+        if( simplex.dimension() == 1 )
+        {
+          simplex.setData( 1 );
+          K.replace( it, simplex );
+        }
       }
+
+      K.sort();
+    }
+    else
+    {
+      auto id_to_index  = reader.id_to_index<VertexType>();
+      auto attributeMap = reader.getNodeAttribute( nodeAttribute );
+
+      // Assumption: attribute map contains exactly the same number of
+      // entries than the number of vertices in the graph
+      std::vector<DataType> data( attributeMap.size() );
+
+      for( auto&& pair : attributeMap )
+      {
+        bool success = false;
+        auto index   = id_to_index[pair.first];
+        auto value   = aleph::utilities::convert<DataType>( pair.second, success );
+
+        if( !success )
+          throw std::runtime_error( "Unable to convert attribute value to data type" );
+
+        data.at( index ) = value;
+      }
+
+      aleph::geometry::RipsExpander<SimplicialComplex> expander;
+      K = expander.assignMaximumData( K, data.begin(), data.end() );
+
+      // Recalculate all weights in the simplicial complex based on the
+      // specified node attribute.
+      bool useMaximum                  = reverseFiltration ? false : true;
+      bool skipOneDimensionalSimplices = false;
+
+      K.recalculateWeights( useMaximum, skipOneDimensionalSimplices );
     }
 
-    K.sort();
-
-    // TODO:
-    //  - Extract vertex data
-    //  - Use vertex data in Laplacian matrix
+    K.sort(
+      aleph::topology::filtrations::Data<Simplex>()
+    );
 
     auto L           = aleph::geometry::weightedLaplacianMatrix( K );
     using MatrixType = decltype(L);
