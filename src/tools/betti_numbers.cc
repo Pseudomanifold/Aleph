@@ -18,6 +18,8 @@ int main( int argc, char** argv )
   if( argc <= 1 )
     return -1;
 
+  bool verbose            = false;
+
   using DataType          = double;
   using VertexType        = unsigned short;
   using Simplex           = aleph::topology::Simplex<DataType, VertexType>;
@@ -37,7 +39,8 @@ int main( int argc, char** argv )
 
   for( auto&& filename : filenames )
   {
-    std::cerr << "* Processing " << filename << "...";
+    if( verbose )
+      std::cerr << "* Processing " << filename << "...";
 
     SimplicialComplex K;
     reader( filename, K );
@@ -52,7 +55,8 @@ int main( int argc, char** argv )
                                              dualize,
                                              includeAllUnpairedCreators );
 
-    std::cerr << "finished\n";
+    if( verbose )
+      std::cerr << "finished\n";
 
     auto basename
       = aleph::utilities::basename( filename );
@@ -73,7 +77,8 @@ int main( int argc, char** argv )
       throw std::runtime_error( "Unable to identify ID" );
   }
 
-  std::cerr << "* Obtained " << id_to_betti.size() << " data sets\n";
+  if( verbose )
+    std::cerr << "* Obtained " << id_to_betti.size() << " data sets\n";
 
   for( auto&& pair : id_to_betti )
     std::cout << pair.first << "\t" << pair.second << "\n";
