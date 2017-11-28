@@ -26,6 +26,7 @@
 template <class T> class Spectrum
 {
 public:
+  Spectrum() = default;
 
   template <class InputIterator> Spectrum( InputIterator begin, InputIterator end )
     : _eigenvalues( begin, end )
@@ -78,14 +79,29 @@ int main( int argc, char** argv )
   using Spectrum          = Spectrum<DataType>;
 
   std::vector<std::string> filenames;
+  std::map<std::string, unsigned> filename_to_id;
 
   for( int i = 1; i < argc; i++ )
+  {
     filenames.push_back( argv[i] );
+
+    std::regex reDataSetSuffix( "\\D*([[:digit:]]+).*" );
+    std::smatch matches;
+
+    auto basename = aleph::utilities::basename( filenames.back() );
+
+    if( std::regex_match( basename, matches, reDataSetSuffix ) )
+    {
+      unsigned id                        = static_cast<unsigned>( std::stoull( matches[1] ) );
+      filename_to_id[ filenames.back() ] = id;
+    }
+    else
+      throw std::runtime_error( "Unable to identify ID" );
+  }
 
   aleph::topology::io::GMLReader reader;
 
-  std::vector<Spectrum> spectra;
-  spectra.reserve( filenames.size() );
+  std::vector<Spectrum> spectra( filenames.size() );
 
   for( auto&& filename : filenames )
   {
@@ -125,7 +141,7 @@ int main( int argc, char** argv )
       for( decltype( eigenvalues.size() ) i = 0; i < eigenvalues.size(); i++ )
         data.push_back( eigenvalues( i ) );
 
-      spectra.push_back( Spectrum( data.begin(), data.end() ) );
+      spectra.at( filename_to_id[filename] ) = Spectrum( data.begin(), data.end() );
     }
 
     std::cerr << "finished\n";
