@@ -39,7 +39,7 @@ if __name__ == "__main__":
   data = dict()
 
   for filename in filenames:
-    print("Processing file '{}'...".format(filename))
+    print("Processing file '{}'...".format(filename), file=sys.stderr)
     with open(filename) as f:
       reader = csv.reader(f)
 
@@ -71,6 +71,9 @@ if __name__ == "__main__":
   num_cols       = num_time_steps
   data_array     = np.zeros((num_rows, num_cols), dtype=float)
 
+  print("Maximum cycle length: {}\n"
+        "Minimum cycle length: {}\n".format(max_length, min_length), file=sys.stderr)
+
   for index,t in enumerate(sorted(data.keys())):
     cycle_lengths = data[t].cycle_lengths
     for length in cycle_lengths:
@@ -80,6 +83,10 @@ if __name__ == "__main__":
       data_array[row_index, col_index] += 1
 
   data_array = ( data_array - np.min(data_array, axis=0) ) / np.max(data_array, axis=0)
+
+  # Output to STDOUT; this could be made configurable with respect to
+  # the formatting specifier.
+  np.savetxt(sys.stdout.buffer, data_array, fmt="%.5f")
 
   fig, axes = plt.subplots()
 
