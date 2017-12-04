@@ -83,6 +83,10 @@ if __name__ == "__main__":
       data_array[row_index, col_index] += 1
 
   data_array = ( data_array - np.min(data_array, axis=0) ) / np.max(data_array, axis=0)
+  data_array = np.nan_to_num(data_array) # Replace NaNs with zero. They can only
+                                         # be generated in cases where the `max`
+                                         # function returns zero, so we may just
+                                         # as well replace them.
 
   # Output to STDOUT; this could be made configurable with respect to
   # the formatting specifier.
