@@ -3,6 +3,8 @@
 # This file is part of 'Aleph - A Library for Exploring Persistent
 # Homology'. It contains code for calculating statistics about the
 # Betti numbers of a triangulated space.
+#
+# Original author: Bastian Rieck
 
 import json
 import sys

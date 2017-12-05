@@ -1,4 +1,10 @@
 #!/usr/bin/env python3
+#
+# This file is part of 'Aleph - A Library for Exploring Persistent
+# Homology'. It contains code for performing *intensity estimates*
+# of persistence diagrams.
+#
+# Original author: Bastian Rieck
 
 import math
 import numpy

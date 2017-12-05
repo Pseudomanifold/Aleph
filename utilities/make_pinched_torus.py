@@ -2,7 +2,8 @@
 #
 # This file is part of the utilities shipped with 'Aleph - A Library for
 # Exploring Persistent Homology'. It contains test code to parametrize a
-# 'pinched torus'.
+# 'pinched torus'. The parametrization follows a sine pattern as the gap
+# towards the singular point is approached.
 #
 # Original author: Bastian Rieck
 

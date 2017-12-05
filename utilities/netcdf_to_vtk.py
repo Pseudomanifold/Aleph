@@ -11,6 +11,8 @@
 # variable that is _neither_ longitude _nor_ latitude _nor_ time. If
 # said variable is not scalar, the behaviour of the converter is not
 # defined.
+#
+# Original author: Bastian Rieck
 
 import math
 import netCDF4

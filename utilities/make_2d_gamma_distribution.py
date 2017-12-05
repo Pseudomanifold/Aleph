@@ -3,6 +3,8 @@
 # This file is part of 'Aleph - A Library for Exploring Persistent
 # Homology'. It creates a set of points in the plane, whose values
 # follow two different Gamma distributions.
+#
+# Original author: Bastian Rieck
 
 import numpy as np
 
