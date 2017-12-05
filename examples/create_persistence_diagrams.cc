@@ -200,8 +200,8 @@ int main( int argc, char** argv )
 
   unsigned m            = 50;
   unsigned n            = 50;
-  DataType R            = DataType(0.25);
-  DataType r            = DataType(0.50);
+  DataType R            = DataType(0.50);
+  DataType r            = DataType(0.25);
 
   bool sampleFromBox    = false;
   bool sampleFromSphere = false;
