@@ -16,12 +16,12 @@ namespace geometry
 
 /**
   Using the rejection sampling method from "Sampling from a manifold" by
-  Diaconis et al., samples at most $n$ points from a torus with an inner
+  Diaconis et al., samples exactly $n$ points from a torus with an inner
   radius of \f$R\f$ and an outer radius of \f$r\f$.
 
   @param R Inner radius
   @param r Outer radius
-  @param n Maximum number of samples to draw
+  @param n Number of samples to draw
 
   @returns Vector of angle values, i.e. \f$\theta\f$ and \f$\psi\f$,
            which are sufficient to describe a torus. Please use
@@ -45,34 +45,21 @@ std::vector< std::pair<T, T> > torusRejectionSampling( T R,
   std::vector< std::pair<T, T> > angles;
   angles.reserve( n );
 
-  std::vector<T> xValues;
-  std::vector<T> yValues;
-  xValues.reserve( n );
-  yValues.reserve( n );
+  std::uniform_real_distribution<T> xDistribution  ( T(0), T(2.0 * M_PI) ); // distribution for x-values
+  std::uniform_real_distribution<T> yDistribution  ( T(0), T(1.0 / M_PI) ); // distribution for y-values
+  std::uniform_real_distribution<T> psiDistribution( T(0), T(2 * M_PI) );   // distribution for angles
 
-  std::uniform_real_distribution<T> xDistribution( T(0), T(2.0 * M_PI) );
-  std::uniform_real_distribution<T> yDistribution( T(0), T(1.0 / M_PI) );
-
-  for( unsigned i = 0; i < n; i++ )
+  while( angles.size() < n )
   {
-    xValues.push_back( xDistribution( rngX ) );
-    yValues.push_back( yDistribution( rngY ) );
+    auto x = xDistribution( rngX );
+    auto y = yDistribution( rngY );
+    auto f = static_cast<T>( 1.0 + (r/R) * std::cos( x ) ) / ( 2.0 * M_PI );
+
+    if( y < f )
+      angles.push_back( std::make_pair( x, psiDistribution( rngPsi ) ) );
   }
 
-  std::vector<double> functionValues;
-  functionValues.reserve( n );
-
-  for( double x : xValues )
-    functionValues.push_back( static_cast<T>( 1.0 + (r/R) * std::cos( x ) ) / ( 2.0 * M_PI ) );
-
-  std::uniform_real_distribution<T> psiDistribution( T(0), T(2 * M_PI) );
-
-  for( unsigned i = 0; i < n; i++ )
-    if( yValues[i] < functionValues[i] )
-      angles.push_back( std::make_pair( xValues[i], psiDistribution( rngPsi ) ) );
-
   return angles;
-
 }
 
 /**
