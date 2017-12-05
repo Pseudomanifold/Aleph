@@ -255,7 +255,7 @@ int main( int argc, char** argv )
   else if( sampleFromSphere )
     std::cerr << "* Sampling " << m << " points from a sphere with r=" << r << "\n";
   else if( sampleFromTorus )
-    std::cerr << "* Sampling at most " << m << " points from a torus with R=" << R << " and r=" << r << "\n";
+    std::cerr << "* Sampling " << m << " points from a torus with R=" << R << " and r=" << r << "\n";
   else
     std::cerr << "* Generating " << m << " random points per diagram\n";
 
