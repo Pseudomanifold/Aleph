@@ -71,7 +71,7 @@ public:
       auto p = container[u]; // coordinate
 
       if( p.size() >= 2 )
-        write( out, p );
+        write( out, p, _addVertexLabels ? std::to_string( u ) : std::string() );
       else
         throw std::runtime_error( "Insufficient number of dimensions for storing coordinates" );
     }
@@ -99,16 +99,32 @@ public:
         throw std::runtime_error( "Insufficient number of dimensions for storing coordinates" );
     }
   }
-private:
-  template <class Container> void write( std::ostream& out, Container& p )
+
+  bool addVertexLabels() const noexcept
   {
-    out << p[0] << "\t" << p[1] << " ";
+    return _addVertexLabels;
+  }
+
+  void addVertexLabels( bool value ) noexcept
+  {
+    _addVertexLabels = value;
+  }
+
+private:
+  template <class Container> void write( std::ostream& out, Container& p, const std::string& label = std::string() )
+  {
+    out << p[0] << "\t" << p[1];
 
     if( p.size() >= 3 )
-      out << p[2];
+      out << " " << p[2];
+
+    if( not label.empty() )
+      out << " " << label;
 
     out << "\n";
   }
+
+  bool _addVertexLabels = false;
 };
 
 } // namespace io
