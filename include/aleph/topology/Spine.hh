@@ -211,64 +211,11 @@ template <class SimplicialComplex> SimplicialComplex spine( const SimplicialComp
   using Simplex = typename SimplicialComplex::value_type;
   auto L        = K;
 
-  std::set<Simplex> admissible;
+  // Step 1: obtain initial set of principal faces to start the process
+  // of collapsing the complex.
+  auto admissible = principalFaces( L );
 
-  // Step 1: determine free faces --------------------------------------
-  //
-  // This first checks which simplices have at least one free face,
-  // meaning that they may be potentially admissible.
-
-  for( auto it = L.begin(); it != L.end(); ++it )
-  {
-    if( it->dimension() == 0 )
-      continue;
-
-    // The range of the complex M is sufficient because we have
-    // already encountered all lower-dimensional simplices that
-    // precede the current one given by `it`.
-    //
-    // This complex will be used for testing free faces.
-    SimplicialComplex M( L.begin(), it );
-
-    bool hasFreeFace = false;
-    for( auto itFace = it->begin_boundary(); itFace != it->end_boundary(); ++itFace )
-    {
-      bool isFace = false;
-      for( auto&& simplex : M )
-      {
-        if( itFace->dimension() + 1 == simplex.dimension() )
-        {
-          // The current face must *not* be a face of another simplex in
-          // the simplicial complex.
-          if( intersect( *itFace, simplex ) == *itFace )
-          {
-            isFace = true;
-            break;
-          }
-        }
-      }
-
-      hasFreeFace = !isFace;
-      if( hasFreeFace )
-        break;
-    }
-
-    if( hasFreeFace )
-      admissible.insert( *it );
-  }
-
-  // Step 2: determine principality ------------------------------------
-  //
-  // All simplices that are faces of higher-dimensional simplices are
-  // now removed from the map of admissible simplices.
-
-  for( auto&& s : L )
-  {
-    for( auto itFace = s.begin_boundary(); itFace != s.end_boundary(); ++itFace )
-      admissible.erase( *itFace );
-  }
-
-  // Step 3: collapse until no admissible simplices are left -----------
+  // Step 2: collapse until no admissible simplices are left -----------
 
   while( !admissible.empty() )
   {
@@ -293,6 +240,8 @@ template <class SimplicialComplex> SimplicialComplex spine( const SimplicialComp
         // Add new admissible simplices that may potentially have been
         // spawned by the removal of s.
 
+        // 1. Add all faces of the principal simplex, as they may
+        //    potentially become admissible again.
         std::vector<Simplex> faces( s.begin_boundary(), s.end_boundary() );
 
         std::for_each( faces.begin(), faces.end(),
@@ -303,6 +252,8 @@ template <class SimplicialComplex> SimplicialComplex spine( const SimplicialComp
           }
         );
 
+        // 2. Add all faces othe free face, as they may now themselves
+        //    become admissible.
         faces.assign( t.begin_boundary(), t.end_boundary() );
 
         std::for_each( faces.begin(), faces.end(),
@@ -322,6 +273,13 @@ template <class SimplicialComplex> SimplicialComplex spine( const SimplicialComp
     // be used.
     if( !hasFreeFace )
       admissible.erase( s );
+
+    // The heuristic above is incapable of detecting *all* principal
+    // faces of the complex because this may involve searching *all*
+    // co-faces. Instead, it is easier to fill up the admissible set
+    // here.
+    if( admissible.empty() )
+      admissible = principalFaces( L );
   }
 
   return L;
