@@ -105,7 +105,7 @@ cases:
     $ make
 
 It is advisable to test that Aleph works correctly on your system, so
-you can run the unit test with:
+you can run the unit tests with:
 
     $ make test
 
@@ -118,5 +118,5 @@ documentation.
 
 # Contact
 
-For general discussion, questions, and comments please contact Bastian
-Rieck (bastian.rieck@iwr.uni-heidelberg.de).
+For general discussion, questions, and comments, please contact the
+principal developer and maintainer Bastian Rieck (bastian.rieck@iwr.uni-heidelberg.de).
