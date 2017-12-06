@@ -123,6 +123,82 @@ template <class SimplicialComplex, class Simplex> bool isAdmissible( const Simpl
 }
 
 /**
+  Calculates all principal faces of a given simplicial complex and
+  returns them.
+*/
+
+template <class SimplicialComplex> std::unordered_set<typename SimplicialComplex::value_type> principalFaces( const SimplicialComplex& K )
+{
+  using Simplex = typename SimplicialComplex::value_type;
+  auto L        = K;
+
+  std::unordered_set<Simplex> admissible;
+
+  // Step 1: determine free faces --------------------------------------
+  //
+  // This first checks which simplices have at least one free face,
+  // meaning that they may be potentially admissible.
+
+  for( auto it = L.begin(); it != L.end(); ++it )
+  {
+    if( it->dimension() == 0 )
+      continue;
+
+    // The range of the complex M is sufficient because we have
+    // already encountered all lower-dimensional simplices that
+    // precede the current one given by `it`.
+    //
+    // This complex will be used for testing free faces.
+    SimplicialComplex M( L.begin(), it );
+
+    // FIXME:
+    //
+    // In case of equal data values, the assignment from above does
+    // *not* work and will result in incorrect candidates.
+    M = L;
+
+    bool hasFreeFace = false;
+    for( auto itFace = it->begin_boundary(); itFace != it->end_boundary(); ++itFace )
+    {
+      bool isFace = false;
+      for( auto&& simplex : M )
+      {
+        if( itFace->dimension() + 1 == simplex.dimension() && simplex != *it )
+        {
+          // The current face must *not* be a face of another simplex in
+          // the simplicial complex.
+          if( intersect( *itFace, simplex ) == *itFace )
+          {
+            isFace = true;
+            break;
+          }
+        }
+      }
+
+      hasFreeFace = !isFace;
+      if( hasFreeFace )
+        break;
+    }
+
+    if( hasFreeFace )
+      admissible.insert( *it );
+  }
+
+  // Step 2: determine principality ------------------------------------
+  //
+  // All simplices that are faces of higher-dimensional simplices are
+  // now removed from the map of admissible simplices.
+
+  for( auto&& s : L )
+  {
+    for( auto itFace = s.begin_boundary(); itFace != s.end_boundary(); ++itFace )
+      admissible.erase( *itFace );
+  }
+
+  return admissible;
+}
+
+/**
   Performs one step of an elementary simplicial collapse in a given
   simplicial complex. The function assumes that the given simplices
   are *valid* for performing the collapse.
