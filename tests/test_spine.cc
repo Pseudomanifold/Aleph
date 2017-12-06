@@ -16,6 +16,8 @@
 #include <aleph/topology/Skeleton.hh>
 #include <aleph/topology/Spine.hh>
 
+#include <aleph/topology/filtrations/Data.hh>
+
 #include <aleph/topology/io/LinesAndPoints.hh>
 
 #include <random>
@@ -143,7 +145,7 @@ template <class T> void testS1vS1()
 
   ALEPH_TEST_BEGIN( "Spine: S^1 v S^1" );
 
-  unsigned n = 50;
+  unsigned n = 10;
 
   PointCloud pc( 2*n - 1, 2 );
 
@@ -173,9 +175,15 @@ template <class T> void testS1vS1()
   auto K
     = aleph::geometry::buildVietorisRipsComplex(
       NearestNeighbours( pc ),
-      DataType( 0.30 ),
-      2
+      DataType( 1.50 ),
+      20
   );
+
+  {
+    std::ofstream out( "/tmp/K.txt" );
+    aleph::topology::io::LinesAndPoints lap;
+    lap( out, K, pc );
+  }
 
   auto D1 = aleph::calculatePersistenceDiagrams( K );
 
@@ -184,7 +192,7 @@ template <class T> void testS1vS1()
   // This should not be surprising: it is possible to extract the two
   // circles from the data set. They form one connected component.
 
-  ALEPH_ASSERT_EQUAL( D1.size(),     2 );
+  ALEPH_ASSERT_THROW( D1.size() >=   2 );
   ALEPH_ASSERT_EQUAL( D1[0].betti(), 1 );
   ALEPH_ASSERT_EQUAL( D1[1].betti(), 2 );
 
@@ -193,22 +201,43 @@ template <class T> void testS1vS1()
   // Regardless of the stratification, it is impossible to detect the
   // singularity in dimension 0.
 
-  auto L  = aleph::topology::BarycentricSubdivision()( K, [] ( std::size_t dimension ) { return dimension == 0 ? 0 : 0.5; } );
+  auto L  = aleph::topology::BarycentricSubdivision()( aleph::topology::Skeleton()( 2, K), [] ( std::size_t dimension ) { return dimension == 0 ? 0 : 0.5; } );
   auto K0 = aleph::topology::Skeleton()( 0, K );
-  auto D2 = aleph::calculateIntersectionHomology( L, {K0,K}, aleph::Perversity( {-1} ) );
+  auto D2 = aleph::calculateIntersectionHomology( L, {K0, aleph::topology::Skeleton()(2, K) }, aleph::Perversity( {-1} ) );
 
-  ALEPH_ASSERT_EQUAL( D2.size(),         3 );
+  ALEPH_ASSERT_THROW( D2.size() >=       1 );
   ALEPH_ASSERT_EQUAL( D2[0].dimension(), 0 );
   ALEPH_ASSERT_EQUAL( D2[0].betti(),     1 );
 
   // Spine calculation -------------------------------------------------
 
   auto M = aleph::topology::spine( K );
+  K.sort( aleph::topology::filtrations::Data<typename decltype(K)::ValueType>() );
 
   {
-    auto D = aleph::calculatePersistenceDiagrams( M );
+    std::ofstream out( "/tmp/M.txt" );
+    aleph::topology::io::LinesAndPoints lap;
+    lap.addVertexLabels( true );
+    lap( out, M, pc );
+  }
 
-    ALEPH_ASSERT_EQUAL( D.size()    ,     2 );
+  {
+    std::ofstream out( "/tmp/Spine_complex.txt" );
+    out << M << "\n";
+  }
+
+  {
+    bool dualize                    = true;
+    bool includeAllUnpairedCreators = true;
+
+    auto D
+      = aleph::calculatePersistenceDiagrams(
+          M,
+          dualize,
+          includeAllUnpairedCreators
+    );
+
+    ALEPH_ASSERT_THROW( D.size() >=       2 );
     ALEPH_ASSERT_EQUAL( D[0].dimension(), 0 );
     ALEPH_ASSERT_EQUAL( D[1].dimension(), 1 );
     ALEPH_ASSERT_EQUAL( D[0].betti(),     1 );
@@ -218,21 +247,15 @@ template <class T> void testS1vS1()
   ALEPH_ASSERT_THROW( M.size() < K .size() );
   ALEPH_TEST_END();
 
-  {
-    std::ofstream out( "/tmp/M.txt" );
-    aleph::topology::io::LinesAndPoints lap;
-    lap( out, M, pc );
-  }
+  L = aleph::topology::BarycentricSubdivision()( M, [] ( std::size_t dimension ) { return dimension == 0 ? 0 : 0.5; } );
+  L.sort( aleph::topology::filtrations::Data<typename decltype(L)::ValueType>() );
 
-  L       = aleph::topology::BarycentricSubdivision()( M, [] ( std::size_t dimension ) { return dimension == 0 ? 0 : 0.5; } );
-  L.sort();
+  K0      = { {9}, {17} };
+  auto D3 = aleph::calculateIntersectionHomology( L, {K0,M}, aleph::Perversity( {-1,0} ) );
 
-  K0      = { {0} };
-  auto D3 = aleph::calculateIntersectionHomology( L, {K0,M}, aleph::Perversity( {0,0} ) );
-
-  ALEPH_ASSERT_EQUAL( D3.size(),         3 );
+  ALEPH_ASSERT_THROW( D3.empty() == false );
   ALEPH_ASSERT_EQUAL( D3[0].dimension(), 0 );
-  ALEPH_ASSERT_EQUAL( D3[0].betti(),     1 );
+  ALEPH_ASSERT_EQUAL( D3[0].betti(),     3 );
 }
 
 template <class T> void testTriangle()
