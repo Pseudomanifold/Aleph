@@ -199,23 +199,6 @@ template <class SimplicialComplex> std::unordered_set<typename SimplicialComplex
 }
 
 /**
-  Performs one step of an elementary simplicial collapse in a given
-  simplicial complex. The function assumes that the given simplices
-  are *valid* for performing the collapse.
-*/
-
-template <class SimplicialComplex, class Simplex> SimplicialComplex elementarySimplicialCollapse(
-  const Simplex& sigma,
-  const Simplex& delta,
-  const SimplicialComplex& K )
-{
-  auto L = K;
-
-  L.remove_without_validation( sigma );
-  L.remove_without_validation( delta );
-}
-
-/**
   Performs an iterated elementary simplicial collapse until *all* of the
   admissible simplices have been collapsed. This leads to the *spine* of
   the simplicial complex.
