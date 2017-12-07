@@ -90,7 +90,7 @@ template <class SimplicialComplex, class Simplex> Simplex isAdmissible( const Si
   if( pos == admissible.end() )
     return Simplex();
   else
-    return faces.at( std::distance( admissible.begin(), pos ) );
+    return faces.at( typename decltype(faces)::size_type( std::distance( admissible.begin(), pos ) ) );
 }
 
 /**
