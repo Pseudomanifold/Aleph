@@ -3,6 +3,8 @@
 
 #include <aleph/topology/Intersections.hh>
 
+#include <algorithm>
+#include <unordered_map>
 #include <set>
 #include <vector>
 
@@ -48,10 +50,10 @@ template <class SimplicialComplex, class Simplex> bool isPrincipal( const Simple
   the simplex is *principal* and has at least one free face.
 */
 
-template <class SimplicialComplex, class Simplex> bool isAdmissible( const Simplex& s, const SimplicialComplex& K )
+template <class SimplicialComplex, class Simplex> Simplex isAdmissible( const Simplex& s, const SimplicialComplex& K )
 {
   if( !isPrincipal(s,K) )
-    return false;
+    return Simplex();
 
   // Check whether a free face exists ----------------------------------
 
@@ -84,8 +86,11 @@ template <class SimplicialComplex, class Simplex> bool isAdmissible( const Simpl
     ++i;
   }
 
-  // TODO: return free face along with admissibility condition
-  return std::find( admissible.begin(), admissible.end(), true ) != admissible.end();
+  auto pos = std::find( admissible.begin(), admissible.end(), true );
+  if( pos == admissible.end() )
+    return Simplex();
+  else
+    return faces.at( std::distance( admissible.begin(), pos ) );
 }
 
 /**
@@ -127,12 +132,12 @@ template <class SimplicialComplex, class Simplex> bool isAdmissible( const Simpl
   returns them.
 */
 
-template <class SimplicialComplex> std::unordered_set<typename SimplicialComplex::value_type> principalFaces( const SimplicialComplex& K )
+template <class SimplicialComplex> std::unordered_map<typename SimplicialComplex::value_type, typename SimplicialComplex::value_type> principalFaces( const SimplicialComplex& K )
 {
   using Simplex = typename SimplicialComplex::value_type;
   auto L        = K;
 
-  std::unordered_set<Simplex> admissible;
+  std::unordered_map<Simplex, Simplex> admissible;
 
   // Step 1: determine free faces --------------------------------------
   //
@@ -158,6 +163,8 @@ template <class SimplicialComplex> std::unordered_set<typename SimplicialComplex
     M = L;
 
     bool hasFreeFace = false;
+    Simplex freeFace = Simplex();
+
     for( auto itFace = it->begin_boundary(); itFace != it->end_boundary(); ++itFace )
     {
       bool isFace = false;
@@ -177,11 +184,14 @@ template <class SimplicialComplex> std::unordered_set<typename SimplicialComplex
 
       hasFreeFace = !isFace;
       if( hasFreeFace )
+      {
+        freeFace = *itFace;
         break;
+      }
     }
 
     if( hasFreeFace )
-      admissible.insert( *it );
+      admissible.insert( std::make_pair( *it, freeFace ) );
   }
 
   // Step 2: determine principality ------------------------------------
@@ -219,9 +229,50 @@ template <class SimplicialComplex> SimplicialComplex spine( const SimplicialComp
 
   while( !admissible.empty() )
   {
-    auto s           = *admissible.begin();
-    bool hasFreeFace = false;
+    auto s = admissible.begin()->first;
+    auto t = admissible.begin()->second;
 
+    L.remove_without_validation( s );
+    L.remove_without_validation( t );
+
+    admissible.erase( s );
+
+    // New simplices ---------------------------------------------------
+    //
+    // Add new admissible simplices that may potentially have been
+    // spawned by the removal of s.
+
+    // 1. Add all faces of the principal simplex, as they may
+    //    potentially become admissible again.
+    std::vector<Simplex> faces( s.begin_boundary(), s.end_boundary() );
+
+    std::for_each( faces.begin(), faces.end(),
+      [&t, &L, &admissible] ( const Simplex& s )
+      {
+        // TODO: rename function
+        auto face = isAdmissible( s, L );
+
+        if( t != s && face )
+          admissible.insert( std::make_pair( s, face ) );
+      }
+    );
+
+    // 2. Add all faces othe free face, as they may now themselves
+    //    become admissible.
+    faces.assign( t.begin_boundary(), t.end_boundary() );
+
+    std::for_each( faces.begin(), faces.end(),
+      [&L, &admissible] ( const Simplex& s )
+      {
+        // TODO: rename function
+        auto face = isAdmissible( s, L );
+
+        if( face )
+          admissible.insert( std::make_pair( s, face ) );
+      }
+    );
+
+#if 0
     // TODO: this check could be simplified by *storing* the free face
     // along with the given simplex
     for( auto itFace = s.begin_boundary(); itFace != s.end_boundary(); ++itFace )
@@ -273,6 +324,7 @@ template <class SimplicialComplex> SimplicialComplex spine( const SimplicialComp
     // be used.
     if( !hasFreeFace )
       admissible.erase( s );
+#endif
 
     // The heuristic above is incapable of detecting *all* principal
     // faces of the complex because this may involve searching *all*
