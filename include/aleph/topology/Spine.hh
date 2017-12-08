@@ -22,6 +22,21 @@ namespace topology
 
 template <class Simplex> using CofaceMap = std::unordered_map<Simplex, std::unordered_set<Simplex> >;
 
+template <class SimplicialComplex> CofaceMap<typename SimplicialComplex::ValueType> buildCofaceMap( const SimplicialComplex& K )
+{
+  using Simplex   = typename SimplicialComplex::ValueType;
+  using CofaceMap = CofaceMap<Simplex>;
+
+  CofaceMap cofaces;
+  for( auto&& s : K )
+  {
+    for( auto itFace = s.begin_boundary(); itFace != s.end_boundary(); ++itFace )
+      cofaces[ *itFace ].insert( s );
+  }
+
+  return cofaces;
+}
+
 template <class Simplex> bool isPrincipal( const CofaceMap<Simplex>& cofaces, const Simplex& s )
 {
   return cofaces.at( s ).empty();
