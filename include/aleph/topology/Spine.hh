@@ -30,6 +30,11 @@ template <class SimplicialComplex> CofaceMap<typename SimplicialComplex::ValueTy
   CofaceMap cofaces;
   for( auto&& s : K )
   {
+    // Adding an *empty* list of cofaces (so far) for this simplex
+    // simplifies the rest of the code because there is no need to
+    // check for the existence of a simplex.
+    cofaces[s] = {};
+
     for( auto itFace = s.begin_boundary(); itFace != s.end_boundary(); ++itFace )
       cofaces[ *itFace ].insert( s );
   }
