@@ -118,7 +118,6 @@ template <class T> void testPinchedTorus()
   ALEPH_ASSERT_EQUAL( D1[1].betti(),     1 );
 
 #if 0
-
   // FIXME: this is still too large to be easily processed by the
   // algorithm...
 
@@ -283,10 +282,8 @@ int main( int, char** )
   testDisk<short>   ();
   testDisk<unsigned>();
 
-#if 0
   testPinchedTorus<float> ();
   testPinchedTorus<double>();
-#endif
 
   testS1vS1<float> ();
   testS1vS1<double>();
