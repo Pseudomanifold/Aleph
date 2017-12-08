@@ -252,14 +252,9 @@ template <class SimplicialComplex> std::unordered_map<typename SimplicialComplex
 
 template <class SimplicialComplex> SimplicialComplex spine( const SimplicialComplex& K )
 {
-  using Simplex = typename SimplicialComplex::value_type;
-  auto L        = K;
-
-  // Step 1: obtain initial set of principal faces to start the process
-  // of collapsing the complex.
-  auto admissible = principalFaces( L );
-
-  // Step 2: collapse until no admissible simplices are left -----------
+  auto L          = K;
+  auto cofaces    = buildCofaceMap( L );
+  auto admissible = getPrincipalFaces( cofaces, L );
 
   while( !admissible.empty() )
   {
@@ -271,6 +266,24 @@ template <class SimplicialComplex> SimplicialComplex spine( const SimplicialComp
 
     admissible.erase( s );
 
+    // Predicate for removing s and t, the principal simplex with its
+    // free face, from the coface data structure. This is required in
+    // order to keep the coface relation up-to-date.
+    using Simplex        = typename SimplicialComplex::ValueType;
+    auto removeSimplices = [&cofaces,&s,&t] ( const Simplex& sigma )
+    {
+      cofaces.at(sigma).erase(s);
+      cofaces.at(sigma).erase(t);
+    };
+
+    std::for_each( s.begin_boundary(), s.end_boundary(), removeSimplices );
+    std::for_each( t.begin_boundary(), t.end_boundary(), removeSimplices );
+
+    // Both s and t do not have to be stored any more because they
+    // should not be queried again.
+    cofaces.erase(s);
+    cofaces.erase(t);
+
     // New simplices ---------------------------------------------------
     //
     // Add new admissible simplices that may potentially have been
@@ -281,26 +294,25 @@ template <class SimplicialComplex> SimplicialComplex spine( const SimplicialComp
     std::vector<Simplex> faces( s.begin_boundary(), s.end_boundary() );
 
     std::for_each( faces.begin(), faces.end(),
-      [&t, &L, &admissible] ( const Simplex& s )
+      [&t, &admissible, &cofaces] ( const Simplex& s )
       {
-        // TODO: rename function
-        auto face = isAdmissible( s, L );
-
-        if( t != s && face )
-          admissible.insert( std::make_pair( s, face ) );
+        if( t != s )
+        {
+          auto face = getFreeFace( cofaces, s );
+          if( face )
+            admissible.insert( std::make_pair( s, face ) );
+        }
       }
     );
 
-    // 2. Add all faces othe free face, as they may now themselves
+    // 2. Add all faces of the free face, as they may now themselves
     //    become admissible.
     faces.assign( t.begin_boundary(), t.end_boundary() );
 
     std::for_each( faces.begin(), faces.end(),
-      [&L, &admissible] ( const Simplex& s )
+      [&admissible, &cofaces] ( const Simplex& s )
       {
-        // TODO: rename function
-        auto face = isAdmissible( s, L );
-
+        auto face = getFreeFace( cofaces, s );
         if( face )
           admissible.insert( std::make_pair( s, face ) );
       }
@@ -365,7 +377,7 @@ template <class SimplicialComplex> SimplicialComplex spine( const SimplicialComp
     // co-faces. Instead, it is easier to fill up the admissible set
     // here.
     if( admissible.empty() )
-      admissible = principalFaces( L );
+      admissible = getPrincipalFaces( cofaces, L );
   }
 
   return L;
