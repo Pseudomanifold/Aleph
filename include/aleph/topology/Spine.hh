@@ -90,41 +90,7 @@ template <class SimplicialComplex, class Simplex> Simplex isAdmissible( const Si
   if( pos == admissible.end() )
     return Simplex();
   else
-    return faces.at( typename decltype(faces)::size_type( std::distance( admissible.begin(), pos ) ) );
-}
-
-/**
-  Checks whether a pair of a simplex and its face are admissible, i.e.
-  the simplex is *principal* and the face is free.
-*/
-
-template <class SimplicialComplex, class Simplex> bool isAdmissible( const Simplex& sigma, const Simplex& delta, const SimplicialComplex& K )
-{
-  if( !isPrincipal(sigma,K) )
-    return false;
-
-  // Check whether the face is free ------------------------------------
-
-  bool admissible = true;
-  auto itPair     = K.range( delta.dimension() + 1 );
-
-  for( auto it = itPair.first; it != itPair.second; ++it )
-  {
-    auto&& s = *it;
-
-    // The simplex we are looking for should be a free face of sigma, so
-    // we must skip it when checking for other co-faces.
-    if( s != sigma )
-    {
-      if( sizeOfIntersection(delta, s) == delta.size() )
-      {
-        admissible = false;
-        break;
-      }
-    }
-  }
-
-  return admissible;
+    return faces.at( std::distance( admissible.begin(), pos ) );
 }
 
 /**
