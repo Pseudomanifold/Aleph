@@ -15,6 +15,36 @@ namespace topology
 {
 
 /**
+  Stores coface relationships in a simplicial complex. Given a simplex
+  \f$\sigma\f$, the map contains all of its cofaces. Note that the map
+  will be updated upon every elementary collapse.
+*/
+
+template <class Simplex> using CofaceMap = std::unordered_map<Simplex, std::unordered_set<Simplex> >;
+
+template <class Simplex> bool isPrincipal( const CofaceMap<Simplex>& cofaces, const Simplex& s )
+{
+  return cofaces.at( s ).empty();
+}
+
+template <class Simplex> Simplex getFreeFace( const CofaceMap<Simplex>& cofaces, const Simplex& s )
+{
+  if( !isPrincipal( cofaces, s ) )
+    return Simplex();
+
+  // Check whether a free face exists ----------------------------------
+
+  for( auto itFace = s.begin_boundary(); itFace != s.end_boundary(); ++itFace )
+  {
+    auto&& allCofaces = cofaces.at( *itFace );
+    if( allCofaces.size() == 1 && allCofaces.find( s ) != allCofaces.end() )
+      return *itFace;
+  }
+
+  return Simplex();
+}
+
+/**
   Checks whether a simplex in a simplicial complex is principal, i.e.
   whether it is not a proper face of any other simplex in K.
 */
