@@ -65,6 +65,23 @@ template <class Simplex> Simplex getFreeFace( const CofaceMap<Simplex>& cofaces,
   return Simplex();
 }
 
+template <class SimplicialComplex> std::unordered_map<typename SimplicialComplex::value_type, typename SimplicialComplex::value_type> getPrincipalFaces( const CofaceMap<typename SimplicialComplex::ValueType>& cofaces, const SimplicialComplex& K )
+{
+  using Simplex = typename SimplicialComplex::value_type;
+  auto L        = K;
+
+  std::unordered_map<Simplex, Simplex> admissible;
+
+  for( auto&& s : K )
+  {
+    auto freeFace = getFreeFace( cofaces, s );
+    if( freeFace )
+      admissible.insert( std::make_pair( s, freeFace ) );
+  }
+
+  return admissible;
+}
+
 /**
   Checks whether a simplex in a simplicial complex is principal, i.e.
   whether it is not a proper face of any other simplex in K.
