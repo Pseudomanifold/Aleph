@@ -116,6 +116,28 @@ For more information, including how to run tests, please refer to the
 instructions](https://submanifold.github.io/Aleph/building) in the
 documentation.
 
+# Installing Aleph
+
+If you want to install Aleph from source, simply issue
+
+    $ make install
+
+from the compilation directory. In general, this will require `root`
+privileges, unless you change the `CMAKE_INSTALL_PREFIX` variable to
+a *local directory*.
+
+It is easier to install Aleph as a package. Currently, only packages
+for Arch Linux are available. Use your favourite AUR helper tool for
+installing Aleph:
+
+    $ pacaur -S aleph-git # pacaur
+    $ trizen -S aleph-git # trizen
+    $ yaourt -S aleph-git # yaourt
+
+If you want to volunteer and submit a package for your favourite Linux
+distribution, please take a look at [issue #27](https://github.com/Submanifold/Aleph/issues/27)
+and add your comments.
+
 # Contact
 
 For general discussion, questions, and comments, please contact the
