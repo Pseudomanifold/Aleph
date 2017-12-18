@@ -88,8 +88,13 @@ FIND_PACKAGE( OpenMP )
 #
 # I do not want to have too many of these declarations for different
 # targets flying around.
+#
 IF( OpenMP_CXX_FOUND )
-  ADD_FLAGS( CMAKE_CXX_FLAGS ${OpenMP_CXX_FLAGS} )
+  # Workaround: OpenMP with Clang breaks the build for Travis CI. Hence,
+  # disabling this feature for now, at least on older versions of Clang.
+  IF( CMAKE_CXX_COMPILER_ID MATCHES "GNU" OR ( CMAKE_CXX_COMPILER_ID MATCHES "Clang" AND CMAKE_CXX_COMPILER_VERSION VERSION_GREATER "5.0.0" ) )
+    ADD_FLAGS( CMAKE_CXX_FLAGS ${OpenMP_CXX_FLAGS} )
+  ENDIF()
 ENDIF()
 
 FIND_PACKAGE( FLANN )
