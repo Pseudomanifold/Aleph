@@ -604,13 +604,15 @@ int main( int argc, char** argv )
   std::vector< std::vector<double> > distances;
   distances.resize( dataSets.size(), std::vector<double>( dataSets.size() ) );
 
-  #pragma omp parallel for collapse(2)
-  for( std::size_t row = 0; row < dataSets.size(); row++ )
   {
-    for( std::size_t col = 0; col < dataSets.size(); col++ )
+    std::size_t n = dataSets.size();
+    std::size_t m = dataSets.size() * ( dataSets.size() - 1 ) / 2;
+
+    #pragma omp parallel for
+    for( std::size_t k = 0; k < m; k++ )
     {
-      if( row <= col )
-        continue;
+      auto row = std::size_t( double( n - 2 ) - std::floor( std::sqrt( -8*k + 4*n*(n-1) - 7 ) / 2.0 - 0.5 ) );
+      auto col = std::size_t( k + row + 1 - n*(n-1)/2 + (n-row)*( (n-row)-1 ) / 2 );
 
       double d = 0.0;
 
