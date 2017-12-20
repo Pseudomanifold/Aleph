@@ -1,6 +1,7 @@
 #ifndef ALEPH_CONTAINERS_MEAN_SHIFT_HH__
 #define ALEPH_CONTAINERS_MEAN_SHIFT_HH__
 
+#include <algorithm>
 #include <iterator>
 #include <vector>
 
@@ -11,12 +12,14 @@ namespace containers
 {
 
 template <
-  class Container    ,
   class Wrapper      ,
-  class InputIterator
+  class Container    ,
+  class InputIterator,
+  class OutputIterator
 > void meanShiftSmoothing(
   const Container& container,
   InputIterator begin, InputIterator end,
+  OutputIterator result,
   unsigned k,
   unsigned n = 1
 )
@@ -68,7 +71,7 @@ template <
     data.swap( data_ );
   }
 
-  return data;
+  std::copy( data.begin(), data.end(), result );
 }
 
 } // namespace containers
