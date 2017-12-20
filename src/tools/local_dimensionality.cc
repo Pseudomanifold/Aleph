@@ -8,6 +8,7 @@
 */
 
 #include <aleph/containers/DimensionalityEstimators.hh>
+#include <aleph/containers/MeanShift.hh>
 #include <aleph/containers/PointCloud.hh>
 
 #include <aleph/geometry/FLANN.hh>
@@ -34,50 +35,6 @@ using Distance   = aleph::geometry::distances::Euclidean<DataType>;
 #else
   using NearestNeighbours = aleph::geometry::BruteForce<PointCloud, Distance>;
 #endif
-
-std::vector<double> smoothValues( const PointCloud& pointCloud, const std::vector<double>& values, unsigned k, unsigned n = 1 )
-{
-  using IndexType   = typename NearestNeighbours::IndexType;
-  using ElementType = typename NearestNeighbours::ElementType;
-
-  std::vector< std::vector<IndexType> > indices;
-  std::vector< std::vector<ElementType> > distances;
-
-  NearestNeighbours nn( pointCloud );
-  nn.neighbourSearch( k+1, indices, distances );
-
-  std::vector<double> result = values;
-
-  for( unsigned iteration = 0; iteration < n; iteration++ )
-  {
-    std::vector<double> values_;
-    values_.resize( values.size() );
-
-    for( std::size_t i = 0; i < pointCloud.size(); i++ )
-    {
-      auto&& neighbours_  = indices[i];
-      auto&& distances_   = distances[i];
-
-      aleph::math::KahanSummation<double> value        = 0.0;
-      aleph::math::KahanSummation<double> sumOfWeights = 0.0;
-
-      for( std::size_t j = 0; j < neighbours_.size(); j++ )
-      {
-        auto index    = neighbours_[j];
-        auto weight   = distances_[j] > 0 ? 1.0 / ( distances_[j] * distances_[j] ) : 1.0;
-        value        += result[ index ] * weight;
-        sumOfWeights += weight;
-      }
-
-      value      /= sumOfWeights;
-      values_[i]  = value;
-    }
-
-    result.swap( values_ );
-  }
-
-  return result;
-}
 
 int main( int argc, char** argv )
 {
@@ -194,11 +151,16 @@ int main( int argc, char** argv )
   {
     std::cerr << "* Performing smoothing operation with k=" << k << " and n=" << n << "...";
 
-    dimensionalities
-      = smoothValues( pc,
-                      dimensionalities,
-                      k,
-                      n );
+    std::vector<double> tmp;
+
+    aleph::containers::meanShiftSmoothing<NearestNeighbours>(
+      pc,
+      dimensionalities.begin(), dimensionalities.end(),
+      std::back_inserter( tmp ),
+      k,
+      n );
+
+    dimensionalities.swap( tmp );
 
     std::cerr << "\n";
   }
