@@ -13,15 +13,16 @@ namespace containers
 template <
   class Container    ,
   class Wrapper      ,
-  class InputIterator,
+  class InputIterator
 > void meanShiftSmoothing(
   const Container& container,
+  InputIterator begin, InputIterator end,
   unsigned k,
-  unsigned n = 1,
-  InputIterator begin, InputIterator end )
+  unsigned n = 1
+)
 {
   using T = typename std::iterator_traits<InputIterator>::value_type;
-  auto n  = container.size();
+  auto N  = container.size();
 
   // Makes it easier to permit random access to the container; I am
   // assuming that the indices correspond to each other.
@@ -41,7 +42,7 @@ template <
   {
     std::vector<T> data_( data.size() );
 
-    for( std::size_t i = 0; i < n; i++ )
+    for( std::size_t i = 0; i < N; i++ )
     {
       auto&& neighbours_  = indices[i];
       auto&& distances_   = distances[i];
@@ -55,7 +56,8 @@ template <
       {
         auto index    = neighbours_[j];
         auto weight   = distances_[j] > 0 ? 1.0 / ( distances_[j] * distances_[j] ) : 1.0;
-        value        += result[ index ] * weight;
+        value        += data[ index ] * weight; // use data values from *previous* step to
+                                                // perform the smoothing!
         sumOfWeights += weight;
       }
 
