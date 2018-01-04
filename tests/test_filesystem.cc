@@ -2,6 +2,8 @@
 
 #include <aleph/utilities/Filesystem.hh>
 
+#include <fstream>
+
 void testUtilities()
 {
   ALEPH_TEST_BEGIN( "Filesystem utilities" );
@@ -15,7 +17,27 @@ void testUtilities()
   ALEPH_TEST_END();
 }
 
+void testFileType()
+{
+  ALEPH_TEST_BEGIN( "File type detection" );
+
+  // FIXME: add code to determine temporary directory programmatically
+  std::string test = "/tmp/aleph_test.txt";
+
+  {
+    std::ofstream out( test );
+
+    ALEPH_ASSERT_THROW( out );
+  }
+
+  ALEPH_ASSERT_THROW( aleph::utilities::exists( test ) );
+  ALEPH_ASSERT_THROW( aleph::utilities::isRegularFile( test ) );
+
+  ALEPH_TEST_END();
+}
+
 int main( int, char** )
 {
   testUtilities();
+  testFileType();
 }
