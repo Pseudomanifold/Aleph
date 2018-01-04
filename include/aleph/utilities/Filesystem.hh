@@ -1,11 +1,24 @@
 #ifndef ALEPH_UTILITIES_FILESYSTEM_HH__
 #define ALEPH_UTILITIES_FILESYSTEM_HH__
 
+// If either one of these is defined, there is a good chance that POSIX
+// concepts are available under the current architecture.
 #if defined(__unix__) || defined(__unix) || ( defined(__APPLE__) && defined(__MACH__) )
+  #define POSIX_SOURCES_AVAILABLE
+#endif
+
+#ifdef POSIX_SOURCES_AVAILABLE
   #include <libgen.h>
   #include <unistd.h>
 
   #include <sys/stat.h>
+#endif
+
+// In the best case, the `_POSIX_VERSION` variable is set on the system,
+// but more exotic configurations may not have this. The essence of this
+// check is to ensure that common features of `lstat()` are available.
+#if ( defined(_POSIX_VERSION) && _POSIX_VERSION >= 200112L ) || ( defined(POSIX_SOURCES_AVAILABLE) && ( ( defined(_POSIX_C_SOURCE) && _POSIX_C_SOURCE >= 200112L ) || defined(_DEFAULT_SOURCE) ) )
+  #define POSIX_VERSION_COMPATIBLE
 #endif
 
 #if defined(_BSD_SOURCE) || defined(_SVID_SOURCE) || defined(_DEFAULT_SOURCE)
@@ -46,7 +59,7 @@ FileType fileType( const std::string& path )
 {
   FileType t = FileType::Undefined;
 
-#if defined(__unix__) && ( ( defined(_POSIX_C_SOURCE) && _POSIX_C_SOURCE >= 200112L ) || defined(_DEFAULT_SOURCE) )
+#ifdef POSIX_VERSION_COMPATIBLE
   struct stat info;
   int error = lstat( path.c_str(), &info );
 
