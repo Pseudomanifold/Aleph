@@ -2,7 +2,7 @@
 
 #include <aleph/utilities/Filesystem.hh>
 
-int main( int, char** )
+void testUtilities()
 {
   ALEPH_TEST_BEGIN( "Filesystem utilities" );
 
@@ -13,4 +13,9 @@ int main( int, char** )
   ALEPH_ASSERT_THROW( aleph::utilities::extension( path1 ) == std::string( ".txt" ) );
 
   ALEPH_TEST_END();
+}
+
+int main( int, char** )
+{
+  testUtilities();
 }
