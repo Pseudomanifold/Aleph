@@ -25,6 +25,12 @@
   #define ALL_FILE_TYPE_QUERIES_AVAILABLE
 #endif
 
+// Brute-force check for the availability of some macros for `lstat()`,
+// in case the check from above fails.
+#if defined(S_ISBLK) && defined(S_ISCHR) && defined(S_ISDIR) && defined(S_ISFIFO) && defined(S_ISREG) && defined(S_ISLNK) && defined(S_ISSOCK)
+  #define ALL_FILE_TYPE_QUERIES_AVAILABLE
+#endif
+
 #if defined(ALL_FILE_TYPE_QUERIES_AVAILABLE) || defined(_BSD_SOURCE) || defined(_DEFAULT_SOURCE) || ( defined(_XOPEN_SOURCE) && _XOPEN_SOURCE >= 500 )
   #define SOCKET_FILE_TYPE_QUERY_AVAILABLE
 #endif
