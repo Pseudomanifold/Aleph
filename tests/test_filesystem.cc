@@ -14,6 +14,10 @@ void testUtilities()
   ALEPH_ASSERT_THROW( aleph::utilities::stem( path1 )      == std::string( "queries" ) );
   ALEPH_ASSERT_THROW( aleph::utilities::extension( path1 ) == std::string( ".txt" ) );
 
+  auto tmp = aleph::utilities::tempDirectory();
+
+  ALEPH_ASSERT_THROW( tmp.empty() == false );
+
   ALEPH_TEST_END();
 }
 
