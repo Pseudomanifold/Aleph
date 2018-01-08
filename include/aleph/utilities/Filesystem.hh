@@ -9,6 +9,8 @@
 
 #ifdef POSIX_SOURCES_AVAILABLE
   #include <libgen.h>
+  #include <paths.h>
+  #include <stdlib.h>
   #include <unistd.h>
 
   #include <sys/stat.h>
@@ -198,6 +200,53 @@ std::string extension( const std::string& path )
 
   auto pos = filename.find_last_of( '.' );
   return filename.substr( pos );
+}
+
+/**
+  @returns The temporary directory of the given system. This function
+  attempts to solve this in a platform-independent manner. It is very
+  likely though that this only works for POSIX-based systems.
+*/
+
+std::string tempDirectory()
+{
+#ifdef POSIX_SOURCES_AVAILABLE
+  auto tmpdir  = getenv("TMPDIR");
+  auto tmp     = getenv("TMP");
+  auto temp    = getenv("TEMP");
+  auto tempdir = getenv("TEMPDIR");
+
+  // These may not always be available, so we have to perform an
+  // additional check below.
+  const char* ptmpdir = nullptr;
+  const char* pathtmp = nullptr;
+
+  #ifdef P_tmpdir
+    ptmpdir = P_tmpdir;
+  #endif
+
+  #ifdef _PATH_TMP
+    pathtmp = _PATH_TMP;
+  #endif
+
+  // This does not check to what extent the information present in two
+  // of these variables is consistent with the rest. The order is more
+  // or less random here; I was unable to find an authoritative guide.
+
+  return tmpdir ? tmpdir
+                : tmp ? tmp
+                      : temp ? temp
+                             : tempdir ? tempdir
+                                       : ptmpdir ? ptmpdir
+                                                 : pathtmp ? pathtmp
+                                                           : ""; // Return an empty directory rather
+                                                                 // than an incorrect one
+#endif
+
+  // Return an empty directory rather than guessing an incorrect one;
+  // we *could* potentially default to '/tmp' here, but I do not like
+  // this idea of an untested fallback.
+  return {};
 }
 
 } // namespace utilities
