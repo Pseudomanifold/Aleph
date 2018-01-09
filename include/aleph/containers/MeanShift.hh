@@ -11,6 +11,21 @@ namespace aleph
 namespace containers
 {
 
+/**
+  Performs a mean--shift smoothing operation on a given container. This
+  means that a set of function values will be assigned to each of the
+  indices in the container. Subsequently, the local neighbours of the
+  container are evaluated and used to perform a pre-defined number of
+  smoothing steps.
+
+  @param container Input container
+  @param begin     Input iterator to begin of function value range
+  @param end       Input iterator to end of function value range
+  @param result    Output iterator for storing the result
+  @param k         Number of neighbours to use for smoothing
+  @param n         Number of steps to use for smoothing
+*/
+
 template <
   class Wrapper      ,
   class Container    ,
@@ -50,8 +65,6 @@ template <
       auto&& neighbours_  = indices[i];
       auto&& distances_   = distances[i];
 
-      // TODO: make configurable; it might also make sense to permit the
-      // usage of arbitrary functors here
       aleph::math::KahanSummation<T> value        = 0.0;
       aleph::math::KahanSummation<T> sumOfWeights = 0.0;
 
