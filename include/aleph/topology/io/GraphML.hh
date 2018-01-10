@@ -1,6 +1,12 @@
 #ifndef ALEPH_TOPOLOGY_IO_GRAPHML_HH__
 #define ALEPH_TOPOLOGY_IO_GRAPHML_HH__
 
+#include <aleph/config/TinyXML2.hh>
+
+#ifdef ALEPH_WITH_TINYXML2
+  #include <tinyxml2.h>
+#endif
+
 namespace aleph
 {
 
@@ -65,25 +71,6 @@ public:
 
   template <class SimplicialComplex, class Functor> void operator()( const std::string& filename, SimplicialComplex& K, Functor f )
   {
-    std::ifstream in( filename );
-    if( !in )
-      throw std::runtime_error( "Unable to read input file" );
-
-    this->operator()( in, K, f );
-  }
-
-  /** @overload operator()( const std::string&, SimplicialComplex& ) */
-  template <class SimplicialComplex> void operator()( std::ifstream& in, SimplicialComplex& K )
-  {
-    using Simplex    = typename SimplicialComplex::ValueType;
-    using DataType   = typename Simplex::DataType;
-
-    this->operator()( in, K, [] ( DataType a, DataType b ) { return std::max(a,b); } );
-  }
-
-  /** @overload operator()( const std::string&, SimplicialComplex&, SimplicialComplex&, Functor ) */
-  template <class SimplicialComplex, class Functor> void operator()( std::ifstream& in, SimplicialComplex& K, Functor f )
-  {
     _nodes.clear();
     _edges.clear();
 
@@ -92,6 +79,13 @@ public:
     using Simplex           = typename SimplicialComplex::ValueType;
     using DataType          = typename Simplex::DataType;
     using VertexType        = typename Simplex::VertexType;
+
+    #ifdef ALEPH_WITH_TINYXML2
+      using namespace tinyxml2;
+
+      XMLDocument document;
+      document.LoadFile( filename );
+    #endif
   }
 
   /** Retrieves attribute names for the node attributes. */
