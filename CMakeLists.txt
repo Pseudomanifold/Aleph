@@ -135,6 +135,12 @@ IF( PKG_CONFIG_FOUND )
   PKG_SEARCH_MODULE( Python3 python3 )
 ENDIF()
 
+FIND_PACKAGE( tinyxml2 )
+
+IF( tinyxml2_FOUND )
+  SET( ALEPH_WITH_TINYXML2 TRUE )
+ENDIF()
+
 ########################################################################
 # Configuration files
 ########################################################################
@@ -143,6 +149,7 @@ CONFIGURE_FILE( ${CMAKE_SOURCE_DIR}/include/aleph/config/Eigen.hh.in ${CMAKE_SOU
 CONFIGURE_FILE( ${CMAKE_SOURCE_DIR}/include/aleph/config/FLANN.hh.in ${CMAKE_SOURCE_DIR}/include/aleph/config/FLANN.hh )
 CONFIGURE_FILE( ${CMAKE_SOURCE_DIR}/include/aleph/config/HDF5.hh.in ${CMAKE_SOURCE_DIR}/include/aleph/config/HDF5.hh )
 CONFIGURE_FILE( ${CMAKE_SOURCE_DIR}/include/aleph/config/RapidJSON.hh.in ${CMAKE_SOURCE_DIR}/include/aleph/config/RapidJSON.hh )
+CONFIGURE_FILE( ${CMAKE_SOURCE_DIR}/include/aleph/config/TinyXML2.hh.in ${CMAKE_SOURCE_DIR}/include/aleph/config/TinyXML2.hh )
 
 ########################################################################
 # Include directories

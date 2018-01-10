@@ -1,0 +1,6 @@
+#ifndef ALEPH_CONFIG_TINY_XML2_HH__
+#define ALEPH_CONFIG_TINY_XML2_HH__
+
+#cmakedefine ALEPH_WITH_TINYXML2
+
+#endif
