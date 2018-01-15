@@ -205,6 +205,29 @@ private:
 
       if( !id )
         throw std::runtime_error( "Node element must specify ID" );
+
+      Node node;
+      node.id = id;
+
+      // Parse additional details of the node, even though they may not
+      // be used in the creation of a simplicial complex.
+
+      auto child = element->FirstChildElement();
+      while( child )
+      {
+        std::string name = child->Name();
+        if( name == "data" )
+        {
+          auto key   = child->Attribute( "key" );
+          auto value = child->GetText();
+
+          node.dict[key] = value;
+        }
+
+        child = child->NextSiblingElement();
+      }
+
+      _nodes.push_back( node );
     }
 
     void parseEdge( tinyxml2::XMLElement* element )
