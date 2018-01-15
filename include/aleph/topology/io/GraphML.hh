@@ -108,6 +108,38 @@ public:
         }
       }
 
+      // 2. Start parsing the graph ------------------------------------
+
+      auto graph = graphml->FirstChildElement( "graph" );
+      if( !graph )
+        throw std::runtime_error( "GraphML file has to contain at least one graph" );
+
+      // Check whether the graph is directed or not. Note that this does
+      // not have any influence on the parsing process for now.
+      auto edgedefault = graph->Attribute( "edgedefault" );
+      if( edgedefault && std::string( edgedefault ) == "directed" )
+        _graph.isDirected = true;
+      else
+        _graph.isDirected = false;
+
+      auto current = graph->FirstChildElement();
+
+      while( current )
+      {
+        std::string name = current->Name();
+        if( name == "node" )
+          parseNode( current );
+        else if( name == "edge" )
+          parseEdge( current );
+        else
+        {
+          // Ignoring *unknown* elements for now, because they could not
+          // possibly harm the extraction process.
+        }
+
+        current = current->NextSiblingElement();
+      }
+
     #endif
   }
 
@@ -160,6 +192,27 @@ public:
   }
 
 private:
+
+  #ifdef ALEPH_WITH_TINYXML2
+
+    void parseNode( tinyxml2::XMLElement* element )
+    {
+      auto name = element->Name();
+      auto id   = element->Attribute( "id" );
+
+      if( std::string( name ) != "node" )
+        throw std::runtime_error( "Unexpected element for node parsing" );
+
+      if( !id )
+        throw std::runtime_error( "Node element must specify ID" );
+    }
+
+    void parseEdge( tinyxml2::XMLElement* element )
+    {
+    }
+
+  #endif
+
 
   /**
     Auxiliary function for creating a numerical ID out of a parsed ID.
