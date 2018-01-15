@@ -10,6 +10,7 @@
 #endif
 
 #include <algorithm>
+#include <string>
 
 namespace aleph
 {
@@ -243,6 +244,8 @@ public:
 
       simplices.push_back( Simplex( {u,v}, weight ) );
     }
+
+    K = SimplicialComplex( simplices.begin(), simplices.end() );
   }
 
   /** Retrieves attribute names for the node attributes. */
