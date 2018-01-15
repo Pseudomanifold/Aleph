@@ -24,6 +24,12 @@ template <class D, class V> void test( const std::string& filename )
 
   ALEPH_ASSERT_THROW( K.empty() == false );
 
+  auto numNodes = std::count_if( K.begin(), K.end(), [] ( const Simplex& s ) { return s.dimension() == 0; } );
+  auto numEdges = std::count_if( K.begin(), K.end(), [] ( const Simplex& s ) { return s.dimension() == 1; } );
+
+  ALEPH_ASSERT_EQUAL( numNodes, 6 );
+  ALEPH_ASSERT_EQUAL( numEdges, 7 );
+
   ALEPH_TEST_END();
 }
 
