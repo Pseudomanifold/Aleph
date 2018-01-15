@@ -217,6 +217,12 @@ public:
     return result;
   }
 
+  void setReadNodeWeights( bool value = true ) noexcept { _readNodeWeights = value; }
+  void setReadEdgeWeights( bool value = true ) noexcept { _readEdgeWeights = value; }
+
+  bool readNodeWeights() const noexcept { return _readNodeWeights; }
+  bool readEdgeWeights() const noexcept { return _readEdgeWeights; }
+
 private:
 
   #ifdef ALEPH_WITH_TINYXML2
@@ -339,6 +345,14 @@ private:
 
     Dictionary dict; // all remaining attributes
   };
+
+  // Attributes --------------------------------------------------------
+
+  bool _readEdgeWeights = true;
+  bool _readNodeWeights = true;
+
+  std::string _edgeWeightAttribute = "weight"; // default attribute for node weight extraction
+  std::string _nodeWeightAttribute = "weight"; // default attribute for edge weight extraction
 
   // Local storage -----------------------------------------------------
   //
