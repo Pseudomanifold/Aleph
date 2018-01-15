@@ -217,11 +217,17 @@ public:
     return result;
   }
 
-  void setReadNodeWeights( bool value = true ) noexcept { _readNodeWeights = value; }
-  void setReadEdgeWeights( bool value = true ) noexcept { _readEdgeWeights = value; }
+  void setReadNodeWeights( bool value = true ) noexcept           { _readNodeWeights = value; }
+  void setReadEdgeWeights( bool value = true ) noexcept           { _readEdgeWeights = value; }
 
-  bool readNodeWeights() const noexcept { return _readNodeWeights; }
-  bool readEdgeWeights() const noexcept { return _readEdgeWeights; }
+  bool readNodeWeights() const noexcept                           { return _readNodeWeights; }
+  bool readEdgeWeights() const noexcept                           { return _readEdgeWeights; }
+
+  void setNodeWeightAttribute( const std::string& name ) noexcept { _nodeWeightAttribute = name; }
+  void setEdgeWeightAttribute( const std::string& name ) noexcept { _edgeWeightAttribute = name; }
+
+  const std::string& nodeWeightAttribute() const noexcept         { return _nodeWeightAttribute; }
+  const std::string& edgeWeightAttribute() const noexcept         { return _edgeWeightAttribute; }
 
 private:
 
