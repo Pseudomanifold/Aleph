@@ -210,12 +210,17 @@ public:
       {
         if( _graph.edgeKeys.find( _edgeWeightAttribute ) != _graph.edgeKeys.end() )
         {
-          bool success = false;
-          auto data    = edge.dict.at( _graph.edgeKeys.at( _edgeWeightAttribute ) );
-          weight       = convert<DataType>( data, success );
+          // Check that the current edge stores data that corresponds to
+          // the current key.
+          if( edge.dict.find( _graph.edgeKeys.at( _edgeWeightAttribute ) ) != edge.dict.end() )
+          {
+            bool success = false;
+            auto data    = edge.dict.at( _graph.edgeKeys.at( _edgeWeightAttribute ) );
+            weight       = convert<DataType>( data, success );
 
-          if( !success )
-            throw std::runtime_error( "Unable to convert edge weight to data type" );
+            if( !success )
+              throw std::runtime_error( "Unable to convert edge weight to data type" );
+          }
         }
       }
 
@@ -228,7 +233,7 @@ public:
         {
           auto iu = id_to_index_map.at( edge.source );
           auto iv = id_to_index_map.at( edge.target );
-          auto du = _nodes.at( iu ).dict.at( _graph.nodeKeys.at( _edgeWeightAttribute ) );
+          auto du = _nodes.at( iu ).dict.at( _graph.nodeKeys.at( _nodeWeightAttribute ) );
           auto dv = _nodes.at( iv ).dict.at( _graph.nodeKeys.at( _nodeWeightAttribute ) );
 
           // There is no need to check the success of the conversion
