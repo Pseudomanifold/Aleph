@@ -232,6 +232,44 @@ private:
 
     void parseEdge( tinyxml2::XMLElement* element )
     {
+      auto name   = element->Name();
+      auto id     = element->Attribute( "id" );
+      auto source = element->Attribute( "source" );
+      auto target = element->Attribute( "target" );
+
+      if( std::string( name ) != "edge" )
+        throw std::runtime_error( "Unexpected element for edge parsing" );
+
+      if( !id )
+        throw std::runtime_error( "Edge element must specify ID" );
+
+      if( !source || !target )
+        throw std::runtime_error( "Edge element must specify both source and target" );
+
+      Edge edge;
+      edge.source = source;
+      edge.target = target;
+
+      // Parse additional details of the node, even though they may not
+      // be used in the creation of a simplicial complex.
+
+      auto child = element->FirstChildElement();
+      while( child )
+      {
+        std::string name = child->Name();
+        if( name == "data" )
+        {
+          auto key   = child->Attribute( "key" );
+          auto value = child->GetText();
+
+          edge.dict[key] = value;
+        }
+
+        child = child->NextSiblingElement();
+      }
+
+      _edges.push_back( edge );
+
     }
 
   #endif
