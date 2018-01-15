@@ -186,6 +186,28 @@ public:
 
       simplices.push_back( Simplex( vertex, weight ) );
     }
+
+    for( auto&& edge : _edges )
+    {
+      auto u      = id_to_index_map.at( edge.source );
+      auto v      = id_to_index_map.at( edge.target );
+      auto weight = DataType();
+
+      if( _readEdgeWeights && not _edgeWeightAttribute.empty() )
+      {
+        if( _graph.edgeKeys.find( _edgeWeightAttribute ) != _graph.edgeKeys.end() )
+        {
+          bool success = false;
+          auto data    = edge.dict.at( _graph.edgeKeys.at( _edgeWeightAttribute ) );
+          weight       = convert<DataType>( data, success );
+
+          if( !success )
+            throw std::runtime_error( "Unable to convert edge weight to data type" );
+        }
+      }
+
+      simplices.push_back( Simplex( {u,v}, weight ) );
+    }
   }
 
   /** Retrieves attribute names for the node attributes. */
