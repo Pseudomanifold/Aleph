@@ -17,9 +17,12 @@ addons:
     sources:
       - ubuntu-toolchain-r-test
     packages:
-      - libboost-dev libflann-dev libeigen3-dev
-      - libgomp1
       - g++-4.9
+      - libboost-dev
+      - libeigen3-dev
+      - libflann-dev
+      - libgomp1
+      - libtinyxml2-dev
 
 compiler:
   - clang
