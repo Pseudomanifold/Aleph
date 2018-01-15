@@ -356,6 +356,8 @@ private:
       // Parse additional details of the edge, even though they may not
       // be used in the creation of a simplicial complex.
       parseData( element, edge.dict );
+
+      _edges.push_back( edge );
     }
 
     void parseData( tinyxml2::XMLElement* element, Dictionary& dict )
