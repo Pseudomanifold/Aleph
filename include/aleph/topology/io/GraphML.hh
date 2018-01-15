@@ -30,6 +30,13 @@ class GraphMLReader
 public:
 
   /**
+    Default dictionary type used by this class. This is a convenience
+    declaration that shortens the code.
+  */
+
+  using Dictionary = std::map<std::string, std::string>;
+
+  /**
     Reads a simplicial complex from a file, using the default maximum
     functor for weight assignment. If you want to change the functor,
     please refer to the overloaded variant of this method.
@@ -250,7 +257,7 @@ private:
       edge.source = source;
       edge.target = target;
 
-      // Parse additional details of the node, even though they may not
+      // Parse additional details of the edge, even though they may not
       // be used in the creation of a simplicial complex.
 
       auto child = element->FirstChildElement();
@@ -270,6 +277,10 @@ private:
 
       _edges.push_back( edge );
 
+    }
+
+    void parseData( tinyxml2::XMLElement* element, Dictionary& dict )
+    {
     }
 
   #endif
@@ -308,7 +319,7 @@ private:
 
     // This maps all key IDs to their corresponding names, which is how
     // they are stored for nodes and edges.
-    std::map<std::string, std::string> keys;
+    Dictionary keys;
   };
 
   /** Describes a parsed node along with all of its attributes */
@@ -316,7 +327,7 @@ private:
   {
     std::string id;
 
-    std::map<std::string, std::string> dict; // all remaining attributes
+    Dictionary dict; // all remaining attributes
   };
 
   /** Describes a parsed edge along with all of its attributes */
@@ -325,7 +336,7 @@ private:
     std::string source; // source node ID
     std::string target; // target node ID
 
-    std::map<std::string, std::string> dict; // all remaining attributes
+    Dictionary dict; // all remaining attributes
   };
 
   // Local storage -----------------------------------------------------
