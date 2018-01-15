@@ -88,6 +88,10 @@ public:
     _nodes.clear();
     _edges.clear();
 
+    // Silence the warning/error message about unused filenames in case
+    // no XML parser is available.
+    (void) filename;
+
     #ifdef ALEPH_WITH_TINYXML2
       using namespace tinyxml2;
 
