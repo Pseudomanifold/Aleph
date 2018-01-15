@@ -9,6 +9,8 @@
   #include <tinyxml2.h>
 #endif
 
+#include <algorithm>
+
 namespace aleph
 {
 
@@ -164,6 +166,16 @@ public:
 
     auto id_to_index_map = id_to_index<VertexType>();
 
+    // Ensures that the ordering of nodes follows the ordering of their
+    // IDs, which simplifies the lookup of source and target nodes when
+    // processing edges.
+    std::sort( _nodes.begin(), _nodes.end(),
+      [&id_to_index_map] ( const Node& u, const Node& v )
+      {
+        return id_to_index_map.at( u.id ) < id_to_index_map.at( v.id );
+      }
+    );
+
     using namespace aleph::utilities;
 
     for( auto&& node : _nodes )
@@ -203,6 +215,29 @@ public:
 
           if( !success )
             throw std::runtime_error( "Unable to convert edge weight to data type" );
+        }
+      }
+
+      // Use the node weights to assign a weight to the edge. Even
+      // though nodes have been parsed at this point already, some
+      // information has to be looked up again here.
+      else if( _readNodeWeights && not _nodeWeightAttribute.empty() )
+      {
+        if( _graph.nodeKeys.find( _nodeWeightAttribute ) != _graph.nodeKeys.end() )
+        {
+          auto iu = id_to_index_map.at( edge.source );
+          auto iv = id_to_index_map.at( edge.target );
+          auto du = _nodes.at( iu ).dict.at( _graph.nodeKeys.at( _edgeWeightAttribute ) );
+          auto dv = _nodes.at( iv ).dict.at( _graph.nodeKeys.at( _nodeWeightAttribute ) );
+
+          // There is no need to check the success of the conversion
+          // because we already processed the nodes before. Failures
+          // to convert the data type have already been processed at
+          // this point.
+          auto wu = convert<DataType>( du );
+          auto wv = convert<DataType>( dv );
+
+          weight = f(wu, wv);
         }
       }
 
