@@ -71,10 +71,10 @@ public:
 
   template <class SimplicialComplex, class Functor> void operator()( const std::string& filename, SimplicialComplex& K, Functor f )
   {
+    _graph = {};
+
     _nodes.clear();
     _edges.clear();
-
-    using namespace aleph::utilities;
 
     using Simplex           = typename SimplicialComplex::ValueType;
     using DataType          = typename Simplex::DataType;
@@ -84,7 +84,30 @@ public:
       using namespace tinyxml2;
 
       XMLDocument document;
-      document.LoadFile( filename );
+      document.LoadFile( filename.c_str() );
+
+      auto root        = document.FirstChild();
+      auto graphml     = root->NextSiblingElement( "graphml" );
+
+      // 1. Read optional information about keys in the graph ----------
+
+      {
+        auto key = graphml->FirstChildElement( "key" );
+        while( key )
+        {
+          auto id   = key->Attribute( "id" );
+          auto name = key->Attribute( "attr.name" );
+          auto type = key->Attribute( "for" );
+
+          _graph.keys[id] = name;
+
+          if( std::string( type ) != "node" && std::string( type ) != "edge" )
+            throw std::runtime_error( "Attribute must belong to either nodes or edges" );
+
+          key = key->NextSiblingElement( "key" );
+        }
+      }
+
     #endif
   }
 
@@ -168,6 +191,10 @@ private:
   struct Graph
   {
     bool isDirected;
+
+    // This maps all key IDs to their corresponding names, which is how
+    // they are stored for nodes and edges.
+    std::map<std::string, std::string> keys;
   };
 
   /** Describes a parsed node along with all of its attributes */
