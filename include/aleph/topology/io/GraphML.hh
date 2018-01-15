@@ -83,9 +83,6 @@ public:
     _nodes.clear();
     _edges.clear();
 
-    using Simplex           = typename SimplicialComplex::ValueType;
-    using DataType          = typename Simplex::DataType;
-    using VertexType        = typename Simplex::VertexType;
 
     #ifdef ALEPH_WITH_TINYXML2
       using namespace tinyxml2;
@@ -148,6 +145,28 @@ public:
       }
 
     #endif
+
+    // 3. Create simplicial complex ----------------------------------
+    //
+    // This works regardless of the presence of an XML parsing library,
+    // even though the resulting complex may of course be empty.
+
+    using Simplex    = typename SimplicialComplex::ValueType;
+    using DataType   = typename Simplex::DataType;
+    using VertexType = typename Simplex::VertexType;
+
+    std::vector<Simplex> simplices;
+    simplices.reserve( _nodes.size() + _edges.size() );
+
+    auto id_to_index_map = id_to_index<VertexType>();
+
+    for( auto&& node : _nodes )
+    {
+      auto vertex = id_to_index_map.at( node.id );
+      auto weight = DataType();
+
+      simplices.push_back( Simplex( vertex, weight ) );
+    }
   }
 
   /** Retrieves attribute names for the node attributes. */
@@ -267,7 +286,6 @@ private:
     }
 
   #endif
-
 
   /**
     Auxiliary function for creating a numerical ID out of a parsed ID.
