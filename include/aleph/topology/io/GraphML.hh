@@ -218,21 +218,7 @@ private:
 
       // Parse additional details of the node, even though they may not
       // be used in the creation of a simplicial complex.
-
-      auto child = element->FirstChildElement();
-      while( child )
-      {
-        std::string name = child->Name();
-        if( name == "data" )
-        {
-          auto key   = child->Attribute( "key" );
-          auto value = child->GetText();
-
-          node.dict[key] = value;
-        }
-
-        child = child->NextSiblingElement();
-      }
+      parseData( element, node.dict );
 
       _nodes.push_back( node );
     }
@@ -259,7 +245,11 @@ private:
 
       // Parse additional details of the edge, even though they may not
       // be used in the creation of a simplicial complex.
+      parseData( element, edge.dict );
+    }
 
+    void parseData( tinyxml2::XMLElement* element, Dictionary& dict )
+    {
       auto child = element->FirstChildElement();
       while( child )
       {
@@ -269,18 +259,11 @@ private:
           auto key   = child->Attribute( "key" );
           auto value = child->GetText();
 
-          edge.dict[key] = value;
+          dict[key] = value;
         }
 
         child = child->NextSiblingElement();
       }
-
-      _edges.push_back( edge );
-
-    }
-
-    void parseData( tinyxml2::XMLElement* element, Dictionary& dict )
-    {
     }
 
   #endif
