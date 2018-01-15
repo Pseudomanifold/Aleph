@@ -188,12 +188,17 @@ public:
       {
         if( _graph.nodeKeys.find( _nodeWeightAttribute ) != _graph.nodeKeys.end() )
         {
-          bool success = false;
-          auto data    = node.dict.at( _graph.nodeKeys.at( _nodeWeightAttribute ) );
-          weight       = convert<DataType>( data, success );
+          // Check that the current node stores data that corresponds to
+          // the current key.
+          if( node.dict.find( _graph.nodeKeys.at( _nodeWeightAttribute ) ) != node.dict.end() )
+          {
+            bool success = false;
+            auto data    = node.dict.at( _graph.nodeKeys.at( _nodeWeightAttribute ) );
+            weight       = convert<DataType>( data, success );
 
-          if( !success )
-            throw std::runtime_error( "Unable to convert node weight to data type" );
+            if( !success )
+              throw std::runtime_error( "Unable to convert node weight to data type" );
+          }
         }
       }
 
