@@ -3,6 +3,8 @@
 
 #include <aleph/config/TinyXML2.hh>
 
+#include <aleph/utilities/String.hh>
+
 #ifdef ALEPH_WITH_TINYXML2
   #include <tinyxml2.h>
 #endif
@@ -83,7 +85,6 @@ public:
     _nodes.clear();
     _edges.clear();
 
-
     #ifdef ALEPH_WITH_TINYXML2
       using namespace tinyxml2;
 
@@ -103,9 +104,13 @@ public:
           auto name = key->Attribute( "attr.name" );
           auto type = key->Attribute( "for" );
 
-          _graph.keys[id] = name;
-
-          if( std::string( type ) != "node" && std::string( type ) != "edge" )
+          // It makes sense to switch these two items because we use the
+          // name, e.g. 'weight', to look up the ID, e.g. 'id0'.
+          if( std::string( type ) == "node" )
+            _graph.nodeKeys[name] = id;
+          else if( std::string( type ) == "edge" )
+            _graph.edgeKeys[name] = id;
+          else
             throw std::runtime_error( "Attribute must belong to either nodes or edges" );
 
           key = key->NextSiblingElement( "key" );
@@ -143,7 +148,6 @@ public:
 
         current = current->NextSiblingElement();
       }
-
     #endif
 
     // 3. Create simplicial complex ----------------------------------
@@ -160,10 +164,25 @@ public:
 
     auto id_to_index_map = id_to_index<VertexType>();
 
+    using namespace aleph::utilities;
+
     for( auto&& node : _nodes )
     {
       auto vertex = id_to_index_map.at( node.id );
       auto weight = DataType();
+
+      if( _readNodeWeights && not _nodeWeightAttribute.empty() )
+      {
+        if( _graph.nodeKeys.find( _nodeWeightAttribute ) != _graph.nodeKeys.end() )
+        {
+          bool success = false;
+          auto data    = node.dict.at( _graph.nodeKeys.at( _nodeWeightAttribute ) );
+          weight       = convert<DataType>( data, success );
+
+          if( !success )
+            throw std::runtime_error( "Unable to convert node weight to data type" );
+        }
+      }
 
       simplices.push_back( Simplex( vertex, weight ) );
     }
@@ -332,7 +351,8 @@ private:
 
     // This maps all key IDs to their corresponding names, which is how
     // they are stored for nodes and edges.
-    Dictionary keys;
+    Dictionary nodeKeys;
+    Dictionary edgeKeys;
   };
 
   /** Describes a parsed node along with all of its attributes */
