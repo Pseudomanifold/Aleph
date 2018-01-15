@@ -180,6 +180,11 @@ IF( ALEPH_WITH_HDF5 )
   TARGET_LINK_LIBRARIES(      test_io_vtk               ${HDF5_CXX_LIBRARIES} )
 ENDIF()
 
+IF( ALEPH_WITH_TINYXML2 )
+  INCLUDE( ${tinyxml2_CONFIG} )
+  TARGET_LINK_LIBRARIES( test_io_graphml tinyxml2 )
+ENDIF()
+
 ########################################################################
 # Python integration
 ########################################################################

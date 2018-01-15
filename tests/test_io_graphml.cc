@@ -5,7 +5,7 @@
 #include <aleph/topology/Simplex.hh>
 #include <aleph/topology/SimplicialComplex.hh>
 
-#include <aleph/topology/io/GML.hh>
+#include <aleph/topology/io/GraphML.hh>
 #include <aleph/topology/io/SimplicialComplexReader.hh>
 
 #include <set>
@@ -19,7 +19,7 @@ template <class D, class V> void test( const std::string& filename )
 
   SimplicialComplex K;
 
-  aleph::topology::io::GMLReader reader;
+  aleph::topology::io::GraphMLReader reader;
   reader( filename, K );
 
   ALEPH_ASSERT_THROW( K.empty() == false );
