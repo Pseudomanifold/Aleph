@@ -125,6 +125,51 @@ template <
 }
 
 /**
+  Converts function values to a simplicial complex. The client
+  can define the corresponding vertex and data types. Functors
+  can be used to determine how weights are being calculated.
+*/
+
+template <
+  class SimplicialComplex,
+  class Functor,
+  class InputIterator
+> SimplicialComplex loadFunction( InputIterator begin, InputIterator end,
+                                  Functor f )
+{
+  using Simplex    = typename SimplicialComplex::ValueType;
+  using DataType   = typename Simplex::DataType;
+  using VertexType = typename Simplex::VertexType;
+
+  static_assert( std::is_same<DataType, decltype( f(DataType(), DataType() ) )>::value,
+                 "Functor return type must be compatible with simplex data type" );
+
+  SimplicialComplex K;
+
+  VertexType vertex = VertexType();
+  for( auto it = begin; it != end; ++it )
+    K.push_back( Simplex( vertex++, *it ) );
+
+  vertex = VertexType();
+  for( auto it = begin; it != end; ++it )
+  {
+    auto next = std::next( it );
+    if( next == end )
+      break;
+
+    auto&& a = *it;
+    auto&& b = *next;
+    auto   w = f(a,b);
+
+    // This is an edge that connects two adjacent simplices; the
+    // weight is set according to their maximum by default.
+    K.push_back( Simplex( {vertex, VertexType( vertex+1 ) }, w ) );
+
+    ++vertex;
+  }
+}
+
+/**
   Loads a set of 1D functions from a file and converts them to
   simplicial complexes. The file format is simple and consists
   of a number of function values per line. A line break starts
