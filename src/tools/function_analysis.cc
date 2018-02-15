@@ -126,20 +126,26 @@ int main( int argc, char** argv )
   // time. Using '-' indicates that input should be read from `stdin`.
 
   bool useSublevelSetFiltration = true;
+  std::string output;
 
   {
     static option commandLineOptions[] =
     {
-      { "sublevels"  , no_argument, nullptr, 's' },
-      { "superlevels", no_argument, nullptr, 'S' },
-      { nullptr      , 0          , nullptr,  0  }
+      { "sublevels"  , no_argument      , nullptr, 's' },
+      { "superlevels", no_argument      , nullptr, 'S' },
+      { "output"     , required_argument, nullptr, 'o' },
+      { nullptr      , 0                , nullptr,  0  }
     };
 
     int option = 0;
-    while( ( option = getopt_long( argc, argv, "sS", commandLineOptions, nullptr ) ) != -1 )
+    while( ( option = getopt_long( argc, argv, "sSo:", commandLineOptions, nullptr ) ) != -1 )
     {
       switch( option )
       {
+      case 'o':
+        output = optarg;
+        break;
+
       case 's':
         useSublevelSetFiltration = true;
         break;
@@ -195,6 +201,14 @@ int main( int argc, char** argv )
 
   std::cerr << "* Calculating persistent homology...";
 
+  std::ostream* out = &std::cout;
+  std::ofstream fout;
+  if( not output.empty() )
+  {
+    fout.open( output );
+    out = &fout;
+  }
+
   for( auto&& K : complexes )
   {
     auto diagrams = aleph::calculatePersistenceDiagrams( K );
@@ -231,7 +245,7 @@ int main( int argc, char** argv )
       }
     );
 
-    std::cout << D << std::endl;
+    *out << D << "\n\n";
   }
 
   std::cerr << "finished\n";
