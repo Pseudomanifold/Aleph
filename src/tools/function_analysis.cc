@@ -125,12 +125,14 @@ int main( int argc, char** argv )
   // input data set. One or more input data sets may be specified at a
   // time. Using '-' indicates that input should be read from `stdin`.
 
+  bool normalize                = false;
   bool useSublevelSetFiltration = true;
   std::string output;
 
   {
     static option commandLineOptions[] =
     {
+      { "normalize"  , no_argument      , nullptr, 'n' },
       { "sublevels"  , no_argument      , nullptr, 's' },
       { "superlevels", no_argument      , nullptr, 'S' },
       { "output"     , required_argument, nullptr, 'o' },
@@ -138,10 +140,14 @@ int main( int argc, char** argv )
     };
 
     int option = 0;
-    while( ( option = getopt_long( argc, argv, "sSo:", commandLineOptions, nullptr ) ) != -1 )
+    while( ( option = getopt_long( argc, argv, "no:sS", commandLineOptions, nullptr ) ) != -1 )
     {
       switch( option )
       {
+      case 'n':
+        normalize = true;
+        break;
+
       case 'o':
         output = optarg;
         break;
@@ -244,6 +250,23 @@ int main( int argc, char** argv )
           return Point( p );
       }
     );
+
+    // Check the suitability prior to performing normalization of all
+    // persistence diagrams.
+    if( normalize and minmax.first != minmax.second )
+    {
+      auto range = minmax.second - minmax.first;
+
+      std::transform( D.begin(), D.end(), D.begin(),
+        [&minmax, &range] ( const Point& p )
+        {
+          return Point(
+            (p.x() - minmax.first ) / range,
+            (p.y() - minmax.first ) / range
+          );
+        }
+      );
+    }
 
     *out << D << "\n\n";
   }
