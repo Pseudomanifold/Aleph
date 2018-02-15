@@ -20,6 +20,8 @@
 #include <utility>
 #include <vector>
 
+#include <cmath>
+
 #include <getopt.h>
 
 using DataType           = double;
@@ -185,4 +187,52 @@ int main( int argc, char** argv )
   }
 
   std::cerr << "* Read " << complexes.size() << " simplicial complexes\n";
+
+  // Persistent homology calculation -----------------------------------
+  //
+  // Calculate the zero-dimensional persistent homology of every stored
+  // complex.
+
+  std::cerr << "* Calculating persistent homology...";
+
+  for( auto&& K : complexes )
+  {
+    auto diagrams = aleph::calculatePersistenceDiagrams( K );
+    auto minmax   = minmaxData( K );
+
+    if( diagrams.size() != 1 )
+      throw std::runtime_error( "Unexpected number of persistence diagrams" );
+
+    auto&& D    = diagrams.front();
+    using Point = typename PersistenceDiagram::Point;
+
+    if( D.betti() != 1 )
+      throw std::runtime_error( "Unexpected Betti number" );
+
+    std::transform( D.begin(), D.end(), D.begin(),
+      [&minmax, &useSublevelSetFiltration] ( const Point& p )
+      {
+        if( !std::isfinite( p.y() ) )
+        {
+          // Use the *maximum* weight for the sublevel set filtration so
+          // that all points are *above* the diagonal, and vice versa in
+          // case of the superlevel set filtration.
+          auto y = useSublevelSetFiltration
+            ? minmax.second
+            : minmax.first;
+
+          return Point( p.x(), y );
+        }
+
+        // Just copy the original point; this is not highly efficient
+        // but the amount of data should not be too large
+        else
+          return Point( p );
+      }
+    );
+
+    std::cout << D << std::endl;
+  }
+
+  std::cerr << "finished\n";
 }
