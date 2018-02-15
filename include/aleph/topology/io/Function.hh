@@ -167,6 +167,8 @@ template <
 
     ++vertex;
   }
+
+  return K;
 }
 
 /**
