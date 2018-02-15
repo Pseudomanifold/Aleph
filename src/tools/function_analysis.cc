@@ -1,3 +1,7 @@
+#include <aleph/persistenceDiagrams/PersistenceDiagram.hh>
+
+#include <aleph/persistentHomology/Calculation.hh>
+
 #include <aleph/topology/filtrations/Data.hh>
 
 #include <aleph/topology/io/Function.hh>
@@ -10,16 +14,39 @@
 #include <fstream>
 #include <istream>
 #include <iostream>
+#include <limits>
 #include <stdexcept>
 #include <string>
+#include <utility>
 #include <vector>
 
 #include <getopt.h>
 
-using DataType          = double;
-using VertexType        = unsigned;
-using Simplex           = aleph::topology::Simplex<DataType, VertexType>;
-using SimplicialComplex = aleph::topology::SimplicialComplex<Simplex>;
+using DataType           = double;
+using VertexType         = unsigned;
+using Simplex            = aleph::topology::Simplex<DataType, VertexType>;
+using SimplicialComplex  = aleph::topology::SimplicialComplex<Simplex>;
+using PersistenceDiagram = aleph::PersistenceDiagram<DataType>;
+
+/**
+  Auxiliary function for extracting the minimum and maximum data value
+  of a given simplicial complex.
+*/
+
+std::pair<DataType, DataType> minmaxData( const SimplicialComplex& K )
+{
+  DataType min = std::numeric_limits<DataType>::max();
+  DataType max = std::numeric_limits<DataType>::lowest();
+
+  for( auto&& s : K )
+  {
+    auto d = s.data();
+    min    = std::min( min, d );
+    max    = std::max( max, d );
+  }
+
+  return std::make_pair( min, max );
+}
 
 std::vector<SimplicialComplex> readData( std::istream& in, bool useSublevelSetFiltration )
 {
