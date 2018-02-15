@@ -1,3 +1,5 @@
+#include <aleph/topology/io/Function.hh>
+
 #include <aleph/topology/Simplex.hh>
 #include <aleph/topology/SimplicialComplex.hh>
 
@@ -17,6 +19,7 @@ using SimplicialComplex = aleph::topology::SimplicialComplex<Simplex>;
 
 std::vector<SimplicialComplex> readData( std::istream& in )
 {
+  std::vector<SimplicialComplex> complexes;
   std::string line;
 
   while( std::getline( in, line ) )
@@ -40,7 +43,19 @@ std::vector<SimplicialComplex> readData( std::istream& in )
 
       values.emplace_back( value );
     }
+
+    complexes.push_back(
+      aleph::topology::io::loadFunction<SimplicialComplex>(
+        values.begin(), values.end(),
+        [] ( DataType x, DataType y )
+        {
+          return std::max(x,y);
+        }
+      )
+    );
   }
+
+  return complexes;
 }
 
 void usage()
