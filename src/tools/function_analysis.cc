@@ -1,3 +1,5 @@
+#include <aleph/topology/filtrations/Data.hh>
+
 #include <aleph/topology/io/Function.hh>
 
 #include <aleph/topology/Simplex.hh>
@@ -12,12 +14,14 @@
 #include <string>
 #include <vector>
 
+#include <getopt.h>
+
 using DataType          = double;
 using VertexType        = unsigned;
 using Simplex           = aleph::topology::Simplex<DataType, VertexType>;
 using SimplicialComplex = aleph::topology::SimplicialComplex<Simplex>;
 
-std::vector<SimplicialComplex> readData( std::istream& in )
+std::vector<SimplicialComplex> readData( std::istream& in, bool useSublevelSetFiltration )
 {
   std::vector<SimplicialComplex> complexes;
   std::string line;
@@ -47,9 +51,12 @@ std::vector<SimplicialComplex> readData( std::istream& in )
     complexes.push_back(
       aleph::topology::io::loadFunction<SimplicialComplex>(
         values.begin(), values.end(),
-        [] ( DataType x, DataType y )
+        [&useSublevelSetFiltration] ( DataType x, DataType y )
         {
-          return std::max(x,y);
+          if( useSublevelSetFiltration )
+            return std::max(x,y);
+          else
+            return std::min(x,y);
         }
       )
     );
@@ -64,9 +71,72 @@ void usage()
 
 int main( int argc, char** argv )
 {
-  if( argc < 1 )
+  // Options parsing ---------------------------------------------------
+  //
+  // By default, a sublevel set filtration is being calculated for the
+  // input data set. One or more input data sets may be specified at a
+  // time. Using '-' indicates that input should be read from `stdin`.
+
+  bool useSublevelSetFiltration = true;
+
+  {
+    static option commandLineOptions[] =
+    {
+      { "sublevels"  , no_argument, nullptr, 's' },
+      { "superlevels", no_argument, nullptr, 'S' },
+      { nullptr      , 0          , nullptr,  0  }
+    };
+
+    int option = 0;
+    while( ( option = getopt_long( argc, argv, "sS", commandLineOptions, nullptr ) ) != -1 )
+    {
+      switch( option )
+      {
+      case 's':
+        useSublevelSetFiltration = true;
+        break;
+
+      case 'S':
+        useSublevelSetFiltration = false;
+        break;
+
+      default:
+        break;
+      }
+    }
+  }
+
+  if( ( argc - optind ) < 1 )
   {
     usage();
     return -1;
   }
+
+  std::vector<SimplicialComplex> complexes;
+
+  for( int i = optind; i < argc; i++ )
+  {
+    std::string filename = argv[i];
+    std::cerr << "* Reading '" << filename << "'...";
+
+    std::istream* in = &std::cin;
+    std::ifstream fin;
+
+    if( filename != "-" and not filename.empty() )
+    {
+      fin.open( filename );
+      in = &fin;
+    }
+
+    auto localComplexes
+      = readData( *in, useSublevelSetFiltration );
+
+    std::cerr << "finished\n";
+
+    complexes.insert( complexes.end(),
+      localComplexes.begin(), localComplexes.end()
+    );
+  }
+
+  std::cerr << "* Read " << complexes.size() << " simplicial complexes\n";
 }
