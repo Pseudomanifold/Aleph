@@ -60,6 +60,25 @@ std::vector<SimplicialComplex> readData( std::istream& in, bool useSublevelSetFi
         }
       )
     );
+
+    auto&& K = complexes.back();
+
+    // Establish filtration order of the simplicial complex. For the
+    // sublevel set filtration, regular sorting is sufficient, while
+    // for the superlevel set filtration, the comparison functor has
+    // to be swapped out.
+    if( useSublevelSetFiltration )
+    {
+      K.sort(
+        aleph::topology::filtrations::Data< Simplex, std::less<DataType> >()
+      );
+    }
+    else
+    {
+      K.sort(
+        aleph::topology::filtrations::Data< Simplex, std::greater<DataType> >()
+      );
+    }
   }
 
   return complexes;
