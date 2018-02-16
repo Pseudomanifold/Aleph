@@ -163,7 +163,7 @@ int main( int argc, char** argv )
   // input data set. One or more input data sets may be specified at a
   // time. Using '-' indicates that input should be read from `stdin`.
 
-  bool condense                 = true;
+  bool condense                 = false;
   bool normalize                = false;
   bool useSublevelSetFiltration = true;
   std::string output;
@@ -180,10 +180,14 @@ int main( int argc, char** argv )
     };
 
     int option = 0;
-    while( ( option = getopt_long( argc, argv, "no:sS", commandLineOptions, nullptr ) ) != -1 )
+    while( ( option = getopt_long( argc, argv, "cno:sS", commandLineOptions, nullptr ) ) != -1 )
     {
       switch( option )
       {
+      case 'c':
+        condense = true;
+        break;
+
       case 'n':
         normalize = true;
         break;
