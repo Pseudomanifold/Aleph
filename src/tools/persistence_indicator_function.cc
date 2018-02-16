@@ -63,7 +63,7 @@ int main( int argc, char** argv )
   // Get filenames -----------------------------------------------------
 
   std::vector<std::string> filenames;
-  filenames.reserve( argc - optind );
+  filenames.reserve( std::size_t( argc - optind ) );
 
   for( int i = optind; i < argc; i++ )
     filenames.push_back( argv[i] );
