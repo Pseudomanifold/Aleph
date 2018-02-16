@@ -41,7 +41,7 @@ int main( int argc, char** argv )
   }
 
   std::vector<Input> inputs;
-  inputs.reserve( argc );
+  inputs.reserve( std::size_t( argc ) );
 
   for( int i = 1; i < argc; i++ )
   {
