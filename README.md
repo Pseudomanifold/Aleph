@@ -45,6 +45,7 @@ important ones:
   a variety of input files
     - 1D functions
     - Edge lists
+    - GraphML
     - GML
     - HDF5
     - Lexicographic triangulations
@@ -86,7 +87,6 @@ in the main directory of the repository for more details.
 # Optional dependencies
 
 * [`FLANN`](https://github.com/mariusmuja/flann) for fast nearest-neighbour queries
-* Qt 5, for the GUI
 * [`RapidJSON`](http://rapidjson.org) for parsing JSON input files
 
 # Building Aleph
