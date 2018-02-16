@@ -1,2 +1,1 @@
-ADD_SUBDIRECTORY( gui )
 ADD_SUBDIRECTORY( tools )
