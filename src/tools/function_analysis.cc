@@ -308,7 +308,21 @@ int main( int argc, char** argv )
       );
     }
 
-    *out << D << "\n\n";
+    if( condense )
+    {
+      auto values = condensePersistenceDiagram( D );
+      for( auto it = values.begin(); it != values.end(); ++it )
+      {
+        if( it != values.begin() )
+          *out << " ";
+
+        *out << *it;
+      }
+
+      *out << "\n";
+    }
+    else
+      *out << D << "\n\n";
   }
 
   std::cerr << "finished\n";
