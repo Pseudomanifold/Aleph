@@ -13,6 +13,13 @@ IF( BUILD_PYTHON_BINDINGS )
         PREFIX ""
     )
 
+    IF( APPLE )
+      SET_TARGET_PROPERTIES( aleph
+        PROPERTIES
+          LINK_FLAGS "-undefined dynamic_lookup"
+      )
+    ENDIF()
+
     IF( HDF5_FOUND )
       TARGET_INCLUDE_DIRECTORIES( aleph SYSTEM PUBLIC ${HDF5_CXX_INCLUDE_DIRS} )
       TARGET_LINK_LIBRARIES(      aleph               ${HDF5_CXX_LIBRARIES} )
