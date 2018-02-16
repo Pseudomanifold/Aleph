@@ -46,7 +46,7 @@ public:
 
     for( auto&& betti : _betti )
     {
-      chi = s ? chi + betti : chi - betti;
+      chi = s ? chi + long( betti ) : chi - long ( betti );
       s   = !s;
     }
 
