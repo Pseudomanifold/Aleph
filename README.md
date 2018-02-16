@@ -86,8 +86,15 @@ in the main directory of the repository for more details.
 
 # Optional dependencies
 
+* [`Eigen3`](http://eigen.tuxfamily.org) for some auxiliary mathematical
+  functions
 * [`FLANN`](https://github.com/mariusmuja/flann) for fast nearest-neighbour queries
+* [`HDF5`](https://www.hdfgroup.org) for parsing `HDF5` input files
+* [`pybind11`](https://github.com/pybind/pybind11) for building the
+  Python bindings
 * [`RapidJSON`](http://rapidjson.org) for parsing JSON input files
+* [`TinyXML2`](https://github.com/leethomason/tinyxml2) for parsing
+  GraphML input files
 
 # Building Aleph
 
