@@ -12,7 +12,8 @@
     Bastian Rieck, Ulderico Fugacci, Jonas Lukasczyk, Heike Leitte
     Submitted to IEEE Vis 2017
 
-  TODO: Link to documentation
+  Please see https://submanifold.github.io/Aleph/Rieck17d.html for more
+  usage details.
 */
 
 #include <algorithm>
@@ -224,13 +225,13 @@ int main( int argc, char** argv )
 
   // Prepare histogram calculation -------------------------------------
 
-  auto valueToLinIndex = [&min, &max, &linbins, &n] ( DataType value )
+  auto valueToLinIndex = [&min, &max, &n] ( DataType value )
   {
     auto offset = ( max - min ) / n;
     return static_cast<std::size_t>( ( value - min ) / offset );
   };
 
-  auto valueToLogIndex = [&min, &max, &logbins, &n] ( DataType value )
+  auto valueToLogIndex = [&min, &max, &n] ( DataType value )
   {
     auto offset = ( std::log10( max ) - std::log10( min ) ) / n;
     return static_cast<std::size_t>( ( std::log10( value ) - std::log10( min ) ) / offset );
