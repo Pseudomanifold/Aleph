@@ -1,3 +1,6 @@
+#include <aleph/math/KahanSummation.hh>
+
+#include <aleph/persistenceDiagrams/Norms.hh>
 #include <aleph/persistenceDiagrams/PersistenceDiagram.hh>
 
 #include <aleph/persistentHomology/Calculation.hh>
@@ -54,9 +57,13 @@ std::vector<DataType> condensePersistenceDiagram( const PersistenceDiagram& D )
   auto minmax = std::minmax_element( persistenceValues.begin(), persistenceValues.end() );
   auto min    = *minmax.first;
   auto max    = *minmax.second;
+  auto mean   = aleph::math::accumulate_kahan_sorted( persistenceValues.begin(), persistenceValues.end(), DataType() ) / D.size();
+  auto norm   = aleph::pNorm( D, 2.0 );
 
-  values.push_back( min );
-  values.push_back( max );
+  values.push_back( min  );
+  values.push_back( max  );
+  values.push_back( mean );
+  values.push_back( norm );
 
   return values;
 }
