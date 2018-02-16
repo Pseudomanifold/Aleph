@@ -57,7 +57,7 @@ std::vector<DataType> condensePersistenceDiagram( const PersistenceDiagram& D )
   auto minmax = std::minmax_element( persistenceValues.begin(), persistenceValues.end() );
   auto min    = *minmax.first;
   auto max    = *minmax.second;
-  auto mean   = aleph::math::accumulate_kahan_sorted( persistenceValues.begin(), persistenceValues.end(), DataType() ) / D.size();
+  auto mean   = aleph::math::accumulate_kahan_sorted( persistenceValues.begin(), persistenceValues.end(), DataType() ) / DataType( D.size() );
   auto norm   = aleph::pNorm( D, 2.0 );
 
   values.push_back( min  );
