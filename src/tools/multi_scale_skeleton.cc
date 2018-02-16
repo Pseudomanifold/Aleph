@@ -112,10 +112,12 @@ int main( int argc, char** argv )
   auto t5 = 1.000;
   auto t6 = 9.000;
 
+  using IndexType = aleph::geometry::HeatKernel::IndexType;
+
   for( auto&& t : {t0,t1,t2,t3,t4,t5,t6} )
   {
     for( std::size_t i = 0; i < scalesBefore.size(); i++ )
-      std::cout << i << "\t" << scalesBefore.at(i) * hk(i,t) << "\n";
+      std::cout << i << "\t" << scalesBefore.at(i) * hk( IndexType(i), t ) << "\n";
 
     std::cout << "\n\n";
   }
@@ -133,7 +135,7 @@ int main( int argc, char** argv )
         auto x = p[0];
         auto y = p[1];
 
-        out << x << "\t" << y << "\t" << scalesBefore.at(i) * hk(i,t) << "\n";
+        out << x << "\t" << y << "\t" << scalesBefore.at(i) * hk( IndexType(i),t ) << "\n";
       }
 
       out << "\n\n";
