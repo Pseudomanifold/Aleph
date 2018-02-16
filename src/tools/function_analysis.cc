@@ -31,6 +31,37 @@ using SimplicialComplex  = aleph::topology::SimplicialComplex<Simplex>;
 using PersistenceDiagram = aleph::PersistenceDiagram<DataType>;
 
 /**
+  Auxiliary function for condensing a persistence diagram to a vector of
+  values. At present, the following attributes are calculated:
+
+  - minimum persistence
+  - maximum persistence
+  - average persistence
+  - $2$-norm
+*/
+
+std::vector<DataType> condensePersistenceDiagram( const PersistenceDiagram& D )
+{
+  std::vector<DataType> values;
+  values.reserve( 4 );
+
+  std::vector<DataType> persistenceValues;
+  persistenceValues.reserve( D.size() );
+
+  for( auto&& p : D )
+    persistenceValues.push_back( p.persistence() );
+
+  auto minmax = std::minmax_element( persistenceValues.begin(), persistenceValues.end() );
+  auto min    = *minmax.first;
+  auto max    = *minmax.second;
+
+  values.push_back( min );
+  values.push_back( max );
+
+  return values;
+}
+
+/**
   Auxiliary function for extracting the minimum and maximum data value
   of a given simplicial complex.
 */
@@ -125,6 +156,7 @@ int main( int argc, char** argv )
   // input data set. One or more input data sets may be specified at a
   // time. Using '-' indicates that input should be read from `stdin`.
 
+  bool condense                 = true;
   bool normalize                = false;
   bool useSublevelSetFiltration = true;
   std::string output;
@@ -132,6 +164,7 @@ int main( int argc, char** argv )
   {
     static option commandLineOptions[] =
     {
+      { "condense"   , no_argument      , nullptr, 'c' },
       { "normalize"  , no_argument      , nullptr, 'n' },
       { "sublevels"  , no_argument      , nullptr, 's' },
       { "superlevels", no_argument      , nullptr, 'S' },
