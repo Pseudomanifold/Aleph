@@ -25,8 +25,8 @@ void testFileType()
 {
   ALEPH_TEST_BEGIN( "File type detection" );
 
-  // FIXME: add code to determine temporary directory programmatically
-  std::string test = "/tmp/aleph_test.txt";
+  auto tempDirectory = aleph::utilities::tempDirectory();
+  auto test = tempDirectory + "/aleph_test.txt";
 
   {
     std::ofstream out( test );
