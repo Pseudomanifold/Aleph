@@ -20,6 +20,7 @@
 #include <vector>
 
 #include <cassert>
+#include <cmath>
 
 namespace aleph
 {
