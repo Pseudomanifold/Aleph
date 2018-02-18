@@ -1,6 +1,5 @@
 #include <tests/Base.hh>
 
-#include <aleph/containers/DimensionalityEstimators.hh>
 #include <aleph/containers/PointCloud.hh>
 
 #include <aleph/geometry/BruteForce.hh>
@@ -262,16 +261,6 @@ template <class T> void testDiskWithFlares()
     T(0.225),
     1
   );
-
-#if 0
-
-  // FIXME: this is horrible...
-  auto dimensionalities
-    = aleph::containers::estimateLocalDimensionalityNearestNeighbours<Distance, PointCloud, NearestNeighbours>( pc,
-         8,
-        Distance() );
-
-#endif
 
   ALEPH_ASSERT_THROW( pc.empty() == false );
   ALEPH_ASSERT_THROW( K.empty() == false );
