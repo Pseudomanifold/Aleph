@@ -7,9 +7,6 @@
 
 #include <vector>
 
-// FIXME: remove after debugging
-#include <iostream>
-
 template <class T> void test()
 {
   ALEPH_TEST_BEGIN( "Bisection" );
