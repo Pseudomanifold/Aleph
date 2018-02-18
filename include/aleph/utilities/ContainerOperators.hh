@@ -90,6 +90,36 @@ template <class T> std::vector<T> operator-( const std::vector<T>& lhs, const st
   return result;
 }
 
+/**
+  Checks whether all elements of two sequences are close to each other
+  with some pre-defined tolerance. This function *closely* follows the
+  `numpy.allclose` function.
+*/
+
+template <class InputIterator1, class InputIterator2> bool allclose(
+  InputIterator1 begin1, InputIterator1 end1,
+  InputIterator2 begin2, InputIterator2 end2,
+  double rtol = 1e-05,
+  double atol = 1e-08 )
+{
+  auto n = std::distance( begin1, end1 );
+  auto m = std::distance( begin2, end2 );
+
+  if( n != m )
+    return false;
+
+  auto it1 = begin1;
+  auto it2 = begin2;
+
+  for( ; it1 != end1 && it2 != end2; ++it1, ++it2 )
+  {
+    if( double( std::abs( *it1 -  *it2 ) ) > ( atol + rtol * std::abs( double( *it2 ) ) ) )
+      return false;
+  }
+
+  return true;
+}
+
 } // namespace utilities
 
 } // namespace aleph
