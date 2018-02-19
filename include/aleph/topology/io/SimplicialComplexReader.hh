@@ -257,7 +257,12 @@ private:
     return labels;
   }
 
-  // TODO: missing documentation
+  /**
+    Unrolls all stored labels (if any) of the simplicial complex into
+    a vector, following the lexicographical ordering inside a map for
+    mapping node IDs to their labels.
+  */
+
   template <class Map1, class Map2> std::vector<std::string> getLabels( const Map1& labelMap, const Map2& idMap )
   {
     if( labelMap.empty() || idMap.empty() )
