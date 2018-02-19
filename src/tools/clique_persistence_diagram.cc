@@ -12,7 +12,8 @@
     Bastian Rieck, Ulderico Fugacci, Jonas Lukasczyk, Heike Leitte
     Submitted to IEEE Vis 2017
 
-  TODO: Link to documentation
+  Please see https://submanifold.github.io/Aleph/Rieck17d.html for more
+  usage details.
 */
 
 #include <algorithm>
@@ -29,8 +30,6 @@
 #include <cassert>
 #include <cmath>
 
-// TODO: Replace this as soon as possible with a more modern option
-// parser interface.
 #include <getopt.h>
 
 #include <aleph/geometry/RipsExpander.hh>
@@ -344,8 +343,6 @@ int main( int argc, char** argv )
 
     // Note that this assumes that the labels are convertible to
     // numbers.
-    //
-    // TODO: Solve this generically?
     for( auto&& pair : labelMap )
       if( !pair.second.empty() )
         labels[ static_cast<VertexType>( std::stoul( pair.first ) ) ] = pair.second;
@@ -362,8 +359,6 @@ int main( int argc, char** argv )
 
     // Note that this assumes that the labels are convertible to
     // numbers.
-    //
-    // TODO: Solve this generically?
     for( auto&& pair : labelMap )
       if( !pair.second.empty() )
         labels[ static_cast<VertexType>( std::stoul( pair.first ) ) ] = pair.second;
