@@ -14,7 +14,8 @@
     Bastian Rieck, Ulderico Fugacci, Jonas Lukasczyk, Heike Leitte
     Submitted to IEEE Vis 2017
 
-  TODO: Link to documentation
+  Please see https://submanifold.github.io/Aleph/Rieck17d.html for more
+  usage details.
 */
 
 #include <algorithm>
@@ -25,8 +26,6 @@
 #include <string>
 #include <sstream>
 
-// TODO: Replace this as soon as possible with a more modern option
-// parser interface.
 #include <getopt.h>
 
 #include <cmath>
