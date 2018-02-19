@@ -5,7 +5,6 @@ IF( BUILD_TOOLS )
   ADD_EXECUTABLE( clique_communities_to_json                     clique_communities_to_json.cc )
   ADD_EXECUTABLE( clique_persistence_diagram                     clique_persistence_diagram.cc )
   ADD_EXECUTABLE( function_analysis                              function_analysis.cc )
-  ADD_EXECUTABLE( fragmentation_analysis                         fragmentation_analysis.cc )
 
   # This tool performs a decomposition of Laplacian matrices, so the
   # `Eigen` library needs to be available.
