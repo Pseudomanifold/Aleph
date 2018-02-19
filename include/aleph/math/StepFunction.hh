@@ -290,9 +290,6 @@ public:
           h.add( prev, detail::previous( curr ), y5+y6 );
           h.add( curr, detail::next(     curr ), y3+y4 );
         }
-
-        // FIXME: Not sure whether this is really the best workaround
-        // here or whether I need a different strategy.
         else
           h.add( prev, detail::next( curr ), y3+y4 );
 
@@ -452,7 +449,11 @@ public:
     return *this;
   }
 
-  template <class U, class V> friend std::ostream& operator<<( std::ostream&, const StepFunction<U, V>& f );
+  /** Permits accessing all indicator functions */
+  std::set<IndicatorFunction> indicatorFunctions() const noexcept
+  {
+    return _indicatorFunctions;
+  }
 
 private:
 
@@ -497,11 +498,9 @@ private:
   std::set<IndicatorFunction> _indicatorFunctions;
 };
 
-// FIXME: This does not need to be a friend function; it suffices to be
-// implemented using the public interface of the class.
 template <class D, class I> std::ostream& operator<<( std::ostream& o, const StepFunction<D, I>& f )
 {
-  for( auto&& indicatorFunction : f._indicatorFunctions )
+  for( auto&& indicatorFunction : f.indicatorFunctions() )
   {
     o << indicatorFunction.a() << "\t" << indicatorFunction.y() << "\n"
       << indicatorFunction.b() << "\t" << indicatorFunction.y() << "\n";
