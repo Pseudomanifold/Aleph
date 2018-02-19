@@ -158,11 +158,15 @@ int main( int argc, char** argv )
     }
   }
 
+  unsigned dimension = 2;
+  if( ( argc - optind ) >= 1 )
+    dimension = static_cast<unsigned>( std::stoul( argv[optind++] ) );
+
   auto K
     = aleph::geometry::buildVietorisRipsComplex(
         NearestNeighbours( pointCloud ),
         epsilon,
-        2 // FIXME: make configurable
+        dimension
   );
 
   std::cerr << "* Obtained Vietoris--Rips complex with " << K.size() << " simplices\n";
