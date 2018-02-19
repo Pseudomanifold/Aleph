@@ -11,9 +11,10 @@
 #include <string>
 #include <vector>
 
-// FIXME: This is only a temporary workaround. Depending on the index
-// type of the representation, conversions between signed and unsigned
-// data types may occur here.
+// Depending on the index type of the representation, conversions
+// between signed and unsigned data types may occur here. As this
+// cannot be avoided, I am suppressing the corresponding warnings
+// for this file.
 _Pragma( "GCC diagnostic push" )
 _Pragma( "GCC diagnostic ignored \"-Wsign-conversion\"" )
 
