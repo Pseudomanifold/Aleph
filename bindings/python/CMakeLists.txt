@@ -17,6 +17,7 @@ IF( BUILD_PYTHON_BINDINGS )
       SET_TARGET_PROPERTIES( aleph
         PROPERTIES
           LINK_FLAGS "-undefined dynamic_lookup"
+          SUFFIX     ".so"
       )
     ENDIF()
 
