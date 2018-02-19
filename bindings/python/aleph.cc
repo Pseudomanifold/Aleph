@@ -323,7 +323,10 @@ void wrapPersistentHomologyCalculation( py::module& m )
       auto n = bufferInfo.shape[0];
       auto d = bufferInfo.shape[1];
 
-      PointCloud pointCloud(n,d);
+      PointCloud pointCloud(
+        static_cast<std::size_t>(n),
+        static_cast<std::size_t>(d)
+      );
 
       DataType* target = pointCloud.data();
       DataType* source = reinterpret_cast<DataType*>( bufferInfo.ptr );
@@ -508,9 +511,9 @@ void wrapInputFunctions( py::module& m )
   );
 }
 
-PYBIND11_PLUGIN(aleph)
+PYBIND11_MODULE(aleph, m)
 {
-  py::module m("aleph", "Python bindings for Aleph, a library for exploring persistent homology");
+  m.doc() = "Python bindings for Aleph, a library for exploring persistent homology";
 
   wrapSimplex(m);
   wrapSimplicialComplex(m);
@@ -519,6 +522,4 @@ PYBIND11_PLUGIN(aleph)
   wrapRipsExpander(m);
   wrapStepFunction(m);
   wrapInputFunctions(m);
-
-  return m.ptr();
 }
