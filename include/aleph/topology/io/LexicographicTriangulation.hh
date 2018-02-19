@@ -213,7 +213,7 @@ private:
         for( auto&& token : tokens )
           vertices.emplace_back( convert<VertexType>( token ) );
 
-        std::advance( it, positionEnd - offset );
+        std::advance( it, long( positionEnd - offset ) );
       }
     }
 
