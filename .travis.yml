@@ -33,6 +33,7 @@ compiler:
 # examples.
 before_install:
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install eigen     ; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install pybind11  ; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install rapidjson ; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install tinyxml2  ; fi
 
