@@ -105,8 +105,7 @@ public:
 
       using VertexType = typename SimplicialComplex::ValueType::VertexType;
 
-      // TODO: make node attribute configurable?
-      _labels = getLabels( reader.getNodeAttribute( "label" ), reader.id_to_index<VertexType>() );
+      _labels = getLabels( reader.getNodeAttribute( _labelAttribute ), reader.id_to_index<VertexType>() );
     }
 
     // The HDF5 parser permits the use of a functor that assigns
@@ -184,6 +183,18 @@ public:
     return _dataAttribute;
   }
 
+  /** Sets current label attribute */
+  void setLabelAttribute( const std::string& attribute ) noexcept
+  {
+    _labelAttribute = attribute;
+  }
+
+  /** @returns Current label attribute */
+  std::string labelAttribute() const noexcept
+  {
+    return _labelAttribute;
+  }
+
   /**
     @returns Node labels (if any). The indexing follows the vertex order
     in the simplicial complex and the graph. The label at index `0` thus
@@ -211,6 +222,17 @@ private:
   */
 
   std::string _dataAttribute;
+
+  /**
+    Specifies an attribute of the input data file that stores labels for
+    the corresponding simplicial complex. Since not all file formats are
+    capable of storing labels at all, this attribute may not be used.
+
+    @see SimplicialComplexReader::labelAttribute()
+    @see SimplicialComplexReader::setLabelAttribute()
+  */
+
+  std::string _labelAttribute = "label";
 
   /**
     Converts a map of labels, obtained from a subordinate reader class,
