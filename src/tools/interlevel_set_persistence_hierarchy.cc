@@ -61,8 +61,6 @@
 #include <string>
 #include <vector>
 
-// TODO: Replace this as soon as possible with a more modern option
-// parser interface.
 #include <getopt.h>
 
 using DataType           = double;
