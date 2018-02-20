@@ -71,8 +71,10 @@ int main( int argc, char** argv )
 
   static option commandLineOptions[] =
   {
+    { "landmarks"     , required_argument, nullptr, 'l' },
     { "nu"            , required_argument, nullptr, 'n' },
     { "radius"        , required_argument, nullptr, 'r' },
+    { "random"        , no_argument      , nullptr, 'R' },
     { nullptr         , 0                , nullptr,  0  }
   };
 
@@ -80,10 +82,11 @@ int main( int argc, char** argv )
                                     // for the witness complex.
   unsigned nu               = 2;
   DataType radius           = DataType();
+  bool randomLandmarks      = false;
 
   {
     int option = 0;
-    while( ( option = getopt_long( argc, argv, "l:n:r:", commandLineOptions, nullptr ) ) != -1 )
+    while( ( option = getopt_long( argc, argv, "l:n:r:R", commandLineOptions, nullptr ) ) != -1 )
     {
       switch( option )
       {
@@ -95,6 +98,9 @@ int main( int argc, char** argv )
         break;
       case 'r':
         radius = DataType( std::stod( optarg) );
+        break;
+      case 'R':
+        randomLandmarks = true;
         break;
       }
     }
@@ -115,24 +121,31 @@ int main( int argc, char** argv )
   auto dimension    = static_cast<unsigned>( pointCloud.dimension() + 1 );
   auto numLandmarks = static_cast<std::size_t>( pointCloud.size() * landmarksFraction );
 
-  // TODO: missing parameters
-  //  - nu
-  //  - R
-  //  - landmark selection process
-  //  - number of landmarks
-
   if( ( argc - optind ) >= 2 )
     dimension = static_cast<unsigned>( std::stoul( argv[optind++] ) );
 
-  std::cerr << "* Generating landmarks using max--min strategy...";
-
   std::vector<std::size_t> landmarks;
 
-  generateMaxMinLandmarks( pointCloud,
-                           numLandmarks,
-                           std::back_inserter( landmarks ), Distance() );
+  if( randomLandmarks )
+  {
+    std::cerr << "* Generating landmarks using random strategy...";
 
-  std::cerr << "finished\n";
+    generateRandomLandmarks( pointCloud.size(),
+                             numLandmarks,
+                             std::back_inserter( landmarks ) );
+
+    std::cerr << "finished\n";
+  }
+  else
+  {
+    std::cerr << "* Generating landmarks using max--min strategy...";
+
+    generateMaxMinLandmarks( pointCloud,
+                             numLandmarks,
+                             std::back_inserter( landmarks ), Distance() );
+
+    std::cerr << "finished\n";
+  }
 
   std::cerr << "* Calculating witness complex with nu=" << nu << ", R=" << radius << ", and d=" << dimension << "...";
 
