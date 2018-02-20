@@ -15,6 +15,7 @@ for an absolute novice would be the Vietoris&ndash;Rips calculation example.
 | [vietoris_rips](https://github.com/Submanifold/Aleph/blob/master/examples/vietoris_rips.cc) | Calculating a Vietoris&ndash;Rips complex of point clouds |
 | [vietoris_rips_eccentricity](https://github.com/Submanifold/Aleph/blob/master/examples/vietoris_rips_eccentricity.cc) | Calculating a Vietoris&ndash;Rips complex of point clouds using an eccentricity data descriptor |
 | [vtk](https://github.com/Submanifold/Aleph/blob/master/examples/vtk.cc) | Calculating persistent homology of structured grids in VTK legacy format |
+| [witness_complex](https://github.com/Submanifold/Aleph/blob/master/examples/witness_complex.cc) | Calculating a witness complex of point cloud data |
 
 # Building the examples
 
