@@ -76,15 +76,20 @@ int main( int argc, char** argv )
     { nullptr         , 0                , nullptr,  0  }
   };
 
-  unsigned nu     = 2;
-  DataType radius = DataType();
+  double  landmarksFraction = 0.10; // By default, use 10% of the data points as landmarks
+                                    // for the witness complex.
+  unsigned nu               = 2;
+  DataType radius           = DataType();
 
   {
     int option = 0;
-    while( ( option = getopt_long( argc, argv, "n:r:", commandLineOptions, nullptr ) ) != -1 )
+    while( ( option = getopt_long( argc, argv, "l:n:r:", commandLineOptions, nullptr ) ) != -1 )
     {
       switch( option )
       {
+      case 'l':
+        landmarksFraction = std::stod( optarg );
+        break;
       case 'n':
         nu = unsigned( std::stoul( optarg ) );
         break;
@@ -108,7 +113,7 @@ int main( int argc, char** argv )
   // separators in a file.
   auto pointCloud   = aleph::containers::load<DataType>( input );
   auto dimension    = static_cast<unsigned>( pointCloud.dimension() + 1 );
-  auto numLandmarks = static_cast<std::size_t>( pointCloud.size() * 0.10 );
+  auto numLandmarks = static_cast<std::size_t>( pointCloud.size() * landmarksFraction );
 
   // TODO: missing parameters
   //  - nu
@@ -153,7 +158,9 @@ int main( int argc, char** argv )
   auto K
     = buildWitnessComplex<Distance>( pointCloud,
                                      landmarks.begin(), landmarks.end(),
-                                     dimension );
+                                     dimension,
+                                     nu,
+                                     radius );
 
   std::cerr << "finished\n"
             << "* Obtained simplicial complex with " << K.size() << " simplices\n";
