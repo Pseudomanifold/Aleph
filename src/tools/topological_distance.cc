@@ -47,6 +47,8 @@
 
 #include <cmath>
 
+#include <getopt.h>
+
 #include <aleph/persistenceDiagrams/Envelope.hh>
 #include <aleph/persistenceDiagrams/PersistenceDiagram.hh>
 #include <aleph/persistenceDiagrams/PersistenceIndicatorFunction.hh>
