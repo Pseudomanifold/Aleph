@@ -10,6 +10,7 @@
 
 #include <algorithm>
 #include <iostream>
+#include <map>
 #include <string>
 #include <vector>
 
@@ -18,6 +19,12 @@ using VertexType        = unsigned short;
 
 using Simplex           = aleph::topology::Simplex<DataType, VertexType>;
 using SimplicialComplex = aleph::topology::SimplicialComplex<Simplex>;
+
+// Maps a dimension (and unsigned integer) to a vector of potential
+// perversities that may happen in that space. Essentially, this is
+// a simple caching mechanism because input data sets may share the
+// same dimensionality.
+using PerversityMap = std::map<unsigned, std::vector<aleph::Perversity> >;
 
 /**
   Models a signature consisting of Betti numbers, i.e. a set of natural
@@ -263,6 +270,8 @@ int main(int argc, char* argv[])
 
   index = 0;
 
+  PerversityMap pm;
+
   for( auto&& K : simplicialComplexes )
   {
     std::vector<SimplicialComplex> skeletons;
@@ -275,9 +284,22 @@ int main(int argc, char* argv[])
     aleph::topology::BarycentricSubdivision subdivision;
     auto L = subdivision( K );
 
-    // TODO: this is not optimal because the simplicial complexes may
-    // share the same dimensionality.
-    auto perversities = getPerversities( static_cast<unsigned>( K.dimension() ) );
+    // Use the perversity map to cache some calculations. This will be
+    // helpful if many simplicial complexes share the same dimension.
+    auto it = pm.find( static_cast<unsigned>( K.dimension() ) );
+    if( it == pm.end() )
+    {
+      auto pair = pm.insert(
+        std::make_pair(
+          static_cast<unsigned>( K.dimension() ),
+          getPerversities( static_cast<unsigned>( K.dimension() ) )
+        )
+      );
+
+      it = pair.first;
+    }
+
+    auto perversities = it->second;
 
     std::vector<Signature> signatures;
     signatures.reserve( perversities.size() );
