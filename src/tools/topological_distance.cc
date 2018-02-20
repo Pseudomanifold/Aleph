@@ -47,10 +47,6 @@
 
 #include <cmath>
 
-// TODO: Replace this as soon as possible with a more modern option
-// parser interface.
-#include <getopt.h>
-
 #include <aleph/persistenceDiagrams/Envelope.hh>
 #include <aleph/persistenceDiagrams/PersistenceDiagram.hh>
 #include <aleph/persistenceDiagrams/PersistenceIndicatorFunction.hh>
@@ -447,8 +443,6 @@ int main( int argc, char** argv )
     // match them to a dimension, and store them.
     if( aleph::utilities::extension( filenames.front() ) == ".txt" )
     {
-      // TODO: Make this regular expression more, well, 'expressive' and
-      // support more methods of specifying a dimension.
       std::regex reDataSetPrefix( "(.*)_[dk]([[:digit:]]+)\\.txt" );
       std::smatch matches;
 
