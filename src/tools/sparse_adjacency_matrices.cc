@@ -72,22 +72,27 @@ int main( int argc, char** argv )
 {
   static option commandLineOptions[] =
   {
+    { "dimension"           , required_argument, nullptr, 'd' },
     { "infinity"            , required_argument, nullptr, 'f' },
     { "closeness-centrality", no_argument      , nullptr, 'c' },
     { "sum"                 , no_argument      , nullptr, 's' },
     { nullptr               , 0                , nullptr,  0  }
   };
 
+  unsigned dimension                = 0;
   bool calculateClosenessCentrality = false;
   bool useSumOfDegrees              = false;
   DataType infinity                 = DataType(2);
 
   {
     int option = 0;
-    while( ( option = getopt_long( argc, argv, "f:cs", commandLineOptions, nullptr ) ) != -1 )
+    while( ( option = getopt_long( argc, argv, "d:f:cs", commandLineOptions, nullptr ) ) != -1 )
     {
       switch( option )
       {
+      case 'd':
+        dimension = static_cast<unsigned>( std::stoul( optarg  ) );
+        break;
       case 'f':
         infinity = aleph::utilities::convert<DataType>( optarg );
         break;
@@ -145,8 +150,15 @@ int main( int argc, char** argv )
 
   aleph::geometry::RipsExpander<SimplicialComplex> expander;
 
-  // TODO: make expansion configurable; does it make sense to expand the
-  // complexes at all?
+  if( dimension != 0 )
+  {
+    std::cerr << "* Expanding simplicial complexes to dimension " << dimension << "...";
+
+    for( auto&& K : simplicialComplexes )
+      expander( K, dimension );
+
+    std::cerr << "finished\n";
+  }
 
   // Calculate degrees -------------------------------------------------
 
