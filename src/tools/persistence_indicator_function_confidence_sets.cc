@@ -26,9 +26,6 @@ auto meanCalculation = [] ( auto begin, auto end )
   return sum / static_cast<double>( std::distance(begin, end) );
 };
 
-// TODO: shamelessly copied from bootstrap functor class; this should
-// either be made public or the calculation below needs to be changed
-// accordingly...
 unsigned index( unsigned int samples, double alpha )
 {
   // This accounts for rounding and works regardless of whether
