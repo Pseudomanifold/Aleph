@@ -29,6 +29,22 @@
 using DataType           = double;
 using PersistenceDiagram = aleph::PersistenceDiagram<DataType>;
 
+void usage()
+{
+  std::cerr << "Usage: persistence_indicator_function [--mean] FLES\n"
+            << "\n"
+            << "Calculates persistence indicator functions from a set of persistence\n"
+            << "diagrams, stored in FILES. Output will be written to '/tmp' and will\n"
+            << "have a prefix of 'PIF_', along with the basename of the input file.\n"
+            << "\n"
+            << "Optionally, the mean indicator function is calculated as well, along\n"
+            << "with information about the sample variance.\n"
+            << "\n"
+            << "Flags:\n"
+            << "  -m: calculate mean persistence diagram\n"
+            << "\n";
+}
+
 int main( int argc, char** argv )
 {
   static option commandLineOptions[] =
@@ -39,7 +55,7 @@ int main( int argc, char** argv )
 
   if( ( argc - optind ) < 1 )
   {
-    // TODO: Show usage
+    usage();
     return -1;
   }
 
