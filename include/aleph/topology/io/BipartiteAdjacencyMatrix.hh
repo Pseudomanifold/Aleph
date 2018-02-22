@@ -65,8 +65,8 @@ public:
 
     auto position = in.tellg();
 
-    std::size_t rows = 0;
-    std::size_t cols = 0;
+    std::size_t height = 0;
+    std::size_t width  = 0;
 
     using namespace aleph::utilities;
 
@@ -89,8 +89,8 @@ public:
       in.seekg( position );
     }
 
-    _height = rows;
-    _width  = cols;
+    _height = height;
+    _width  = width;
 
     using Simplex    = typename SimplicialComplex::ValueType;
     using DataType   = typename Simplex::DataType;
@@ -112,7 +112,7 @@ public:
     {
       VertexType v = VertexType();
 
-      for( std::size_t i = 0: i < _height + _width; i++ )
+      for( std::size_t i = 0; i < _height + _width; i++ )
         simplices.push_back( Simplex( VertexType( i ) ) );
     }
 
