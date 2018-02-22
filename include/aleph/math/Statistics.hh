@@ -87,7 +87,7 @@ template <class InputIterator> double sampleVariance( InputIterator begin,
   if(    begin == end
       || std::distance( begin, end ) == 1  )
   {
-    return( std::numeric_limits<double>::quiet_NaN() );
+    return std::numeric_limits<double>::quiet_NaN();
   }
 
   double mean = sampleMean( begin, end );
