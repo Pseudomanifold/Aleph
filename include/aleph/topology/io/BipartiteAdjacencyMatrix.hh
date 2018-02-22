@@ -2,6 +2,7 @@
 #define ALEPH_TOPOLOGY_IO_MATRIX_HH__
 
 #include <algorithm>
+#include <fstream>
 #include <istream>
 #include <string>
 #include <vector>
@@ -49,8 +50,9 @@ public:
 
   template <class SimplicialComplex> void operator()( const std::string& filename, SimplicialComplex& K )
   {
-    using Simplex    = typename SimplicialComplex::ValueType;
-    using DataType   = typename Simplex::DataType;
+    std::ifstream in( filename );
+    if( !in )
+      throw std::runtime_error( "Unable to read input file" );
 
     this->operator()( filename, K );
   }
@@ -103,25 +105,33 @@ public:
     std::vector<Simplex> simplices;
 
     // Vertices --------------------------------------------------------
+    //
+    // Create a vertex for every node in the input data. An (n,m)-matrix
+    // thus gives rise to n+m nodes.
 
     {
       VertexType v = VertexType();
 
-      for( auto&& value : values )
-        simplices.push_back( Simplex( v++, value ) );
+      for( std::size_t i = 0: i < _height + _width; i++ )
+        simplices.push_back( Simplex( VertexType( i ) ) );
     }
 
     // Edges -----------------------------------------------------------
+    //
+    // Vertex indices start go from [0,rows-1] for the nodes of class one,
+    // and from [rows,rows+columns] for the nodes of class two.
 
     for( std::size_t y = 0; y < _height; y++ )
     {
-      for( std::size_t x = 0; x < _width - 1; x++ )
+      for( std::size_t x = 0; x < _width; x++ )
       {
-        // current:   (x,  y) --> width * y + x
-        // neighbour: (x+1,y) --> width * y + x+1
-        auto u = static_cast<VertexType>( width * y + x   );
-        auto v = static_cast<VertexType>( width * y + x+1 );
-        auto w = f( values.at(u), values.at(v) );
+        auto i = static_cast<VertexType>( width * y + x   );
+        auto w = values.at( i );
+
+        // Map matrix indices to the corresponding vertex indices as
+        // outline above.
+        auto u = VertexType(y);
+        auto v = VertexType(x + _height);
 
         simplices.push_back( Simplex( {u,v}, w ) );
       }
@@ -139,7 +149,6 @@ public:
 private:
   std::size_t _height = 0;
   std::size_t _width  = 0;
-
 };
 
 } // namespace io
