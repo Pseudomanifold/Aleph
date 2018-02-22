@@ -32,6 +32,47 @@ template <class InputIterator> double sampleMean( InputIterator begin,
 }
 
 /**
+  Given two ranges of numbers, calculates their sample covariance and
+  returns it.
+
+  @param begin Input iterator to begin of range
+  @param end   Input iterator to end of range
+
+  @returns Sample covariance
+*/
+
+template <
+  class InputIterator1,
+  class InputIterator2
+> double sampleCovariance( InputIterator1 begin1, InputIterator1 end1,
+                           InputIterator2 begin2, InputIterator2 end2 )
+{
+  if(    begin1 == end1
+      || begin2 == end2
+      || std::distance( begin1, end1 ) == 1
+      || std::distance( begin2, end2 ) == 1  )
+  {
+    return std::numeric_limits<double>::quiet_NaN();
+  }
+
+  double mean1 = sampleMean( begin1, end1 );
+  double mean2 = sampleMean( begin2, end2 );
+  double sum   = 0.0;
+
+  InputIterator1 it1 = begin1;
+  InputIterator2 it2 = begin2;
+
+  for( ; it1 != end1 && it2 != end2; ++it1, ++it2 )
+  {
+    double d1  = static_cast<double>( *it1 ) - mean1;
+    double d2  = static_cast<double>( *it2 ) - mean2;
+    sum       += d1 * d2;
+  }
+
+  return sum;
+}
+
+/**
   Given a range of numbers, calculates the sample variance of the data.
 
   @param begin Input iterator to begin of range
