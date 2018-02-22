@@ -76,7 +76,7 @@ template <
     seen += count;
 
     cds.x.push_back( distance );
-    cds.y.push_back( count / static_cast<double>( 0.5 * n * (n-1) ) );
+    cds.y.push_back( seen / static_cast<double>( 0.5 * n * (n-1) ) );
   }
 
   return cds;
