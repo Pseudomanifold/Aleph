@@ -83,7 +83,7 @@ template <
     if( distance > 0 )
     {
       cds.x.push_back( distance );
-      cds.y.push_back( seen / static_cast<double>( 0.5 * n * (n-1) ) );
+      cds.y.push_back( seen / ( static_cast<double>( n * (n-1) ) * 0.5 ) );
     }
   }
 
