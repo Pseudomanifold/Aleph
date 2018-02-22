@@ -3,6 +3,8 @@
 
 #include <aleph/geometry/distances/Traits.hh>
 
+#include <algorithm>
+#include <map>
 #include <vector>
 
 namespace aleph
@@ -40,7 +42,7 @@ template <
   auto n = container.size();
   auto d = container.dimension();
 
-  std::vector<double> distances;
+  std::map<double, unsigned> distances;
   distances.reserve( n * (n - 1) / 2 );
 
   aleph::geometry::distances::Traits<Distance> traits;
@@ -56,9 +58,31 @@ template <
                             q.begin(),
                             d );
 
-      distances.push_back( trait.from( distance ) );
+      distances[ traits.from( distance ) ] += 1;
     }
   }
+
+  CorrelationDimensionSequence cds;
+  cds.x.reserve( distances.size() );
+  cds.y.reserve( distances.size() );
+
+  // Determine the correlation dimension integral for all potential
+  // values. This only requires counting how many *pairs* have been
+  // seen by the algorithm.
+
+  unsigned seen = 0;
+  for( auto&& pair : distances )
+  {
+    auto&& distance = pair.first;
+    auto&& count    = pair.second;
+
+    seen += count;
+
+    cds.x.push_back( distance );
+    cds.y.push_back( count / static_cast<double>( 0.5 * n * (n-1) ) );
+  }
+
+  return cds;
 }
 
 } // namespace containers
