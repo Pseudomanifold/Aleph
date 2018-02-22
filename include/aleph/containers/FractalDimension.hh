@@ -3,9 +3,14 @@
 
 #include <aleph/geometry/distances/Traits.hh>
 
+#include <aleph/math/Statistics.hh>
+
 #include <algorithm>
 #include <map>
+#include <stdexcept>
 #include <vector>
+
+#include <cmath>
 
 namespace aleph
 {
@@ -75,11 +80,52 @@ template <
 
     seen += count;
 
-    cds.x.push_back( distance );
-    cds.y.push_back( seen / static_cast<double>( 0.5 * n * (n-1) ) );
+    if( distance > 0 )
+    {
+      cds.x.push_back( distance );
+      cds.y.push_back( seen / static_cast<double>( 0.5 * n * (n-1) ) );
+    }
   }
 
   return cds;
+}
+
+/**
+  Estimates the correlation dimension from a correlation dimension
+  sequence, which involves calculating a log-log plot of the data,
+  and determining the best coefficient for a linear fit.
+*/
+
+double correlationDimension( const CorrelationDimensionSequence& cds )
+{
+  if( cds.x.size() != cds.y.size() )
+    throw std::runtime_error( "Inconsistent correlation dimension sequence" );
+
+  std::vector<double> X;
+  std::vector<double> Y;
+
+  X.reserve( cds.x.size() );
+  Y.reserve( cds.y.size() );
+
+  auto log = [] ( double x )
+  {
+    return std::log( x );
+  };
+
+  std::transform( cds.x.begin(), cds.x.end(), std::back_inserter( X ), log );
+  std::transform( cds.y.begin(), cds.y.end(), std::back_inserter( Y ), log );
+
+  // This is a simple linear regression model. We are only interested in
+  // the slope of the regression line, so this is sufficient.
+
+  auto cov
+    = aleph::math::sampleCovariance( X.begin(), X.end(),
+                                     Y.begin(), Y.end() );
+
+  auto var
+    = aleph::math::sampleVariance( X.begin(), X.end() );
+
+  return cov / var;
 }
 
 } // namespace containers
