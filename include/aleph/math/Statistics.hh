@@ -4,6 +4,7 @@
 #include <iterator>
 #include <limits>
 #include <numeric>
+#include <stdexcept>
 
 #include <cmath>
 
@@ -55,6 +56,9 @@ template <
     return std::numeric_limits<double>::quiet_NaN();
   }
 
+  if( std::distance( begin1, end1 ) != std::distance( begin2, end2) )
+    throw std::runtime_error( "Sample size must coincide for both ranges" );
+
   double mean1 = sampleMean( begin1, end1 );
   double mean2 = sampleMean( begin2, end2 );
   double sum   = 0.0;
@@ -69,7 +73,7 @@ template <
     sum       += d1 * d2;
   }
 
-  return sum;
+  return sum / static_cast<double>( std::distance( begin1, end1 ) - 1 );
 }
 
 /**
