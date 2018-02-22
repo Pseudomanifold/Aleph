@@ -23,6 +23,11 @@ template <class T> void testCorrelationDimension()
   ALEPH_ASSERT_THROW( cds.x.empty() == false );
   ALEPH_ASSERT_THROW( cds.y.empty() == false );
 
+  auto nu = correlationDimension( cds );
+
+  ALEPH_ASSERT_THROW( nu > 0.0 );
+  ALEPH_ASSERT_THROW( nu > 1.0 );
+
   ALEPH_TEST_END();
 }
 
