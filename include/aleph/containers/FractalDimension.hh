@@ -37,13 +37,10 @@ template <
   const Container& container,
   Distance dist = Distance() )
 {
-  aleph::geometry::distances::Traits<Distance> traits;
-
   auto n = container.size();
   auto d = container.dimension();
 
   std::map<double, unsigned> distances;
-  distances.reserve( n * (n - 1) / 2 );
 
   aleph::geometry::distances::Traits<Distance> traits;
 
