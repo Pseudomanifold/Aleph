@@ -9,6 +9,8 @@
 
 #include <aleph/utilities/String.hh>
 
+#include <aleph/topology/filtrations/Data.hh>
+
 namespace aleph
 {
 
@@ -35,6 +37,9 @@ namespace io
   0 1 2
   3 4 5
   \endcode
+
+  All simplicial complexes created by this class will be reported
+  in filtration order, following the detected weights.
 */
 
 class BipartiteAdjacencyMatrixReader
@@ -134,6 +139,13 @@ public:
     }
 
     K = SimplicialComplex( simplices.begin(), simplices.end() );
+
+    // Establish filtration order based on weights. There does not seem
+    // to be much of a point to make this configurable; the edge weight
+    // is a given property of the data.
+    K.sort(
+      filtrations::Data<Simplex>()
+    );
   }
 
   /** @returns Height of matrix that was read last */
