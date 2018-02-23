@@ -59,7 +59,7 @@ public:
     if( !in )
       throw std::runtime_error( "Unable to read input file" );
 
-    this->operator()( filename, K );
+    this->operator()( in, K );
   }
 
   /** @overload operator()( const std::string&, SimplicialComplex& ) */
