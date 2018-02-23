@@ -109,12 +109,8 @@ public:
     // Create a vertex for every node in the input data. An (n,m)-matrix
     // thus gives rise to n+m nodes.
 
-    {
-      VertexType v = VertexType();
-
-      for( std::size_t i = 0; i < _height + _width; i++ )
-        simplices.push_back( Simplex( VertexType( i ) ) );
-    }
+    for( std::size_t i = 0; i < _height + _width; i++ )
+      simplices.push_back( Simplex( VertexType( i ) ) );
 
     // Edges -----------------------------------------------------------
     //
