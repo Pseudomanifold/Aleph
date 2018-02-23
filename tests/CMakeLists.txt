@@ -48,7 +48,7 @@ ENABLE_IF_SUPPORTED( CMAKE_CXX_FLAGS "-Wextra" )
 # I rather want this switch to be disabled.
 #
 # The automated tests under Linux will still have this setting though,
-# so I should not miss to many issues.
+# so I should not miss too many issues.
 IF( NOT ${CMAKE_SYSTEM_NAME} MATCHES "Darwin" )
   ENABLE_IF_SUPPORTED( CMAKE_CXX_FLAGS "-Werror" )
 ENDIF()
