@@ -41,6 +41,24 @@ template <class T> void testSimple()
   ALEPH_ASSERT_THROW( K.empty() == false );
   ALEPH_ASSERT_EQUAL( K.size(), 6 + 5 );    // 6 nodes, 5 edges
 
+  std::vector<DataType> weights;
+
+  std::transform( K.begin(), K.end(), std::back_inserter( weights ),
+    [] ( const Simplex& s )
+    {
+      return s.data();
+    }
+  );
+
+  std::sort( weights.begin(), weights.end() );
+
+  std::vector<DataType> expectedWeights = {
+    0,0,0,0,0,0,  // nodes
+    1,2,3,4,5     // edges (sorted)
+  };
+
+  ALEPH_ASSERT_THROW( weights == expectedWeights );
+
   // Broken ------------------------------------------------------------
 
   SimplicialComplex L;
