@@ -107,6 +107,15 @@ public:
     std::copy( std::istream_iterator<DataType>( in ), std::istream_iterator<DataType>(),
                std::back_inserter( values ) );
 
+    // We cannot fill an empt simplicial complex. It might be useful to
+    // throw an error here, though.
+    if( values.empty() )
+      return;
+
+    // This is required in order to assign the weight of nodes
+    // correctly; we cannot trust the weights to be positive.
+    auto minData = *std::min_element( values.begin(), values.end() );
+
     std::vector<Simplex> simplices;
 
     // Vertices --------------------------------------------------------
@@ -115,7 +124,7 @@ public:
     // thus gives rise to n+m nodes.
 
     for( std::size_t i = 0; i < _height + _width; i++ )
-      simplices.push_back( Simplex( VertexType( i ) ) );
+      simplices.push_back( Simplex( VertexType( i ), minData ) );
 
     // Edges -----------------------------------------------------------
     //
