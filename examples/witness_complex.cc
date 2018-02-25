@@ -119,7 +119,7 @@ int main( int argc, char** argv )
   // separators in a file.
   auto pointCloud   = aleph::containers::load<DataType>( input );
   auto dimension    = static_cast<unsigned>( pointCloud.dimension() + 1 );
-  auto numLandmarks = static_cast<std::size_t>( pointCloud.size() * landmarksFraction );
+  auto numLandmarks = static_cast<std::size_t>( static_cast<double>( pointCloud.size() ) * landmarksFraction );
 
   if( ( argc - optind ) >= 2 )
     dimension = static_cast<unsigned>( std::stoul( argv[optind++] ) );
