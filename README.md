@@ -68,7 +68,9 @@ important ones:
 # Documentation
 
 [Documentation](https://submanifold.github.io/Aleph) of the main
-features, including some tutorials, is available on GitHub.
+features, including some tutorials, is available on GitHub. If you want
+to delve into the code, the `examples` subdirectory is a good starting
+point.
 
 # License
 
@@ -137,7 +139,7 @@ It is easier to install Aleph as a package. Currently, only packages
 for Arch Linux are available. Use your favourite AUR helper tool for
 installing Aleph:
 
-    $ pacaur -S aleph-git # pacaur
+    $ pacaur -S aleph-git # pacaur (deprecated)
     $ trizen -S aleph-git # trizen
     $ yaourt -S aleph-git # yaourt
 
