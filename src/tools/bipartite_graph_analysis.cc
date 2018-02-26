@@ -16,20 +16,25 @@
 
 int main( int argc, char** argv )
 {
+  bool minimum   = false;
   bool normalize = false;
 
   {
     static option commandLineOptions[] =
     {
+      { "minimum"  , no_argument, nullptr, 'm' },
       { "normalize", no_argument, nullptr, 'n' },
       { nullptr    , 0          , nullptr,  0  }
     };
 
     int option = 0;
-    while( ( option = getopt_long( argc, argv, "n", commandLineOptions, nullptr ) ) != -1 )
+    while( ( option = getopt_long( argc, argv, "mn", commandLineOptions, nullptr ) ) != -1 )
     {
       switch( option )
       {
+      case 'm':
+        minimum = true;
+        break;
       case 'n':
         normalize = true;
         break;
@@ -54,6 +59,9 @@ int main( int argc, char** argv )
 
   {
     aleph::topology::io::BipartiteAdjacencyMatrixReader reader;
+
+    if( minimum )
+      reader.setAssignMinimumVertexWeight();
 
     for( int i = optind; i < argc; i++ )
     {
