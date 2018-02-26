@@ -5,6 +5,7 @@
 #include <fstream>
 #include <istream>
 #include <string>
+#include <unordered_map>
 #include <vector>
 
 #include <aleph/utilities/String.hh>
@@ -123,8 +124,48 @@ public:
     // Create a vertex for every node in the input data. An (n,m)-matrix
     // thus gives rise to n+m nodes.
 
-    for( std::size_t i = 0; i < _height + _width; i++ )
-      simplices.push_back( Simplex( VertexType( i ), minData ) );
+    if( _assignMinimumVertexWeight )
+    {
+      // For determining the minimum weight, we first loop over all
+      // possible edges, create a lookup table for the weights, and
+      // finally create all the vertices using this lookup table.
+
+      std::unordered_map<VertexType, DataType> minWeight;
+
+      auto updateOrSetWeight
+        = [&minWeight] ( const VertexType& v, const DataType& w )
+          {
+            if( minWeight.find( v ) == minWeight.end() )
+              minWeight[v] = w;
+            else
+              minWeight[v] = std::min( minWeight[v], w );
+          };
+
+      for( std::size_t y = 0; y < _height; y++ )
+      {
+        for( std::size_t x = 0; x < _width; x++ )
+        {
+          auto i = static_cast<VertexType>( width * y + x   );
+          auto w = values.at( i );
+
+          // Map matrix indices to the corresponding vertex indices as
+          // outline above.
+          auto u = VertexType(y);
+          auto v = VertexType(x + _height);
+
+          updateOrSetWeight( u, w );
+          updateOrSetWeight( v, w );
+        }
+      }
+
+      for( std::size_t i = 0; i < _height + _width; i++ )
+        simplices.push_back( Simplex( VertexType( i ), minWeight.at( VertexType(i) ) ) );
+    }
+    else
+    {
+      for( std::size_t i = 0; i < _height + _width; i++ )
+        simplices.push_back( Simplex( VertexType( i ), minData ) );
+    }
 
     // Edges -----------------------------------------------------------
     //
@@ -163,9 +204,29 @@ public:
   /** @returns Width of matrix that was read last */
   std::size_t width()  const noexcept { return _width;  }
 
+  /** Permits changing the behaviour of vertex weight assignment */
+  void setAssignMinimumVertexWeight( bool value = true )
+  {
+    _assignMinimumVertexWeight = value;
+  }
+
+  /** @returns Flag whether vertex weights are assigned to be minimal or not */
+  bool assignMinimumVertexWeight() const noexcept
+  {
+    return _assignMinimumVertexWeight;
+  }
+
 private:
   std::size_t _height = 0;
   std::size_t _width  = 0;
+
+  /**
+    If set, assigns the minimum vertex weight according to the minimum
+    edge weight that is connected to the given vertex. Else, *all* the
+    vertices will get a weight of zero.
+  */
+
+  bool _assignMinimumVertexWeight = false;
 };
 
 } // namespace io
