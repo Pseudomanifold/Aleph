@@ -119,58 +119,26 @@ public:
 
     std::vector<Simplex> simplices;
 
-    // Vertices --------------------------------------------------------
-    //
-    // Create a vertex for every node in the input data. An (n,m)-matrix
-    // thus gives rise to n+m nodes.
-
-    if( _assignMinimumVertexWeight )
-    {
-      // For determining the minimum weight, we first loop over all
-      // possible edges, create a lookup table for the weights, and
-      // finally create all the vertices using this lookup table.
-
-      std::unordered_map<VertexType, DataType> minWeight;
-
-      auto updateOrSetWeight
-        = [&minWeight] ( const VertexType& v, const DataType& w )
-          {
-            if( minWeight.find( v ) == minWeight.end() )
-              minWeight[v] = w;
-            else
-              minWeight[v] = std::min( minWeight[v], w );
-          };
-
-      for( std::size_t y = 0; y < _height; y++ )
-      {
-        for( std::size_t x = 0; x < _width; x++ )
-        {
-          auto i = static_cast<VertexType>( width * y + x   );
-          auto w = values.at( i );
-
-          // Map matrix indices to the corresponding vertex indices as
-          // outline above.
-          auto u = VertexType(y);
-          auto v = VertexType(x + _height);
-
-          updateOrSetWeight( u, w );
-          updateOrSetWeight( v, w );
-        }
-      }
-
-      for( std::size_t i = 0; i < _height + _width; i++ )
-        simplices.push_back( Simplex( VertexType( i ), minWeight.at( VertexType(i) ) ) );
-    }
-    else
-    {
-      for( std::size_t i = 0; i < _height + _width; i++ )
-        simplices.push_back( Simplex( VertexType( i ), minData ) );
-    }
-
     // Edges -----------------------------------------------------------
     //
-    // Vertex indices start go from [0,rows-1] for the nodes of class one,
-    // and from [rows,rows+columns] for the nodes of class two.
+    // Create the edges first and update information about their weights
+    // along with them.
+
+    // For determining the minimum weight, we first loop over all
+    // possible edges, create a lookup table for the weights, and
+    // finally create all the vertices using this lookup table. A
+    // vertex will only information stored here if the right flag
+    // has been set by the client.
+    std::unordered_map<VertexType, DataType> minWeight;
+
+    auto updateOrSetWeight
+      = [&minWeight] ( const VertexType& v, const DataType& w )
+        {
+          if( minWeight.find( v ) == minWeight.end() )
+            minWeight[v] = w;
+          else
+            minWeight[v] = std::min( minWeight[v], w );
+        };
 
     for( std::size_t y = 0; y < _height; y++ )
     {
@@ -184,8 +152,26 @@ public:
         auto u = VertexType(y);
         auto v = VertexType(x + _height);
 
+        updateOrSetWeight( u, w );
+        updateOrSetWeight( v, w );
+
         simplices.push_back( Simplex( {u,v}, w ) );
       }
+    }
+
+    // Vertices --------------------------------------------------------
+    //
+    // Create a vertex for every node in the input data. An (n,m)-matrix
+    // thus gives rise to n+m nodes.
+
+    for( std::size_t i = 0; i < _height + _width; i++ )
+    {
+      simplices.push_back(
+        Simplex( VertexType( i ),
+          _assignMinimumVertexWeight
+            ?  minWeight.at( VertexType(i) )
+            :  minData )
+      );
     }
 
     K = SimplicialComplex( simplices.begin(), simplices.end() );
