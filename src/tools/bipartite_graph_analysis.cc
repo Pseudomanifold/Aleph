@@ -1,3 +1,6 @@
+#include <aleph/math/SymmetricMatrix.hh>
+
+#include <aleph/persistenceDiagrams/Distances.hh>
 #include <aleph/persistenceDiagrams/Norms.hh>
 #include <aleph/persistenceDiagrams/PersistenceDiagram.hh>
 
@@ -16,9 +19,10 @@
 
 int main( int argc, char** argv )
 {
-  bool minimum           = false;
-  bool normalize         = false;
-  bool calculateDiagrams = false;
+  bool minimum               = false;
+  bool normalize             = false;
+  bool calculateDiagrams     = false;
+  bool calculateTrajectories = false;
 
   {
     static option commandLineOptions[] =
@@ -26,11 +30,12 @@ int main( int argc, char** argv )
       { "minimum"             , no_argument, nullptr, 'm' },
       { "normalize"           , no_argument, nullptr, 'n' },
       { "persistence-diagrams", no_argument, nullptr, 'p' },
+      { "trajectories"        , no_argument, nullptr, 't' },
       { nullptr               , 0          , nullptr,  0  }
     };
 
     int option = 0;
-    while( ( option = getopt_long( argc, argv, "mnp", commandLineOptions, nullptr ) ) != -1 )
+    while( ( option = getopt_long( argc, argv, "mnpt", commandLineOptions, nullptr ) ) != -1 )
     {
       switch( option )
       {
@@ -42,6 +47,9 @@ int main( int argc, char** argv )
         break;
       case 'p':
         calculateDiagrams = true;
+        break;
+      case 't':
+        calculateTrajectories = true;
         break;
       default:
         break;
@@ -94,6 +102,25 @@ int main( int argc, char** argv )
 
   // 2. Calculate persistent homology ----------------------------------
 
+  using Matrix = aleph::math::SymmetricMatrix<double>;
+
+  // Stores the distance matrix for the trajectories of persistence
+  // diagrams. This will only be used if the client set the correct
+  // flag.
+  Matrix trajectoryDistances;
+  if( calculateTrajectories )
+    trajectoryDistances = Matrix( simplicialComplexes.size() );
+
+  using PersistenceDiagram = aleph::PersistenceDiagram<DataType>;
+  using Point              = typename PersistenceDiagram::Point;
+
+  // Stores the zeroth persistence diagram for calculating trajectories
+  // later on. This may need to be extended in order to handle diagrams
+  // with higher-dimensional features.
+  std::vector<PersistenceDiagram> trajectoryDiagrams;
+  if( calculateTrajectories )
+    trajectoryDiagrams.reserve( simplicialComplexes.size() );
+
   for( std::size_t i = 0; i < simplicialComplexes.size(); i++ )
   {
     auto&& K      = simplicialComplexes[i];
@@ -105,9 +132,6 @@ int main( int argc, char** argv )
 
     if( normalize )
     {
-      using PersistenceDiagram = aleph::PersistenceDiagram<DataType>;
-      using Point              = typename PersistenceDiagram::Point;
-
       // Ensures that points are in [-1:+1]
       std::transform( D.begin(), D.end(), D.begin(),
         [&minData, &maxData] ( const Point& p )
@@ -129,11 +153,37 @@ int main( int argc, char** argv )
     // operations are possible:
     //
     // - Calculate persistence diagrams
+    // - Calculate persistence diagram trajectories
     // - Calculate 2-norm of the persistence diagrams
 
     if( calculateDiagrams )
       std::cout << D << "\n\n";
+    else if( calculateTrajectories )
+      trajectoryDiagrams.push_back( D );
     else
       std::cout << i << "\t" << aleph::pNorm( D ) << "\n";
+  }
+
+  // Need to calculate the trajectories afterwards because they require
+  // building a database of persistence diagrams.
+  if( calculateTrajectories )
+  {
+    for( std::size_t i = 0; i < trajectoryDiagrams.size(); i++ )
+    {
+      auto&& Di = trajectoryDiagrams[i];
+
+      for( std::size_t j = i+1; j < trajectoryDiagrams.size(); j++ )
+      {
+        auto&& Dj = trajectoryDiagrams[j];
+        auto dist = aleph::distances::hausdorffDistance(
+          Di, Dj
+        );
+
+        trajectoryDistances(i,j) = dist;
+      }
+    }
+
+    // FIXME: replace with proper layout
+    std::cout << trajectoryDistances << "\n";
   }
 }
