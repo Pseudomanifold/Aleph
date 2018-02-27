@@ -16,19 +16,21 @@
 
 int main( int argc, char** argv )
 {
-  bool minimum   = false;
-  bool normalize = false;
+  bool minimum           = false;
+  bool normalize         = false;
+  bool calculateDiagrams = false;
 
   {
     static option commandLineOptions[] =
     {
-      { "minimum"  , no_argument, nullptr, 'm' },
-      { "normalize", no_argument, nullptr, 'n' },
-      { nullptr    , 0          , nullptr,  0  }
+      { "minimum"             , no_argument, nullptr, 'm' },
+      { "normalize"           , no_argument, nullptr, 'n' },
+      { "persistence-diagrams", no_argument, nullptr, 'p' },
+      { nullptr               , 0          , nullptr,  0  }
     };
 
     int option = 0;
-    while( ( option = getopt_long( argc, argv, "mn", commandLineOptions, nullptr ) ) != -1 )
+    while( ( option = getopt_long( argc, argv, "mnp", commandLineOptions, nullptr ) ) != -1 )
     {
       switch( option )
       {
@@ -37,6 +39,9 @@ int main( int argc, char** argv )
         break;
       case 'n':
         normalize = true;
+        break;
+      case 'p':
+        calculateDiagrams = true;
         break;
       default:
         break;
