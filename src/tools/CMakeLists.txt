@@ -43,6 +43,11 @@ IF( BUILD_TOOLS )
     PROPERTIES COMPILE_FLAGS "-std=c++14"
   )
 
+  IF( UNIX AND NOT APPLE )
+    TARGET_LINK_LIBRARIES( persistent_intersection_homology lz4 )
+    TARGET_LINK_LIBRARIES( point_cloud_data_descriptors     lz4 )
+  ENDIF()
+
   IF( ALEPH_WITH_HDF5 )
     TARGET_LINK_LIBRARIES( relevant_edges ${HDF5_LIBRARIES} )
   ENDIF()

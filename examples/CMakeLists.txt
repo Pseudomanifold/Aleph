@@ -12,6 +12,11 @@ IF( BUILD_EXAMPLES )
   ADD_EXECUTABLE( vietoris_rips_eccentricity       vietoris_rips_eccentricity.cc       )
   ADD_EXECUTABLE( witness_complex                  witness_complex.cc                  )
 
+  IF( UNIX AND NOT APPLE )
+    TARGET_LINK_LIBRARIES( vietoris_rips              lz4 )
+    TARGET_LINK_LIBRARIES( vietoris_rips_eccentricity lz4 )
+  ENDIF()
+
   ENABLE_IF_SUPPORTED( CMAKE_CXX_FLAGS "-O3" )
 ELSE()
   MESSAGE( STATUS "Not building examples (toggle BUILD_EXAMPLES to change this)" )
