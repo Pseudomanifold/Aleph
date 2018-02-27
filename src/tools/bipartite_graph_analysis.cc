@@ -100,6 +100,7 @@ int main( int argc, char** argv )
     auto diagrams = aleph::calculatePersistenceDiagrams( K );
     auto&& D      = diagrams.front();
 
+    D.removeDiagonal();
     D.removeUnpaired();
 
     if( normalize )
@@ -121,6 +122,20 @@ int main( int argc, char** argv )
       );
     }
 
-    std::cout << i << "\t" << aleph::pNorm( D ) << "\n";
+    // Determine mode of operation -------------------------------------
+    //
+    // Several modes of operation exist for this program. They can be
+    // set using the flags specified above. At present, the following
+    // operations are possible:
+    //
+    // 1. Calculate persistence diagrams
+    // 2. Calculate 2-norm of the persistence diagrams
+
+    if( calculateDiagrams )
+    {
+      std::cout << D << "\n";
+    }
+    else
+      std::cout << i << "\t" << aleph::pNorm( D ) << "\n";
   }
 }
