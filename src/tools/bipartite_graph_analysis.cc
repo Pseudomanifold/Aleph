@@ -128,13 +128,11 @@ int main( int argc, char** argv )
     // set using the flags specified above. At present, the following
     // operations are possible:
     //
-    // 1. Calculate persistence diagrams
-    // 2. Calculate 2-norm of the persistence diagrams
+    // - Calculate persistence diagrams
+    // - Calculate 2-norm of the persistence diagrams
 
     if( calculateDiagrams )
-    {
-      std::cout << D << "\n";
-    }
+      std::cout << D << "\n\n";
     else
       std::cout << i << "\t" << aleph::pNorm( D ) << "\n";
   }
