@@ -2,6 +2,8 @@
 #define ALEPH_MATH_SYMMETRIC_MATRIX_HH__
 
 #include <algorithm>
+#include <iomanip>
+#include <iosfwd>
 #include <stdexcept>
 
 #include <cstddef>
@@ -156,5 +158,41 @@ private:
 } // namespace math
 
 } // namespace aleph
+
+/**
+  Output operator for pretty-printing symmetric matrices. This is most
+  useful for debugging. The function takes care of formatting but will
+  not modify the flags of the output stream permanently.
+
+  @param o Output stream
+  @param M Input matrix
+
+  @returns Modified output stream
+*/
+
+template <class T> std::ostream& operator<<( std::ostream& o, const aleph::math::SymmetricMatrix<T>& M )
+{
+  auto flags( o.flags() );
+
+  auto n = M.numRows();
+
+  o << std::setfill( ' ' );
+
+  for( decltype(n) i = 0; i < n; i++ )
+  {
+    for( decltype(n) j = 0; j < n; j++ )
+    {
+      if( j != 0 )
+        o << ", ";
+
+      o << std::setw( 10 ) << std::right << M(i,j);
+    }
+
+    o << "\n";
+  }
+
+  o.flags( flags );
+  return o;
+}
 
 #endif
