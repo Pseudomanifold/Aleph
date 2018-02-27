@@ -79,7 +79,12 @@ public:
     std::swap( _data   , other._data    );
   }
 
-  SymmetricMatrix& operator==( SymmetricMatrix other )
+  /**
+    Assigns a given symmetric matrix to the current symmetric matrix,
+    taking care not to throw an error.
+  */
+
+  SymmetricMatrix& operator=( SymmetricMatrix other )
   {
     this->swap( other );
     return *this;
