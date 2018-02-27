@@ -6,9 +6,9 @@
   persistence diagrams.
 */
 
-#include <distances/Bottleneck.hh>
-#include <distances/Hausdorff.hh>
-#include <distances/NearestNeighbour.hh>
-#include <distances/Wasserstein.hh>
+#include "distances/Bottleneck.hh"
+#include "distances/Hausdorff.hh"
+#include "distances/NearestNeighbour.hh"
+#include "distances/Wasserstein.hh"
 
 #endif
