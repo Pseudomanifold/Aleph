@@ -184,6 +184,6 @@ int main( int argc, char** argv )
     }
 
     // FIXME: replace with proper layout
-    std::cout << trajectoryDistances << "\n";
+    std::cout << trajectoryDistances;
   }
 }
