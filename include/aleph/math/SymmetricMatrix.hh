@@ -2,8 +2,7 @@
 #define ALEPH_MATH_SYMMETRIC_MATRIX_HH__
 
 #include <algorithm>
-#include <iomanip>
-#include <iosfwd>
+#include <ostream>
 #include <stdexcept>
 
 #include <cstddef>
@@ -172,26 +171,21 @@ private:
 
 template <class T> std::ostream& operator<<( std::ostream& o, const aleph::math::SymmetricMatrix<T>& M )
 {
-  auto flags( o.flags() );
-
   auto n = M.numRows();
-
-  o << std::setfill( ' ' );
 
   for( decltype(n) i = 0; i < n; i++ )
   {
     for( decltype(n) j = 0; j < n; j++ )
     {
       if( j != 0 )
-        o << ", ";
+        o << " ";
 
-      o << std::setw( 10 ) << std::right << M(i,j);
+      o << M(i,j);
     }
 
     o << "\n";
   }
 
-  o.flags( flags );
   return o;
 }
 
