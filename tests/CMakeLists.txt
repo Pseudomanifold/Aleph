@@ -189,6 +189,11 @@ IF( ALEPH_WITH_TINYXML2 )
   TARGET_LINK_LIBRARIES( test_io_graphml tinyxml2 )
 ENDIF()
 
+IF( FLANN_FOUND AND FLANN_VERSION VERSION_GREATER "1.8.4" )
+  TARGET_LINK_LIBRARIES( test_nearest_neighbours lz4 )
+  TARGET_LINK_LIBRARIES( test_rips_skeleton      lz4 )
+ENDIF()
+
 ########################################################################
 # Python integration
 ########################################################################
