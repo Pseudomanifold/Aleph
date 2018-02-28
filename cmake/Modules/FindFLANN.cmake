@@ -37,9 +37,30 @@ IF( FLANN_FOUND )
   SET( FLANN_LIBRARIES ${FLANN_LIBRARY} )
   SET( FLANN_INCLUDE_DIRS ${FLANN_INCLUDE_DIR} )
 
+  FILE( STRINGS "${FLANN_INCLUDE_DIR}/flann/config.h" FLANN_CONFIG )
+  FOREACH( LINE ${FLANN_CONFIG} )
+    STRING( REGEX MATCH
+      "FLANN_VERSION_ \"([0-9\\.]+)\""
+      LINE_MATCHES
+      ${LINE}
+    )
+
+    # We have a match, i.e. there is some sort of FLANN version
+    # identification available.
+    IF( NOT "${LINE_MATCHES}" STREQUAL "" )
+      SET(
+        FLANN_VERSION
+          ${CMAKE_MATCH_1}
+        CACHE STRING
+          "Detected version of the FLANN library"
+      )
+    ENDIF()
+  ENDFOREACH()
+
   MARK_AS_ADVANCED(
     FLANN_LIBRARY
     FLANN_INCLUDE_DIR
+    FLANN_VERSION
     FLANN_DIR
   )
 ELSE()
