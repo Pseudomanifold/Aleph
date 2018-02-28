@@ -22,6 +22,7 @@
 int main( int argc, char** argv )
 {
   bool absolute              = false;
+  bool cycles                = false;
   bool expand                = false;
   bool minimum               = false;
   bool normalize             = false;
@@ -32,6 +33,7 @@ int main( int argc, char** argv )
     static option commandLineOptions[] =
     {
       { "absolute"            , no_argument, nullptr, 'a' },
+      { "cycles"              , no_argument, nullptr, 'c' },
       { "expand"              , no_argument, nullptr, 'e' },
       { "minimum"             , no_argument, nullptr, 'm' },
       { "normalize"           , no_argument, nullptr, 'n' },
@@ -41,12 +43,15 @@ int main( int argc, char** argv )
     };
 
     int option = 0;
-    while( ( option = getopt_long( argc, argv, "aemnpt", commandLineOptions, nullptr ) ) != -1 )
+    while( ( option = getopt_long( argc, argv, "acemnpt", commandLineOptions, nullptr ) ) != -1 )
     {
       switch( option )
       {
       case 'a':
         absolute = true;
+        break;
+      case 'c':
+        cycles = true;
         break;
       case 'e':
         expand = true;
@@ -156,15 +161,23 @@ int main( int argc, char** argv )
 
   for( std::size_t i = 0; i < simplicialComplexes.size(); i++ )
   {
+    bool dualize                    = true;
+    bool includeAllUnpairedCreators = cycles;
+
     auto&& K      = simplicialComplexes[i];
-    auto diagrams = aleph::calculatePersistenceDiagrams( K );
+    auto diagrams = aleph::calculatePersistenceDiagrams(
+      K,
+      dualize,
+      includeAllUnpairedCreators
+    );
     auto&& D      = diagrams.back(); // always use the last diagram; in the
                                      // absence of another mechanism,  this
                                      // will always give us the features in
                                      // the highest dimension.
 
     D.removeDiagonal();
-    D.removeUnpaired();
+    if( !cycles )
+      D.removeUnpaired();
 
     if( normalize )
     {
@@ -186,6 +199,19 @@ int main( int argc, char** argv )
             x = 2 * (x - minData) / (maxData - minData) - 1;
             y = 2 * (y - minData) / (maxData - minData) - 1;
           }
+
+          return Point( x,y );
+        }
+      );
+    }
+
+    if( cycles )
+    {
+      std::transform( D.begin(), D.end(), D.begin(),
+        [] ( const Point& p )
+        {
+          auto x = p.x();
+          auto y = DataType();
 
           return Point( x,y );
         }
