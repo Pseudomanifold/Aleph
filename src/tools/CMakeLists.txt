@@ -43,9 +43,12 @@ IF( BUILD_TOOLS )
     PROPERTIES COMPILE_FLAGS "-std=c++14"
   )
 
-  IF( UNIX AND NOT APPLE )
+  IF( FLANN_FOUND AND FLANN_VERSION VERSION_GREATER "1.8.4" )
+    TARGET_LINK_LIBRARIES( local_dimensionality             lz4 )
+    TARGET_LINK_LIBRARIES( persistence_diagram_entropies    lz4 )
     TARGET_LINK_LIBRARIES( persistent_intersection_homology lz4 )
     TARGET_LINK_LIBRARIES( point_cloud_data_descriptors     lz4 )
+    TARGET_LINK_LIBRARIES( rips_distributions               lz4 )
   ENDIF()
 
   IF( ALEPH_WITH_HDF5 )
