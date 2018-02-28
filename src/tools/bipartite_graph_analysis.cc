@@ -19,6 +19,7 @@
 
 int main( int argc, char** argv )
 {
+  bool absolute              = false;
   bool minimum               = false;
   bool normalize             = false;
   bool calculateDiagrams     = false;
@@ -27,6 +28,7 @@ int main( int argc, char** argv )
   {
     static option commandLineOptions[] =
     {
+      { "absolute"            , no_argument, nullptr, 'a' },
       { "minimum"             , no_argument, nullptr, 'm' },
       { "normalize"           , no_argument, nullptr, 'n' },
       { "persistence-diagrams", no_argument, nullptr, 'p' },
@@ -35,10 +37,13 @@ int main( int argc, char** argv )
     };
 
     int option = 0;
-    while( ( option = getopt_long( argc, argv, "mnpt", commandLineOptions, nullptr ) ) != -1 )
+    while( ( option = getopt_long( argc, argv, "amnpt", commandLineOptions, nullptr ) ) != -1 )
     {
       switch( option )
       {
+      case 'a':
+        absolute = true;
+        break;
       case 'm':
         minimum = true;
         break;
@@ -72,6 +77,9 @@ int main( int argc, char** argv )
 
   {
     aleph::topology::io::BipartiteAdjacencyMatrixReader reader;
+
+    if( absolute )
+      reader.setUseAbsoluteValues();
 
     if( minimum )
       reader.setAssignMinimumVertexWeight();
@@ -132,14 +140,24 @@ int main( int argc, char** argv )
 
     if( normalize )
     {
-      // Ensures that points are in [-1:+1]
+      // Ensures that points are in [-1:+1] or [0:1] if absolute values
+      // have been selected by the client.
       std::transform( D.begin(), D.end(), D.begin(),
-        [&minData, &maxData] ( const Point& p )
+        [&absolute, &minData, &maxData] ( const Point& p )
         {
           auto x = p.x();
           auto y = p.y();
-          x      = 2 * (x - minData) / (maxData - minData) - 1;
-          y      = 2 * (y - minData) / (maxData - minData) - 1;
+
+          if( absolute )
+          {
+            x = (x - minData) / (maxData - minData);
+            y = (y - minData) / (maxData - minData);
+          }
+          else
+          {
+            x = 2 * (x - minData) / (maxData - minData) - 1;
+            y = 2 * (y - minData) / (maxData - minData) - 1;
+          }
 
           return Point( x,y );
         }
