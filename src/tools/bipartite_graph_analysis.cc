@@ -158,7 +158,10 @@ int main( int argc, char** argv )
   {
     auto&& K      = simplicialComplexes[i];
     auto diagrams = aleph::calculatePersistenceDiagrams( K );
-    auto&& D      = diagrams.front();
+    auto&& D      = diagrams.back(); // always use the last diagram; in the
+                                     // absence of another mechanism,  this
+                                     // will always give us the features in
+                                     // the highest dimension.
 
     D.removeDiagonal();
     D.removeUnpaired();
