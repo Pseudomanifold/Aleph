@@ -12,9 +12,10 @@ IF( BUILD_EXAMPLES )
   ADD_EXECUTABLE( vietoris_rips_eccentricity       vietoris_rips_eccentricity.cc       )
   ADD_EXECUTABLE( witness_complex                  witness_complex.cc                  )
 
-  IF( UNIX AND NOT APPLE )
+  IF( FLANN_FOUND AND FLANN_VERSION VERSION_GREATER "1.8.4" )
     TARGET_LINK_LIBRARIES( vietoris_rips              lz4 )
     TARGET_LINK_LIBRARIES( vietoris_rips_eccentricity lz4 )
+    TARGET_LINK_LIBRARIES( witness_complex            lz4 )
   ENDIF()
 
   ENABLE_IF_SUPPORTED( CMAKE_CXX_FLAGS "-O3" )
