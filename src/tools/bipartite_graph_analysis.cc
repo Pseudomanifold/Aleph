@@ -72,13 +72,16 @@ int main( int argc, char** argv )
   using Simplex           = aleph::topology::Simplex<DataType, VertexType>;
   using SimplicialComplex = aleph::topology::SimplicialComplex<Simplex>;
 
-  DataType minData = std::numeric_limits<DataType>::max();
-  DataType maxData = std::numeric_limits<DataType>::lowest();
-
   // 1. Read simplicial complexes --------------------------------------
 
   std::vector<SimplicialComplex> simplicialComplexes;
   simplicialComplexes.reserve( static_cast<unsigned>( argc - optind - 1 ) );
+
+  std::vector<DataType> minData;
+  std::vector<DataType> maxData;
+
+  minData.reserve( simplicialComplexes.size() );
+  maxData.reserve( simplicialComplexes.size() );
 
   {
     aleph::topology::io::BipartiteAdjacencyMatrixReader reader;
@@ -100,14 +103,20 @@ int main( int argc, char** argv )
 
       std::cerr << "finished\n";
 
+      DataType minData_ = std::numeric_limits<DataType>::max();
+      DataType maxData_ = std::numeric_limits<DataType>::lowest();
+
       // *Always* determine minimum and maximum weights so that we may
       // report them later on. They are only used for normalization in
       // the persistence diagram calculation step.
       for( auto&& s : K )
       {
-        minData = std::min( minData, s.data() );
-        maxData = std::max( maxData, s.data() );
+        minData_ = std::min( minData_, s.data() );
+        maxData_ = std::max( maxData_, s.data() );
       }
+
+      minData.push_back( minData_ );
+      maxData.push_back( maxData_ );
 
       simplicialComplexes.emplace_back( K );
     }
@@ -159,20 +168,20 @@ int main( int argc, char** argv )
       // Ensures that points are in [-1:+1] or [0:1] if absolute values
       // have been selected by the client.
       std::transform( D.begin(), D.end(), D.begin(),
-        [&absolute, &minData, &maxData] ( const Point& p )
+        [&absolute, &i, &minData, &maxData] ( const Point& p )
         {
           auto x = p.x();
           auto y = p.y();
 
           if( absolute )
           {
-            x = (x - minData) / (maxData - minData);
-            y = (y - minData) / (maxData - minData);
+            x = (x - minData[i]) / (maxData[i] - minData[i]);
+            y = (y - minData[i]) / (maxData[i] - minData[i]);
           }
           else
           {
-            x = 2 * (x - minData) / (maxData - minData) - 1;
-            y = 2 * (y - minData) / (maxData - minData) - 1;
+            x = 2 * (x - minData[i]) / (maxData[i] - minData[i]) - 1;
+            y = 2 * (y - minData[i]) / (maxData[i] - minData[i]) - 1;
           }
 
           return Point( x,y );
