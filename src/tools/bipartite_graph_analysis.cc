@@ -1,5 +1,3 @@
-#include <aleph/geometry/RipsExpander.hh>
-
 #include <aleph/math/SymmetricMatrix.hh>
 
 #include <aleph/persistenceDiagrams/Distances.hh>
@@ -23,7 +21,6 @@ int main( int argc, char** argv )
 {
   bool absolute              = false;
   bool cycles                = false;
-  bool expand                = false;
   bool minimum               = false;
   bool normalize             = false;
   bool calculateDiagrams     = false;
@@ -34,7 +31,6 @@ int main( int argc, char** argv )
     {
       { "absolute"            , no_argument, nullptr, 'a' },
       { "cycles"              , no_argument, nullptr, 'c' },
-      { "expand"              , no_argument, nullptr, 'e' },
       { "minimum"             , no_argument, nullptr, 'm' },
       { "normalize"           , no_argument, nullptr, 'n' },
       { "persistence-diagrams", no_argument, nullptr, 'p' },
@@ -43,7 +39,7 @@ int main( int argc, char** argv )
     };
 
     int option = 0;
-    while( ( option = getopt_long( argc, argv, "acemnpt", commandLineOptions, nullptr ) ) != -1 )
+    while( ( option = getopt_long( argc, argv, "acmnpt", commandLineOptions, nullptr ) ) != -1 )
     {
       switch( option )
       {
@@ -52,9 +48,6 @@ int main( int argc, char** argv )
         break;
       case 'c':
         cycles = true;
-        break;
-      case 'e':
-        expand = true;
         break;
       case 'm':
         minimum = true;
@@ -117,24 +110,6 @@ int main( int argc, char** argv )
       }
 
       simplicialComplexes.emplace_back( K );
-    }
-  }
-
-  // Optional post-processing ------------------------------------------
-
-  if( expand )
-  {
-    using RipsExpander = aleph::geometry::RipsExpander<SimplicialComplex>;
-    RipsExpander expander;
-
-    for( auto&& K : simplicialComplexes )
-    {
-      K = expander( K, 2 );
-      K = expander.assignMaximumWeight( K );
-
-      K.sort(
-        aleph::topology::filtrations::Data<Simplex>()
-      );
     }
   }
 
