@@ -137,7 +137,7 @@ public:
       for( std::size_t x = 0; x < _width; x++ )
       {
         auto i = static_cast<VertexType>( _width * y + x   );
-        auto w = values.at( i );
+        auto w = values[i];
 
         // Map matrix indices to the corresponding vertex indices as
         // outline above.
@@ -161,7 +161,7 @@ public:
       simplices.push_back(
         Simplex( VertexType( i ),
           _assignMinimumVertexWeight
-            ?  minWeight.at( VertexType(i) )
+            ?  minWeight[ VertexType(i) ]
             :  minData )
       );
     }
