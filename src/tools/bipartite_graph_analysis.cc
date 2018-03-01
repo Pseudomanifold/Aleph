@@ -33,6 +33,8 @@ SimplicialComplex makeFiltration( const SimplicialComplex& K, bool upper = false
   std::vector<Simplex> simplices;
   simplices.reserve( K.size() );
 
+  // Keep vertices if they are above/below the desired data type
+  // threshold for the filtration.
   std::transform( K.begin(), K.end(), std::back_inserter( simplices ),
     [&upper] ( const Simplex& s )
     {
@@ -49,6 +51,24 @@ SimplicialComplex makeFiltration( const SimplicialComplex& K, bool upper = false
     }
   );
 
+  // Ensure that all vertices are created at threshold zero. This
+  // indicates that vertices are always available in the network,
+  // regardless of weight threshold.
+  //
+  // FIXME: this somewhat interferes with the weight selection in
+  // the reader class; not sure how to merge those aspects
+  std::transform( K.begin(), K.end(), std::back_inserter( simplices ),
+    [] ( const Simplex& s )
+    {
+      if( s.dimension() == 0 )
+        return Simplex( *s.begin(), DataType() );
+      else
+        return s;
+    }
+  );
+
+  // Remove higher-dimensional simplices (edges) that do not have
+  // a part in the current filtration.
   simplices.erase(
     std::remove_if( simplices.begin(), simplices.end(),
       [] ( const Simplex& s )
