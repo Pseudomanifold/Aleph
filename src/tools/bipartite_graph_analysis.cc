@@ -93,6 +93,7 @@ int main( int argc, char** argv )
 {
   bool absolute              = false;
   bool cycles                = false;
+  bool filtration            = false;
   bool minimum               = false;
   bool normalize             = false;
   bool calculateDiagrams     = false;
@@ -103,6 +104,7 @@ int main( int argc, char** argv )
     {
       { "absolute"            , no_argument, nullptr, 'a' },
       { "cycles"              , no_argument, nullptr, 'c' },
+      { "filtration"          , no_argument, nullptr, 'f' },
       { "minimum"             , no_argument, nullptr, 'm' },
       { "normalize"           , no_argument, nullptr, 'n' },
       { "persistence-diagrams", no_argument, nullptr, 'p' },
@@ -111,7 +113,7 @@ int main( int argc, char** argv )
     };
 
     int option = 0;
-    while( ( option = getopt_long( argc, argv, "acmnpt", commandLineOptions, nullptr ) ) != -1 )
+    while( ( option = getopt_long( argc, argv, "acfmnpt", commandLineOptions, nullptr ) ) != -1 )
     {
       switch( option )
       {
@@ -120,6 +122,9 @@ int main( int argc, char** argv )
         break;
       case 'c':
         cycles = true;
+        break;
+      case 'f':
+        filtration = true;
         break;
       case 'm':
         minimum = true;
@@ -200,9 +205,6 @@ int main( int argc, char** argv )
   if( calculateTrajectories )
     trajectoryDistances = Matrix( simplicialComplexes.size() );
 
-  using PersistenceDiagram = aleph::PersistenceDiagram<DataType>;
-  using Point              = typename PersistenceDiagram::Point;
-
   // Stores the zeroth persistence diagram for calculating trajectories
   // later on. This may need to be extended in order to handle diagrams
   // with higher-dimensional features.
@@ -212,19 +214,46 @@ int main( int argc, char** argv )
 
   for( std::size_t i = 0; i < simplicialComplexes.size(); i++ )
   {
+    // The persistence diagram that will be used in the subsequent
+    // analysis. This does not necessarily have to stem from data,
+    // but can be calculated from a suitable transformation.
+    PersistenceDiagram D;
+
     bool dualize                    = true;
     bool includeAllUnpairedCreators = cycles;
 
-    auto&& K      = simplicialComplexes[i];
-    auto diagrams = aleph::calculatePersistenceDiagrams(
-      K,
-      dualize,
-      includeAllUnpairedCreators
-    );
-    auto&& D      = diagrams.back(); // always use the last diagram; in the
-                                     // absence of another mechanism,  this
-                                     // will always give us the features in
-                                     // the highest dimension.
+    auto&& K                        = simplicialComplexes[i];
+
+    if( filtration )
+    {
+      auto L = makeLowerFiltration( K );
+      auto U = makeUpperFiltration( K );
+
+      auto lowerDiagrams = aleph::calculatePersistenceDiagrams(
+        L,
+        dualize,
+        includeAllUnpairedCreators
+      );
+
+      auto upperDiagrams = aleph::calculatePersistenceDiagrams(
+        U,
+        dualize,
+        includeAllUnpairedCreators
+      );
+
+      D = merge( lowerDiagrams.back(), upperDiagrams.back() );
+    }
+    else
+    {
+      auto diagrams = aleph::calculatePersistenceDiagrams(
+        K,
+        dualize,
+        includeAllUnpairedCreators
+      );
+
+      D = diagrams.back(); // Use the *last* diagram of the filtration so that
+                           // we get features in the highest dimension.
+    }
 
     D.removeDiagonal();
     if( !cycles )
