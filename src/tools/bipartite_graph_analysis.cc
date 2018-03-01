@@ -49,6 +49,15 @@ SimplicialComplex makeFiltration( const SimplicialComplex& K, bool upper = false
     }
   );
 
+  simplices.erase(
+    std::remove_if( simplices.begin(), simplices.end(),
+      [] ( const Simplex& s )
+      {
+        return s.dimension() != 0 && s.data() == DataType();
+      }
+    ), simplices.end()
+  );
+
   return SimplicialComplex( simplices.begin(), simplices.end() );
 }
 
