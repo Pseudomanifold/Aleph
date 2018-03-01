@@ -70,50 +70,39 @@ public:
   {
     using Simplex    = typename SimplicialComplex::ValueType;
     using DataType   = typename Simplex::DataType;
+    using VertexType = typename Simplex::VertexType;
 
-    auto position = in.tellg();
-
+    auto position      = in.tellg();
     std::size_t height = 0;
-    std::size_t width  = 0;
+
+    // An 'unrolled' version of all edge weights that can be read from
+    // the file. They are supposed to correspond to a matrix with some
+    // number of columns and some number of rows.
+    std::vector<DataType> values;
 
     using namespace aleph::utilities;
 
     {
       std::string line;
       while( std::getline( in, line ) )
-      {
-        line           = trim( line );
-        auto numTokens = countTokens( line );
-
-        if( width == 0 )
-          width = numTokens;
-        else if( width != numTokens )
-          throw std::runtime_error( "Format error: number of columns must not vary" );
-
         ++height;
-      }
 
       in.clear();
       in.seekg( position );
     }
 
-    _height = height;
-    _width  = width;
-
-    using Simplex    = typename SimplicialComplex::ValueType;
-    using DataType   = typename Simplex::DataType;
-    using VertexType = typename Simplex::VertexType;
-
-    std::vector<DataType> values;
-    values.reserve( _height * _width );
-
     std::copy( std::istream_iterator<DataType>( in ), std::istream_iterator<DataType>(),
                std::back_inserter( values ) );
 
-    // We cannot fill an empt simplicial complex. It might be useful to
+    // We cannot fill an empty simplicial complex. It might be useful to
     // throw an error here, though.
     if( values.empty() )
       return;
+
+    _height = height;
+    _width  = values.size() / height;
+    if( values.size() % height != 0 )
+      throw std::runtime_error( "Format error: number of columns must not vary" );
 
     // This is required in order to assign the weight of nodes
     // correctly; we cannot trust the weights to be positive.
@@ -146,7 +135,7 @@ public:
     {
       for( std::size_t x = 0; x < _width; x++ )
       {
-        auto i = static_cast<VertexType>( width * y + x   );
+        auto i = static_cast<VertexType>( _width * y + x   );
         auto w = values.at( i );
 
         // Map matrix indices to the corresponding vertex indices as
