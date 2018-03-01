@@ -121,7 +121,6 @@ PersistenceDiagram merge( const PersistenceDiagram& D, const PersistenceDiagram&
 int main( int argc, char** argv )
 {
   bool absolute              = false;
-  bool cycles                = false;
   bool filtration            = false;
   bool minimum               = false;
   bool normalize             = false;
@@ -132,7 +131,6 @@ int main( int argc, char** argv )
     static option commandLineOptions[] =
     {
       { "absolute"            , no_argument, nullptr, 'a' },
-      { "cycles"              , no_argument, nullptr, 'c' },
       { "filtration"          , no_argument, nullptr, 'f' },
       { "minimum"             , no_argument, nullptr, 'm' },
       { "normalize"           , no_argument, nullptr, 'n' },
@@ -142,15 +140,12 @@ int main( int argc, char** argv )
     };
 
     int option = 0;
-    while( ( option = getopt_long( argc, argv, "acfmnpt", commandLineOptions, nullptr ) ) != -1 )
+    while( ( option = getopt_long( argc, argv, "afmnpt", commandLineOptions, nullptr ) ) != -1 )
     {
       switch( option )
       {
       case 'a':
         absolute = true;
-        break;
-      case 'c':
-        cycles = true;
         break;
       case 'f':
         filtration = true;
@@ -248,45 +243,30 @@ int main( int argc, char** argv )
     // but can be calculated from a suitable transformation.
     PersistenceDiagram D;
 
-    bool dualize                    = true;
-    bool includeAllUnpairedCreators = cycles;
-
-    auto&& K                        = simplicialComplexes[i];
+    auto&& K = simplicialComplexes[i];
 
     if( filtration )
     {
       auto L = makeLowerFiltration( K );
       auto U = makeUpperFiltration( K );
 
-      auto lowerDiagrams = aleph::calculatePersistenceDiagrams(
-        L,
-        dualize,
-        includeAllUnpairedCreators
-      );
+      auto lowerDiagrams = aleph::calculatePersistenceDiagrams( L );
+      auto upperDiagrams = aleph::calculatePersistenceDiagrams( U );
 
-      auto upperDiagrams = aleph::calculatePersistenceDiagrams(
-        U,
-        dualize,
-        includeAllUnpairedCreators
+      D = merge(
+        lowerDiagrams.back(),
+        upperDiagrams.back()
       );
-
-      D = merge( lowerDiagrams.back(), upperDiagrams.back() );
     }
     else
     {
-      auto diagrams = aleph::calculatePersistenceDiagrams(
-        K,
-        dualize,
-        includeAllUnpairedCreators
-      );
-
+      auto diagrams = aleph::calculatePersistenceDiagrams( K );
       D = diagrams.back(); // Use the *last* diagram of the filtration so that
                            // we get features in the highest dimension.
     }
 
     D.removeDiagonal();
-    if( !cycles )
-      D.removeUnpaired();
+    D.removeUnpaired();
 
     if( normalize )
     {
@@ -304,19 +284,6 @@ int main( int argc, char** argv )
             x = (x - minData[i]) / (maxData[i] - minData[i]);
             y = (y - minData[i]) / (maxData[i] - minData[i]);
           }
-
-          return Point( x,y );
-        }
-      );
-    }
-
-    if( cycles )
-    {
-      std::transform( D.begin(), D.end(), D.begin(),
-        [] ( const Point& p )
-        {
-          auto x = p.x();
-          auto y = DataType();
 
           return Point( x,y );
         }
