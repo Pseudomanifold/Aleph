@@ -57,7 +57,7 @@ SimplicialComplex makeFiltration( const SimplicialComplex& K, bool upper = false
   //
   // FIXME: this somewhat interferes with the weight selection in
   // the reader class; not sure how to merge those aspects
-  std::transform( K.begin(), K.end(), std::back_inserter( simplices ),
+  std::transform( simplices.begin(), simplices.end(), simplices.begin(),
     [] ( const Simplex& s )
     {
       if( s.dimension() == 0 )
