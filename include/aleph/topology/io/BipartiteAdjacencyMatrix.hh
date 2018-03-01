@@ -82,12 +82,12 @@ public:
       std::string line;
       while( std::getline( in, line ) )
       {
-        line        = trim( line );
-        auto tokens = split( line );
+        line           = trim( line );
+        auto numTokens = countTokens( line );
 
         if( width == 0 )
-          width = tokens.size();
-        else if( width != tokens.size() )
+          width = numTokens;
+        else if( width != numTokens )
           throw std::runtime_error( "Format error: number of columns must not vary" );
 
         ++height;
