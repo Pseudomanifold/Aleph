@@ -17,6 +17,13 @@
 
 #include <getopt.h>
 
+// These declarations should remain global because we have to refer to
+// them in utility functions that are living outside of `main()`.
+using DataType          = double;
+using VertexType        = unsigned short;
+using Simplex           = aleph::topology::Simplex<DataType, VertexType>;
+using SimplicialComplex = aleph::topology::SimplicialComplex<Simplex>;
+
 int main( int argc, char** argv )
 {
   bool absolute              = false;
@@ -66,11 +73,6 @@ int main( int argc, char** argv )
       }
     }
   }
-
-  using DataType          = double;
-  using VertexType        = unsigned short;
-  using Simplex           = aleph::topology::Simplex<DataType, VertexType>;
-  using SimplicialComplex = aleph::topology::SimplicialComplex<Simplex>;
 
   // 1. Read simplicial complexes --------------------------------------
 
