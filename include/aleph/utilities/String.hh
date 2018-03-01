@@ -2,6 +2,7 @@
 #define ALEPH_UTILITIES_STRING_HH__
 
 #include <algorithm>
+#include <iterator>
 #include <limits>
 #include <regex>
 #include <sstream>
@@ -72,6 +73,23 @@ template <class T> std::vector<T> splitByWhitespace( const T& sequence )
              std::back_inserter( tokens ) );
 
   return tokens;
+}
+
+/**
+  Counts the number of tokens that can be extracted from a sequence if
+  one were to perform splitting by whitespace character. This function
+  is useful if the client is only interested in the *number* of tokens
+  but not their actual content.
+*/
+
+template <class T> std::size_t countTokens( const T& sequence )
+{
+  std::istringstream iss( sequence );
+
+  return static_cast<std::size_t>(
+    std::distance( std::istream_iterator<T>( iss ),
+                   std::istream_iterator<T>() )
+  );
 }
 
 /**
