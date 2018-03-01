@@ -110,16 +110,6 @@ public:
     std::copy( std::istream_iterator<DataType>( in ), std::istream_iterator<DataType>(),
                std::back_inserter( values ) );
 
-    if( _useAbsoluteValues )
-    {
-      std::transform( values.begin(), values.end(), values.begin(),
-        [] ( const DataType& x )
-        {
-          return std::abs( x );
-        }
-      );
-    }
-
     // We cannot fill an empt simplicial complex. It might be useful to
     // throw an error here, though.
     if( values.empty() )
@@ -202,18 +192,6 @@ public:
   /** @returns Width of matrix that was read last */
   std::size_t width()  const noexcept { return _width;  }
 
-  /** Permits changing the behaviour of weight transformations */
-  void setUseAbsoluteValues( bool value = true )
-  {
-    _useAbsoluteValues = value;
-  }
-
-  /** @return Flag for weight transformation behaviour */
-  bool useAbsoluteValues() const noexcept
-  {
-    return _useAbsoluteValues;
-  }
-
   /** Permits changing the behaviour of vertex weight assignment */
   void setAssignMinimumVertexWeight( bool value = true )
   {
@@ -229,13 +207,6 @@ public:
 private:
   std::size_t _height = 0;
   std::size_t _width  = 0;
-
-  /**
-    If set, uses the absolute values of weights in the graph, which is
-    essentially a transformation into another weight space.
-  */
-
-  bool _useAbsoluteValues = false;
 
   /**
     If set, assigns the minimum vertex weight according to the minimum
