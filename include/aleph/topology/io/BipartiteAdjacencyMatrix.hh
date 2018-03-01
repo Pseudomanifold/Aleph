@@ -109,6 +109,7 @@ public:
     auto minData = *std::min_element( values.begin(), values.end() );
 
     std::vector<Simplex> simplices;
+    simplices.reserve( _width * _height + ( _width + _height ) );
 
     // Edges -----------------------------------------------------------
     //
