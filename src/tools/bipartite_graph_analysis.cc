@@ -24,6 +24,30 @@ using VertexType        = unsigned short;
 using Simplex           = aleph::topology::Simplex<DataType, VertexType>;
 using SimplicialComplex = aleph::topology::SimplicialComplex<Simplex>;
 
+SimplicialComplex makeLowerFiltration( const SimplicialComplex& K )
+{
+  std::vector<Simplex> simplices;
+  simplices.reserve( K.size() );
+
+  std::transform( K.begin(), K.end(), std::back_inserter( simplices ),
+    [] ( const Simplex& s )
+    {
+      if( s.data() > DataType() )
+        return s;
+
+      // Copy the simple but set its weight to be zero because it does
+      // not correspond to any structure that we want to learn.
+      else
+      {
+        std::vector<VertexType> vertices( s.begin(), s.end() );
+        return Simplex( s.begin(), s.end(), DataType() );
+      }
+    }
+  );
+
+  return SimplicialComplex( simplices.begin(), simplices.end() );
+}
+
 int main( int argc, char** argv )
 {
   bool absolute              = false;
