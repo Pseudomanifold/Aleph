@@ -8,6 +8,9 @@
 
 #include <aleph/topology/Simplex.hh>
 #include <aleph/topology/SimplicialComplex.hh>
+
+#include <aleph/topology/filtrations/Data.hh>
+
 #include <aleph/topology/io/BipartiteAdjacencyMatrix.hh>
 
 #include <algorithm>
@@ -51,12 +54,20 @@ SimplicialComplex makeFiltration( const SimplicialComplex& K, bool upper = false
 SimplicialComplex makeLowerFiltration( const SimplicialComplex& K )
 {
   auto L = makeFiltration( K );
+  L.sort(
+    aleph::topology::filtrations::Data<Simplex, std::greater<DataType> >()
+  );
+
   return L;
 }
 
 SimplicialComplex makeUpperFiltration( const SimplicialComplex& K )
 {
   auto L = makeFiltration( K, true );
+  L.sort(
+    aleph::topology::filtrations::Data<Simplex, std::less<DataType> >()
+  );
+
   return makeFiltration( K, true );
 }
 
