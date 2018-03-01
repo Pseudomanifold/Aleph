@@ -120,7 +120,6 @@ PersistenceDiagram merge( const PersistenceDiagram& D, const PersistenceDiagram&
 
 int main( int argc, char** argv )
 {
-  bool absolute              = false;
   bool filtration            = false;
   bool minimum               = false;
   bool normalize             = false;
@@ -130,7 +129,6 @@ int main( int argc, char** argv )
   {
     static option commandLineOptions[] =
     {
-      { "absolute"            , no_argument, nullptr, 'a' },
       { "filtration"          , no_argument, nullptr, 'f' },
       { "minimum"             , no_argument, nullptr, 'm' },
       { "normalize"           , no_argument, nullptr, 'n' },
@@ -140,13 +138,10 @@ int main( int argc, char** argv )
     };
 
     int option = 0;
-    while( ( option = getopt_long( argc, argv, "afmnpt", commandLineOptions, nullptr ) ) != -1 )
+    while( ( option = getopt_long( argc, argv, "fmnpt", commandLineOptions, nullptr ) ) != -1 )
     {
       switch( option )
       {
-      case 'a':
-        absolute = true;
-        break;
       case 'f':
         filtration = true;
         break;
@@ -181,9 +176,6 @@ int main( int argc, char** argv )
 
   {
     aleph::topology::io::BipartiteAdjacencyMatrixReader reader;
-
-    if( absolute )
-      reader.setUseAbsoluteValues();
 
     if( minimum )
       reader.setAssignMinimumVertexWeight();
@@ -274,7 +266,7 @@ int main( int argc, char** argv )
       // diagram. This enables the comparison of time-varying graphs
       // or different instances.
       std::transform( D.begin(), D.end(), D.begin(),
-        [&absolute, &i, &minData, &maxData] ( const Point& p )
+        [&i, &minData, &maxData] ( const Point& p )
         {
           auto x = p.x();
           auto y = p.y();
