@@ -16,6 +16,7 @@
 #include <algorithm>
 #include <iostream>
 #include <limits>
+#include <stdexcept>
 #include <vector>
 
 #include <getopt.h>
@@ -69,6 +70,23 @@ SimplicialComplex makeUpperFiltration( const SimplicialComplex& K )
   );
 
   return makeFiltration( K, true );
+}
+
+using PersistenceDiagram = aleph::PersistenceDiagram<DataType>;
+using Point              = typename PersistenceDiagram::Point;
+
+PersistenceDiagram merge( const PersistenceDiagram& D, const PersistenceDiagram& E )
+{
+  PersistenceDiagram F;
+
+  if( D.dimension() != F.dimension() )
+    throw std::runtime_error( "Persistence diagram dimensions have to agree" );
+
+  for( auto&& diagram : { D, E } )
+    for( auto&& p : diagram )
+      F.add( p.x(), p.y() );
+
+  return F;
 }
 
 int main( int argc, char** argv )
