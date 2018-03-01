@@ -56,6 +56,25 @@ template <class T> std::vector<T> split( const T& sequence,
 }
 
 /**
+  This is a variant for tokenizing a string according to whitespace
+  characters. It is more efficient but less generic than `split()`,
+  which permits the use of arbitrary regular expressions.
+*/
+
+template <class T> std::vector<T> splitByWhitespace( const T& sequence )
+{
+  std::vector<T> tokens;
+
+  std::istringstream iss( sequence );
+
+  std::copy( std::istream_iterator<T>( iss ),
+             std::istream_iterator<T>(),
+             std::back_inserter( tokens ) );
+
+  return tokens;
+}
+
+/**
   Attempts to convert a sequence type `S` to a non-sequence type `T` by
   using `std::stringstream`. This makes converting strings to different
   types such as numbers easier.
