@@ -290,23 +290,19 @@ int main( int argc, char** argv )
 
     if( normalize )
     {
-      // Ensures that points are in [-1:+1] or [0:1] if absolute values
-      // have been selected by the client.
+      // Ensures that all weights are in [0:1] for the corresponding
+      // diagram. This enables the comparison of time-varying graphs
+      // or different instances.
       std::transform( D.begin(), D.end(), D.begin(),
         [&absolute, &i, &minData, &maxData] ( const Point& p )
         {
           auto x = p.x();
           auto y = p.y();
 
-          if( absolute )
+          if( minData[i] != maxData[i] )
           {
             x = (x - minData[i]) / (maxData[i] - minData[i]);
             y = (y - minData[i]) / (maxData[i] - minData[i]);
-          }
-          else
-          {
-            x = 2 * (x - minData[i]) / (maxData[i] - minData[i]) - 1;
-            y = 2 * (y - minData[i]) / (maxData[i] - minData[i]) - 1;
           }
 
           return Point( x,y );
