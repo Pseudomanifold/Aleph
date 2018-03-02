@@ -31,7 +31,7 @@ using PersistenceDiagram = aleph::PersistenceDiagram<DataType>;
 
 void usage()
 {
-  std::cerr << "Usage: persistence_indicator_function [--mean] FLES\n"
+  std::cerr << "Usage: persistence_indicator_function [--mean] FILES\n"
             << "\n"
             << "Calculates persistence indicator functions from a set of persistence\n"
             << "diagrams, stored in FILES. Output will be written to '/tmp' and will\n"
