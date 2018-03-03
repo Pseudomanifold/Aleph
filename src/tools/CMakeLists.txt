@@ -6,13 +6,6 @@ IF( BUILD_TOOLS )
   ADD_EXECUTABLE( clique_communities_to_json                     clique_communities_to_json.cc )
   ADD_EXECUTABLE( clique_persistence_diagram                     clique_persistence_diagram.cc )
   ADD_EXECUTABLE( function_analysis                              function_analysis.cc )
-
-  # This tool performs a decomposition of Laplacian matrices, so the
-  # `Eigen` library needs to be available.
-  IF( ALEPH_WITH_EIGEN )
-    ADD_EXECUTABLE( graph_distance graph_distance.cc )
-  ENDIF()
-
   ADD_EXECUTABLE( interlevel_set_persistence_hierarchy           interlevel_set_persistence_hierarchy.cc )
   ADD_EXECUTABLE( local_dimensionality                           local_dimensionality.cc )
   ADD_EXECUTABLE( mean_curvature                                 mean_curvature.cc )
