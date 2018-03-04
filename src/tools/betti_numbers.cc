@@ -1,3 +1,20 @@
+/*
+  This is a tool shipped by 'Aleph - A Library for Exploring Persistent
+  Homology'.
+
+  Its purpose is to calculate the zeroth and first Betti number of
+  a data set given in the form of a graph in GML format. For every
+  input filename, the program attempts to extract an ID. This will
+  be used to assign Betti numbers in the output.
+
+  This tool has been used to perform auxiliary calculations during
+  molecular dynamics simulation, as described by:
+
+  > Kai Sdeo, Bastian Rieck, Filip Sadlo
+  > Visualization of Fullerene Fragmentation
+  > IEEE Pacific Visualization Symposium 2018
+*/
+
 #include <aleph/persistentHomology/Calculation.hh>
 
 #include <aleph/topology/io/GML.hh>

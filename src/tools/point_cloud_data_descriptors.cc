@@ -1,4 +1,3 @@
-
 /*
   This is a tool shipped by 'Aleph - A Library for Exploring Persistent
   Homology'.
