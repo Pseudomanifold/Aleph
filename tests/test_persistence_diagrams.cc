@@ -9,6 +9,7 @@
 #include <aleph/persistenceDiagrams/distances/Bottleneck.hh>
 #include <aleph/persistenceDiagrams/distances/Hausdorff.hh>
 #include <aleph/persistenceDiagrams/distances/NearestNeighbour.hh>
+#include <aleph/persistenceDiagrams/distances/PointSet.hh>
 #include <aleph/persistenceDiagrams/distances/Wasserstein.hh>
 
 #include <aleph/persistenceDiagrams/kernels/KernelEmbedding.hh>
@@ -267,6 +268,53 @@ template <class T> void testNearestNeighbourDistance()
   ALEPH_TEST_END();
 }
 
+template <class T> void testPointSetDistances()
+{
+  ALEPH_TEST_BEGIN( "Point set distances" );
+
+  using Diagram = aleph::PersistenceDiagram<T>;
+  using namespace aleph::distances;
+
+  Diagram D1;
+  D1.add( T(0.9), T(1.0) );
+  D1.add( T(1.9), T(2.0) );
+  D1.add( T(2.9), T(3.0) );
+  D1.add( T(3.9), T(4.0) );
+
+  {
+    auto d11 = sumOfMinimumDistances( D1, D1 );
+
+    ALEPH_ASSERT_THROW( d11 >= T() );
+    ALEPH_ASSERT_THROW( d11 == T() );
+  }
+
+  Diagram D2;
+  D2.add( T(0.9), T(1.0) );
+  D2.add( T(1.9), T(2.0) );
+  D2.add( T(2.9), T(3.0) );
+  D2.add( T(3.9), T(9.9) );
+
+  {
+    auto d12 = sumOfMinimumDistances( D1, D2 );
+    auto d21 = sumOfMinimumDistances( D2, D1 );
+
+    ALEPH_ASSERT_THROW( d12 > T() );
+    ALEPH_ASSERT_THROW( d21 > T() );
+
+    // All distances are zero, except for the one from (3.9,4.0) to the
+    // second set, which is realized by (2.9,3.0) under the metric with
+    // a value of 1.0 (maximum of differences). For the second set, the
+    // distance from (3.9,9.9) is realized by (3.9,4.0) with a distance
+    // value of 5.9. Hence, the total distance is:
+    //
+    //   0.5 * (5.9 + 1.0) = 3.45
+    ALEPH_ASSERT_EQUAL( d12, d21 );
+    ALEPH_ASSERT_THROW( std::abs( d12 -  T( 3.45 ) ) < 1e-6 );
+  }
+
+  ALEPH_TEST_END();
+}
+
 template <class T> void testWassersteinDistance()
 {
   ALEPH_TEST_BEGIN( "Wasserstein distance" );
@@ -335,6 +383,9 @@ int main(int, char**)
 
   testPersistenceIndicatorFunction<float> ();
   testPersistenceIndicatorFunction<double>();
+
+  testPointSetDistances<float> ();
+  testPointSetDistances<double>();
 
   testWassersteinDistance<float> ();
   testWassersteinDistance<double>();
