@@ -23,6 +23,10 @@
 //    CH-8092 Zuerich, Switzerland
 //    http://www.inf.ethz.ch/personal/gaertner
 
+// Ignoring all warnings that arise from this code. It is not written by
+// me and I do not want to change it for now.
+#pragma warning(push, 0)
+
 #include <cassert>
 #include <algorithm>
 #include <list>
@@ -513,3 +517,5 @@ namespace Miniball {
   }
 
 } // end Namespace Miniball
+
+#pragma warning(pop)
