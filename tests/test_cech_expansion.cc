@@ -31,6 +31,13 @@ template <class T> void triangle()
   ALEPH_ASSERT_EQUAL( pc.dimension(), 2);
   ALEPH_ASSERT_EQUAL( pc.size()     , 3);
 
+  auto K = buildCechComplex3D( pc, T(0.6) );
+  auto L = buildCechComplex3D( pc, T(1.0) );
+
+  ALEPH_ASSERT_THROW( not K.empty() );
+  ALEPH_ASSERT_THROW( not L.empty() );
+  ALEPH_ASSERT_THROW( K.size() < L.size() );
+
   ALEPH_TEST_END();
 }
 

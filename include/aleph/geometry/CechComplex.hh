@@ -13,6 +13,8 @@
 #include <numeric>
 #include <vector>
 
+#include <cmath>
+
 namespace aleph
 {
 
@@ -33,6 +35,11 @@ template <class Container> auto buildCechComplex3D( const Container& container, 
              IndexType(0) );
 
   std::vector<Simplex> simplices;
+
+  // Add 0-skeleton ----------------------------------------------------
+
+  for( auto&& vertex : vertices )
+    simplices.push_back( Simplex( vertex ) );
 
   // Add 1-skeleton ----------------------------------------------------
   //
@@ -61,7 +68,7 @@ template <class Container> auto buildCechComplex3D( const Container& container, 
         Miniball mb( static_cast<int>(D), points.begin(), points.end() );
         if( mb.squared_radius() <= R )
         {
-          Simplex s( first, last );
+          Simplex s( first, last, ElementType( std::sqrt( mb.squared_radius() ) ) );
           simplices.push_back( s );
         }
 
@@ -70,7 +77,10 @@ template <class Container> auto buildCechComplex3D( const Container& container, 
     );
   }
 
-  return SimplicialComplex( simplices.begin(), simplices.end() );
+  SimplicialComplex K( simplices.begin(), simplices.end() );
+  K.sort( topology::filtrations::Data<Simplex>() );
+
+  return K;
 }
 
 } // namespace geometry
