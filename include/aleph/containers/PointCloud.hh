@@ -27,6 +27,10 @@ public:
   // used by other algorithms to prevent casting.
   using ElementType = T;
 
+  // Ditto for the index type. It might make sense to leave this
+  // configurable, but I do not see a pressing reason to do so.
+  using IndexType = std::size_t;
+
   PointCloud()
     : _n( 0 )
     , _d( 0 )
@@ -90,12 +94,12 @@ public:
 
   // Attributes --------------------------------------------------------
 
-  std::size_t size() const noexcept
+  IndexType size() const noexcept
   {
     return _n;
   }
 
-  std::size_t dimension() const noexcept
+  IndexType dimension() const noexcept
   {
     return _d;
   }
@@ -120,7 +124,7 @@ public:
     does not match the number of dimensions in the point cloud.
   */
 
-  template <class InputIterator> void set( std::size_t i,
+  template <class InputIterator> void set( IndexType i,
                                            InputIterator begin, InputIterator end )
   {
     if( i >= this->size() )
@@ -128,14 +132,14 @@ public:
 
     auto distance = std::distance( begin, end );
 
-    if( static_cast<std::size_t>( distance ) != this->dimension() )
+    if( static_cast<IndexType>( distance ) != this->dimension() )
       throw std::runtime_error( "Incorrect number of dimensions" );
 
     std::copy( begin, end, _points + this->dimension() * i );
   }
 
   /** @overload set() */
-  void set( std::size_t i, const std::initializer_list<T>& il )
+  void set( IndexType i, const std::initializer_list<T>& il )
   {
     this->set( i, il.begin(), il.end() );
   }
@@ -145,7 +149,7 @@ public:
     output iterator. Incorrect indices will result in an exception.
   */
 
-  template <class OutputIterator> void get( std::size_t i,
+  template <class OutputIterator> void get( IndexType i,
                                             OutputIterator result ) const
   {
     if( i >= this->size() )
@@ -163,7 +167,7 @@ public:
     as a fallback/simplified variant.
   */
 
-  std::vector<T> operator[]( std::size_t i ) const
+  std::vector<T> operator[]( IndexType i ) const
   {
     std::vector<T> p;
 
