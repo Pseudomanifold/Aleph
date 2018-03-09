@@ -25,7 +25,7 @@
 
 // Ignoring all warnings that arise from this code. It is not written by
 // me and I do not want to change it for now.
-#pragma warning(push, 0)
+#pragma GCC system_header
 
 #include <cassert>
 #include <algorithm>
@@ -517,5 +517,3 @@ namespace Miniball {
   }
 
 } // end Namespace Miniball
-
-#pragma warning(pop)
