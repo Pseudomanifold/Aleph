@@ -11,7 +11,7 @@
 
 #include <aleph/topology/filtrations/Data.hh>
 
-#include <algorithm>
+#include <numeric>
 #include <vector>
 
 namespace aleph
@@ -46,7 +46,7 @@ template <class NearestNeighbours> auto buildCechComplex3D(
 
   std::vector<Simplex> simplices;
 
-  math::for_each_combination( vertices.begin(), vertices.begin() + DifferenceType(3); vertices.end(),
+  math::for_each_combination( vertices.begin(), vertices.begin() + DifferenceType(3), vertices.end(),
     [&simplices] ( Iterator first, Iterator last )
     {
       Simplex s( first, last );
@@ -56,6 +56,7 @@ template <class NearestNeighbours> auto buildCechComplex3D(
     }
   );
 
+  (void) dimension;
   return SimplicialComplex( simplices.begin(), simplices.end() );
 }
 
