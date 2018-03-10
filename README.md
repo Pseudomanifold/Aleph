@@ -63,6 +63,7 @@ important ones:
     - Multi-scale smoothing kernel
     - Wasserstein distance
 * Algorithms for computing [*intersection homology*](http://www.math.ias.edu/~goresky/pdf/IH.pdf) and [*persistent intersection homology*](https://doi.org/10.1007/s10208-010-9081-1)
+* Basic support for *Čech complexes*
 * Support for *Dowker complexes*
 
 # Documentation
