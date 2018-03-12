@@ -3,6 +3,7 @@
 #include <aleph/containers/PointCloud.hh>
 
 #include <aleph/geometry/BruteForce.hh>
+#include <aleph/geometry/CechComplex.hh>
 #include <aleph/geometry/VietorisRipsComplex.hh>
 
 #include <aleph/geometry/distances/Euclidean.hh>
@@ -168,14 +169,10 @@ template <class T> void testS1vS1()
       pc.set(k++, {x0, y0} );
   }
 
-  using Distance          = aleph::geometry::distances::Euclidean<DataType>;
-  using NearestNeighbours = aleph::geometry::BruteForce<PointCloud, Distance>;
-
   auto K
-    = aleph::geometry::buildVietorisRipsComplex(
-      NearestNeighbours( pc ),
-      DataType( 1.50 ),
-      20
+    = aleph::geometry::buildCechComplex(
+      pc,
+      DataType( 0.75 )
   );
 
   {
