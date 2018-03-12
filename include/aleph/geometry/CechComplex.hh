@@ -48,12 +48,15 @@ template <class Container> auto buildCechComplex( const Container& container, ty
   // in *every* dimension.
 
   auto D               = container.dimension();
+  auto n               = container.size();
   auto R               = r * r;
   using DifferenceType = typename decltype(vertices)::difference_type;
   using Iterator       = typename decltype(vertices)::const_iterator;
 
-  for( unsigned d = 2; d <= D+1; d++ )
+  for( unsigned d = 2; d <= n; d++ )
   {
+    auto previous_n = simplices.size();
+
     math::for_each_combination( vertices.begin(), vertices.begin() + DifferenceType(d), vertices.end(),
       [&container, &simplices, &D, &R] ( Iterator first, Iterator last )
       {
@@ -75,6 +78,13 @@ template <class Container> auto buildCechComplex( const Container& container, ty
         return false;
       }
     );
+
+    // Check whether we can stop adding simplices. If no additional
+    // simplices have been created during the last iteration, there
+    // is no need to continue the iteration.
+    auto current_n = simplices.size();
+    if( previous_n == current_n )
+      break;
   }
 
   SimplicialComplex K( simplices.begin(), simplices.end() );
