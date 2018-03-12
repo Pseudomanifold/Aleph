@@ -176,6 +176,11 @@ template <class T> void testS1vS1()
   );
 
   {
+    std::ofstream out( "/tmp/SimplicialComplex.txt" );
+    out << K << "\n";
+  }
+
+  {
     std::ofstream out( "/tmp/K.txt" );
     aleph::topology::io::LinesAndPoints lap;
     lap( out, K, pc );
