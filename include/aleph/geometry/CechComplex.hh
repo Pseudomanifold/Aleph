@@ -21,7 +21,7 @@ namespace aleph
 namespace geometry
 {
 
-template <class Container> auto buildCechComplex3D( const Container& container, typename Container::ElementType r ) -> topology::SimplicialComplex< topology::Simplex<typename Container::ElementType, typename Container::IndexType> >
+template <class Container> auto buildCechComplex( const Container& container, typename Container::ElementType r ) -> topology::SimplicialComplex< topology::Simplex<typename Container::ElementType, typename Container::IndexType> >
 {
   using ElementType       = typename Container::ElementType;
   using IndexType         = typename Container::IndexType;
@@ -52,7 +52,7 @@ template <class Container> auto buildCechComplex3D( const Container& container, 
   using DifferenceType = typename decltype(vertices)::difference_type;
   using Iterator       = typename decltype(vertices)::const_iterator;
 
-  for( unsigned d = 2; d <= 3; d++ )
+  for( unsigned d = 2; d <= D+1; d++ )
   {
     math::for_each_combination( vertices.begin(), vertices.begin() + DifferenceType(d), vertices.end(),
       [&container, &simplices, &D, &R] ( Iterator first, Iterator last )
