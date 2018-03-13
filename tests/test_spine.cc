@@ -153,7 +153,7 @@ template <class T> void testS1vS1()
 
   unsigned n = 8;
 
-  PointCloud pc( 2*n - 1 + 0.5*n, 2 );
+  PointCloud pc( 2*n - 1 + n/2, 2 );
 
   unsigned k = 0;
   for( unsigned i = 0; i < n; i++ )
@@ -179,13 +179,16 @@ template <class T> void testS1vS1()
   // that is stands out from other points.
 
   {
+    auto m = n /2;
     auto a = 2.0 * std::tan( M_PI / n );
-    auto r = 0.5 * a;
+    auto r = DataType( 0.5 * a );
 
-    std::cerr << a << "," << r << std::endl;
-
-    for( unsigned i = 0; i < n/2; i++ )
+    for( unsigned i = 0; i < m; i++ )
     {
+      auto x0 = r * DataType( std::cos( 2*M_PI / m * i ) ) + 1;
+      auto y0 = r * DataType( std::sin( 2*M_PI / m * i ) );
+
+      pc.set(k++, {x0, y0} );
     }
   }
 
