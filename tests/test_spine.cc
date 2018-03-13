@@ -53,9 +53,15 @@ template <class T> void testDisk()
   K.sort();
 
   auto L = aleph::topology::spine( K );
+  auto M = aleph::topology::dumb::spine( K );
 
   ALEPH_ASSERT_THROW( L.size() < K.size() );
   ALEPH_ASSERT_EQUAL( L.size(), 1 );
+  ALEPH_ASSERT_EQUAL( M.size(), 1 );
+
+  // Note that it does not make sense to check whether both spines
+  // resulted in the *same* vertex. Every vertex is equally likely
+  // to be left over; and every result is equally valid.
 
   ALEPH_TEST_END();
 }
