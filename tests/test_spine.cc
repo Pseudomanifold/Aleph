@@ -267,6 +267,8 @@ template <class T> void testS1vS1()
 
 template <class T> void testTriangle()
 {
+  ALEPH_TEST_BEGIN( "Triangle" );
+
   using DataType   = bool;
   using VertexType = T;
 
@@ -280,9 +282,13 @@ template <class T> void testTriangle()
   };
 
   auto L = aleph::topology::spine( K );
+  auto M = aleph::topology::dumb::spine( K );
 
   ALEPH_ASSERT_THROW( L.size() < K.size() );
   ALEPH_ASSERT_EQUAL( L.size(), 1 );
+  ALEPH_ASSERT_EQUAL( M.size(), 1 );
+
+  ALEPH_TEST_END();
 }
 
 int main( int, char** )
