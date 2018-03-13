@@ -71,7 +71,7 @@ template <class Container> auto buildCechComplex( const Container& container, ty
         Miniball mb( static_cast<int>(D), points.begin(), points.end() );
         if( mb.squared_radius() <= R )
         {
-          Simplex s( first, last, ElementType( std::sqrt( mb.squared_radius() ) ) );
+          Simplex s( first, last, ElementType( 2 * std::sqrt( mb.squared_radius() ) ) );
           simplices.push_back( s );
         }
 
