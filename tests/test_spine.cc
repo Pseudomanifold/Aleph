@@ -151,9 +151,9 @@ template <class T> void testS1vS1()
 
   ALEPH_TEST_BEGIN( "Spine: S^1 v S^1" );
 
-  unsigned n = 10;
+  unsigned n = 8;
 
-  PointCloud pc( 2*n - 1, 2 );
+  PointCloud pc( 2*n - 1 + 0.5*n, 2 );
 
   unsigned k = 0;
   for( unsigned i = 0; i < n; i++ )
@@ -173,6 +173,20 @@ template <class T> void testS1vS1()
     // prevent duplication of singular point
     else
       pc.set(k++, {x0, y0} );
+  }
+
+  // Improve sampling density around the singularity in order to ensure
+  // that is stands out from other points.
+
+  {
+    auto a = 2.0 * std::tan( M_PI / n );
+    auto r = 0.5 * a;
+
+    std::cerr << a << "," << r << std::endl;
+
+    for( unsigned i = 0; i < n/2; i++ )
+    {
+    }
   }
 
   auto K
