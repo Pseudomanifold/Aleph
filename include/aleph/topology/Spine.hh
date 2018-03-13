@@ -14,73 +14,11 @@ namespace aleph
 namespace topology
 {
 
-/**
-  Stores coface relationships in a simplicial complex. Given a simplex
-  \f$\sigma\f$, the map contains all of its cofaces. Note that the map
-  will be updated upon every elementary collapse.
-*/
-
-template <class Simplex> using CofaceMap = std::unordered_map<Simplex, std::unordered_set<Simplex> >;
-
-template <class SimplicialComplex> CofaceMap<typename SimplicialComplex::ValueType> buildCofaceMap( const SimplicialComplex& K )
+// Contains the 'dumbest' implementation for calculating the spine, i.e.
+// without any optimizations or skips. This will be used as the baseline
+// for comparisons, but also to check the correctness of the approach.
+namespace dumb
 {
-  using Simplex   = typename SimplicialComplex::ValueType;
-  using CofaceMap = CofaceMap<Simplex>;
-
-  CofaceMap cofaces;
-  for( auto&& s : K )
-  {
-    // Adding an *empty* list of cofaces (so far) for this simplex
-    // simplifies the rest of the code because there is no need to
-    // check for the existence of a simplex.
-    if( cofaces.find(s) == cofaces.end() )
-      cofaces[s] = {};
-
-    for( auto itFace = s.begin_boundary(); itFace != s.end_boundary(); ++itFace )
-      cofaces[ *itFace ].insert( s );
-  }
-
-  return cofaces;
-}
-
-template <class Simplex> bool isPrincipal( const CofaceMap<Simplex>& cofaces, const Simplex& s )
-{
-  return cofaces.at( s ).empty();
-}
-
-template <class Simplex> Simplex getFreeFace( const CofaceMap<Simplex>& cofaces, const Simplex& s )
-{
-  if( !isPrincipal( cofaces, s ) )
-    return Simplex();
-
-  // Check whether a free face exists ----------------------------------
-
-  for( auto itFace = s.begin_boundary(); itFace != s.end_boundary(); ++itFace )
-  {
-    auto&& allCofaces = cofaces.at( *itFace );
-    if( allCofaces.size() == 1 && allCofaces.find( s ) != allCofaces.end() )
-      return *itFace;
-  }
-
-  return Simplex();
-}
-
-template <class SimplicialComplex> std::unordered_map<typename SimplicialComplex::value_type, typename SimplicialComplex::value_type> getPrincipalFaces( const CofaceMap<typename SimplicialComplex::ValueType>& cofaces, const SimplicialComplex& K )
-{
-  using Simplex = typename SimplicialComplex::value_type;
-  auto L        = K;
-
-  std::unordered_map<Simplex, Simplex> admissible;
-
-  for( auto&& s : K )
-  {
-    auto freeFace = getFreeFace( cofaces, s );
-    if( freeFace )
-      admissible.insert( std::make_pair( s, freeFace ) );
-  }
-
-  return admissible;
-}
 
 /**
   Checks whether a simplex in a simplicial complex is principal, i.e.
@@ -237,6 +175,82 @@ template <class SimplicialComplex> std::unordered_map<typename SimplicialComplex
   {
     for( auto itFace = s.begin_boundary(); itFace != s.end_boundary(); ++itFace )
       admissible.erase( *itFace );
+  }
+
+  return admissible;
+}
+
+} // namespace dumb
+
+// ---------------------------------------------------------------------
+// From this point on, only 'smart' implementations of the spine
+// calculation will be given. Various optimizations will be used
+// in order to improve the run-time.
+// ---------------------------------------------------------------------
+
+/**
+  Stores coface relationships in a simplicial complex. Given a simplex
+  \f$\sigma\f$, the map contains all of its cofaces. Note that the map
+  will be updated upon every elementary collapse.
+*/
+
+template <class Simplex> using CofaceMap = std::unordered_map<Simplex, std::unordered_set<Simplex> >;
+
+template <class SimplicialComplex> CofaceMap<typename SimplicialComplex::ValueType> buildCofaceMap( const SimplicialComplex& K )
+{
+  using Simplex   = typename SimplicialComplex::ValueType;
+  using CofaceMap = CofaceMap<Simplex>;
+
+  CofaceMap cofaces;
+  for( auto&& s : K )
+  {
+    // Adding an *empty* list of cofaces (so far) for this simplex
+    // simplifies the rest of the code because there is no need to
+    // check for the existence of a simplex.
+    if( cofaces.find(s) == cofaces.end() )
+      cofaces[s] = {};
+
+    for( auto itFace = s.begin_boundary(); itFace != s.end_boundary(); ++itFace )
+      cofaces[ *itFace ].insert( s );
+  }
+
+  return cofaces;
+}
+
+template <class Simplex> bool isPrincipal( const CofaceMap<Simplex>& cofaces, const Simplex& s )
+{
+  return cofaces.at( s ).empty();
+}
+
+template <class Simplex> Simplex getFreeFace( const CofaceMap<Simplex>& cofaces, const Simplex& s )
+{
+  if( !isPrincipal( cofaces, s ) )
+    return Simplex();
+
+  // Check whether a free face exists ----------------------------------
+
+  for( auto itFace = s.begin_boundary(); itFace != s.end_boundary(); ++itFace )
+  {
+    auto&& allCofaces = cofaces.at( *itFace );
+    if( allCofaces.size() == 1 && allCofaces.find( s ) != allCofaces.end() )
+      return *itFace;
+  }
+
+  return Simplex();
+}
+
+template <class SimplicialComplex> std::unordered_map<typename SimplicialComplex::value_type, typename SimplicialComplex::value_type> getPrincipalFaces( const CofaceMap<typename SimplicialComplex::ValueType>& cofaces, const SimplicialComplex& K )
+{
+  using Simplex = typename SimplicialComplex::value_type;
+  auto L        = K;
+
+  std::unordered_map<Simplex, Simplex> admissible;
+
+  for( auto&& s : K )
+  {
+    auto freeFace = getFreeFace( cofaces, s );
+    if( freeFace )
+      admissible.insert( std::make_pair( s, freeFace ) );
   }
 
   return admissible;
