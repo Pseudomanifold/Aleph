@@ -216,6 +216,18 @@ template <class T> void testS1vS1()
   ALEPH_ASSERT_EQUAL( D2[0].dimension(), 0 );
   ALEPH_ASSERT_EQUAL( D2[0].betti(),     1 );
 
+  {
+    // This is the stratification with prior knowledge about the data
+    // set, where we place the singularity in the lowest stratum.
+
+    auto L  = aleph::topology::BarycentricSubdivision()( aleph::topology::Skeleton()( 2, K), [] ( std::size_t dimension ) { return dimension == 0 ? 0 : 0.5; } );
+    auto D2 = aleph::calculateIntersectionHomology( L, { {0}, aleph::topology::Skeleton()(2, K) }, aleph::Perversity( {-1} ) );
+
+    ALEPH_ASSERT_THROW( D2.size() >=       1 );
+    ALEPH_ASSERT_EQUAL( D2[0].dimension(), 0 );
+    ALEPH_ASSERT_EQUAL( D2[0].betti(),     1 );
+  }
+
   // Spine calculation -------------------------------------------------
 
   auto M = aleph::topology::spine( K );
