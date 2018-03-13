@@ -62,6 +62,10 @@ template <class SimplicialComplex, class Simplex> Simplex isAdmissible( const Si
     return Simplex();
 
   // Check whether a free face exists ----------------------------------
+  //
+  // This involves iterating over all simplices that have the *same*
+  // dimension as s, because we are interested in checking whether a
+  // simplex shares a face of s.
 
   std::vector<Simplex> faces( s.begin_boundary(), s.end_boundary() );
   std::vector<bool> admissible( faces.size(), true );
@@ -92,6 +96,10 @@ template <class SimplicialComplex, class Simplex> Simplex isAdmissible( const Si
     ++i;
   }
 
+  // Return the free face if possible; as usual, an empty return value
+  // indicates that we did not find such a face. Note that the call to
+  // the `find()` function prefers the lexicographically smallest one,
+  // which ensures consistency.
   auto pos = std::find( admissible.begin(), admissible.end(), true );
   if( pos == admissible.end() )
     return Simplex();
@@ -178,6 +186,39 @@ template <class SimplicialComplex> std::unordered_map<typename SimplicialComplex
   }
 
   return admissible;
+}
+
+/**
+  Performs an iterated elementary simplicial collapse until *all* of the
+  admissible simplices have been collapsed. This leads to the *spine* of
+  the simplicial complex.
+
+  Notice that this is the *dumbest* possible implementation, as no state
+  will be stored, and the search for new principal faces starts fresh in
+  every iteration.
+
+  This implementation is useful to check improved algorithms.
+
+  @see S. Matveev, "Algorithmic Topology and Classification of 3-Manifolds"
+*/
+
+template <class SimplicialComplex> SimplicialComplex spine( const SimplicialComplex& K )
+{
+  auto L          = K;
+  auto admissible = principalFaces( L );
+
+  while( !admissible.empty() )
+  {
+    auto s = admissible.begin()->first;
+    auto t = admissible.begin()->second;
+
+    L.remove_without_validation( s );
+    L.remove_without_validation( t );
+
+    admissible = principalFaces( L );
+  }
+
+  return L;
 }
 
 } // namespace dumb
