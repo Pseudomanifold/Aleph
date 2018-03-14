@@ -19,6 +19,8 @@
 
 #include <aleph/geometry/CechComplex.hh>
 
+#include <aleph/topology/Spine.hh>
+
 #include <getopt.h>
 
 using DataType   = double;
@@ -92,9 +94,19 @@ int main( int argc, char** argv )
   std::cerr << "finished\n"
             << "* Čech complex contains " << simplicialComplex.size() << " simplices\n";
 
+  using SimplicialComplex = decltype( simplicialComplex );
+
   // 3. Spine calculation ----------------------------------------------
 
   std::cerr << "* Calculating spine (" << method << " method)...";
+
+  SimplicialComplex spine;
+  if( method == "dumb" )
+    spine = aleph::topology::dumb::spine( simplicialComplex );
+
+  // Not so many choices here for now, to be honest...
+  else
+    spine = aleph::topology::spine( simplicialComplex );
 
   std::cerr << "finished\n";
 
