@@ -83,8 +83,7 @@ public:
       auto u = s[0];         // vertex
       auto v = s[1];         // vertex
 
-      if( p.size() >= 2 && q.size() >= 2 )
-        writeEdge(out, p, q);
+      writeEdge(out, u, v);
     }
 
     out << "\\end{tikzpicture}\n";
@@ -92,7 +91,7 @@ public:
 
   bool showVertexLabels() const noexcept
   {
-    return _addVertexLabels;
+    return _showVertexLabels;
   }
 
   void showVertexLabels( bool value ) noexcept
@@ -111,7 +110,7 @@ private:
     @param p   Coordinates for the vertex (only two dimensions will be used)
   */
 
-  template <class Coordinate, class Index> void writePoint( std::ostream& out, Index v, Container& p )
+  template <class Coordinate, class Index> void writePoint( std::ostream& out, Index v, Coordinate& p )
   {
     auto x = p[0];
     auto y = p[1];
@@ -121,7 +120,7 @@ private:
     if( _showVertexLabels )
       out << "[label=" << _labelPosition << ":" << std::to_string(v) << "] ";
 
-    out << "(" << v << ") at (" << p[0] << "," << p[1] << ");\n";
+    out << "(" << v << ") at (" << x << "," << y << ");\n";
 
     out << "\\filldraw[" << _pointColour << "]"
         << " " << "(" << v << ") circle (" << _pointSize << _pointSizeUnit << ");\n";
@@ -136,12 +135,9 @@ private:
     @param v   Target vertex index
   */
 
-  template <class Coordinate, class Index> void writeEdge( std::ostream& out, Index u, Index v )
+  template <class Index> void writeEdge( std::ostream& out, Index u, Index v )
   {
-    auto x = p[0];
-    auto y = p[1];
-
-    out << "\\draw[" << _lineColour << "]";
+    out << "\\draw[" << _lineColour << "]"
         << " " << "(" << u << ") -- (" << v << ");\n";
   }
 
