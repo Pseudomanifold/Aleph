@@ -21,6 +21,8 @@
 
 #include <aleph/topology/Spine.hh>
 
+#include <aleph/topology/io/TikZ.hh>
+
 #include <getopt.h>
 
 using DataType   = double;
@@ -111,4 +113,13 @@ int main( int argc, char** argv )
   std::cerr << "finished\n";
 
   // 4. Output ---------------------------------------------------------
+
+  if( tikzOutput )
+  {
+    aleph::topology::io::TikZ writer;
+
+    writer( std::cout,
+            spine,
+            pointCloud );
+  }
 }
