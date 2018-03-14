@@ -116,10 +116,28 @@ int main( int argc, char** argv )
 
   if( tikzOutput )
   {
+    std::cout << "\\documentclass{standalone}\n"
+              << "\\usepackage{tikz}\n"
+              << "\\begin{document}\n";
+
     aleph::topology::io::TikZ writer;
 
+    writer.showBalls( true );
+    writer.ballRadius( radius );
+
+    writer( std::cout,
+            simplicialComplex,
+            pointCloud );
+
+    std::cout << "\n\n";
+
+    writer.showBalls( false );
     writer( std::cout,
             spine,
             pointCloud );
+
+    std::cout << "\\end{document}\n";
   }
+  else
+    std::cout << spine << "\n";
 }
