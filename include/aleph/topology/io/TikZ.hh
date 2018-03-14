@@ -99,6 +99,26 @@ public:
     _showVertexLabels = value;
   }
 
+  bool showBalls() const noexcept
+  {
+    return _showBalls;
+  }
+
+  void showBalls( bool value ) noexcept
+  {
+    _showBalls = value;
+  }
+
+  double ballRadius() const noexcept
+  {
+    return _ballRadius;
+  }
+
+  void ballRadius( double radius )
+  {
+    _ballRadius = radius;
+  }
+
 private:
 
   /**
@@ -124,6 +144,14 @@ private:
 
     out << "\\filldraw[" << _pointColour << "]"
         << " " << "(" << v << ") circle (" << _pointSize << _pointSizeUnit << ");\n";
+
+    if( _showBalls )
+    {
+      out << "\\fill[" << _ballColour << ","
+          << " fill opacity=" << _ballOpacity
+          << "]"
+          << " " << "(" << v << ") circle (" << _ballRadius << "cm" << ");\n";
+    }
   }
 
   /**
@@ -142,6 +170,11 @@ private:
         <<"]"
         << " " << "(" << u << ") -- (" << v << ");\n";
   }
+
+  bool _showBalls         = false;
+  double _ballOpacity     = 0.1;
+  double _ballRadius      = 0.0;
+  std::string _ballColour = "black";
 
   bool _showVertexLabels     = false;
   std::string _labelPosition = "above";
