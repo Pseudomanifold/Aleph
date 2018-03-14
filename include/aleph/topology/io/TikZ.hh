@@ -137,7 +137,9 @@ private:
 
   template <class Index> void writeEdge( std::ostream& out, Index u, Index v )
   {
-    out << "\\draw[" << _lineColour << "]"
+    out << "\\draw[" << _lineColour << ","
+        << " line width=" << _lineWidth << _lineWidthUnit
+        <<"]"
         << " " << "(" << u << ") -- (" << v << ");\n";
   }
 
