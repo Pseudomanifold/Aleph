@@ -17,6 +17,8 @@
 
 #include <aleph/containers/PointCloud.hh>
 
+#include <aleph/geometry/CechComplex.hh>
+
 #include <getopt.h>
 
 using DataType   = double;
@@ -81,7 +83,14 @@ int main( int argc, char** argv )
 
   std::cerr << "* Calculating Čech complex with r=" << radius << "...";
 
-  std::cerr << "finished\n";
+  auto simplicialComplex
+    = aleph::geometry::buildCechComplex(
+        pointCloud,
+        radius
+  );
+
+  std::cerr << "finished\n"
+            << "* Čech complex contains " << simplicialComplex.size() << " simplices\n";
 
   // 3. Spine calculation ----------------------------------------------
 
