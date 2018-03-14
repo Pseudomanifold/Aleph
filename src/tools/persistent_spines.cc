@@ -15,9 +15,12 @@
 #include <iostream>
 #include <string>
 
+#include <aleph/containers/PointCloud.hh>
+
 #include <getopt.h>
 
-using DataType = double;
+using DataType   = double;
+using PointCloud = aleph::containers::PointCloud<DataType>;
 
 void usage()
 {
@@ -68,7 +71,11 @@ int main( int argc, char** argv )
 
   std::cerr << "* Loading point cloud from '" << filename << "'...";
 
-  std::cerr << "finished\n";
+  auto pointCloud
+    = aleph::containers::load<DataType>( filename );
+
+  std::cerr << "finished\n"
+            << "* Point cloud contains " << pointCloud.size() << " points of dimensionality " << pointCloud.dimension() << "\n";
 
   // 2. Čech complex calculation ---------------------------------------
 
