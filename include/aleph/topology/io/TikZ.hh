@@ -71,21 +71,6 @@ public:
         throw std::runtime_error( "Insufficient number of dimensions for storing coordinates" );
     }
 
-    // Render edges as lines -------------------------------------------
-
-    out << "% 1-simplices\n";
-
-    for( auto&& s : K )
-    {
-      if( s.dimension() != 1 )
-        continue;
-
-      auto u = s[0];         // vertex
-      auto v = s[1];         // vertex
-
-      writeEdge(out, u, v);
-    }
-
     // Render 2-simplices as triangles ----------------------------------
 
     if( _showTriangles )
@@ -103,6 +88,21 @@ public:
 
         writeTriangle(out, u, v, w);
       }
+    }
+
+    // Render edges as lines -------------------------------------------
+
+    out << "% 1-simplices\n";
+
+    for( auto&& s : K )
+    {
+      if( s.dimension() != 1 )
+        continue;
+
+      auto u = s[0];         // vertex
+      auto v = s[1];         // vertex
+
+      writeEdge(out, u, v);
     }
 
     out << "\\end{tikzpicture}\n";

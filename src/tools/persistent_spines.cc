@@ -131,6 +131,7 @@ int main( int argc, char** argv )
 
     writer.showTriangles( true );
     writer.triangleColour( "cb-1" );
+    writer.triangleOpacity( 0.4 );
 
     writer( std::cout,
             simplicialComplex,
