@@ -222,7 +222,7 @@ private:
 
   template <class Index> void writeTriangle( std::ostream& out, Index u, Index v, Index w )
   {
-    out << "\\filldraw[" << _triangleColour << ","
+    out << "\\fill[" << _triangleColour << ","
         << " fill opacity=" << _triangleOpacity
         <<"]"
         << " " << "(" << u << ") -- (" << v << ") -- (" << w << ") -- cycle;\n";
