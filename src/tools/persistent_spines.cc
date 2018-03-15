@@ -110,7 +110,8 @@ int main( int argc, char** argv )
   else
     spine = aleph::topology::spine( simplicialComplex );
 
-  std::cerr << "finished\n";
+  std::cerr << "finished\n"
+            << "* Spine contains " << spine.size() << " simplices\n";
 
   // 4. Output ---------------------------------------------------------
 
