@@ -259,10 +259,24 @@ template <class SimplicialComplex> CofaceMap<typename SimplicialComplex::ValueTy
   return cofaces;
 }
 
+/**
+  Checks whether a given simplex is *principal* with respect to its
+  coface relations. A principal simplex is not the proper face of a
+  simplex in the complex. Hence, it has no cofaces.
+*/
+
 template <class Simplex> bool isPrincipal( const CofaceMap<Simplex>& cofaces, const Simplex& s )
 {
   return cofaces.at( s ).empty();
 }
+
+/**
+  Given a *principal* simplex, i.e. a simplex that is not a proper face
+  of another simplex in the complex, returns the first free face of the
+  simplex, i.e. a face that only has the given simplex as a coface.
+
+  If no such face is found, the empty simplex is returned.
+*/
 
 template <class Simplex> Simplex getFreeFace( const CofaceMap<Simplex>& cofaces, const Simplex& s )
 {
@@ -280,6 +294,12 @@ template <class Simplex> Simplex getFreeFace( const CofaceMap<Simplex>& cofaces,
 
   return Simplex();
 }
+
+/**
+  Gets *all* principal simplices along with their free faces and stores them in
+  a map. The map contains the principal simplex as its key, and the *free face*
+  as its value.
+*/
 
 template <class SimplicialComplex> std::unordered_map<typename SimplicialComplex::value_type, typename SimplicialComplex::value_type> getPrincipalFaces( const CofaceMap<typename SimplicialComplex::ValueType>& cofaces, const SimplicialComplex& K )
 {
