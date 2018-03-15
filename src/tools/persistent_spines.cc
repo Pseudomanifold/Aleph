@@ -126,6 +126,8 @@ int main( int argc, char** argv )
 
     aleph::topology::io::TikZ writer;
 
+    writer.pointSize( 1.5 );
+
     writer.showBalls( true );
     writer.ballRadius( radius );
 
@@ -140,6 +142,9 @@ int main( int argc, char** argv )
     std::cout << "\n\n";
 
     writer.showBalls( false );
+    writer.pointColour( "cb-2" );
+    writer.lineColour( "cb-2" );
+
     writer( std::cout,
             spine,
             pointCloud );

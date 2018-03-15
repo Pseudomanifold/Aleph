@@ -118,6 +118,21 @@ public:
     _showVertexLabels = value;
   }
 
+  void pointSize( double value ) noexcept
+  {
+    _pointSize = value;
+  }
+
+  void pointColour( const std::string& value ) noexcept
+  {
+    _pointColour = value;
+  }
+
+  void lineColour( const std::string& value ) noexcept
+  {
+    _lineColour = value;
+  }
+
   bool showBalls() const noexcept
   {
     return _showBalls;
