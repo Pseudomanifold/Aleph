@@ -119,12 +119,18 @@ int main( int argc, char** argv )
   {
     std::cout << "\\documentclass{standalone}\n"
               << "\\usepackage{tikz}\n"
+              << "\\definecolor{cb-1}{RGB}{ 27,158,119}\n"
+              << "\\definecolor{cb-2}{RGB}{217, 95,  2}\n"
+              << "\\definecolor{cb-3}{RGB}{117,112,179}\n"
               << "\\begin{document}\n";
 
     aleph::topology::io::TikZ writer;
 
     writer.showBalls( true );
     writer.ballRadius( radius );
+
+    writer.showTriangles( true );
+    writer.triangleColour( "cb-1" );
 
     writer( std::cout,
             simplicialComplex,

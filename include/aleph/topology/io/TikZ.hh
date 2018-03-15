@@ -148,6 +148,11 @@ public:
     _showTriangles = value;
   }
 
+  void triangleColour( const std::string& value ) noexcept
+  {
+    _triangleColour = value;
+  }
+
   void triangleOpacity( double value ) noexcept
   {
     _triangleOpacity = value;
