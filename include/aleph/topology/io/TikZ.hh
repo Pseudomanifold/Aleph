@@ -148,6 +148,11 @@ public:
     _showTriangles = value;
   }
 
+  void triangleOpacity( double value ) noexcept
+  {
+    _triangleOpacity = value;
+  }
+
 private:
 
   /**
@@ -242,7 +247,7 @@ private:
 
   bool _showTriangles         = false;
   std::string _triangleColour = "black";
-  double _triangleOpacity     = 0.50;
+  double _triangleOpacity     = 0.20;
 };
 
 } // namespace io
