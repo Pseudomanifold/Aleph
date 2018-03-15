@@ -140,5 +140,9 @@ int main( int argc, char** argv )
     std::cout << "\\end{document}\n";
   }
   else
-    std::cout << spine << "\n";
+  {
+    std::cout << simplicialComplex << "\n"
+              << "\n"
+              << spine << "\n";
+  }
 }
