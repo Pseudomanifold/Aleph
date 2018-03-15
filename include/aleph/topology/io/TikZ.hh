@@ -86,6 +86,25 @@ public:
       writeEdge(out, u, v);
     }
 
+    // Render 2-simplices as triangles ----------------------------------
+
+    if( _showTriangles )
+    {
+      out << "% 2-simplices\n";
+
+      for( auto&& s : K )
+      {
+        if( s.dimension() != 2 )
+          continue;
+
+        auto u = s[0];
+        auto v = s[1];
+        auto w = s[2];
+
+        writeTriangle(out, u, v, w);
+      }
+    }
+
     out << "\\end{tikzpicture}\n";
   }
 
@@ -117,6 +136,16 @@ public:
   void ballRadius( double radius )
   {
     _ballRadius = radius;
+  }
+
+  bool showTriangles() const noexcept
+  {
+    return _showTriangles;
+  }
+
+  void showTriangles( bool value ) noexcept
+  {
+    _showTriangles = value;
   }
 
 private:
@@ -171,6 +200,24 @@ private:
         << " " << "(" << u << ") -- (" << v << ");\n";
   }
 
+  /**
+    Auxiliary function for creating a triangle in TikZ format. It is
+    supposed to represent a 2-simplex.
+
+    @param out Output stream to which the triangle will be appended
+    @param u   First vertex index
+    @param v   Second vertex index
+    @param w   Third vertex index
+  */
+
+  template <class Index> void writeTriangle( std::ostream& out, Index u, Index v, Index w )
+  {
+    out << "\\filldraw[" << _triangleColour << ","
+        << " fill opacity=" << _triangleOpacity
+        <<"]"
+        << " " << "(" << u << ") -- (" << v << ") -- (" << w << ") -- cycle;\n";
+  }
+
   bool _showBalls         = false;
   double _ballOpacity     = 0.1;
   double _ballRadius      = 0.0;
@@ -190,6 +237,12 @@ private:
   std::string _lineColour    = "black";
   std::string _lineWidthUnit = "mm";
   double _lineWidth          = 0.50;
+
+  // Triangles ---------------------------------------------------------
+
+  bool _showTriangles         = false;
+  std::string _triangleColour = "black";
+  double _triangleOpacity     = 0.50;
 };
 
 } // namespace io
