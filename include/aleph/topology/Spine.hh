@@ -394,60 +394,6 @@ template <class SimplicialComplex> SimplicialComplex spine( const SimplicialComp
       }
     );
 
-#if 0
-    // TODO: this check could be simplified by *storing* the free face
-    // along with the given simplex
-    for( auto itFace = s.begin_boundary(); itFace != s.end_boundary(); ++itFace )
-    {
-      auto t = *itFace;
-
-      if( isAdmissible( s, t, L ) )
-      {
-        L.remove_without_validation( s );
-        L.remove_without_validation( t );
-
-        admissible.erase( s );
-
-        // New simplices -----------------------------------------------
-        //
-        // Add new admissible simplices that may potentially have been
-        // spawned by the removal of s.
-
-        // 1. Add all faces of the principal simplex, as they may
-        //    potentially become admissible again.
-        std::vector<Simplex> faces( s.begin_boundary(), s.end_boundary() );
-
-        std::for_each( faces.begin(), faces.end(),
-          [&t, &L, &admissible] ( const Simplex& s )
-          {
-            if( t != s && isAdmissible( s, L ) )
-              admissible.insert( s );
-          }
-        );
-
-        // 2. Add all faces othe free face, as they may now themselves
-        //    become admissible.
-        faces.assign( t.begin_boundary(), t.end_boundary() );
-
-        std::for_each( faces.begin(), faces.end(),
-          [&L, &admissible] ( const Simplex& s )
-          {
-            if( isAdmissible( s, L ) )
-              admissible.insert( s );
-          }
-        );
-
-        hasFreeFace = true;
-        break;
-      }
-    }
-
-    // The admissible simplex does not have a free face, so it must not
-    // be used.
-    if( !hasFreeFace )
-      admissible.erase( s );
-#endif
-
     // The heuristic above is incapable of detecting *all* principal
     // faces of the complex because this may involve searching *all*
     // co-faces. Instead, it is easier to fill up the admissible set
