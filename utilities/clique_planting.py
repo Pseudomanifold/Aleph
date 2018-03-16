@@ -42,6 +42,7 @@ if __name__ == "__main__":
   # With probability = 0.5, we decide upon whether a clique should be
   # planted in the graph or not.
   if random.choice( [True, False] ):
-    G = plant_clique(G, k)
+    G                  = plant_clique(G, k)
+    G.graph['comment'] = 'Planted clique'
 
   nx.write_gml(G, sys.stdout.buffer)
