@@ -42,7 +42,10 @@ if __name__ == "__main__":
   # With probability = 0.5, we decide upon whether a clique should be
   # planted in the graph or not.
   if random.choice( [True, False] ):
-    G                  = plant_clique(G, k)
-    G.graph['comment'] = 'Planted clique'
+    G = plant_clique(G, k)
+    print("# Planted clique")
 
-  nx.write_gml(G, sys.stdout.buffer)
+  # This is easier than other output formats and not as wasteful.
+  nx.write_edgelist(G,
+                    sys.stdout.buffer,
+                    data=False)
