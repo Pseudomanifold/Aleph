@@ -6,7 +6,8 @@
   indicator functions and---optionally---their mean indicator function
   if specified by the client.
 
-  All files will be written to '/tmp', prefixed with 'PIF_'.
+  If not specified otherwise, all files will be written to '/tmp', and
+  will have a prefix of 'PIF_'.
 */
 
 #include <algorithm>
@@ -31,7 +32,7 @@ using PersistenceDiagram = aleph::PersistenceDiagram<DataType>;
 
 void usage()
 {
-  std::cerr << "Usage: persistence_indicator_function [--mean] FILES\n"
+  std::cerr << "Usage: persistence_indicator_function [--mean] [--output=OUT] [--prefix=PRE] FILES\n"
             << "\n"
             << "Calculates persistence indicator functions from a set of persistence\n"
             << "diagrams, stored in FILES. Output will be written to '/tmp' and will\n"
@@ -59,22 +60,41 @@ int main( int argc, char** argv )
     return -1;
   }
 
+  std::string outputDirectory = "/tmp";
+  std::string prefix          = "PIF_";
   bool calculateMean = false;
 
   {
     int option = 0;
-    while( ( option = getopt_long( argc, argv, "m", commandLineOptions, nullptr ) ) != -1 )
+    while( ( option = getopt_long( argc, argv, "mo:p:", commandLineOptions, nullptr ) ) != -1 )
     {
       switch( option )
       {
       case 'm':
         calculateMean = true;
         break;
+      case 'o':
+        outputDirectory = optarg;
+        break;
+      case 'p':
+        prefix = optarg;
+        break;
       default:
         break;
       }
     }
   }
+
+  if( outputDirectory.empty() )
+  {
+    std::cerr << "* Resetting output directory to temporary directory\n";
+    outputDirectory = "/tmp/";
+  }
+
+  // Ensures that the output directory ends with a slash in order to
+  // indicate a proper path.
+  if( outputDirectory.back() != '/' )
+    outputDirectory.push_back( '/' );
 
   // Get filenames -----------------------------------------------------
 
@@ -126,7 +146,9 @@ int main( int argc, char** argv )
 
     using namespace aleph::utilities;
 
-    auto outputFilename = "/tmp/PIF_" + stem( basename( filename ) ) + ".txt";
+    auto outputFilename = outputDirectory
+                        + prefix
+                        + stem( basename( filename ) ) + ".txt";
 
     std::cerr << "* Writing persistence indicator function to '" << outputFilename << "'...\n";
 
@@ -141,7 +163,9 @@ int main( int argc, char** argv )
   if( calculateMean )
   {
     mean                /= static_cast<DataType>( persistenceDiagrams.size() );
-    auto outputFilename  = "/tmp/PIF_mean.txt";
+    auto outputFilename  = outputDirectory
+                         + prefix
+                         + "mean.txt";
 
     std::cerr << "* Writing mean persistence indicator function to '" << outputFilename << "'...\n";
 
