@@ -27,6 +27,7 @@
 #include <getopt.h>
 
 #include <iostream>
+#include <stdexcept>
 #include <vector>
 
 using DataType          = unsigned;
@@ -40,15 +41,17 @@ int main( int argc, char** argv )
   {
     { "infinity"            , required_argument, nullptr, 'f' },
     { "loops"               , no_argument      , nullptr, 'l' },
+    { "zero"                , no_argument      , nullptr, 'z' },
     { nullptr               , 0                , nullptr,  0  }
   };
 
-  DataType infinity   = DataType(2);
-  bool calculateLoops = false;
+  DataType infinity           = DataType(2);
+  bool calculateLoops         = false;
+  bool zeroWeightsForVertices = false;
 
   {
     int option = 0;
-    while( ( option = getopt_long( argc, argv, "f:l", commandLineOptions, nullptr ) ) != -1 )
+    while( ( option = getopt_long( argc, argv, "f:lz", commandLineOptions, nullptr ) ) != -1 )
     {
       switch( option )
       {
@@ -57,6 +60,9 @@ int main( int argc, char** argv )
         break;
       case 'l':
         calculateLoops = true;
+        break;
+      case 'z':
+        zeroWeightsForVertices = true;
         break;
       }
     }
@@ -97,14 +103,40 @@ int main( int argc, char** argv )
       maxDegree = *std::max_element( degrees.begin(), degrees.end() );
 
     K = expander.assignMaximumData( K, degrees.begin(), degrees.end() );
-    K.sort( aleph::topology::filtrations::Data<Simplex>() );
   }
 
   std::cerr << "finished\n";
 
+  // Set vertex weights ------------------------------------------------
+
+  if( zeroWeightsForVertices )
+  {
+    std::cerr << "* Setting vertex weights to zero...";
+
+    for( auto it = K.begin(); it != K.end(); ++it )
+    {
+      if( it->dimension() == 0 )
+      {
+        auto s = *it;
+        s.setData( DataType() );
+
+        auto success = K.replace( it, s );
+        if( !success )
+          throw std::runtime_error( "Unable to replace simplex" );
+      }
+    }
+
+    std::cerr << "finished\n";
+  }
+
   // Calculate persistent homology -------------------------------------
 
   {
+    // Establish filtration order of the simplicial complex. The reason
+    // we are doing this so late is because client options might change
+    // the filtration.
+    K.sort( aleph::topology::filtrations::Data<Simplex>() );
+
     bool dualize                    = true;
     bool includeAllUnpairedCreators = calculateLoops;
 
