@@ -160,7 +160,7 @@ int main( int argc, char** argv )
 
       for( auto&& point : diagram )
       {
-        if( point.isUnpaired() )
+        if( point.isUnpaired() && infinity > DataType() )
           out << point.x() << "\t" << infinity * maxDegree << "\n";
         else
           out << point.x() << "\t" << point.y() << "\n";
