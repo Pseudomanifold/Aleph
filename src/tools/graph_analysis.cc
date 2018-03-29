@@ -21,6 +21,7 @@
 
 #include <aleph/topology/io/EdgeLists.hh>
 
+#include <aleph/utilities/Filesystem.hh>
 #include <aleph/utilities/String.hh>
 
 #include <getopt.h>
@@ -42,7 +43,7 @@ int main( int argc, char** argv )
     { nullptr               , 0                , nullptr,  0  }
   };
 
-  DataType infinity   = DataType();
+  DataType infinity   = DataType(2);
   bool calculateLoops = false;
 
   {
@@ -86,9 +87,14 @@ int main( int argc, char** argv )
 
   aleph::geometry::RipsExpander<SimplicialComplex> expander;
 
+  unsigned maxDegree = 0;
+
   {
     std::vector<unsigned> degrees;
     aleph::topology::filtrations::degrees( K, std::back_inserter( degrees ) );
+
+    if( not degrees.empty() )
+      maxDegree = *std::max_element( degrees.begin(), degrees.end() );
 
     K = expander.assignMaximumData( K, degrees.begin(), degrees.end() );
     K.sort( aleph::topology::filtrations::Data<Simplex>() );
@@ -96,59 +102,39 @@ int main( int argc, char** argv )
 
   std::cerr << "finished\n";
 
-#if 0
   // Calculate persistent homology -------------------------------------
 
   {
-    std::size_t index = 0;
+    bool dualize                    = true;
+    bool includeAllUnpairedCreators = calculateLoops;
 
-    for( auto&& K : simplicialComplexes )
+    auto diagrams
+      = aleph::calculatePersistenceDiagrams( K,
+                                             dualize,
+                                             includeAllUnpairedCreators );
+    for( auto&& diagram : diagrams )
     {
-      bool dualize                    = true;
-      bool includeAllUnpairedCreators = true;
+      diagram.removeDiagonal();
 
-      auto diagrams
-        = aleph::calculatePersistenceDiagrams( K,
-                                               dualize,
-                                               includeAllUnpairedCreators );
+      auto output = "/tmp/"
+                    + aleph::utilities::basename( filename )
+                    + "_d"
+                    + std::to_string( diagram.dimension() )
+                    + ".txt";
 
-      for( auto&& diagram : diagrams )
+      std::cerr << "* Writing data to \"" << output << "\"...";
+
+      std::ofstream out( output );
+
+      for( auto&& point : diagram )
       {
-        diagram.removeDiagonal();
-
-        auto output = "/tmp/"
-                      + aleph::utilities::format( index, simplicialComplexes.size() )
-                      + "_d"
-                      + std::to_string( diagram.dimension() )
-                      + ".txt";
-
-        std::ofstream out( output );
-
-        for( auto&& point : diagram )
-        {
-          if( point.isUnpaired() )
-            out << point.x() << "\t" << infinity * maxDegree << "\n";
-          else
-            out << point.x() << "\t" << point.y() << "\n";
-        }
+        if( point.isUnpaired() )
+          out << point.x() << "\t" << infinity * maxDegree << "\n";
+        else
+          out << point.x() << "\t" << point.y() << "\n";
       }
 
-      ++index;
+      std::cerr << "finished\n";
     }
   }
-
-  // Store labels ------------------------------------------------------
-
-  {
-    std::vector<std::string> labels;
-    reader.graphLabels( std::back_inserter( labels ) );
-
-    std::ofstream out( "/tmp/"
-                      + aleph::utilities::basename( filename )
-                      + ".txt" );
-
-    for( auto&& label : labels )
-      out << label << "\n";
-  }
-#endif
 }
