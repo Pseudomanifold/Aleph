@@ -40,23 +40,28 @@ int main( int argc, char** argv )
   static option commandLineOptions[] =
   {
     { "infinity"            , required_argument, nullptr, 'f' },
+    { "output"              , required_argument, nullptr, 'o' },
     { "loops"               , no_argument      , nullptr, 'l' },
     { "zero"                , no_argument      , nullptr, 'z' },
     { nullptr               , 0                , nullptr,  0  }
   };
 
   DataType infinity           = DataType(2);
+  std::string outputDirectory = "/tmp";
   bool calculateLoops         = false;
   bool zeroWeightsForVertices = false;
 
   {
     int option = 0;
-    while( ( option = getopt_long( argc, argv, "f:lz", commandLineOptions, nullptr ) ) != -1 )
+    while( ( option = getopt_long( argc, argv, "f:o:lz", commandLineOptions, nullptr ) ) != -1 )
     {
       switch( option )
       {
       case 'f':
         infinity = aleph::utilities::convert<DataType>( optarg );
+        break;
+      case 'o':
+        outputDirectory = optarg;
         break;
       case 'l':
         calculateLoops = true;
@@ -131,6 +136,11 @@ int main( int argc, char** argv )
 
   // Calculate persistent homology -------------------------------------
 
+  // Format output directory if necessary; it should end in a slash in
+  // order to indicate a directory.
+  if( outputDirectory.back() != '/' )
+    outputDirectory.push_back( '/' );
+
   {
     // Establish filtration order of the simplicial complex. The reason
     // we are doing this so late is because client options might change
@@ -148,8 +158,8 @@ int main( int argc, char** argv )
     {
       diagram.removeDiagonal();
 
-      auto output = "/tmp/"
-                    + aleph::utilities::basename( filename )
+      auto output = outputDirectory
+                    + aleph::utilities::stem( filename )
                     + "_d"
                     + std::to_string( diagram.dimension() )
                     + ".txt";
