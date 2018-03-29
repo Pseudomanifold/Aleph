@@ -50,8 +50,10 @@ int main( int argc, char** argv )
 {
   static option commandLineOptions[] =
   {
-    { "mean" , no_argument, nullptr, 'm' },
-    { nullptr, 0          , nullptr,  0  }
+    { "mean"  , no_argument      , nullptr, 'm' },
+    { "output", required_argument, nullptr, 'o' },
+    { "prefix", required_argument, nullptr, 'p' },
+    { nullptr , 0                , nullptr,  0  }
   };
 
   if( ( argc - optind ) < 1 )
