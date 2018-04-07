@@ -154,7 +154,7 @@ int main( int argc, char** argv )
                          return norm >= threshold;
                        } );
 
-    PointCloud filteredPointCloud( numRemainingPatches, pointCloud.dimension() );
+    PointCloud filteredPointCloud( static_cast<std::size_t>( numRemainingPatches ), pointCloud.dimension() );
     IndexType j = 0;
 
     for( std::size_t i = 0; i < contrastNorms.size(); i++ )

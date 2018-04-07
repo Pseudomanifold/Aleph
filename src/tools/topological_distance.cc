@@ -431,7 +431,7 @@ int main( int argc, char** argv )
 
   {
     std::vector<std::string> filenames;
-    filenames.reserve( argc - 1 );
+    filenames.reserve( std::size_t( argc - 1 ) );
 
     for( int i = optind; i < argc; i++ )
       filenames.push_back( argv[i] );
