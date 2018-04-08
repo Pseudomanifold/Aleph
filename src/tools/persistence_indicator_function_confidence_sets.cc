@@ -38,7 +38,7 @@ unsigned index( unsigned int samples, double alpha )
 int main( int argc, char** argv )
 {
   std::vector<PersistenceIndicatorFunction> persistenceIndicatorFunctions;
-  persistenceIndicatorFunctions.reserve( argc - 1 );
+  persistenceIndicatorFunctions.reserve( static_cast<std::size_t>( argc - 1 ) );
 
   for( int i = 1; i < argc; i++ )
   {
