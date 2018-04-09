@@ -155,17 +155,26 @@ public:
     while( !nodes.empty() )
     {
       {
+        auto n      = nodes.size();
         auto&& node = nodes.front();
 
-        o << node->_level << ": "
-          << node->_point
-          << "\n";
+        o << node->_level << ": ";
 
-        for( auto&& child : node->_children )
-          nodes.push( child.get() );
+        for( decltype(n) i = 0; i < n; i++ )
+        {
+          if( i != 0 )
+            o << " ";
+
+          o << node->_point;
+
+          for( auto&& child : node->_children )
+            nodes.push( child.get() );
+
+          o << "\n";
+
+          nodes.pop();
+        }
       }
-
-      nodes.pop();
     }
   }
 
