@@ -607,7 +607,7 @@ int main( int argc, char** argv )
     #pragma omp parallel for
     for( std::size_t k = 0; k < m; k++ )
     {
-      auto row = std::size_t( double( n - 2 ) - std::floor( std::sqrt( -8*k + 4*n*(n-1) - 7 ) / 2.0 - 0.5 ) );
+      auto row = std::size_t( double( n - 2 ) - std::floor( std::sqrt( -8.0* double( k ) + double( 4*n*(n-1) ) - double( 7 ) ) / 2.0 - 0.5 ) );
       auto col = std::size_t( k + row + 1 - n*(n-1)/2 + (n-row)*( (n-row)-1 ) / 2 );
 
       double d = 0.0;
