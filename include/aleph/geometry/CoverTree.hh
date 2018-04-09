@@ -71,6 +71,12 @@ public:
       _children.push_back( std::unique_ptr<Node>( new Node( p, _level - 1 ) ) );
     }
 
+    /** @returns true if the node is a leaf node */
+    bool isLeaf() const noexcept
+    {
+      return _children.empty();
+    }
+
     void insert( const Point& p )
     {
       auto d = Metric()( _point, p );
