@@ -234,62 +234,6 @@ private:
     }
   }
 
-  /**
-    Auxiliary function for calculating the distance between a point and
-    a given set of nodes.
-  */
-
-  double distanceToSet( const Point& p, const std::vector<Node*>& Q )
-  {
-    Metric metric;
-
-    double d = std::numeric_limits<double>::max();
-    for( auto&& q : Q )
-      d = std::min( d, double( metric(p, q->_point) ) );
-
-    return d;
-  }
-
-  bool insert( const Point& p, const std::vector<Node*>& Qi, unsigned i )
-  {
-    std::cerr << "Inserting point " << p << " at level " << i << "\n";
-
-    Metric metric;
-
-    // Contains all nodes that satisfy the distance criterion for this
-    // level.
-    std::vector<Node*> Qj;
-
-    double d = std::numeric_limits<double>::max();
-    for( auto&& Q : Qi )
-    {
-      for( auto&& child : Q->_children )
-      {
-        double distance = double( metric( p, child->_point ) );
-        if( unsigned( std::log2( distance ) ) <= i )
-        {
-          d = std::min( d, distance );
-          Qj.push_back( child.get() );
-        }
-      }
-    }
-
-    d = std::log2( d );
-
-    if( d > i )
-      return false;
-    else
-    {
-      auto parentFound = insert( p, Qj, i-1 );
-      auto distance    = unsigned( std::log2( distanceToSet(p, Qi) ) );
-
-      if( !parentFound && distance < i )
-        return true;
-      else
-        return false;
-    }
-  }
-
   /** Root pointer of the tree */
   std::unique_ptr<Node> _root;
 };
