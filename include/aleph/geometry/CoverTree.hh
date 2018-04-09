@@ -4,11 +4,16 @@
 #include <iterator>
 #include <limits>
 #include <memory>
+#include <ostream>
+#include <queue>
 #include <stdexcept>
 #include <vector>
 
 // FIXME: remove after debugging
 #include <iostream>
+
+#include <cassert>
+#include <cmath>
 
 namespace aleph
 {
@@ -26,25 +31,94 @@ namespace geometry
 
     http://hunch.net/~jl/projects/cover_tree/cover_tree.html
 
-  This implementation attempts to be as generic as possible.
+  This implementation attempts to be as generic as possible. It uses
+  the simplified description of the cover tree, as given by Izbicki,
+  Shelton in "Faster Cover Trees".
 */
 
 template <class Point, class Metric> class CoverTree
 {
 public:
 
+  /**
+    Covering constant of the cover tree. It might make sense to change
+    this later on in order to improve performance. Some papers set the
+    constant to `1.3`.
+  */
+
+  constexpr static const double coveringConstant = 2.0;
+
   class Node
   {
   public:
 
     /** Creates a new node that stores a point */
-    Node( const Point& point )
+    Node( const Point& point, unsigned level )
       : _point( point )
+      , _level( level )
     {
+      assert( level >= 1 );
     }
 
-    /** The point stored in the node */
-    Point _point;
+    /** Calculates current covering distance of the node */
+    double coveringDistance() const noexcept
+    {
+      return std::pow( coveringConstant, static_cast<double>( _level ) );
+    }
+
+    void addChild( const Point& p )
+    {
+      _children.push_back( std::unique_ptr<Node>( new Node( p, _level - 1 ) ) );
+    }
+
+    void insert( const Point& p )
+    {
+      auto d = Metric()( _point, p );
+
+      std::cerr << __PRETTY_FUNCTION__ << ": Distance from point to root = " << d << "\n";
+
+      if( d > this->coveringDistance() )
+      {
+        std::cerr << __PRETTY_FUNCTION__ << ": Distance is bigger than covering distance; need to raise level of tree\n";
+
+        throw std::runtime_error( "Not yet implemented" );
+      }
+
+      return insert_( p );
+    }
+
+    /**
+      Auxiliary function for performing the recursive insertion of a new
+      node into the tree.
+    */
+
+    void insert_( const Point& p )
+    {
+      for( auto&& child : _children )
+      {
+        auto d = Metric()( child->_point, p );
+        if( d <= child->coveringDistance() )
+        {
+          std::cerr << __PRETTY_FUNCTION__ << ": Recursive enumeration of the tree\n";
+
+          // We found a node in which the new point can be inserted
+          // *without* violating the covering invariant.
+          child->insert_( p );
+          return;
+        }
+      }
+
+      // Add the new point as a child of the current root node. This
+      // might require updating levels.
+
+      if( _children.empty() )
+        _level += 1;
+
+      this->addChild( p );
+    }
+
+    Point    _point; //< The point stored in the node
+    unsigned _level; //< The level of the node (>= 1)
 
     /**
       All children of the node. Their order depends on the insertion
@@ -55,32 +129,41 @@ public:
   };
 
   /**
-    Creates a cover tree from a range of points. The client can specify
-    whether to use batch insertion or standard insertion.
-
-    @param begin Input iterator to begin of point range
-    @param end   Input iterator to end of point range
-    @param batch Flag indicating whether batch insertion should be performed
+    Inserts a new point into the cover tree. If the tree is empty,
+    the new point will become the root of the tree. Else, it shall
+    be inserted according to the covering invariant.
   */
 
-  template <class InputIterator> CoverTree(
-    InputIterator begin, InputIterator end,
-    bool batch = false )
+  void insert( const Point& p )
   {
-    if( batch )
-      throw std::runtime_error( "Not yet implemented" );
+    if( !_root )
+      _root = std::unique_ptr<Node>( new Node(p,1) );
+    else
+      _root->insert( p );
+  }
 
-    auto n = std::distance( begin, end );
-    if( n == 0 )
-      throw std::runtime_error( "Cover tree must be non-empty" );
+  // Pretty-printing function for the tree; this is only meant for
+  // debugging purposes and could conceivably be implemented using
+  // `std::ostream`.
+  void print( std::ostream& o )
+  {
+    std::queue<const Node*> nodes;
+    nodes.push( _root.get() );
 
-    _root = std::unique_ptr<Node>( new Node( *begin ) );
-
-    for( auto it = std::next( begin ); it != end; ++it )
+    while( !nodes.empty() )
     {
-      this->insert( *it,
-                    { _root.get() },
-                    std::numeric_limits<unsigned>::max() );
+      {
+        auto&& node = nodes.front();
+
+        o << node->_level << ": "
+          << node->_point
+          << "\n";
+
+        for( auto&& child : node->_children )
+          nodes.push( child.get() );
+      }
+
+      nodes.pop();
     }
   }
 
