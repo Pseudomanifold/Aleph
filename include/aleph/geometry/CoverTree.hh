@@ -6,6 +6,7 @@
 #include <memory>
 #include <ostream>
 #include <queue>
+#include <stack>
 #include <stdexcept>
 #include <vector>
 
@@ -64,11 +65,6 @@ public:
     double coveringDistance() const noexcept
     {
       return std::pow( coveringConstant, static_cast<double>( _level ) );
-    }
-
-    void addChild( const Point& p )
-    {
-      _children.push_back( std::unique_ptr<Node>( new Node( p, _level - 1 ) ) );
     }
 
     /** @returns true if the node is a leaf node */
@@ -178,9 +174,7 @@ public:
       if( _children.empty() )
         _level += 1;
 
-      std::cerr << "ADDING POINT " << p << " TO ROOT\n";
-
-      this->addChild( p );
+      _children.push_back( std::unique_ptr<Node>( new Node( p, _level - 1 ) ) );
     }
 
     Point    _point; //< The point stored in the node
