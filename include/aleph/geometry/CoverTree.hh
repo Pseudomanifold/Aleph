@@ -81,13 +81,71 @@ public:
     {
       auto d = Metric()( _point, p );
 
+      std::cerr << __PRETTY_FUNCTION__ << ": Covering distance           = " << this->coveringDistance() << "\n";
       std::cerr << __PRETTY_FUNCTION__ << ": Distance from point to root = " << d << "\n";
 
       if( d > this->coveringDistance() )
       {
-        std::cerr << __PRETTY_FUNCTION__ << ": Distance is bigger than covering distance; need to raise level of tree\n";
+        while( d > 2 * this->coveringDistance() )
+        {
+          std::cerr << __PRETTY_FUNCTION__ << ": Distance is bigger than covering distance; need to raise level of tree\n";
 
-        throw std::runtime_error( "Not yet implemented" );
+          std::stack<const Node*> nodes;
+          nodes.push( this );
+
+          const Node* leaf   = nullptr;
+          const Node* parent = nullptr;
+
+          while( !nodes.empty() )
+          {
+            auto&& node = nodes.top();
+            for( auto&& child : parent->_children )
+            {
+              if( child->isLeaf() )
+              {
+                leaf   = child.get();
+                parent = node;
+                break;
+              }
+            }
+
+            nodes.pop();
+          }
+
+          // There is no leaf, so there is nothing to do and we just
+          // skip to the bottom where we add the current node as the
+          // new root of the tree.
+          if( !leaf )
+            break;
+
+          assert( leaf );
+          assert( parent );
+
+          std::cerr << "Oh noes!\n";
+          throw "CRAP";
+
+          // - Find any leaf node that is accessible from the current subtree
+          // - Remove said leaf $q$
+          // - Make the leaf node the new root node, with the remainder of
+          // the tree as a child node
+        }
+
+        // Make the new point $p$ a new root node with the existing root
+        // and, consequently, the remaining tree, as the only child.
+
+        auto oldRoot
+          = std::unique_ptr<Node>( new Node( this->_point, this->_level ) );
+
+        for( auto&& child : _children )
+          oldRoot->_children.push_back( std::move( child ) );
+
+        _point = p;
+        _level = _level + 1;
+
+        _children.clear();
+        _children.push_back( std::move( oldRoot ) );
+
+        return;
       }
 
       return insert_( p );
@@ -119,6 +177,8 @@ public:
 
       if( _children.empty() )
         _level += 1;
+
+      std::cerr << "ADDING POINT " << p << " TO ROOT\n";
 
       this->addChild( p );
     }
