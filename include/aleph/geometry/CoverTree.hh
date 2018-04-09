@@ -57,7 +57,7 @@ public:
       : _point( point )
       , _level( level )
     {
-      assert( level >= 1 );
+      assert( _level >= 1 );
     }
 
     /** Calculates current covering distance of the node */
@@ -140,6 +140,8 @@ public:
       _root = std::unique_ptr<Node>( new Node(p,1) );
     else
       _root->insert( p );
+
+    this->updateLevels();
   }
 
   // Pretty-printing function for the tree; this is only meant for
@@ -182,7 +184,7 @@ private:
     // Determine depth of the tree. This is required in order to assign
     // levels correctly later on.
 
-    unsigned depth = 1;
+    unsigned depth = 0;
 
     std::queue<const Node*> nodes;
     nodes.push( _root.get() );
@@ -200,10 +202,36 @@ private:
           nodes.push( child.get() );
       }
 
-      ++level;
+      ++depth;
     }
 
-    std::cerr << __PRETTY_FUNCTION__ << ": Maximum depth = " << level << "\n";
+    assert( nodes.empty() );
+
+    // Backward pass ---------------------------------------------------
+    //
+    // Set the level of the root node and update child levels. Note that
+    // all nodes will be traversed because this function is dumb.
+
+    _root->_level = depth;
+
+    nodes.push( _root.get() );
+
+    while( !nodes.empty() )
+    {
+      {
+        auto&& parent = nodes.front();
+
+        for( auto&& child : parent->_children )
+        {
+          assert( parent->_level >= 1 );
+
+          child->_level = parent->_level - 1;
+          nodes.push( child.get() );
+        }
+      }
+
+      nodes.pop();
+    }
   }
 
   /**
