@@ -77,6 +77,7 @@ ADD_EXECUTABLE( test_clique_enumeration               test_clique_enumeration.cc
 ADD_EXECUTABLE( test_clique_graph                     test_clique_graph.cc )
 ADD_EXECUTABLE( test_combinatorial_curvature          test_combinatorial_curvature.cc )
 ADD_EXECUTABLE( test_connected_components             test_connected_components.cc )
+ADD_EXECUTABLE( test_cover_tree                       test_cover_tree.cc )
 ADD_EXECUTABLE( test_data_descriptors                 test_data_descriptors.cc )
 ADD_EXECUTABLE( test_distances                        test_distances.cc )
 ADD_EXECUTABLE( test_dowker_complex                   test_dowker_complex.cc )
