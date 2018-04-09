@@ -170,6 +170,43 @@ public:
 private:
 
   /**
+    Updates the levels of a cover tree. This function ensures that all
+    information is being represented correctly. It is not mentioned in
+    the original paper but appears to be necessary.
+  */
+
+  void updateLevels()
+  {
+    // Forward pass ----------------------------------------------------
+    //
+    // Determine depth of the tree. This is required in order to assign
+    // levels correctly later on.
+
+    unsigned depth = 1;
+
+    std::queue<const Node*> nodes;
+    nodes.push( _root.get() );
+
+    while( !nodes.empty() )
+    {
+      auto n = nodes.size();
+
+      for( decltype(n) i = 0; i < n; i++ )
+      {
+        auto node = nodes.front();
+        nodes.pop();
+
+        for( auto&& child : node->_children )
+          nodes.push( child.get() );
+      }
+
+      ++level;
+    }
+
+    std::cerr << __PRETTY_FUNCTION__ << ": Maximum depth = " << level << "\n";
+  }
+
+  /**
     Auxiliary function for calculating the distance between a point and
     a given set of nodes.
   */
