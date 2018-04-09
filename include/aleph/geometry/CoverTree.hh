@@ -1,6 +1,7 @@
 #ifndef ALEPH_GEOMETRY_COVER_TREE_HH__
 #define ALEPH_GEOMETRY_COVER_TREE_HH__
 
+#include <algorithm>
 #include <iterator>
 #include <limits>
 #include <memory>
@@ -86,11 +87,11 @@ public:
         {
           std::cerr << __PRETTY_FUNCTION__ << ": Distance is bigger than covering distance; need to raise level of tree\n";
 
-          std::stack<const Node*> nodes;
+          std::stack<Node*> nodes;
           nodes.push( this );
 
-          const Node* leaf   = nullptr;
-          const Node* parent = nullptr;
+          Node* leaf   = nullptr;
+          Node* parent = nullptr;
 
           while( !nodes.empty() )
           {
@@ -117,17 +118,46 @@ public:
           assert( leaf );
           assert( parent );
 
-          std::cerr << "Oh noes!\n";
-          throw "CRAP";
+          // Remove leaf from subtree ----------------------------------
 
-          // - Find any leaf node that is accessible from the current subtree
-          // - Remove said leaf $q$
-          // - Make the leaf node the new root node, with the remainder of
-          // the tree as a child node
+          std::unique_ptr<Node> leaf_ptr( nullptr );
+
+          parent->_children.erase(
+            std::remove_if(
+              parent->_children.begin(), parent->_children.end(),
+              [&leaf, &leaf_ptr] ( std::unique_ptr<Node>& child )
+              {
+                if( child.get() == leaf )
+                {
+                  leaf_ptr = std::move( child );
+                  return true;
+                }
+
+                return false;
+              }
+            ),
+            parent->_children.end()
+          );
+
+          // Make leaf node the new root node --------------------------
+          //
+          // Notice that this does increase the level of the current
+          // root. This has to be adjusted for.
+
+          auto oldRoot
+            = std::unique_ptr<Node>( new Node( this->_point, this->_level ) );
+
+          for( auto&& child : _children )
+            oldRoot->_children.push_back( std::move( child ) );
+
+          _point = leaf->_point;
+          _level = _level + 1;
+
+          _children.clear();
+          _children.push_back( std::move( oldRoot ) );
         }
 
-        // Make the new point $p$ a new root node with the existing root
-        // and, consequently, the remaining tree, as the only child.
+        // Make current point the new root -----------------------------
 
         auto oldRoot
           = std::unique_ptr<Node>( new Node( this->_point, this->_level ) );
