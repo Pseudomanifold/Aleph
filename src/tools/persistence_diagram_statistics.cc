@@ -94,7 +94,7 @@ int main( int argc, char** argv )
   }
 
   std::vector<Input> inputs;
-  inputs.reserve( argc - optind );
+  inputs.reserve( static_cast<std::size_t>( argc - optind ) );
 
   std::vector<std::string> columns = {
     "file" ,
