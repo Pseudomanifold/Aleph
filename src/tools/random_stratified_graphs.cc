@@ -196,35 +196,39 @@ int main( int, char** )
     std::nextafter( maxWeight, std::numeric_limits<DataType>::max() )
   );
 
-  auto K
-    = makeRandomStratifiedGraph( {2,3}, // FIXME: {2,3,1} for the complete network
-                                 engine,
-                                 distribution
-  );
-
-  PersistenceDiagram D;
-
-  // This uses the upper--lower filtration, which is not theoretically
-  // justified. This should be configurable.
+  // TODO: make configurable
+  for( unsigned i = 0; i < 1000; i++ )
   {
-    auto L = makeLowerFiltration( K );
-    auto U = makeUpperFiltration( K );
+    auto K
+      = makeRandomStratifiedGraph( {2,3}, // FIXME: {2,3,1} for the complete network
+                                   engine,
+                                   distribution
+    );
 
-    auto lowerDiagrams = aleph::calculatePersistenceDiagrams( L );
-    auto upperDiagrams = aleph::calculatePersistenceDiagrams( U );
+    PersistenceDiagram D;
 
-    if( !lowerDiagrams.empty() && !upperDiagrams.empty() )
+    // This uses the upper--lower filtration, which is not theoretically
+    // justified. This should be configurable.
     {
-      D = merge(
-        lowerDiagrams.front(),
-        upperDiagrams.front()
-      );
+      auto L = makeLowerFiltration( K );
+      auto U = makeUpperFiltration( K );
+
+      auto lowerDiagrams = aleph::calculatePersistenceDiagrams( L );
+      auto upperDiagrams = aleph::calculatePersistenceDiagrams( U );
+
+      if( !lowerDiagrams.empty() && !upperDiagrams.empty() )
+      {
+        D = merge(
+          lowerDiagrams.front(),
+          upperDiagrams.front()
+        );
+      }
     }
+
+    D.removeDiagonal();
+    D.removeUnpaired();
+
+    if( !D.empty() )
+      std::cout << aleph::pNorm( D ) << "\n";
   }
-
-  D.removeDiagonal();
-  D.removeUnpaired();
-
-  if( !D.empty() )
-    std::cout << aleph::pNorm( D ) << "\n";
 }
