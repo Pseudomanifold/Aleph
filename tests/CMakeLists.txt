@@ -1,7 +1,7 @@
 CONFIGURE_FILE( Base.hh.in ${CMAKE_SOURCE_DIR}/tests/Base.hh )
 
 IF( CMAKE_CXX_COMPILER_ID MATCHES "GNU" )
-  IF( CMAKE_CXX_COMPILER_VERSION VERSION_LESS "5.4" )
+  IF( CMAKE_CXX_COMPILER_VERSION VERSION_LESS "5.4.1" )
     # Disable this warning for older versions of GCC because it will
     # be triggered by some of the test cases.
     SET_SOURCE_FILES_PROPERTIES(
