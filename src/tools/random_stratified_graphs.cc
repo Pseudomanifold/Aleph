@@ -17,21 +17,17 @@ using VertexType        = unsigned short;
 using Simplex           = aleph::topology::Simplex<DataType, VertexType>;
 using SimplicialComplex = aleph::topology::SimplicialComplex<Simplex>;
 
+template
+<
+  class Engine,       // random engine to use for weight generation (e.g. std::default_random_engine)
+  class Distribution  // distribution to use for weight generation (e.g. std::uniform_real_distribution)
+>
 SimplicialComplex makeRandomStratifiedGraph(
   const std::vector<unsigned>& strata,
-  DataType minWeight = DataType(-1),
-  DataType maxWeight = DataType( 1)
+  Engine& engine,
+  Distribution& distribution
 )
 {
-  std::default_random_engine rd;
-  rd.seed(
-    std::chrono::system_clock::now().time_since_epoch().count()
-  );
-
-  std::uniform_real_distribution<DataType> distribution(
-    minWeight,
-    std::nextafter( maxWeight, std::numeric_limits<DataType>::max() )
-  );
 
   auto n = strata.size();
 
@@ -75,7 +71,7 @@ SimplicialComplex makeRandomStratifiedGraph(
               VertexType( offset - strata[i] + j ),
               VertexType( offset             + k )
             },
-            distribution( rd )
+            distribution( engine )
           )
         );
       }
@@ -87,7 +83,26 @@ SimplicialComplex makeRandomStratifiedGraph(
 
 int main( int, char** )
 {
-  auto K = makeRandomStratifiedGraph( {2,3,1} );
+  std::default_random_engine engine;
+  engine.seed(
+    static_cast<unsigned>(
+      std::chrono::system_clock::now().time_since_epoch().count()
+    )
+  );
+
+  DataType minWeight = DataType(-1);
+  DataType maxWeight = DataType( 1);
+
+  std::uniform_real_distribution<DataType> distribution(
+    minWeight,
+    std::nextafter( maxWeight, std::numeric_limits<DataType>::max() )
+  );
+
+  auto K
+    = makeRandomStratifiedGraph( {2,3,1},
+                                 engine,
+                                 distribution
+  );
 
   std::cerr << K << "\n";
 }
