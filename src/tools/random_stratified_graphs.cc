@@ -3,9 +3,14 @@
 #include <aleph/topology/Simplex.hh>
 #include <aleph/topology/SimplicialComplex.hh>
 
+#include <chrono>
 #include <iostream>
+#include <limits>
+#include <random>
 #include <stdexcept>
 #include <vector>
+
+#include <cmath>
 
 using DataType          = float;
 using VertexType        = unsigned short;
@@ -18,6 +23,16 @@ SimplicialComplex makeRandomStratifiedGraph(
   DataType maxWeight = DataType( 1)
 )
 {
+  std::default_random_engine rd;
+  rd.seed(
+    std::chrono::system_clock::now().time_since_epoch().count()
+  );
+
+  std::uniform_real_distribution<DataType> distribution(
+    minWeight,
+    std::nextafter( maxWeight, std::numeric_limits<DataType>::max() )
+  );
+
   auto n = strata.size();
 
   if( n <= 1 )
@@ -59,7 +74,8 @@ SimplicialComplex makeRandomStratifiedGraph(
             {
               VertexType( offset - strata[i] + j ),
               VertexType( offset             + k )
-            }
+            },
+            distribution( rd )
           )
         );
       }
