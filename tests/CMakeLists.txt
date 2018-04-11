@@ -174,17 +174,24 @@ ADD_TEST( witness_complex                  test_witness_complex )
 # shared library so we need to adjust the interface if we are unable
 # to build them.
 IF( ALEPH_WITH_HDF5 )
-  TARGET_INCLUDE_DIRECTORIES( test_io_gml SYSTEM PUBLIC ${HDF5_CXX_INCLUDE_DIRS} )
-  TARGET_LINK_LIBRARIES(      test_io_gml               ${HDF5_CXX_LIBRARIES} )
 
-  TARGET_INCLUDE_DIRECTORIES( test_io_hdf5 SYSTEM PUBLIC ${HDF5_CXX_INCLUDE_DIRS} )
-  TARGET_LINK_LIBRARIES(      test_io_hdf5               ${HDF5_CXX_LIBRARIES} )
-
-  TARGET_INCLUDE_DIRECTORIES( test_io_pajek SYSTEM PUBLIC ${HDF5_CXX_INCLUDE_DIRS} )
-  TARGET_LINK_LIBRARIES(      test_io_pajek               ${HDF5_CXX_LIBRARIES} )
-
-  TARGET_INCLUDE_DIRECTORIES( test_io_vtk SYSTEM PUBLIC ${HDF5_CXX_INCLUDE_DIRS} )
-  TARGET_LINK_LIBRARIES(      test_io_vtk               ${HDF5_CXX_LIBRARIES} )
+  FOREACH( TARGET_NAME
+    IN ITEMS
+      test_io_gml
+      test_io_graphml
+      test_io_hdf5
+      test_io_pajek
+      test_io_vtk
+  )
+    TARGET_INCLUDE_DIRECTORIES( ${TARGET_NAME}
+      SYSTEM PUBLIC
+        ${HDF5_INCLUDE_DIRS}
+        ${HDF5_CXX_INCLUDE_DIRS}
+    )
+    TARGET_LINK_LIBRARIES( ${TARGET_NAME}
+      ${HDF5_CXX_LIBRARIES}
+    )
+  ENDFOREACH()
 ENDIF()
 
 IF( ALEPH_WITH_TINYXML2 )
