@@ -8,9 +8,13 @@ IF( BUILD_PYTHON_BINDINGS )
 
     ADD_LIBRARY( aleph SHARED aleph.cc )
 
+    # The library must not have any prefix and should be located in
+    # a subfolder that includes the package name. The setup will be
+    # more complicated otherwise.
     SET_TARGET_PROPERTIES( aleph
       PROPERTIES
         PREFIX ""
+        LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/aleph"
     )
 
     IF( APPLE )
@@ -41,8 +45,12 @@ IF( BUILD_PYTHON_BINDINGS )
 
   # Place the initialization file in the output directory for the Python
   # bindings. This will simplify the installation.
-  CONFIGURE_FILE( __init__.py ${CMAKE_CURRENT_BINARY_DIR}/__init__.py )
+  CONFIGURE_FILE( __init__.py
+    ${CMAKE_CURRENT_BINARY_DIR}/aleph/__init__.py
+  )
 
   # Ditto for the setup file.
-  CONFIGURE_FILE( setup.py ${CMAKE_CURRENT_BINARY_DIR}/setup.py )
+  CONFIGURE_FILE( setup.py
+    ${CMAKE_CURRENT_BINARY_DIR}/aleph/setup.py
+  )
 ENDIF()
