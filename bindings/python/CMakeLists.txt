@@ -42,4 +42,7 @@ IF( BUILD_PYTHON_BINDINGS )
   # Place the initialization file in the output directory for the Python
   # bindings. This will simplify the installation.
   CONFIGURE_FILE( __init__.py ${CMAKE_CURRENT_BINARY_DIR}/__init__.py )
+
+  # Ditto for the setup file.
+  CONFIGURE_FILE( setup.py ${CMAKE_CURRENT_BINARY_DIR}/setup.py )
 ENDIF()
