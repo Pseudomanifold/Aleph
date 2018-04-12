@@ -81,59 +81,117 @@ SimplicialComplex makeSemiFiltration( const SimplicialComplex& K, bool upper = f
   return SimplicialComplex( simplices.begin(), simplices.end() );
 }
 
-SimplicialComplex makeLowerFiltration( const SimplicialComplex& K )
+SimplicialComplex makeLowerFiltration( const SimplicialComplex& K, bool reverse = false )
 {
   auto L = makeSemiFiltration( K );
-  L.sort(
-    aleph::topology::filtrations::Data<Simplex, std::greater<DataType> >()
-  );
+
+  if( reverse )
+  {
+    L.sort(
+      aleph::topology::filtrations::Data<Simplex, std::less<DataType> >()
+    );
+  }
+  else
+  {
+    L.sort(
+      aleph::topology::filtrations::Data<Simplex, std::greater<DataType> >()
+    );
+  }
 
   return L;
 }
 
-SimplicialComplex makeUpperFiltration( const SimplicialComplex& K )
+SimplicialComplex makeUpperFiltration( const SimplicialComplex& K, bool reverse = false )
 {
   auto L = makeSemiFiltration( K, true );
-  L.sort(
-    aleph::topology::filtrations::Data<Simplex, std::less<DataType> >()
-  );
+
+  if( reverse )
+  {
+    L.sort(
+      aleph::topology::filtrations::Data<Simplex, std::less<DataType> >()
+    );
+  }
+  else
+  {
+    L.sort(
+      aleph::topology::filtrations::Data<Simplex, std::greater<DataType> >()
+    );
+  }
 
   return L;
 }
 
-SimplicialComplex makeAbsoluteFiltration( const SimplicialComplex& K )
+SimplicialComplex makeAbsoluteFiltration( const SimplicialComplex& K, bool reverse = false )
 {
-  auto functor = [] ( const Simplex& s, const Simplex& t )
-  {
-    auto w1 = s.data();
-    auto w2 = t.data();
-
-    if( std::abs( w1 ) < std::abs( w2 ) )
-      return true;
-    else if( std::abs( w1 ) == std::abs( w2 ) )
-    {
-      // This amounts to saying that w1 is negative and w2 is positive,
-      // thereby ensuring that the order is consistent.
-      if( w1 < w2 )
-        return true;
-      else
-      {
-        if( s.dimension() < t.dimension() )
-          return true;
-
-        // Absolute value is equal, signed value is equal, and the
-        // dimension is equal. We thus have to fall back to merely
-        // using the lexicographical order.
-        else
-          return s < t;
-      }
-    }
-
-    return false;
-  };
 
   auto L = K;
-  L.sort( functor );
+
+  if( reverse )
+  {
+    auto functor = [] ( const Simplex& s, const Simplex& t )
+    {
+      auto w1 = s.data();
+      auto w2 = t.data();
+
+      if( std::abs( w1 ) > std::abs( w2 ) )
+        return true;
+      else if( std::abs( w1 ) == std::abs( w2 ) )
+      {
+        // This amounts to saying that w1 is negative and w2 is positive,
+        // thereby ensuring that the order is consistent.
+        if( w1 < w2 )
+          return true;
+        else
+        {
+          if( s.dimension() < t.dimension() )
+            return true;
+
+          // Absolute value is equal, signed value is equal, and the
+          // dimension is equal. We thus have to fall back to merely
+          // using the lexicographical order.
+          else
+            return s < t;
+        }
+      }
+
+      return false;
+    };
+
+    L.sort( functor );
+  }
+  else
+  {
+    auto functor = [] ( const Simplex& s, const Simplex& t )
+    {
+      auto w1 = s.data();
+      auto w2 = t.data();
+
+      if( std::abs( w1 ) < std::abs( w2 ) )
+        return true;
+      else if( std::abs( w1 ) == std::abs( w2 ) )
+      {
+        // This amounts to saying that w1 is negative and w2 is positive,
+        // thereby ensuring that the order is consistent.
+        if( w1 < w2 )
+          return true;
+        else
+        {
+          if( s.dimension() < t.dimension() )
+            return true;
+
+          // Absolute value is equal, signed value is equal, and the
+          // dimension is equal. We thus have to fall back to merely
+          // using the lexicographical order.
+          else
+            return s < t;
+        }
+      }
+
+      return false;
+    };
+
+    L.sort( functor );
+  }
 
   return L;
 }
@@ -158,6 +216,7 @@ PersistenceDiagram merge( const PersistenceDiagram& D, const PersistenceDiagram&
 int main( int argc, char** argv )
 {
   bool normalize             = false;
+  bool reverse               = false;
   bool verbose               = false;
   bool calculateDiagrams     = false;
   bool calculateTrajectories = false;
@@ -180,6 +239,7 @@ int main( int argc, char** argv )
       { "minimum"             , no_argument,       nullptr, 'm' },
       { "normalize"           , no_argument,       nullptr, 'n' },
       { "persistence-diagrams", no_argument,       nullptr, 'p' },
+      { "reverse"             , no_argument,       nullptr, 'r' },
       { "trajectories"        , no_argument,       nullptr, 't' },
       { "verbose"             , no_argument,       nullptr, 'v' },
       { "filtration"          , required_argument, nullptr, 'f' },
@@ -203,6 +263,9 @@ int main( int argc, char** argv )
         break;
       case 'p':
         calculateDiagrams = true;
+        break;
+      case 'r':
+        reverse = true;
         break;
       case 't':
         calculateTrajectories = true;
@@ -367,9 +430,18 @@ int main( int argc, char** argv )
     }
     else
     {
-      K.sort(
-        aleph::topology::filtrations::Data<Simplex, std::less<DataType> >()
-      );
+      if( reverse )
+      {
+        K.sort(
+          aleph::topology::filtrations::Data<Simplex, std::greater<DataType> >()
+        );
+      }
+      else
+      {
+        K.sort(
+          aleph::topology::filtrations::Data<Simplex, std::less<DataType> >()
+        );
+      }
 
       if( verbose )
       {
