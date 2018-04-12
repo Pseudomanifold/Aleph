@@ -14,8 +14,10 @@
 #include <aleph/topology/io/BipartiteAdjacencyMatrix.hh>
 
 #include <algorithm>
+#include <chrono>
 #include <iostream>
 #include <limits>
+#include <random>
 #include <stdexcept>
 #include <vector>
 
@@ -213,6 +215,69 @@ PersistenceDiagram merge( const PersistenceDiagram& D, const PersistenceDiagram&
   return F;
 }
 
+template
+<
+  class Engine,       // random engine to use for weight generation (e.g. std::default_random_engine)
+  class Distribution  // distribution to use for weight generation (e.g. std::uniform_real_distribution)
+>
+SimplicialComplex makeRandomStratifiedGraph(
+  const std::vector<unsigned>& strata,
+  Engine& engine,
+  Distribution& distribution
+)
+{
+  auto n = strata.size();
+
+  if( n <= 1 )
+    throw std::runtime_error( "Invalid number of strata" );
+
+  std::vector<Simplex> simplices;
+
+  // Create vertices ---------------------------------------------------
+  //
+  // The `strata` vector contains the size of each stratum, so we just
+  // have to add the correct number of vertices here.
+
+  VertexType index = VertexType(0);
+  for( auto&& stratum : strata )
+  {
+    for( unsigned i = 0; i < stratum; i++ )
+      simplices.push_back( Simplex( index++ ) );
+  }
+
+  // Create edges ------------------------------------------------------
+  //
+  // Every stratum is connected to every other stratum, but there are no
+  // connections *within* a given stratum.
+
+  VertexType offset = VertexType(0);
+  for( decltype(n) i = 0; i < n - 1; i++ )
+  {
+    // All vertices in the next stratum start with this offset to their
+    // indices. It depends on the sum of all vertices in *all* previous
+    // strata.
+    offset += strata[i];
+
+    for( unsigned j = 0; j < strata[i]; j++ )
+    {
+      for( unsigned k = 0; k < strata[i+1]; k++ )
+      {
+        simplices.push_back(
+          Simplex(
+            {
+              VertexType( offset - strata[i] + j ),
+              VertexType( offset             + k )
+            },
+            distribution( engine )
+          )
+        );
+      }
+    }
+  }
+
+  return SimplicialComplex( simplices.begin(), simplices.end() );
+}
+
 int main( int argc, char** argv )
 {
   bool normalize             = false;
@@ -326,6 +391,7 @@ int main( int argc, char** argv )
   minData.reserve( simplicialComplexes.size() );
   maxData.reserve( simplicialComplexes.size() );
 
+  if( argc - optind - 1 >= 1 )
   {
     aleph::topology::io::BipartiteAdjacencyMatrixReader reader;
 
@@ -344,6 +410,49 @@ int main( int argc, char** argv )
       reader( filename, K );
 
       std::cerr << "finished\n";
+
+      DataType minData_ = std::numeric_limits<DataType>::max();
+      DataType maxData_ = std::numeric_limits<DataType>::lowest();
+
+      // *Always* determine minimum and maximum weights so that we may
+      // report them later on. They are only used for normalization in
+      // the persistence diagram calculation step.
+      for( auto&& s : K )
+      {
+        minData_ = std::min( minData_, s.data() );
+        maxData_ = std::max( maxData_, s.data() );
+      }
+
+      minData.push_back( minData_ );
+      maxData.push_back( maxData_ );
+
+      simplicialComplexes.emplace_back( K );
+    }
+  }
+  else
+  {
+    std::default_random_engine engine;
+    engine.seed(
+      static_cast<unsigned>(
+        std::chrono::system_clock::now().time_since_epoch().count()
+      )
+    );
+
+    DataType minWeight = DataType(-1);
+    DataType maxWeight = DataType( 1);
+
+    std::uniform_real_distribution<DataType> distribution(
+      minWeight,
+      std::nextafter( maxWeight, std::numeric_limits<DataType>::max() )
+    );
+
+    for( unsigned i = 0; i < 1e5; i++ )
+    {
+      auto K
+        = makeRandomStratifiedGraph( {2,3}, // FIXME: {2,3,1} for the complete network
+                                     engine,
+                                     distribution
+      );
 
       DataType minData_ = std::numeric_limits<DataType>::max();
       DataType maxData_ = std::numeric_limits<DataType>::lowest();
