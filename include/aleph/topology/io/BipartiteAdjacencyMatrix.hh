@@ -124,12 +124,20 @@ public:
     std::unordered_map<VertexType, DataType> minWeight;
 
     auto updateOrSetWeight
-      = [&minWeight] ( const VertexType& v, const DataType& w )
+      = [&minWeight, this] ( const VertexType& v, const DataType& w )
         {
           if( minWeight.find( v ) == minWeight.end() )
             minWeight[v] = w;
           else
-            minWeight[v] = std::min( minWeight[v], w );
+          {
+            if( _assignMinimumAbsoluteVertexWeight )
+            {
+              if( std::abs( w ) < minWeight[v] )
+                minWeight[v] = w;
+            }
+            else
+              minWeight[v] = std::min( minWeight[v], w );
+          }
         };
 
     for( std::size_t y = 0; y < _height; y++ )
@@ -158,9 +166,13 @@ public:
 
     for( std::size_t i = 0; i < _height + _width; i++ )
     {
+      // Notice that that `minWeight` map is guaranteed to contain the
+      // weight (potentially signed) that corresponds to the vertex. A
+      // different way of setting up the map depends on the flags that
+      // are set by the client.
       simplices.push_back(
         Simplex( VertexType( i ),
-          _assignMinimumVertexWeight
+          _assignMinimumVertexWeight || _assignMinimumAbsoluteVertexWeight
             ?  minWeight[ VertexType(i) ]
             :  minData )
       );
@@ -183,6 +195,18 @@ public:
   std::size_t width()  const noexcept { return _width;  }
 
   /** Permits changing the behaviour of vertex weight assignment */
+  void setAssignMinimumAbsoluteVertexWeight( bool value = true )
+  {
+    _assignMinimumAbsoluteVertexWeight = value;
+  }
+
+  /** @returns Flag whether vertex weights are assigned to be minimal or not */
+  bool assignMinimumAbsoluteVertexWeight() const noexcept
+  {
+    return _assignMinimumAbsoluteVertexWeight;
+  }
+
+  /** Permits changing the behaviour of vertex weight assignment */
   void setAssignMinimumVertexWeight( bool value = true )
   {
     _assignMinimumVertexWeight = value;
@@ -197,6 +221,14 @@ public:
 private:
   std::size_t _height = 0;
   std::size_t _width  = 0;
+
+  /**
+    If set, assigns the minimum vertex weight according to the minimum
+    absolute edge weight that is connected to the given vertex. All of
+    the vertices will get a weight of zero otherwise.
+  */
+
+  bool _assignMinimumAbsoluteVertexWeight = false;
 
   /**
     If set, assigns the minimum vertex weight according to the minimum
