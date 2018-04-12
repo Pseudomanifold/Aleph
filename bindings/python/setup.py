@@ -14,5 +14,5 @@ setup(
   package_data = {
     '': ['aleph.so']
   },
-  python_requires = '>3'
+  python_requires = '>3.0.0'
 )
