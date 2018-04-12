@@ -101,6 +101,43 @@ SimplicialComplex makeUpperFiltration( const SimplicialComplex& K )
   return makeFiltration( K, true );
 }
 
+SimplicialComplex makeAbsoluteFiltration( const SimplicialComplex& K )
+{
+  auto functor = [] ( const Simplex& s, const Simplex& t )
+  {
+    auto w1 = s.data();
+    auto w2 = t.data();
+
+    if( std::abs( w1 ) < std::abs( w2 ) )
+      return true;
+    else if( std::abs( w1 ) == std::abs( w2 ) )
+    {
+      // This amounts to saying that w1 is negative and w2 is positive,
+      // thereby ensuring that the order is consistent.
+      if( w1 < w2 )
+        return true;
+      else
+      {
+        if( s.dimension() < t.dimension() )
+          return true;
+
+        // Absolute value is equal, signed value is equal, and the
+        // dimension is equal. We thus have to fall back to merely
+        // using the lexicographical order.
+        else
+          return s < t;
+      }
+    }
+
+    return false;
+  };
+
+  auto L = K;
+  L.sort( functor );
+
+  return L;
+}
+
 using PersistenceDiagram = aleph::PersistenceDiagram<DataType>;
 using Point              = typename PersistenceDiagram::Point;
 
@@ -120,6 +157,7 @@ PersistenceDiagram merge( const PersistenceDiagram& D, const PersistenceDiagram&
 
 int main( int argc, char** argv )
 {
+  bool absolute              = false;
   bool filtration            = false;
   bool minimum               = false;
   bool normalize             = false;
@@ -129,6 +167,7 @@ int main( int argc, char** argv )
   {
     static option commandLineOptions[] =
     {
+      { "absolute"            , no_argument, nullptr, 'a' },
       { "filtration"          , no_argument, nullptr, 'f' },
       { "minimum"             , no_argument, nullptr, 'm' },
       { "normalize"           , no_argument, nullptr, 'n' },
@@ -142,6 +181,9 @@ int main( int argc, char** argv )
     {
       switch( option )
       {
+      case 'a':
+        absolute = true;
+        break;
       case 'f':
         filtration = true;
         break;
@@ -163,6 +205,17 @@ int main( int argc, char** argv )
     }
   }
 
+  // Be verbose about parameters ---------------------------------------
+
+  if( absolute )
+    std::cerr << "* Using filtration based on absolute values\n";
+
+  if( minimum )
+    std::cerr << "* Setting minimum based on signed values\n";
+
+  if( filtration )
+    std::cerr << "* Calculating upper--lower filtration\n";
+
   // 1. Read simplicial complexes --------------------------------------
 
   std::vector<SimplicialComplex> simplicialComplexes;
@@ -176,6 +229,9 @@ int main( int argc, char** argv )
 
   {
     aleph::topology::io::BipartiteAdjacencyMatrixReader reader;
+
+    if( absolute )
+      reader.setAssignMinimumAbsoluteVertexWeight();
 
     if( minimum )
       reader.setAssignMinimumVertexWeight();
@@ -252,6 +308,12 @@ int main( int argc, char** argv )
           upperDiagrams.back()
         );
       }
+    }
+    else if( absolute )
+    {
+      auto L        = makeAbsoluteFiltration( K );
+      auto diagrams = aleph::calculatePersistenceDiagrams( K );
+      D             = diagrams.back();
     }
     else
     {
