@@ -8,6 +8,7 @@
 #include <aleph/topology/Simplex.hh>
 #include <aleph/topology/SimplicialComplex.hh>
 
+#include <algorithm>
 #include <chrono>
 #include <iostream>
 #include <limits>
@@ -191,6 +192,9 @@ int main( int, char** )
   DataType minWeight = DataType(-1);
   DataType maxWeight = DataType( 1);
 
+  // TODO: make configurable
+  bool normalize = true;
+
   std::uniform_real_distribution<DataType> distribution(
     minWeight,
     std::nextafter( maxWeight, std::numeric_limits<DataType>::max() )
@@ -204,6 +208,15 @@ int main( int, char** )
                                    engine,
                                    distribution
     );
+
+    DataType minData = std::numeric_limits<DataType>::max();
+    DataType maxData = std::numeric_limits<DataType>::lowest();
+
+    for( auto&& s : K )
+    {
+      minData = std::min( minData, s.data() );
+      maxData = std::max( maxData, s.data() );
+    }
 
     PersistenceDiagram D;
 
@@ -223,6 +236,22 @@ int main( int, char** )
           upperDiagrams.front()
         );
       }
+    }
+
+    if( normalize && minData != maxData )
+    {
+      std::transform( D.begin(), D.end(), D.begin(),
+        [&minData, &maxData] ( const Point& p )
+        {
+          auto x = p.x();
+          auto y = p.y();
+
+          x = (x - minData) / (maxData - minData);
+          y = (y - minData) / (maxData - minData);
+
+          return Point( x,y );
+        }
+      );
     }
 
     D.removeDiagonal();
