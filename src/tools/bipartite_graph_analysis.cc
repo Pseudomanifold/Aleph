@@ -28,7 +28,7 @@ using VertexType        = unsigned short;
 using Simplex           = aleph::topology::Simplex<DataType, VertexType>;
 using SimplicialComplex = aleph::topology::SimplicialComplex<Simplex>;
 
-SimplicialComplex makeFiltration( const SimplicialComplex& K, bool upper = false )
+SimplicialComplex makeSemiFiltration( const SimplicialComplex& K, bool upper = false )
 {
   std::vector<Simplex> simplices;
   simplices.reserve( K.size() );
@@ -83,7 +83,7 @@ SimplicialComplex makeFiltration( const SimplicialComplex& K, bool upper = false
 
 SimplicialComplex makeLowerFiltration( const SimplicialComplex& K )
 {
-  auto L = makeFiltration( K );
+  auto L = makeSemiFiltration( K );
   L.sort(
     aleph::topology::filtrations::Data<Simplex, std::greater<DataType> >()
   );
@@ -93,12 +93,12 @@ SimplicialComplex makeLowerFiltration( const SimplicialComplex& K )
 
 SimplicialComplex makeUpperFiltration( const SimplicialComplex& K )
 {
-  auto L = makeFiltration( K, true );
+  auto L = makeSemiFiltration( K, true );
   L.sort(
     aleph::topology::filtrations::Data<Simplex, std::less<DataType> >()
   );
 
-  return makeFiltration( K, true );
+  return L;
 }
 
 SimplicialComplex makeAbsoluteFiltration( const SimplicialComplex& K )
@@ -157,40 +157,46 @@ PersistenceDiagram merge( const PersistenceDiagram& D, const PersistenceDiagram&
 
 int main( int argc, char** argv )
 {
-  bool absolute              = false;
-  bool filtration            = false;
-  bool minimum               = false;
   bool normalize             = false;
   bool verbose               = false;
   bool calculateDiagrams     = false;
   bool calculateTrajectories = false;
 
+  // The default filtration sorts simplices by their weights. Negative
+  // weights are treated as being less relevant than positive ones.
+  std::string filtration = "standard";
+
+  // Defines how the minimum value for the vertices is to be set. Valid
+  // options include:
+  //
+  //  - global    (uses the global minimum)
+  //  - local     (uses the local minimum over all neighbours)
+  //  - local_abs (uses the local absolute minimum over all neighbours)
+  std::string minimum = "global";
+
   {
     static option commandLineOptions[] =
     {
-      { "absolute"            , no_argument, nullptr, 'a' },
-      { "filtration"          , no_argument, nullptr, 'f' },
-      { "minimum"             , no_argument, nullptr, 'm' },
-      { "normalize"           , no_argument, nullptr, 'n' },
-      { "persistence-diagrams", no_argument, nullptr, 'p' },
-      { "trajectories"        , no_argument, nullptr, 't' },
-      { "verbose"             , no_argument, nullptr, 'v' },
-      { nullptr               , 0          , nullptr,  0  }
+      { "minimum"             , no_argument,       nullptr, 'm' },
+      { "normalize"           , no_argument,       nullptr, 'n' },
+      { "persistence-diagrams", no_argument,       nullptr, 'p' },
+      { "trajectories"        , no_argument,       nullptr, 't' },
+      { "verbose"             , no_argument,       nullptr, 'v' },
+      { "filtration"          , required_argument, nullptr, 'f' },
+      { "minimum"             , required_argument, nullptr, 'm' },
+      { nullptr               , 0                , nullptr,  0  }
     };
 
     int option = 0;
-    while( ( option = getopt_long( argc, argv, "afmnptv", commandLineOptions, nullptr ) ) != -1 )
+    while( ( option = getopt_long( argc, argv, "nptvf:m:", commandLineOptions, nullptr ) ) != -1 )
     {
       switch( option )
       {
-      case 'a':
-        absolute = true;
-        break;
       case 'f':
-        filtration = true;
+        filtration = optarg;
         break;
       case 'm':
-        minimum = true;
+        minimum = optarg;
         break;
       case 'n':
         normalize = true;
@@ -208,10 +214,32 @@ int main( int argc, char** argv )
         break;
       }
     }
+
+    // Check filtration validity ---------------------------------------
+
+    if(    filtration != "standard"
+        && filtration != "double"
+        && filtration != "absolute" )
+    {
+      std::cerr << "* Invalid filtration value '" << filtration << "', so falling back to standard one\n";
+      filtration = "default";
+    }
+
+    // Check minimum validity ------------------------------------------
+
+    if(    minimum != "global"
+        && minimum != "local"
+        && minimum != "local_abs" )
+    {
+      std::cerr << "* Invalid minimum value '" << minimum << "', so falling back to global one\n";
+      minimum = "global";
+    }
   }
 
   // Be verbose about parameters ---------------------------------------
 
+// FIXME
+#if 0
   if( absolute )
     std::cerr << "* Using filtration based on absolute values\n";
 
@@ -220,6 +248,7 @@ int main( int argc, char** argv )
 
   if( filtration )
     std::cerr << "* Calculating upper--lower filtration\n";
+#endif
 
   if( verbose )
     std::cerr << "* Being verbose\n";
@@ -238,11 +267,10 @@ int main( int argc, char** argv )
   {
     aleph::topology::io::BipartiteAdjacencyMatrixReader reader;
 
-    if( absolute )
-      reader.setAssignMinimumAbsoluteVertexWeight();
-
-    if( minimum )
+    if( minimum == "local" )
       reader.setAssignMinimumVertexWeight();
+    else if( minimum == "local_abs" )
+      reader.setAssignMinimumAbsoluteVertexWeight();
 
     for( int i = optind; i < argc; i++ )
     {
@@ -301,7 +329,19 @@ int main( int argc, char** argv )
 
     auto&& K = simplicialComplexes[i];
 
-    if( filtration )
+    if( filtration == "absolute" )
+    {
+      auto L        = makeAbsoluteFiltration( K );
+      auto diagrams = aleph::calculatePersistenceDiagrams( L );
+      D             = diagrams.back();
+
+      if( verbose )
+      {
+        std::cerr << "* Absolute value simplicial complex:\n"
+                  << L << "\n";
+      }
+    }
+    else if( filtration == "double" )
     {
       auto L = makeLowerFiltration( K );
       auto U = makeUpperFiltration( K );
@@ -325,20 +365,12 @@ int main( int argc, char** argv )
                   << U << "\n";
       }
     }
-    else if( absolute )
-    {
-      auto L        = makeAbsoluteFiltration( K );
-      auto diagrams = aleph::calculatePersistenceDiagrams( L );
-      D             = diagrams.back();
-
-      if( verbose )
-      {
-        std::cerr << "* Absolute value simplicial complex:\n"
-                  << L << "\n";
-      }
-    }
     else
     {
+      K.sort(
+        aleph::topology::filtrations::Data<Simplex, std::less<DataType> >()
+      );
+
       if( verbose )
       {
         std::cerr << "* Default simplicial complex:\n"
