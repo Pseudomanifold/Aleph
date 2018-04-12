@@ -38,4 +38,8 @@ IF( BUILD_PYTHON_BINDINGS )
   ELSE()
     MESSAGE( STATUS "Cannot build Python bindings because no suitable version of Python was found" )
   ENDIF()
+
+  # Place the initialization file in the output directory for the Python
+  # bindings. This will simplify the installation.
+  CONFIGURE_FILE( __init__.py ${CMAKE_CURRENT_BINARY_DIR}/__init__.py )
 ENDIF()
