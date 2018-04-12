@@ -236,7 +236,6 @@ int main( int argc, char** argv )
   {
     static option commandLineOptions[] =
     {
-      { "minimum"             , no_argument,       nullptr, 'm' },
       { "normalize"           , no_argument,       nullptr, 'n' },
       { "persistence-diagrams", no_argument,       nullptr, 'p' },
       { "reverse"             , no_argument,       nullptr, 'r' },
