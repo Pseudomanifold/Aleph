@@ -394,7 +394,7 @@ int main( int argc, char** argv )
 
     if( filtration == "absolute" )
     {
-      auto L        = makeAbsoluteFiltration( K );
+      auto L        = makeAbsoluteFiltration( K, reverse );
       auto diagrams = aleph::calculatePersistenceDiagrams( L );
       D             = diagrams.back();
 
@@ -406,8 +406,8 @@ int main( int argc, char** argv )
     }
     else if( filtration == "double" )
     {
-      auto L = makeLowerFiltration( K );
-      auto U = makeUpperFiltration( K );
+      auto L = makeLowerFiltration( K, reverse );
+      auto U = makeUpperFiltration( K, reverse );
 
       auto lowerDiagrams = aleph::calculatePersistenceDiagrams( L );
       auto upperDiagrams = aleph::calculatePersistenceDiagrams( U );
