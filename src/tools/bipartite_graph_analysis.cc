@@ -161,6 +161,7 @@ int main( int argc, char** argv )
   bool filtration            = false;
   bool minimum               = false;
   bool normalize             = false;
+  bool verbose               = false;
   bool calculateDiagrams     = false;
   bool calculateTrajectories = false;
 
@@ -173,11 +174,12 @@ int main( int argc, char** argv )
       { "normalize"           , no_argument, nullptr, 'n' },
       { "persistence-diagrams", no_argument, nullptr, 'p' },
       { "trajectories"        , no_argument, nullptr, 't' },
+      { "verbose"             , no_argument, nullptr, 'v' },
       { nullptr               , 0          , nullptr,  0  }
     };
 
     int option = 0;
-    while( ( option = getopt_long( argc, argv, "fmnpt", commandLineOptions, nullptr ) ) != -1 )
+    while( ( option = getopt_long( argc, argv, "afmnptv", commandLineOptions, nullptr ) ) != -1 )
     {
       switch( option )
       {
@@ -199,6 +201,9 @@ int main( int argc, char** argv )
       case 't':
         calculateTrajectories = true;
         break;
+      case 'v':
+        verbose = true;
+        break;
       default:
         break;
       }
@@ -215,6 +220,9 @@ int main( int argc, char** argv )
 
   if( filtration )
     std::cerr << "* Calculating upper--lower filtration\n";
+
+  if( verbose )
+    std::cerr << "* Being verbose\n";
 
   // 1. Read simplicial complexes --------------------------------------
 
@@ -308,15 +316,35 @@ int main( int argc, char** argv )
           upperDiagrams.back()
         );
       }
+
+      if( verbose )
+      {
+        std::cerr << "* Lower simplicial complex:\n"
+                  << L << "\n"
+                  << "* Upper simplicial complex:\n"
+                  << U << "\n";
+      }
     }
     else if( absolute )
     {
       auto L        = makeAbsoluteFiltration( K );
-      auto diagrams = aleph::calculatePersistenceDiagrams( K );
+      auto diagrams = aleph::calculatePersistenceDiagrams( L );
       D             = diagrams.back();
+
+      if( verbose )
+      {
+        std::cerr << "* Absolute value simplicial complex:\n"
+                  << L << "\n";
+      }
     }
     else
     {
+      if( verbose )
+      {
+        std::cerr << "* Default simplicial complex:\n"
+                  << K << "\n";
+      }
+
       auto diagrams = aleph::calculatePersistenceDiagrams( K );
       D = diagrams.back(); // Use the *last* diagram of the filtration so that
                            // we get features in the highest dimension.
