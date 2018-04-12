@@ -132,7 +132,7 @@ public:
           {
             if( _assignMinimumAbsoluteVertexWeight )
             {
-              if( std::abs( w ) < minWeight[v] )
+              if( std::abs( w ) < std::abs( minWeight[v] ) )
                 minWeight[v] = w;
             }
             else
