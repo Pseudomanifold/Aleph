@@ -245,10 +245,13 @@ int main( int argc, char** argv )
       auto lowerDiagrams = aleph::calculatePersistenceDiagrams( L );
       auto upperDiagrams = aleph::calculatePersistenceDiagrams( U );
 
-      D = merge(
-        lowerDiagrams.back(),
-        upperDiagrams.back()
-      );
+      if( !lowerDiagrams.empty() && !upperDiagrams.empty() )
+      {
+        D = merge(
+          lowerDiagrams.back(),
+          upperDiagrams.back()
+        );
+      }
     }
     else
     {
