@@ -180,7 +180,6 @@ ADD_SUBDIRECTORY( tests )
 # Place compile commands in the source directory
 ########################################################################
 
-
 IF( EXISTS "${CMAKE_CURRENT_BINARY_DIR}/compile_commands.json" )
   EXECUTE_PROCESS( COMMAND ${CMAKE_COMMAND} -E copy_if_different
     ${CMAKE_CURRENT_BINARY_DIR}/compile_commands.json
