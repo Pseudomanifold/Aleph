@@ -201,7 +201,7 @@ int main( int, char** )
   );
 
   // TODO: make configurable
-  for( unsigned i = 0; i < 1000; i++ )
+  for( unsigned i = 0; i < 1e5; i++ )
   {
     auto K
       = makeRandomStratifiedGraph( {2,3}, // FIXME: {2,3,1} for the complete network
