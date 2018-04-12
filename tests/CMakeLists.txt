@@ -212,7 +212,7 @@ ENDIF()
 # Special handling for the Python integration test. This program needs
 # to be run but with an updated `PYTHONPATH`.
 
-IF( BUILD_PYTHON_BINDINGS AND Python3_FOUND )
+IF( BUILD_PYTHON_BINDINGS AND PYTHONINTERP_FOUND )
   # TODO: handle this dependency better by restructuring the way
   # bindings are being generated
   FIND_PACKAGE( pybind11 )
@@ -220,7 +220,7 @@ IF( BUILD_PYTHON_BINDINGS AND Python3_FOUND )
   IF( PYBIND11_FOUND )
     ADD_TEST(
       NAME python_integration
-      COMMAND python3 test_python_integration.py
+      COMMAND ${PYTHON_EXECUTABLE} test_python_integration.py
     )
 
     SET_TESTS_PROPERTIES( python_integration

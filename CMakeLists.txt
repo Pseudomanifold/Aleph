@@ -132,7 +132,8 @@ IF( PKG_CONFIG_FOUND )
 
   # Not used here, but in subordinate directories, so it is nicer to
   # look for the package in a *single* location.
-  PKG_SEARCH_MODULE( Python3 python3 )
+  FIND_PACKAGE(PythonInterp 3)
+  FIND_PACKAGE(PythonLibs   3)
 ENDIF()
 
 FIND_PACKAGE( tinyxml2 )
