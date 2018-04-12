@@ -248,7 +248,7 @@ int main( int argc, char** argv )
     };
 
     int option = 0;
-    while( ( option = getopt_long( argc, argv, "nptvf:m:", commandLineOptions, nullptr ) ) != -1 )
+    while( ( option = getopt_long( argc, argv, "nprtvf:m:", commandLineOptions, nullptr ) ) != -1 )
     {
       switch( option )
       {
