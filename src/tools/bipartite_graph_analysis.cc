@@ -278,6 +278,100 @@ SimplicialComplex makeRandomStratifiedGraph(
   return SimplicialComplex( simplices.begin(), simplices.end() );
 }
 
+SimplicialComplex applyFiltration( const SimplicialComplex& K,
+                                   const std::string& strategy,
+                                   bool reverse = false )
+{
+  auto L = K;
+
+  if( strategy == "standard" )
+  {
+    if( reverse )
+    {
+      L.sort(
+        aleph::topology::filtrations::Data<Simplex, std::greater<DataType> >()
+      );
+    }
+    else
+    {
+      L.sort(
+        aleph::topology::filtrations::Data<Simplex, std::less<DataType> >()
+      );
+    }
+  }
+  else if( strategy == "absolute" )
+  {
+    if( reverse )
+    {
+      auto functor = [] ( const Simplex& s, const Simplex& t )
+      {
+        auto w1 = s.data();
+        auto w2 = t.data();
+
+        if( std::abs( w1 ) > std::abs( w2 ) )
+          return true;
+        else if( std::abs( w1 ) == std::abs( w2 ) )
+        {
+          // This amounts to saying that w1 is positive and w2 is
+          // negative.
+          if( w1 > w2 )
+            return true;
+          else
+          {
+            if( s.dimension() < t.dimension() )
+              return true;
+
+            // Absolute value is equal, signed value is equal, and the
+            // dimension is equal. We thus have to fall back to merely
+            // using the lexicographical order.
+            else
+              return s < t;
+          }
+        }
+
+        return false;
+      };
+
+      L.sort( functor );
+    }
+    else
+    {
+      auto functor = [] ( const Simplex& s, const Simplex& t )
+      {
+        auto w1 = s.data();
+        auto w2 = t.data();
+
+        if( std::abs( w1 ) < std::abs( w2 ) )
+          return true;
+        else if( std::abs( w1 ) == std::abs( w2 ) )
+        {
+          // This amounts to saying that w1 is negative and w2 is
+          // positive.
+          if( w1 < w2 )
+            return true;
+          else
+          {
+            if( s.dimension() < t.dimension() )
+              return true;
+
+            // Absolute value is equal, signed value is equal, and the
+            // dimension is equal. We thus have to fall back to merely
+            // using the lexicographical order.
+            else
+              return s < t;
+          }
+        }
+
+        return false;
+      };
+
+      L.sort( functor );
+    }
+  }
+
+  return L;
+}
+
 SimplicialComplex assignVertexWeights( const SimplicialComplex& K, const std::string& strategy, bool minimum = true )
 {
   DataType minData = std::numeric_limits<DataType>::max();
@@ -424,7 +518,6 @@ int main( int argc, char** argv )
   //
   //  - global    (uses the global minimum)
   //  - local     (uses the local minimum over all neighbours)
-  //  - local_abs (uses the local absolute minimum over all neighbours)
   std::string minimum = "global";
 
   {
@@ -473,19 +566,17 @@ int main( int argc, char** argv )
 
     // Check filtration validity ---------------------------------------
 
-    if(    filtration != "standard"
-        && filtration != "double"
-        && filtration != "absolute" )
+    if(    filtration != "absolute"
+        && filtration != "standard" )
     {
       std::cerr << "* Invalid filtration value '" << filtration << "', so falling back to standard one\n";
-      filtration = "default";
+      filtration = "standard";
     }
 
     // Check minimum validity ------------------------------------------
 
     if(    minimum != "global"
-        && minimum != "local"
-        && minimum != "local_abs" )
+        && minimum != "local" )
     {
       std::cerr << "* Invalid minimum value '" << minimum << "', so falling back to global one\n";
       minimum = "global";
@@ -575,6 +666,9 @@ int main( int argc, char** argv )
     minData.push_back( minData_ );
     maxData.push_back( maxData_ );
   }
+
+  // Establish filtration order ----------------------------------------
+
 
   // 2. Calculate persistent homology ----------------------------------
 
