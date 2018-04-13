@@ -278,6 +278,35 @@ SimplicialComplex makeRandomStratifiedGraph(
   return SimplicialComplex( simplices.begin(), simplices.end() );
 }
 
+template <class Reader> std::vector<SimplicialComplex> loadSimplicialComplexes( int argc, char** argv, const std::string& minimum )
+{
+  Reader reader;
+
+  if( minimum == "local" )
+    reader.setAssignMinimumVertexWeight();
+  else if( minimum == "local_abs" )
+    reader.setAssignMinimumAbsoluteVertexWeight();
+
+  std::vector<SimplicialComplex> simplicialComplexes;
+  simplicialComplexes.reserve( static_cast<std::size_t>( argc - optind ) );
+
+  for( int i = optind; i < argc; i++ )
+  {
+    auto filename = std::string( argv[i] );
+
+    std::cerr << "* Processing " << filename << "...";
+
+    SimplicialComplex K;
+    reader( filename, K );
+
+    std::cerr << "finished\n";
+
+    simplicialComplexes.emplace_back( K );
+  }
+
+  return simplicialComplexes;
+}
+
 int main( int argc, char** argv )
 {
   bool bipartite             = false;
@@ -395,40 +424,12 @@ int main( int argc, char** argv )
 
   if( argc - optind - 1 >= 1 )
   {
-    aleph::topology::io::BipartiteAdjacencyMatrixReader reader;
-
-    if( minimum == "local" )
-      reader.setAssignMinimumVertexWeight();
-    else if( minimum == "local_abs" )
-      reader.setAssignMinimumAbsoluteVertexWeight();
-
-    for( int i = optind; i < argc; i++ )
+    if( bipartite )
     {
-      auto filename = std::string( argv[i] );
+      using Reader = aleph::topology::io::BipartiteAdjacencyMatrixReader;
 
-      std::cerr << "* Processing " << filename << "...";
-
-      SimplicialComplex K;
-      reader( filename, K );
-
-      std::cerr << "finished\n";
-
-      DataType minData_ = std::numeric_limits<DataType>::max();
-      DataType maxData_ = std::numeric_limits<DataType>::lowest();
-
-      // *Always* determine minimum and maximum weights so that we may
-      // report them later on. They are only used for normalization in
-      // the persistence diagram calculation step.
-      for( auto&& s : K )
-      {
-        minData_ = std::min( minData_, s.data() );
-        maxData_ = std::max( maxData_, s.data() );
-      }
-
-      minData.push_back( minData_ );
-      maxData.push_back( maxData_ );
-
-      simplicialComplexes.emplace_back( K );
+      simplicialComplexes
+        = loadSimplicialComplexes<Reader>( argc, argv, minimum );
     }
   }
   else
@@ -456,23 +457,28 @@ int main( int argc, char** argv )
                                      distribution
       );
 
-      DataType minData_ = std::numeric_limits<DataType>::max();
-      DataType maxData_ = std::numeric_limits<DataType>::lowest();
-
-      // *Always* determine minimum and maximum weights so that we may
-      // report them later on. They are only used for normalization in
-      // the persistence diagram calculation step.
-      for( auto&& s : K )
-      {
-        minData_ = std::min( minData_, s.data() );
-        maxData_ = std::max( maxData_, s.data() );
-      }
-
-      minData.push_back( minData_ );
-      maxData.push_back( maxData_ );
-
       simplicialComplexes.emplace_back( K );
     }
+  }
+
+  // Determine minimum and maximum values for each complex -------------
+
+  for( auto&& K : simplicialComplexes )
+  {
+    DataType minData_ = std::numeric_limits<DataType>::max();
+    DataType maxData_ = std::numeric_limits<DataType>::lowest();
+
+    // *Always* determine minimum and maximum weights so that we may
+    // report them later on. They are only used for normalization in
+    // the persistence diagram calculation step.
+    for( auto&& s : K )
+    {
+      minData_ = std::min( minData_, s.data() );
+      maxData_ = std::max( maxData_, s.data() );
+    }
+
+    minData.push_back( minData_ );
+    maxData.push_back( maxData_ );
   }
 
   // 2. Calculate persistent homology ----------------------------------
