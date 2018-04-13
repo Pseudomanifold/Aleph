@@ -447,14 +447,9 @@ SimplicialComplex assignVertexWeights( const SimplicialComplex& K,
   return L;
 }
 
-template <class Reader> std::vector<SimplicialComplex> loadSimplicialComplexes( int argc, char** argv, const std::string& minimum )
+template <class Reader> std::vector<SimplicialComplex> loadSimplicialComplexes( int argc, char** argv )
 {
   Reader reader;
-
-  if( minimum == "local" )
-    reader.setAssignMinimumVertexWeight();
-  else if( minimum == "local_abs" )
-    reader.setAssignMinimumAbsoluteVertexWeight();
 
   std::vector<SimplicialComplex> simplicialComplexes;
   simplicialComplexes.reserve( static_cast<std::size_t>( argc - optind ) );
@@ -491,9 +486,9 @@ int main( int argc, char** argv )
   // Defines how the minimum value for the vertices is to be set. Valid
   // options include:
   //
-  //  - global    (uses the global minimum)
-  //  - local     (uses the local minimum over all neighbours)
-  std::string minimum = "global";
+  //  - global    (uses the global extremal value)
+  //  - local     (uses the local  extremal value over all neighbours)
+  std::string weights = "global";
 
   {
     static option commandLineOptions[] =
@@ -504,12 +499,12 @@ int main( int argc, char** argv )
       { "reverse"             , no_argument,       nullptr, 'r' },
       { "verbose"             , no_argument,       nullptr, 'v' },
       { "filtration"          , required_argument, nullptr, 'f' },
-      { "minimum"             , required_argument, nullptr, 'm' },
+      { "weights"             , required_argument, nullptr, 'w' },
       { nullptr               , 0                , nullptr,  0  }
     };
 
     int option = 0;
-    while( ( option = getopt_long( argc, argv, "bnprtvf:m:", commandLineOptions, nullptr ) ) != -1 )
+    while( ( option = getopt_long( argc, argv, "bnprtvf:w:", commandLineOptions, nullptr ) ) != -1 )
     {
       switch( option )
       {
@@ -518,9 +513,6 @@ int main( int argc, char** argv )
         break;
       case 'f':
         filtration = optarg;
-        break;
-      case 'm':
-        minimum = optarg;
         break;
       case 'n':
         normalize = true;
@@ -533,6 +525,9 @@ int main( int argc, char** argv )
         break;
       case 'v':
         verbose = true;
+        break;
+      case 'w':
+        weights = optarg;
         break;
       default:
         break;
@@ -548,13 +543,13 @@ int main( int argc, char** argv )
       filtration = "standard";
     }
 
-    // Check minimum validity ------------------------------------------
+    // Check validity of weight strategy -------------------------------
 
-    if(    minimum != "global"
-        && minimum != "local" )
+    if(    weights != "global"
+        && weights != "local" )
     {
-      std::cerr << "* Invalid minimum value '" << minimum << "', so falling back to global one\n";
-      minimum = "global";
+      std::cerr << "* Invalid weight strategy value '" << weights << "', so falling back to global one\n";
+      weights = "global";
     }
   }
 
@@ -567,7 +562,7 @@ int main( int argc, char** argv )
 
   std::cerr << "* Filtration: " << filtration
             << " (" << ( reverse ? "" : "not " ) << "reversed" << ")\n"
-            << "* Vertex weight assignment strategy: " << minimum << "\n";
+            << "* Vertex weight assignment strategy: " << weights << "\n";
 
   if( verbose )
     std::cerr << "* Verbose output\n";
@@ -590,7 +585,7 @@ int main( int argc, char** argv )
       using Reader = aleph::topology::io::BipartiteAdjacencyMatrixReader;
 
       simplicialComplexes
-        = loadSimplicialComplexes<Reader>( argc, argv, minimum );
+        = loadSimplicialComplexes<Reader>( argc, argv );
     }
   }
   else
@@ -644,6 +639,12 @@ int main( int argc, char** argv )
 
   // Establish filtration order ----------------------------------------
 
+  for( auto&& K : simplicialComplexes )
+  {
+    K = applyFiltration( K, filtration, reverse );
+    K = assignVertexWeights( K, weights, reverse );
+    K = applyFiltration( K, filtration, reverse );
+  }
 
   // 2. Calculate persistent homology ----------------------------------
 
