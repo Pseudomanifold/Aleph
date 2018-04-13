@@ -372,7 +372,9 @@ SimplicialComplex applyFiltration( const SimplicialComplex& K,
   return L;
 }
 
-SimplicialComplex assignVertexWeights( const SimplicialComplex& K, const std::string& strategy, bool minimum = true )
+SimplicialComplex assignVertexWeights( const SimplicialComplex& K,
+                                       const std::string& strategy,
+                                       bool reverse = false )
 {
   DataType minData = std::numeric_limits<DataType>::max();
   DataType maxData = std::numeric_limits<DataType>::lowest();
@@ -386,71 +388,44 @@ SimplicialComplex assignVertexWeights( const SimplicialComplex& K, const std::st
     maxData = std::max( maxData, s.data() );
   }
 
+  // Setting up the weights --------------------------------------------
+  //
+  // This function assumes that the simplicial complex is already in
+  // filtration ordering with respect to its weights. Hence, we only
+  // have to take the *first* weight that we encounter (when using a
+  // global vertex weight assignment) or the *extremal* value, which
+  // is either a minimum or a maximum depending on the direction.
+
   std::unordered_map<VertexType, DataType> weight;
-
-  auto updateOrSetWeight
-    = [&weight] ( const VertexType& v, const DataType& w,
-                  bool absolute,
-                  bool minimum )
-      {
-        if( weight.find( v ) == weight.end() )
-          weight[v] = w;
-        else
-        {
-          bool update = false;
-
-          if( absolute )
-          {
-            update = minimum ? std::abs( w ) < std::abs( weight[v] )
-                             : std::abs( w ) > std::abs( weight[v] );
-          }
-          else
-          {
-            update = minimum ? w < weight[v]
-                             : w > weight[v];
-          }
-
-          if( update )
-            weight[v] = w;
-        }
-      };
 
   for( auto&& s : K )
   {
     if( s.dimension() != 1 )
       continue;
 
-    auto u = s[0];
-    auto v = s[1];
+    auto u     = s[0];
+    auto v     = s[1];
+    DataType w = DataType(); // weight to assign; depends on filtration
 
     // Assign the global minimum or maximum. This is rather wasteful
     // because the values do not change, but at least the code makes
     // it clear that all updates are done in the same place.
     if( strategy == "global" )
-    {
-      auto w    = minimum ? minData : maxData;
-      weight[u] = w;
-      weight[v] = w;
-    }
+      w = reverse ? maxData : minData;
     else if( strategy == "local" )
-    {
-      auto w = s.data();
-
-      // Do *not* use the absolute value
-      updateOrSetWeight( u, w, false, minimum );
-      updateOrSetWeight( v, w, false, minimum );
-    }
-    else if( strategy == "local_abs" )
-    {
-      auto w = s.data();
-
-      // Use the absolute value
-      updateOrSetWeight( u, w, true, minimum );
-      updateOrSetWeight( v, w, true, minimum );
-    }
+      w = s.data();
     else
       throw std::runtime_error( "Unknown update strategy '" + strategy + "'" );
+
+    // This only performs the update *once*.
+    weight.insert( {u,w} );
+    weight.insert( {v,w} );
   }
+
+  // Assign the weights ------------------------------------------------
+  //
+  // Having set up the map of weights, we now only need to traverse it
+  // in order to assign weights afterwards.
 
   auto L = K;
 
