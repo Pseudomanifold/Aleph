@@ -422,7 +422,7 @@ int main( int argc, char** argv )
   minData.reserve( simplicialComplexes.size() );
   maxData.reserve( simplicialComplexes.size() );
 
-  if( argc - optind - 1 >= 1 )
+  if( argc - optind >= 1 )
   {
     if( bipartite )
     {
