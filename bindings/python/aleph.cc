@@ -1,4 +1,5 @@
 #include <pybind11/pybind11.h>
+#include <pybind11/numpy.h>
 #include <pybind11/stl.h>
 
 #include <aleph/containers/PointCloud.hh>
@@ -277,7 +278,30 @@ void wrapPersistenceDiagram( py::module& m )
     .def( "removeDiagonal", &PersistenceDiagram::removeDiagonal )
     .def( "removeUnpaired", &PersistenceDiagram::removeUnpaired )
     .def_property( "dimension", &PersistenceDiagram::setDimension, &PersistenceDiagram::dimension )
-    .def_property_readonly( "betti", &PersistenceDiagram::betti );
+    .def_property_readonly( "betti", &PersistenceDiagram::betti )
+    .def( "__array__", [] (PersistenceDiagram &D) {
+      auto n_points = D.size();
+      DataType *buffer = new DataType[2*n_points];
+
+      for (auto it = D.begin(); it != D.end(); it++) {
+        auto index = std::distance(D.begin(), it);
+        buffer[2*index] = it->x();
+        buffer[2*index+1] = it->y();
+      }
+      // Based on https://stackoverflow.com/questions/44659924/returning-numpy-arrays-via-pybind11
+      // Callback that allows buffer to be freed if not used in python anymore
+      py::capsule free_when_done(buffer, [](void *f) {
+            DataType *buf = reinterpret_cast<DataType *>(f);
+            std::cerr << "freeing memory  allocated by aleph @ " << f << "\n";
+            delete[] buf;
+        });
+
+      return py::array_t<DataType>(
+        {static_cast<unsigned long>(n_points), static_cast<unsigned long>(2)}, // shape
+        {static_cast<unsigned long>(2*sizeof(DataType)), static_cast<unsigned long>(sizeof(DataType))}, // Stride
+        buffer, // the data pointer
+        free_when_done); // numpy array references this parent
+    });
 
   using Point = typename PersistenceDiagram::Point;
 
