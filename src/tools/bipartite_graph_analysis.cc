@@ -280,6 +280,7 @@ SimplicialComplex makeRandomStratifiedGraph(
 
 int main( int argc, char** argv )
 {
+  bool bipartite             = false;
   bool normalize             = false;
   bool reverse               = false;
   bool verbose               = false;
@@ -301,6 +302,7 @@ int main( int argc, char** argv )
   {
     static option commandLineOptions[] =
     {
+      { "bipartite"           , no_argument,       nullptr, 'b' },
       { "normalize"           , no_argument,       nullptr, 'n' },
       { "persistence-diagrams", no_argument,       nullptr, 'p' },
       { "reverse"             , no_argument,       nullptr, 'r' },
@@ -312,10 +314,13 @@ int main( int argc, char** argv )
     };
 
     int option = 0;
-    while( ( option = getopt_long( argc, argv, "nprtvf:m:", commandLineOptions, nullptr ) ) != -1 )
+    while( ( option = getopt_long( argc, argv, "bnprtvf:m:", commandLineOptions, nullptr ) ) != -1 )
     {
       switch( option )
       {
+      case 'b':
+        bipartite = true;
+        break;
       case 'f':
         filtration = optarg;
         break;
@@ -365,20 +370,17 @@ int main( int argc, char** argv )
 
   // Be verbose about parameters ---------------------------------------
 
-// FIXME
-#if 0
-  if( absolute )
-    std::cerr << "* Using filtration based on absolute values\n";
+  if( bipartite )
+    std::cerr << "* Mode: reading bipartite adjacency matrices\n";
+  else
+    std::cerr << "* Mode: reading edge lists\n";
 
-  if( minimum )
-    std::cerr << "* Setting minimum based on signed values\n";
-
-  if( filtration )
-    std::cerr << "* Calculating upper--lower filtration\n";
-#endif
+  std::cerr << "* Filtration: " << filtration
+            << " (" << ( reverse ? "" : "not " ) << "reversed" << ")\n"
+            << "* Vertex weight assignment strategy: " << minimum << "\n";
 
   if( verbose )
-    std::cerr << "* Being verbose\n";
+    std::cerr << "* Verbose output\n";
 
   // 1. Read simplicial complexes --------------------------------------
 
