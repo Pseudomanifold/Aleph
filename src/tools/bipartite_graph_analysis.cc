@@ -18,6 +18,7 @@
 #include <limits>
 #include <random>
 #include <stdexcept>
+#include <unordered_map>
 #include <vector>
 
 #include <getopt.h>
@@ -275,6 +276,106 @@ SimplicialComplex makeRandomStratifiedGraph(
   }
 
   return SimplicialComplex( simplices.begin(), simplices.end() );
+}
+
+SimplicialComplex assignVertexWeights( const SimplicialComplex& K, const std::string& strategy, bool minimum = true )
+{
+  DataType minData = std::numeric_limits<DataType>::max();
+  DataType maxData = std::numeric_limits<DataType>::lowest();
+
+  for( auto&& s : K )
+  {
+    if( s.dimension() != 1 )
+      continue;
+
+    minData = std::min( minData, s.data() );
+    maxData = std::max( maxData, s.data() );
+  }
+
+  std::unordered_map<VertexType, DataType> weight;
+
+  auto updateOrSetWeight
+    = [&weight] ( const VertexType& v, const DataType& w,
+                  bool absolute,
+                  bool minimum )
+      {
+        if( weight.find( v ) == weight.end() )
+          weight[v] = w;
+        else
+        {
+          bool update = false;
+
+          if( absolute )
+          {
+            update = minimum ? std::abs( w ) < std::abs( weight[v] )
+                             : std::abs( w ) > std::abs( weight[v] );
+          }
+          else
+          {
+            update = minimum ? w < weight[v]
+                             : w > weight[v];
+          }
+
+          if( update )
+            weight[v] = w;
+        }
+      };
+
+  for( auto&& s : K )
+  {
+    if( s.dimension() != 1 )
+      continue;
+
+    auto u = s[0];
+    auto v = s[1];
+
+    // Assign the global minimum or maximum. This is rather wasteful
+    // because the values do not change, but at least the code makes
+    // it clear that all updates are done in the same place.
+    if( strategy == "global" )
+    {
+      auto w    = minimum ? minData : maxData;
+      weight[u] = w;
+      weight[v] = w;
+    }
+    else if( strategy == "local" )
+    {
+      auto w = s.data();
+
+      // Do *not* use the absolute value
+      updateOrSetWeight( u, w, false, minimum );
+      updateOrSetWeight( v, w, false, minimum );
+    }
+    else if( strategy == "local_abs" )
+    {
+      auto w = s.data();
+
+      // Use the absolute value
+      updateOrSetWeight( u, w, true, minimum );
+      updateOrSetWeight( v, w, true, minimum );
+    }
+    else
+      throw std::runtime_error( "Unknown update strategy '" + strategy + "'" );
+  }
+
+  auto L = K;
+
+  for( auto it = L.begin(); it != L.end(); ++it )
+  {
+    if( it->dimension() == 0 )
+    {
+      auto s = *it;  // simplex
+      auto v = s[0]; // vertex
+
+      s.setData( weight.at(v) );
+
+      auto result = L.replace( it, s );
+      if( !result )
+        throw std::runtime_error( "Unable to replace simplex in simplicial complex" );
+    }
+  }
+
+  return L;
 }
 
 template <class Reader> std::vector<SimplicialComplex> loadSimplicialComplexes( int argc, char** argv, const std::string& minimum )
