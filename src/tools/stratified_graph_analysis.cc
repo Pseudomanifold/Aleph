@@ -444,7 +444,7 @@ int main( int argc, char** argv )
       std::nextafter( maxWeight, std::numeric_limits<DataType>::max() )
     );
 
-    for( unsigned i = 0; i < 1e5; i++ )
+    for( unsigned i = 0; i < 1e3; i++ )
     {
       auto K
         = makeRandomStratifiedGraph( {2,3}, // FIXME: {2,3,1} for the complete network
