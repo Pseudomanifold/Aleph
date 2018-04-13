@@ -11,6 +11,7 @@
 #include <aleph/topology/filtrations/Data.hh>
 
 #include <aleph/topology/io/BipartiteAdjacencyMatrix.hh>
+#include <aleph/topology/io/EdgeLists.hh>
 
 #include <algorithm>
 #include <chrono>
@@ -414,6 +415,13 @@ int main( int argc, char** argv )
     if( bipartite )
     {
       using Reader = aleph::topology::io::BipartiteAdjacencyMatrixReader;
+
+      simplicialComplexes
+        = loadSimplicialComplexes<Reader>( argc, argv );
+    }
+    else
+    {
+      using Reader = aleph::topology::io::EdgeListReader;
 
       simplicialComplexes
         = loadSimplicialComplexes<Reader>( argc, argv );
