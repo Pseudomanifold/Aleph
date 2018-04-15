@@ -1,6 +1,7 @@
 #ifndef ALEPH_EULER_CHARACTERISTIC_HH__
 #define ALEPH_EULER_CHARACTERISTIC_HH__
 
+#include <iterator>
 #include <map>
 
 namespace aleph
@@ -11,7 +12,7 @@ namespace aleph
   simplex cardinalities, of a given simplicial complex.
 */
 
-template <class SimplicialComplex> eulerCharacteristic( const SimplicialComplex& K )
+template <class SimplicialComplex> long eulerCharacteristic( const SimplicialComplex& K )
 {
   // Empty complexes could also be given an invalid characteristic here,
   // but this cannot be expressed through an integer.
@@ -33,6 +34,40 @@ template <class SimplicialComplex> eulerCharacteristic( const SimplicialComplex&
   {
     chi += s * cardinality[d];
     s    = s * (-1);
+  }
+
+  return chi;
+}
+
+/**
+  Calculates the Euler characteristic, i.e the alternating sum of Betti
+  numbers, from a set of persistence diagrams.
+*/
+
+template <class InputIterator> long eulerCharacteristic( InputIterator begin,
+                                                         InputIterator end )
+{
+  if( begin == end )
+    return 0;
+
+  using PersistenceDiagram = typename std::iterator_traits<InputIterator>::value_type;
+
+  std::map<std::size_t, std::size_t> betti;
+
+  for( auto it = begin; it != end; ++it )
+    betti[ it->dimension() ] = it->betti();
+
+  // Obtain the largest dimension stored by the sequence of persistence
+  // diagrams.
+  auto D = betti.rbegin()->first;
+
+  long chi = 0;
+  short s  = 1;
+
+  for( std::size_t d = 0; d < D; d++ )
+  {
+    chi += s * betti[d];
+    s   *= (-1);
   }
 
   return chi;
