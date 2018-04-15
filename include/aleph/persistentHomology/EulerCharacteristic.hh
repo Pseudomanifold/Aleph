@@ -73,6 +73,36 @@ template <class InputIterator> long eulerCharacteristic( InputIterator begin,
   return chi;
 }
 
+/**
+  Calculates the persistent Euler characteristic of a sequence of
+  persistence diagrams.
+*/
+
+template <class InputIterator> auto persistentEulerCharacteristic( InputIterator begin,
+                                                                   InputIterator end )
+  -> typename std::iterator_traits<InputIterator>::value_type::DataType
+{
+  using PersistenceDiagram = typename std::iterator_traits<InputIterator>::value_type;
+  using DataType           = typename PersistenceDiagram::DataType;
+
+  if( begin == end )
+    return DataType();
+
+  DataType chi = DataType();
+
+  for( auto it = begin; it != end; ++it )
+  {
+    auto&& diagram = *it;
+    auto s         = std::pow( -1, it->dimension);
+
+    for( auto&& point : diagram )
+      chi += s * point.persistence();
+  }
+
+  return chi;
+
+}
+
 } // namespace aleph
 
 #endif
