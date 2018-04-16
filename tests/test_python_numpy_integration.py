@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
 
+import sys
 import aleph as al
 
 try:
     import numpy as np
 except ImportError:
-    return
+    sys.exit(0)
 
 import unittest
 
