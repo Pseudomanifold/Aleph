@@ -20,6 +20,7 @@
 
 #include <aleph/topology/io/SimplicialComplexReader.hh>
 
+#include <aleph/persistenceDiagrams/Norms.hh>
 #include <aleph/persistenceDiagrams/PersistenceDiagram.hh>
 #include <aleph/persistenceDiagrams/PersistenceIndicatorFunction.hh>
 
@@ -535,12 +536,46 @@ void wrapInputFunctions( py::module& m )
   );
 }
 
+void wrapNorms( py::module& m )
+{
+    using namespace pybind11::literals;
+
+    py::module mNorm = m.def_submodule("norms", "Norms on persistence diagrams");
+    mNorm.def("totalPersistence",
+      [] (const PersistenceDiagram& D, double k, bool weighted)
+        {
+          return aleph::totalPersistence(D, k, weighted);
+        },
+      "D"_a,
+      "k"_a = 2.0,
+      "weighted"_a = false
+    );
+    mNorm.def("pNorm",
+      [] (const PersistenceDiagram& D, double k, bool weighted)
+        {
+          return aleph::pNorm(D, k, weighted);
+        },
+      "D"_a,
+      "k"_a = 2.0,
+      "weighted"_a = false
+    );
+    mNorm.def("infinityNorm",
+      [] (const PersistenceDiagram& D)
+        {
+          return aleph::infinityNorm(D);
+        },
+      "D"_a
+    );
+}
+
+
 PYBIND11_MODULE(aleph, m)
 {
   m.doc() = "Python bindings for Aleph, a library for exploring persistent homology";
 
   wrapSimplex(m);
   wrapSimplicialComplex(m);
+  wrapNorms(m);
   wrapPersistenceDiagram(m);
   wrapPersistentHomologyCalculation(m);
   wrapRipsExpander(m);

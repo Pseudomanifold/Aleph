@@ -52,7 +52,8 @@ if abc:
 
 print( abc[2] )
 
-for diagram in calculatePersistenceDiagrams(K):
+diagrams = calculatePersistenceDiagrams(K)
+for diagram in diagrams:
   print(diagram)
 
 print(sorted(M, key=lambda x: x.data ))
@@ -63,3 +64,7 @@ def sorting_function(s,t):
 M.sort( sorting_function )
 
 print(M)
+
+norms.pNorm(diagrams[-1])
+norms.totalPersistence(diagrams[-1])
+norms.infinityNorm(diagrams[-1])
