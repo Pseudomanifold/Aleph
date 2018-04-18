@@ -517,15 +517,21 @@ int main( int argc, char** argv )
                            removeDuplicates,
                            infinityFactor );
 
-          // FIXME: This is only required in order to ensure that the
-          // persistence indicator function has a finite integral; it
-          // can be solved more elegantly by using a special value to
-          // indicate infinite intervals.
-          auto pd = dataSet.persistenceDiagram;
-          pd.removeUnpaired();
+          if( useIndicatorFunctionDistance || useEnvelopeFunctionDistance )
+          {
+            // FIXME: This is only required in order to ensure that the
+            // persistence indicator function has a finite integral; it
+            // can be solved more elegantly by using a special value to
+            // indicate infinite intervals.
+            auto pd = dataSet.persistenceDiagram;
+            pd.removeUnpaired();
 
-          dataSet.persistenceIndicatorFunction = aleph::persistenceIndicatorFunction( pd );
-          dataSet.envelopeFunction             = aleph::Envelope()( pd );
+            if( useIndicatorFunctionDistance )
+              dataSet.persistenceIndicatorFunction = aleph::persistenceIndicatorFunction( pd );
+
+            if( useEnvelopeFunctionDistance  )
+              dataSet.envelopeFunction = aleph::Envelope()( pd );
+          }
 
           std::cerr << "finished\n";
         }
@@ -565,12 +571,21 @@ int main( int argc, char** argv )
           auto pd = diagram;
           pd.removeUnpaired();
 
+          PersistenceIndicatorFunction pif;
+          EnvelopeFunction ef;
+
+          if( useIndicatorFunctionDistance )
+            pif = aleph::persistenceIndicatorFunction( pd );
+
+          if( useEnvelopeFunctionDistance )
+            ef = aleph::Envelope()( pd );
+
           dataSet.push_back( { name,
                                filename,
                                dimension,
                                diagram,
-                               aleph::persistenceIndicatorFunction( pd ),
-                               aleph::Envelope()( pd ) } );
+                               pif,
+                               ef } );
         }
 
         dataSets.push_back( dataSet );
