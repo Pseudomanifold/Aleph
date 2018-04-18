@@ -118,7 +118,9 @@ void usage()
             << "  -i: calculate persistence indicator function distances\n"
             << "  -k: calculate kernel values instead of distances\n"
             << "  -n: normalize the persistence indicator function\n"
+            << "  -r: remove duplicate points in each diagram\n"
             << "  -s: use sigma as a scale parameter for the kernel\n"
+            << "  -v: verbose output\n"
             << "  -w: calculate Wasserstein distances\n"
             << "\n";
 }
@@ -309,7 +311,7 @@ DataType getMaximum( const PersistenceDiagram& diagram )
   return max;
 }
 
-PersistenceDiagram postprocess( const PersistenceDiagram& diagram, bool clean, DataType infinityFactor )
+PersistenceDiagram postprocess( const PersistenceDiagram& diagram, bool clean, bool removeDuplicates, DataType infinityFactor )
 {
   auto result = diagram;
 
@@ -318,6 +320,9 @@ PersistenceDiagram postprocess( const PersistenceDiagram& diagram, bool clean, D
     result.removeDiagonal();
     result.removeUnpaired();
   }
+
+  if( removeDuplicates )
+    result.removeDuplicates();
 
   if( infinityFactor != DataType() )
   {
@@ -364,9 +369,11 @@ int main( int argc, char** argv )
   bool normalize                    = false;
   bool calculateKernel              = false;
   bool useWassersteinDistance       = false;
+  bool removeDuplicates             = false;
+  bool verbose                      = false;
 
   int option = 0;
-  while( ( option = getopt_long( argc, argv, "f:p:s:ceEhinkw", commandLineOptions, nullptr ) ) != -1 )
+  while( ( option = getopt_long( argc, argv, "f:p:s:ceEhinkrvw", commandLineOptions, nullptr ) ) != -1 )
   {
     switch( option )
     {
@@ -406,10 +413,16 @@ int main( int argc, char** argv )
     case 'n':
       normalize = true;
       break;
+    case 'r':
+      removeDuplicates = true;
+      break;
     case 'w':
       useEnvelopeFunctionDistance  = false;
       useIndicatorFunctionDistance = false;
       useWassersteinDistance       = true;
+      break;
+    case 'v':
+      verbose = true;
       break;
     default:
       break;
@@ -501,6 +514,7 @@ int main( int argc, char** argv )
           dataSet.persistenceDiagram
             = postprocess( aleph::io::load<DataType>( dataSet.filename ),
                            cleanPersistenceDiagrams,
+                           removeDuplicates,
                            infinityFactor );
 
           // FIXME: This is only required in order to ensure that the
@@ -533,6 +547,7 @@ int main( int argc, char** argv )
           diagram
             = postprocess( diagram,
                            cleanPersistenceDiagrams,
+                           removeDuplicates,
                            infinityFactor );
 
           auto dimension = static_cast<unsigned>( diagram.dimension() );
@@ -628,6 +643,9 @@ int main( int argc, char** argv )
 
       distances[row][col] = d;
       distances[col][row] = d;
+
+      if( verbose )
+        std::cerr << ".";
     }
   }
 
