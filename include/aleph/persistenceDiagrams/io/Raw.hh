@@ -42,8 +42,6 @@ template <class T> PersistenceDiagram<T> load( const std::string& filename )
   std::string line;
   while( std::getline( in, line ) )
   {
-    line = trim( line );
-
     if( line.empty() || line.front() == '#' )
       continue;
 
