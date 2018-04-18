@@ -5,6 +5,7 @@
 #include <iosfwd>
 #include <limits>
 #include <utility>
+#include <set>
 #include <vector>
 
 namespace aleph
@@ -54,6 +55,14 @@ public:
     bool operator!=( const Point& other ) const noexcept
     {
       return !this->operator==( other );
+    }
+
+    bool operator<( const Point& other ) const noexcept
+    {
+      if( _x == other._x )
+        return _y < other._y;
+      else
+        return _x < other._x;
     }
 
     bool isUnpaired() const noexcept
@@ -131,6 +140,21 @@ public:
                       } ),
       _points.end()
     );
+  }
+
+  /**
+    Removes all duplicate points, i.e. enforces that the multiplicity of
+    each point is exactly one. This function does not preserve the local
+    order of points in the persistence diagram (which should not matter,
+    in any case).
+  */
+
+  void removeDuplicates() noexcept
+  {
+    std::set<Point> points( _points.begin(), _points.end() );
+
+    _points.assign( points.begin(),
+                    points.end() );
   }
 
   // Attributes --------------------------------------------------------
