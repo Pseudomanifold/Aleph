@@ -40,6 +40,22 @@ template <class T> T next( T x )
     return std::nextafter( x, std::numeric_limits<T>::max() );
 }
 
+template <class DataType> bool isInverted( const PersistenceDiagram<DataType>& D )
+{
+  for( auto&& p : D )
+  {
+    if( p.isUnpaired() == false )
+    {
+      bool isInverted = p.x() > p.y();
+
+      if( isInverted )
+        return true;
+    }
+  }
+
+  return false;
+}
+
 } // namespace detail
 
 
