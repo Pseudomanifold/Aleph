@@ -30,6 +30,14 @@ template <class T> struct EventPoint
     // a creator may increase the number of active intervals again.
     return value < other.value || ( value == other.value && destroyer && !other.destroyer );
   }
+
+  bool operator>( const EventPoint& other ) const noexcept
+  {
+    // Sort event point by their corresponding values. In case of ties,
+    // consider creators to come after destroyers. This makes sense, as
+    // a creator may increase the number of active intervals again.
+    return value > other.value || ( value == other.value && destroyer && !other.destroyer );
+  }
 };
 
 template <class T> T next( T x )
