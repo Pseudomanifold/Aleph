@@ -85,10 +85,20 @@ template <class DataType> aleph::math::StepFunction<DataType> persistenceIndicat
   std::vector<EP> eventPoints;
   eventPoints.reserve( 2 * D.size() );
 
+  auto inverted = isInverted( D );
+
   for( auto&& p : D )
   {
-    eventPoints.push_back( { p.x(), false } );
-    eventPoints.push_back( { p.y(), true  } );
+    if( inverted )
+    {
+      eventPoints.push_back( { p.x(), true  } );
+      eventPoints.push_back( { p.y(), false } );
+    }
+    else
+    {
+      eventPoints.push_back( { p.x(), false } );
+      eventPoints.push_back( { p.y(), true  } );
+    }
   }
 
   std::sort( eventPoints.begin(), eventPoints.end() );
