@@ -6,6 +6,7 @@
 
 #include <fstream>
 #include <string>
+#include <sstream>
 #include <stdexcept>
 #include <vector>
 
@@ -46,12 +47,20 @@ template <class T> PersistenceDiagram<T> load( const std::string& filename )
     if( line.empty() || line.front() == '#' )
       continue;
 
-    auto tokens = split( line );
+    std::stringstream converter( line );
 
-    if( tokens.size() >= 2 )
+    std::string a_token;
+    std::string b_token;
+
+    converter >> a_token
+              >> b_token;
+
+    if( converter.fail() )
+      throw std::runtime_error( "Unable to parse token" );
+    else
     {
-      T a = convert<T>( tokens[0] );
-      T b = convert<T>( tokens[1] );
+      T a = convert<T>( a_token );
+      T b = convert<T>( b_token );
 
       persistenceDiagram.add( a, b );
     }
