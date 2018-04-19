@@ -8,6 +8,7 @@ IF( BUILD_TOOLS )
   ADD_EXECUTABLE( graph_analysis                                 graph_analysis.cc )
   ADD_EXECUTABLE( interlevel_set_persistence_hierarchy           interlevel_set_persistence_hierarchy.cc )
   ADD_EXECUTABLE( local_dimensionality                           local_dimensionality.cc )
+  ADD_EXECUTABLE( make_signature                                 make_signature.cc )
   ADD_EXECUTABLE( mean_curvature                                 mean_curvature.cc )
   ADD_EXECUTABLE( multi_scale_skeleton                           multi_scale_skeleton.cc )
   ADD_EXECUTABLE( persistence_diagram_entropies                  persistence_diagram_entropies.cc )
@@ -50,8 +51,15 @@ IF( BUILD_TOOLS )
   ENDIF()
 
   IF( ALEPH_WITH_HDF5 )
-    INCLUDE_DIRECTORIES( SYSTEM ${HDF5_INCLUDE_DIRS} )
-    TARGET_LINK_LIBRARIES( relevant_edges ${HDF5_LIBRARIES} )
+    TARGET_INCLUDE_DIRECTORIES( relevant_edges
+      SYSTEM PUBLIC
+        ${HDF5_INCLUDE_DIRS}
+        ${HDF5_CXX_INCLUDE_DIRS}
+    )
+    TARGET_LINK_LIBRARIES( relevant_edges
+      ${HDF5_CXX_LIBRARIES}
+      ${HDF5_LIBRARIES}
+    )
   ENDIF()
 
 ELSE()
