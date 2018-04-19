@@ -1,8 +1,11 @@
+#include <aleph/geometry/distances/Infinity.hh>
+
 #include <aleph/persistenceDiagrams/PersistenceDiagram.hh>
 #include <aleph/persistenceDiagrams/io/Raw.hh>
 
 #include <algorithm>
 #include <iostream>
+#include <iterator>
 #include <limits>
 #include <stdexcept>
 #include <string>
@@ -13,6 +16,7 @@
 using DataType           = double;
 using PersistenceDiagram = aleph::PersistenceDiagram<DataType>;
 using Point              = typename PersistenceDiagram::Point;
+using InfinityDistance   = aleph::geometry::distances::InfinityDistance<DataType>;
 
 void normalizeDiagram( PersistenceDiagram& D )
 {
@@ -42,6 +46,33 @@ void normalizeDiagram( PersistenceDiagram& D )
       return Point(x, y);
     }
   );
+}
+
+std::vector<DataType> makeSignature( const PersistenceDiagram& D )
+{
+  InfinityDistance distance;
+
+  // All pairwise distances with potential repetitions for points that
+  // are well outside the influence radius of other points.
+  std::vector<DataType> distances;
+  distances.reserve( ( D.size() * D.size() - 1 ) / 2 );
+
+  for( auto it1 = D.begin(); it1 != D.end(); ++it1 )
+  {
+    for( auto it2 = std::next( it1 ); it2 != D.end(); ++it2 )
+    {
+      auto dxy = distance( *it1, *it2 );
+      auto dx  = it1->persistence();
+      auto dy  = it2->persistence();
+
+      distances.emplace_back( std::min( dxy, std::min( dx, dy ) ) );
+    }
+  }
+
+  std::sort( distances.begin(), distances.end(),
+             std::greater<DataType>() );
+
+  return distances;
 }
 
 int main( int argc, char** argv)
