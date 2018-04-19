@@ -16,6 +16,8 @@
   Original author: Bastian Rieck
 */
 
+#include <aleph/persistenceDiagrams/PersistenceDiagram.hh>
+
 #include <aleph/persistentHomology/Calculation.hh>
 
 #include <aleph/topology/io/FlexSpectrum.hh>
@@ -23,15 +25,17 @@
 #include <aleph/topology/Simplex.hh>
 #include <aleph/topology/SimplicialComplex.hh>
 
+#include <algorithm>
 #include <iostream>
 #include <string>
 
 #include <cassert>
 
-using DataType          = unsigned;
-using VertexType        = unsigned;
-using Simplex           = aleph::topology::Simplex<DataType, VertexType>;
-using SimplicialComplex = aleph::topology::SimplicialComplex<Simplex>;
+using DataType           = unsigned;
+using VertexType         = unsigned;
+using Simplex            = aleph::topology::Simplex<DataType, VertexType>;
+using SimplicialComplex  = aleph::topology::SimplicialComplex<Simplex>;
+using PersistenceDiagram = aleph::PersistenceDiagram<DataType>;
 
 int main( int argc, char** argv )
 {
@@ -74,7 +78,21 @@ int main( int argc, char** argv )
     assert( D.betti()     == 1 );
 
     D.removeDiagonal();
-    D.removeUnpaired();
+
+    // This ensures that the global maximum is paired with the global
+    // minimum of the persistence diagram. This is valid because each
+    // function has finite support and is bounded from below.
+    std::transform( D.begin(), D.end(), D.begin(),
+      [] ( const PersistenceDiagram::Point& p )
+      {
+        // TODO: we should check whether zero is really the smallest
+        // value
+        if( p.isUnpaired() )
+          return PersistenceDiagram::Point( p.x(), DataType() );
+        else
+          return PersistenceDiagram::Point( p );
+      }
+    );
 
     std::cout << D << "\n";
   }
