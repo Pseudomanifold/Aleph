@@ -297,6 +297,25 @@ double persistenceDiagramDistance( const std::vector<DataSet>& dataSet1,
   return d;
 }
 
+std::pair<DataType, DataType> getMinimumAndMaximum( const PersistenceDiagram& diagram )
+{
+  DataType min = std::numeric_limits<DataType>::max();
+  DataType max = std::numeric_limits<DataType>::lowest();
+
+  for( auto&& p : diagram )
+  {
+    min = std::min( min, p.x() );
+    max = std::max( max, p.x() );
+    if( !p.isUnpaired() )
+    {
+      min = std::min( min, p.y() );
+      max = std::max( max, p.y() );
+    }
+  }
+
+  return std::make_pair( min, max );
+}
+
 DataType getMaximum( const PersistenceDiagram& diagram )
 {
   DataType max = std::numeric_limits<DataType>::lowest();
@@ -311,7 +330,11 @@ DataType getMaximum( const PersistenceDiagram& diagram )
   return max;
 }
 
-PersistenceDiagram postprocess( const PersistenceDiagram& diagram, bool clean, bool removeDuplicates, DataType infinityFactor )
+PersistenceDiagram postprocess( const PersistenceDiagram& diagram,
+  bool clean,
+  bool removeDuplicates,
+  bool normalize,
+  DataType infinityFactor )
 {
   auto result = diagram;
 
@@ -323,6 +346,24 @@ PersistenceDiagram postprocess( const PersistenceDiagram& diagram, bool clean, b
 
   if( removeDuplicates )
     result.removeDuplicates();
+
+  if( normalize )
+  {
+    auto minmax = getMinimumAndMaximum( result );
+
+    std::transform( result.begin(), result.end(), result.begin(),
+                    [&minmax] ( const PersistenceDiagram::Point& p )
+                    {
+                      auto x = p.x();
+                      auto y = p.y();
+
+                      x = (x - minmax.first) / (minmax.second - minmax.first);
+                      if( !p.isUnpaired() )
+                        y = (y - minmax.first) / (minmax.second - minmax.first);
+
+                      return PersistenceDiagram::Point( p.x(), p.y() );
+                    } );
+  }
 
   if( infinityFactor != DataType() )
   {
@@ -515,6 +556,7 @@ int main( int argc, char** argv )
             = postprocess( aleph::io::load<DataType>( dataSet.filename ),
                            cleanPersistenceDiagrams,
                            removeDuplicates,
+                           false,
                            infinityFactor );
 
           if( useIndicatorFunctionDistance || useEnvelopeFunctionDistance )
@@ -554,6 +596,7 @@ int main( int argc, char** argv )
             = postprocess( diagram,
                            cleanPersistenceDiagrams,
                            removeDuplicates,
+                           false,
                            infinityFactor );
 
           auto dimension = static_cast<unsigned>( diagram.dimension() );
