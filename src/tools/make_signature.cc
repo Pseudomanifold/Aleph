@@ -3,10 +3,13 @@
 #include <aleph/persistenceDiagrams/PersistenceDiagram.hh>
 #include <aleph/persistenceDiagrams/io/Raw.hh>
 
+#include <cmath>
+
 #include <algorithm>
 #include <iostream>
 #include <iterator>
 #include <limits>
+#include <ostream>
 #include <stdexcept>
 #include <string>
 #include <vector>
@@ -62,8 +65,8 @@ std::vector<DataType> makeSignature( const PersistenceDiagram& D )
     for( auto it2 = std::next( it1 ); it2 != D.end(); ++it2 )
     {
       auto dxy = distance( *it1, *it2 );
-      auto dx  = it1->persistence();
-      auto dy  = it2->persistence();
+      auto dx  = std::abs( it1->persistence() );
+      auto dy  = std::abs( it2->persistence() );
 
       distances.emplace_back( std::min( dxy, std::min( dx, dy ) ) );
     }
@@ -75,23 +78,44 @@ std::vector<DataType> makeSignature( const PersistenceDiagram& D )
   return distances;
 }
 
+template <class InputIterator> void printSignature(
+  InputIterator begin,
+  InputIterator end,
+  std::ostream& out )
+{
+  for( auto it = begin; it != end; ++it )
+  {
+    if( it != begin )
+      out << " ";
+
+    out << *it;
+  }
+
+  out << "\n";
+}
+
 int main( int argc, char** argv)
 {
   bool normalize = false;
+  unsigned keep  = 0;
 
   {
     static option commandLineOptions[] =
     {
-      { "normalize", no_argument, nullptr, 'n' },
-      { nullptr    , 0          , nullptr,  0  }
+      { "keep"     , required_argument, nullptr, 'k' },
+      { "normalize", no_argument      , nullptr, 'n' },
+      { nullptr    , 0                , nullptr,  0  }
     };
 
     int option = 0;
 
-    while( ( option = getopt_long( argc, argv, "n", commandLineOptions, nullptr ) ) != -1 )
+    while( ( option = getopt_long( argc, argv, "k:n", commandLineOptions, nullptr ) ) != -1 )
     {
       switch( option )
       {
+      case 'k':
+        keep = static_cast<unsigned>( std::stoul( optarg ) );
+        break;
       case 'n':
         normalize = true;
         break;
@@ -117,5 +141,15 @@ int main( int argc, char** argv)
     diagrams.emplace_back( diagram );
 
     std::cerr << "finished\n";
+  }
+
+  for( auto&& diagram : diagrams )
+  {
+    auto signature = makeSignature( diagram );
+
+    if( keep != 0 )
+      signature.resize( keep );
+
+    printSignature( signature.begin(), signature.end(), std::cout );
   }
 }
