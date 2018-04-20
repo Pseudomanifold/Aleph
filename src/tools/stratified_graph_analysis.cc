@@ -1,3 +1,50 @@
+/*
+  This is a tool shipped by 'Aleph - A Library for Exploring Persistent
+  Homology'.
+
+  The purpose of this tool is to analyse stratified graphs or adjacency
+  matrices of bipartite graphs in terms of persistent homology. To this
+  end, the tool permits a selection of different filtrations and weight
+  assignment strategies for vertices.
+
+      Usage: stratified_graph_analysis [OPTIONS] FILES
+
+      If no other options are given, the tool attempts to read a set of
+      edge lists from each file and uses the standard weight filtration
+      to calculate total persistence. These values will then be printed
+      to `stdout`, following the convention `INDEX\tTOTAL_PERSISTENCE`,
+      where `INDEX` refers to the index of the file parameter. Numerous
+      options permit changing the way things are being calculated:
+
+        --bipartite (-b): If set, attempts to read an adjacency matrix,
+                          instead of reading edge lists. Normally, this
+                          parameter is *not* required.
+
+        --filtration (-f): Changes the filtration. Supported values are
+                           "standard" for the standard weight-based one
+                           and "absolute" for using absolute weights of
+                           the edges for sorting
+
+        --normalize (-n): If set, normalizes all diagrams, which allows
+                          us to disregard scaling effects.
+
+        --persistence-diagrams (-p): If, calculates persistence diagrams
+                                     instead of only reporting the total
+                                     persistence values.
+
+        --reverse (-r): If set, reverses the filtration.
+
+        --verbose (v): If set, adds an layer of verbosity to the output
+                       so that debugging is simplified. This should not
+                       be required normally.
+
+        --weights (-w): Changes the strategy for setting vertex weights
+                        and influencing the total persistence. Only two
+                        valid settings exist, with "global" setting all
+                        weights to the same value and "local" using the
+                        first neighbour of a vertex to set the weight.
+*/
+
 #include <aleph/math/SymmetricMatrix.hh>
 
 #include <aleph/persistenceDiagrams/Norms.hh>
