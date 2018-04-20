@@ -21,6 +21,26 @@ using PersistenceDiagram = aleph::PersistenceDiagram<DataType>;
 using Point              = typename PersistenceDiagram::Point;
 using InfinityDistance   = aleph::geometry::distances::InfinityDistance<DataType>;
 
+void filterDiagram( PersistenceDiagram& D, DataType threshold, bool lower = true )
+{
+  D.erase(
+    std::remove_if( D.begin(), D.end(),
+      [&threshold, &lower] ( const Point& p )
+      {
+        // Note that the *absolute* persistence value should be used
+        // here because it will always work, regardless of the state
+        // of the corresponding filtration that was employed for the
+        // persistence diagram calculation.
+        if( lower )
+          return std::abs( p.persistence() ) < threshold;
+        else
+          return std::abs( p.persistence() ) > threshold;
+      }
+    ),
+    D.end()
+  );
+}
+
 void normalizeDiagram( PersistenceDiagram& D )
 {
   auto min = std::numeric_limits<DataType>::max();
@@ -96,12 +116,14 @@ template <class InputIterator> void printSignature(
 
 int main( int argc, char** argv)
 {
-  bool normalize = false;
-  unsigned keep  = 0;
+  bool normalize     = false;
+  unsigned keep      = 0;
+  DataType threshold = DataType();
 
   {
     static option commandLineOptions[] =
     {
+      { "filter"   , required_argument, nullptr, 'f' },
       { "keep"     , required_argument, nullptr, 'k' },
       { "normalize", no_argument      , nullptr, 'n' },
       { nullptr    , 0                , nullptr,  0  }
@@ -109,10 +131,13 @@ int main( int argc, char** argv)
 
     int option = 0;
 
-    while( ( option = getopt_long( argc, argv, "k:n", commandLineOptions, nullptr ) ) != -1 )
+    while( ( option = getopt_long( argc, argv, "f:k:n", commandLineOptions, nullptr ) ) != -1 )
     {
       switch( option )
       {
+      case 'f':
+        threshold = static_cast<DataType>( std::stod( optarg ) );
+        break;
       case 'k':
         keep = static_cast<unsigned>( std::stoul( optarg ) );
         break;
