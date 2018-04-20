@@ -160,12 +160,30 @@ int main( int argc, char** argv)
     auto diagram
       = aleph::io::load<DataType>( argv[i] );
 
+    std::cerr << "finished\n"
+              << "* Loaded diagram with " << diagram.size() << " points\n";
+
+    if( threshold != DataType() )
+    {
+      std::cerr << "* Filtering diagram...";
+
+      filterDiagram( diagram, threshold );
+
+      std::cerr << "finished\n"
+                << "* Filtered diagram contains " << diagram.size() << " points\n";
+    }
+
     if( normalize )
+    {
+      std::cerr << "* Normalizing diagram...";
+
       normalizeDiagram( diagram );
+
+      std::cerr << "finished\n";
+    }
 
     diagrams.emplace_back( diagram );
 
-    std::cerr << "finished\n";
   }
 
   for( auto&& diagram : diagrams )
