@@ -482,12 +482,6 @@ int main( int argc, char** argv )
   std::vector<SimplicialComplex> simplicialComplexes;
   simplicialComplexes.reserve( static_cast<unsigned>( argc - optind - 1 ) );
 
-  std::vector<DataType> minData;
-  std::vector<DataType> maxData;
-
-  minData.reserve( simplicialComplexes.size() );
-  maxData.reserve( simplicialComplexes.size() );
-
   if( argc - optind >= 1 )
   {
     if( bipartite )
@@ -534,26 +528,6 @@ int main( int argc, char** argv )
     }
   }
 
-  // Determine minimum and maximum values for each complex -------------
-
-  for( auto&& K : simplicialComplexes )
-  {
-    DataType minData_ = std::numeric_limits<DataType>::max();
-    DataType maxData_ = std::numeric_limits<DataType>::lowest();
-
-    // *Always* determine minimum and maximum weights so that we may
-    // report them later on. They are only used for normalization in
-    // the persistence diagram calculation step.
-    for( auto&& s : K )
-    {
-      minData_ = std::min( minData_, s.data() );
-      maxData_ = std::max( maxData_, s.data() );
-    }
-
-    minData.push_back( minData_ );
-    maxData.push_back( maxData_ );
-  }
-
   // Establish filtration order ----------------------------------------
 
   for( auto&& K : simplicialComplexes )
@@ -585,19 +559,28 @@ int main( int argc, char** argv )
 
     if( normalize )
     {
+      DataType minData = std::numeric_limits<DataType>::max();
+      DataType maxData = std::numeric_limits<DataType>::lowest();
+
+      for( auto&& s : K )
+      {
+        minData = std::min( minData, s.data() );
+        maxData = std::max( maxData, s.data() );
+      }
+
       // Ensures that all weights are in [0:1] for the corresponding
       // diagram. This enables the comparison of time-varying graphs
       // or different instances.
       std::transform( D.begin(), D.end(), D.begin(),
-        [&i, &minData, &maxData] ( const Point& p )
+        [&minData, &maxData] ( const Point& p )
         {
           auto x = p.x();
           auto y = p.y();
 
-          if( minData[i] != maxData[i] )
+          if( minData != maxData )
           {
-            x = (x - minData[i]) / (maxData[i] - minData[i]);
-            y = (y - minData[i]) / (maxData[i] - minData[i]);
+            x = (x - minData) / (maxData - minData);
+            y = (y - minData) / (maxData - minData);
           }
 
           return Point( x,y );
