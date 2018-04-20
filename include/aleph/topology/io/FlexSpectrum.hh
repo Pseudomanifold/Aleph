@@ -6,6 +6,7 @@
 #include <algorithm>
 #include <fstream>
 #include <map>
+#include <numeric>
 #include <sstream>
 #include <string>
 #include <vector>
@@ -38,6 +39,7 @@ public:
     std::size_t index = 0; // line index, but conveniently, this will
                            // also be the vertex index
 
+    std::vector<DataType> intensities;
     std::vector<Simplex> simplices;
 
     // Read lines & create vertices ------------------------------------
@@ -64,6 +66,7 @@ public:
       _index_to_value[index] = x;
 
       simplices.emplace_back( Simplex( VertexType( index ), y ) );
+      intensities.emplace_back( y );
 
       ++index;
     }
@@ -90,6 +93,15 @@ public:
       simplices.emplace_back( Simplex( {u,v}, w ) );
     }
 
+    if( _normalize )
+    {
+      auto totalIntensity
+        = std::accumulate( intensities.begin(), intensities.end(), DataType() );
+
+      for( auto&& s : simplices )
+        s.setData( s.data() / totalIntensity );
+    }
+
     K = SimplicialComplex( simplices.begin(), simplices.end() );
     K.sort(
       aleph::topology::filtrations::Data<Simplex,
@@ -97,7 +109,24 @@ public:
     );
   }
 
+  bool normalize() const noexcept
+  {
+    return _normalize;
+  }
+
+  void normalize( bool value = true )
+  {
+    _normalize = value;
+  }
+
 private:
+
+  /**
+    If set, normalizes each spectrum according to all intensities that
+    have been observed. This ensures that all masses sum up to one.
+  */
+
+  bool _normalize = false;
 
   /**
     Contains the raw \f$x\f-values that have been read from the file
