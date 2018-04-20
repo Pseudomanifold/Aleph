@@ -75,7 +75,12 @@ template <class InputIterator> long eulerCharacteristic( InputIterator begin,
 
 /**
   Calculates the persistent Euler characteristic of a sequence of
-  persistence diagrams.
+  persistence diagrams. This function follows the definition of a
+  novel persistent characteristic from the following paper:
+
+    > Omer Bobrowski and Matthew Strom Borman
+    > Euler Integration of Gaussian Random Fields and Persistent Homology
+    > https://arxiv.org/pdf/1003.5175.pdf
 */
 
 template <class InputIterator> auto persistentEulerCharacteristic( InputIterator begin,
