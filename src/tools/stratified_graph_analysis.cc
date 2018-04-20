@@ -204,7 +204,24 @@ SimplicialComplex applyFiltration( const SimplicialComplex& K,
   return L;
 }
 
+template <class T> T min_abs( T a, T b )
+{
+  if( std::abs( a ) < std::abs( b ) )
+    return a;
+  else
+    return b;
+}
+
+template <class T> T max_abs( T a, T b )
+{
+  if( std::abs( a ) > std::abs( b ) )
+    return a;
+  else
+    return b;
+}
+
 SimplicialComplex assignVertexWeights( const SimplicialComplex& K,
+                                       const std::string& filtration,
                                        const std::string& strategy,
                                        bool reverse = false )
 {
@@ -216,8 +233,22 @@ SimplicialComplex assignVertexWeights( const SimplicialComplex& K,
     if( s.dimension() != 1 )
       continue;
 
-    minData = std::min( minData, s.data() );
-    maxData = std::max( maxData, s.data() );
+    if( filtration == "standard" )
+    {
+      minData = std::min( minData, s.data() );
+      maxData = std::max( maxData, s.data() );
+    }
+    else if( filtration == "absolute" )
+    {
+      if( minData == std::numeric_limits<DataType>::max() )
+        minData = s.data();
+
+      if( maxData == std::numeric_limits<DataType>::lowest() )
+        maxData = s.data();
+
+      minData = min_abs( minData, s.data() );
+      maxData = max_abs( maxData, s.data() );
+    }
   }
 
   // Setting up the weights --------------------------------------------
@@ -481,8 +512,11 @@ int main( int argc, char** argv )
   for( auto&& K : simplicialComplexes )
   {
     K = applyFiltration( K, filtration, reverse );
-    K = assignVertexWeights( K, weights, reverse );
+    K = assignVertexWeights( K, filtration, weights, reverse );
     K = applyFiltration( K, filtration, reverse );
+
+    if( verbose )
+      std::cerr << K << "\n";
   }
 
   // 2. Calculate persistent homology ----------------------------------
