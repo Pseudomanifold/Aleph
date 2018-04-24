@@ -119,6 +119,11 @@ public:
     _normalize = value;
   }
 
+  std::map<std::size_t, double> getIndexToValueMap() const noexcept
+  {
+    return _index_to_value;
+  }
+
 private:
 
   /**
