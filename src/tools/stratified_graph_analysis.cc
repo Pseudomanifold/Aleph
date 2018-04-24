@@ -25,8 +25,18 @@
                            and "absolute" for using absolute weights of
                            the edges for sorting
 
-        --normalize (-n): If set, normalizes all diagrams, which allows
-                          us to disregard scaling effects.
+        --normalize (-n): Change the normalization strategy. Choose one
+                          of "minmax", or "standardize", or leave empty
+                          to default to "diagram" normalization.
+
+                          - "diagram": scales all points in the diagram
+                            between $0$ and $1$
+
+                          - "minmax": scales all points in the graph to
+                            satisfy $w \in [-1,+1]$
+
+                          - "standardize": scales all weights to have a
+                            mean of $0$ and a standard deviation of $1$
 
         --persistence-diagrams (-p): If, calculates persistence diagrams
                                      instead of only reporting the total
@@ -396,18 +406,25 @@ int main( int argc, char** argv )
   // Defines how the minimum value for the vertices is to be set. Valid
   // options include:
   //
-  //  - global    (uses the global extremal value)
-  //  - local     (uses the local  extremal value over all neighbours)
+  //  - global (uses the global extremal value)
+  //  - local  (uses the local  extremal value over all neighbours)
   std::string weights = "global";
+
+  // By default, only the output persistence diagram will be normalized,
+  // but the user can change this:
+  //
+  //   - minmax      (scales all weights in the graph to $[-1,+1]$
+  //   - standardize (scales all weights to have a mean of $0$ and standard deviation of $1)
+  std::string normalization;
 
   {
     static option commandLineOptions[] =
     {
       { "bipartite"           , no_argument,       nullptr, 'b' },
-      { "normalize"           , no_argument,       nullptr, 'n' },
       { "persistence-diagrams", no_argument,       nullptr, 'p' },
       { "reverse"             , no_argument,       nullptr, 'r' },
       { "verbose"             , no_argument,       nullptr, 'v' },
+      { "normalize"           , optional_argument, nullptr, 'n' },
       { "filtration"          , required_argument, nullptr, 'f' },
       { "weights"             , required_argument, nullptr, 'w' },
       { nullptr               , 0                , nullptr,  0  }
@@ -426,6 +443,10 @@ int main( int argc, char** argv )
         break;
       case 'n':
         normalize = true;
+
+        if( optarg != nullptr )
+          normalization = optarg;
+
         break;
       case 'p':
         calculateDiagrams = true;
