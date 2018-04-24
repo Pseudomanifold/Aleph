@@ -55,6 +55,7 @@
                         first neighbour of a vertex to set the weight.
 */
 
+#include <aleph/math/Statistics.hh>
 #include <aleph/math/SymmetricMatrix.hh>
 
 #include <aleph/persistenceDiagrams/Norms.hh>
@@ -69,6 +70,8 @@
 
 #include <aleph/topology/io/BipartiteAdjacencyMatrix.hh>
 #include <aleph/topology/io/EdgeLists.hh>
+
+#include <cassert>
 
 #include <algorithm>
 #include <chrono>
@@ -367,7 +370,56 @@ SimplicialComplex assignVertexWeights( const SimplicialComplex& K,
   return L;
 }
 
-template <class Reader> std::vector<SimplicialComplex> loadSimplicialComplexes( int argc, char** argv )
+void normalizeSimplicialComplex( SimplicialComplex& K, const std::string& normalization )
+{
+  if( normalization.empty() )
+    return;
+
+  // Only collect weights of 1-dimensional simplices, i.e. edges,
+  // because those are *guaranteed* not to have been changed, and
+  // we want to work with the original weights.
+  std::vector<DataType> weights;
+  for( auto&& s : K )
+  {
+    if( s.dimension() == 1 )
+      weights.push_back( s.data() );
+  }
+
+  if( weights.empty() )
+    return;
+
+  auto minmax = std::minmax_element( weights.begin(), weights.end() );
+  auto mu     = aleph::math::sampleMean( weights.begin(), weights.end() );
+  auto sigma  = aleph::math::sampleStandardDeviation( weights.begin(), weights.end() );
+
+  assert( *minmax.first != *minmax.second );
+
+  for( auto it = K.begin(); it != K.end(); ++it )
+  {
+    auto s = *it;
+    auto w = s.data();
+
+    if( normalization == "minmax" )
+    {
+      w = ( w - *minmax.first ) / ( *minmax.second - *minmax.first ); // [ 0, 1]
+      w = 2*w;                                                        // [ 0, 2]
+      w = w - 1;                                                      // [-1,+1]
+    }
+    else if( normalization == "standardize" )
+      w = (w - mu) / sigma;
+    else
+      throw std::runtime_error( "Unknown normalization strategy '" + normalization + "'" );
+
+    s.setData( w );
+    bool success = K.replace( it, s );
+
+    assert( success );
+  }
+}
+
+template <class Reader> std::vector<SimplicialComplex> loadSimplicialComplexes(
+  int argc, char** argv,
+  const std::string& normalization )
 {
   Reader reader;
 
@@ -385,6 +437,7 @@ template <class Reader> std::vector<SimplicialComplex> loadSimplicialComplexes( 
 
     std::cerr << "finished\n";
 
+    normalizeSimplicialComplex( K, normalization );
     simplicialComplexes.emplace_back( K );
   }
 
@@ -431,7 +484,7 @@ int main( int argc, char** argv )
     };
 
     int option = 0;
-    while( ( option = getopt_long( argc, argv, "bnprtvf:w:", commandLineOptions, nullptr ) ) != -1 )
+    while( ( option = getopt_long( argc, argv, "bprtvf:w:n::", commandLineOptions, nullptr ) ) != -1 )
     {
       switch( option )
       {
@@ -510,14 +563,14 @@ int main( int argc, char** argv )
       using Reader = aleph::topology::io::BipartiteAdjacencyMatrixReader;
 
       simplicialComplexes
-        = loadSimplicialComplexes<Reader>( argc, argv );
+        = loadSimplicialComplexes<Reader>( argc, argv, normalization );
     }
     else
     {
       using Reader = aleph::topology::io::EdgeListReader;
 
       simplicialComplexes
-        = loadSimplicialComplexes<Reader>( argc, argv );
+        = loadSimplicialComplexes<Reader>( argc, argv, normalization );
     }
   }
   else
@@ -578,7 +631,7 @@ int main( int argc, char** argv )
     D.removeDiagonal();
     D.removeUnpaired();
 
-    if( normalize )
+    if( normalize && normalization.empty() )
     {
       DataType minData = std::numeric_limits<DataType>::max();
       DataType maxData = std::numeric_limits<DataType>::lowest();
