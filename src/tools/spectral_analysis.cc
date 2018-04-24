@@ -19,6 +19,7 @@
 #include <aleph/persistenceDiagrams/PersistenceDiagram.hh>
 
 #include <aleph/persistentHomology/Calculation.hh>
+#include <aleph/persistentHomology/ConnectedComponents.hh>
 
 #include <aleph/topology/io/FlexSpectrum.hh>
 
@@ -28,6 +29,7 @@
 #include <algorithm>
 #include <iostream>
 #include <string>
+#include <tuple>
 
 #include <cassert>
 
@@ -59,41 +61,37 @@ int main( int argc, char** argv )
 
   std::cerr << "* Calculating persistent homology...";
 
-  auto diagrams = aleph::calculatePersistenceDiagrams( K );
+  using PersistencePairing = aleph::PersistencePairing<VertexType>;
+  using Traits             = aleph::traits::PersistencePairingCalculation<PersistencePairing>;
 
-  // Need to ensure that we are actually doing the right thing here, so
-  // I rather check *everything* that might go awry.
-  assert( diagrams.empty() == false );
-  assert( diagrams.size()  == 1 );
+  auto&& tuple
+    = aleph::calculateZeroDimensionalPersistenceDiagram<Simplex, Traits>( K );
 
   std::cerr << "finished\n";
 
   // Output ------------------------------------------------------------
 
-  if( diagrams.empty() == false )
-  {
-    auto&& D = diagrams.front();
+  auto&& D = std::get<0>( tuple );
 
-    assert( D.dimension() == 0 );
-    assert( D.betti()     == 1 );
+  assert( D.dimension() == 0 );
+  assert( D.betti()     == 1 );
 
-    D.removeDiagonal();
+  D.removeDiagonal();
 
-    // This ensures that the global maximum is paired with the global
-    // minimum of the persistence diagram. This is valid because each
-    // function has finite support and is bounded from below.
-    std::transform( D.begin(), D.end(), D.begin(),
-      [] ( const PersistenceDiagram::Point& p )
-      {
-        // TODO: we should check whether zero is really the smallest
-        // value
-        if( p.isUnpaired() )
-          return PersistenceDiagram::Point( p.x(), DataType() );
-        else
-          return PersistenceDiagram::Point( p );
-      }
-    );
+  // This ensures that the global maximum is paired with the global
+  // minimum of the persistence diagram. This is valid because each
+  // function has finite support and is bounded from below.
+  std::transform( D.begin(), D.end(), D.begin(),
+    [] ( const PersistenceDiagram::Point& p )
+    {
+      // TODO: we should check whether zero is really the smallest
+      // value
+      if( p.isUnpaired() )
+        return PersistenceDiagram::Point( p.x(), DataType() );
+      else
+        return PersistenceDiagram::Point( p );
+    }
+  );
 
-    std::cout << D << "\n";
-  }
+  std::cout << D << "\n";
 }
