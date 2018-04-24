@@ -33,6 +33,9 @@
 #include <tuple>
 
 #include <cassert>
+#include <cmath>
+
+#include <getopt.h>
 
 using DataType           = unsigned;
 using VertexType         = unsigned;
@@ -42,10 +45,36 @@ using PersistenceDiagram = aleph::PersistenceDiagram<DataType>;
 
 int main( int argc, char** argv )
 {
-  if( argc <= 1 )
+  bool normalize   = false;
+  std::string mode = "diagram";
+
+  {
+    static option commandLineOptions[] =
+    {
+      { "mode"     , required_argument, nullptr, 'm' },
+      { "normalize", no_argument      , nullptr, 'n' },
+      { nullptr    , 0                , nullptr,  0  }
+    };
+
+    int option = 0;
+    while( ( option = getopt_long( argc, argv, "m:n", commandLineOptions, nullptr ) ) != -1 )
+    {
+      switch( option )
+      {
+      case 'm':
+        mode = optarg;
+        break;
+      case 'n':
+        normalize = true;
+        break;
+      }
+    }
+  }
+
+  if( ( argc - optind ) < 1 )
     return -1;
 
-  std::string input = argv[1];
+  std::string input = argv[optind++];
 
   // Parse input -------------------------------------------------------
 
@@ -54,6 +83,9 @@ int main( int argc, char** argv )
   SimplicialComplex K;
 
   aleph::topology::io::FlexSpectrumReader reader;
+  if( normalize )
+    reader.normalize( true );
+
   reader( input, K );
 
   std::cerr << "finished\n";
