@@ -107,16 +107,21 @@ int main( int argc, char** argv )
   {
     auto&& creator   = pair.first;
     auto&& destroyer = pair.second;
-    auto&& sigma     = K.at( creator );
-    auto&& tau       = K.at( destroyer );
 
-    assert( sigma.dimension() == 0 );
-    assert(   tau.dimension() == 1 );
+    // FIXME: need to handle unpaired points as well
+    if( destroyer < K.size() )
+    {
+      auto&& sigma     = K.at( creator );
+      auto&& tau       = K.at( destroyer );
 
-    auto persistence = std::abs( double( sigma.data() ) - double( tau.data() ) );
-    auto x           = map.at( sigma[0] );
+      assert( sigma.dimension() == 0 );
+      assert(   tau.dimension() == 1 );
 
-    transformedFunction[ x ] = persistence;
+      auto persistence = std::abs( double( sigma.data() ) - double( tau.data() ) );
+      auto x           = map.at( sigma[0] );
+
+      transformedFunction[ x ] = persistence;
+    }
   }
 
   std::ofstream out( "/tmp/F.txt" );
