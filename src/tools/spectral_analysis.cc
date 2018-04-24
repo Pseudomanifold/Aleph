@@ -102,57 +102,66 @@ int main( int argc, char** argv )
 
   std::cerr << "finished\n";
 
-  // Output ------------------------------------------------------------
-
   auto&& D       = std::get<0>( tuple );
   auto&& pairing = std::get<1>( tuple );
 
-  assert( D.dimension() == 0 );
-  assert( D.betti()     == 1 );
 
-  D.removeDiagonal();
+  // Output ------------------------------------------------------------
 
-  // This ensures that the global maximum is paired with the global
-  // minimum of the persistence diagram. This is valid because each
-  // function has finite support and is bounded from below.
-  std::transform( D.begin(), D.end(), D.begin(),
-    [] ( const PersistenceDiagram::Point& p )
-    {
-      // TODO: we should check whether zero is really the smallest
-      // value
-      if( p.isUnpaired() )
-        return PersistenceDiagram::Point( p.x(), DataType() );
-      else
-        return PersistenceDiagram::Point( p );
-    }
-  );
-
-  std::cout << D << "\n";
-
-  // Transform input data (experimental) -------------------------------
-
-  auto&& map = reader.getIndexToValueMap();
-
-  std::map<double, double> transformedFunction;
-
-  for( auto&& pair : pairing )
+  if( mode == "diagram" )
   {
-    auto&& creator   = pair.first;
-    auto&& destroyer = pair.second;
-    auto&& sigma     = K.at( creator );
-    auto&& tau       = destroyer < K.size() ? K.at( destroyer ) : Simplex( {0,1}, DataType() );
+    assert( D.dimension() == 0 );
+    assert( D.betti()     == 1 );
 
-    assert( sigma.dimension() == 0 );
-    assert(   tau.dimension() == 1 );
+    D.removeDiagonal();
 
-    auto persistence = std::abs( double( sigma.data() ) - double( tau.data() ) );
-    auto x           = map.at( sigma[0] );
+    // This ensures that the global maximum is paired with the global
+    // minimum of the persistence diagram. This is valid because each
+    // function has finite support and is bounded from below.
+    std::transform( D.begin(), D.end(), D.begin(),
+      [] ( const PersistenceDiagram::Point& p )
+      {
+        // TODO: we should check whether zero is really the smallest
+        // value
+        if( p.isUnpaired() )
+          return PersistenceDiagram::Point( p.x(), DataType() );
+        else
+          return PersistenceDiagram::Point( p );
+      }
+    );
 
-    transformedFunction[ x ] = persistence;
+    std::cout << D << "\n";
   }
 
-  std::ofstream out( "/tmp/F.txt" );
+  // Transform the (normalized) spectrum into a plane where the
+  // $y$-value indicates the persistence of a peak. Thus, it is
+  // easier to filter away peaks.
+  else if( mode == "transformation" )
+  {
+    auto&& map = reader.getIndexToValueMap();
 
-  for( auto&& pair : transformedFunction )
-    out << pair.first << "\t" << pair.second << "\n";
+    std::map<double, double> transformedFunction;
+
+    for( auto&& pair : pairing )
+    {
+      auto&& creator   = pair.first;
+      auto&& destroyer = pair.second;
+      auto&& sigma     = K.at( creator );
+      auto&& tau       = destroyer < K.size() ? K.at( destroyer ) : Simplex( {0,1}, DataType() );
+
+      assert( sigma.dimension() == 0 );
+      assert(   tau.dimension() == 1 );
+
+      auto persistence = std::abs( double( sigma.data() ) - double( tau.data() ) );
+      auto x           = map.at( sigma[0] );
+
+      transformedFunction[ x ] = persistence;
+    }
+
+    std::ofstream out( "/tmp/F.txt" );
+
+    for( auto&& pair : transformedFunction )
+      out << pair.first << "\t" << pair.second << "\n";
+
+  }
 }
