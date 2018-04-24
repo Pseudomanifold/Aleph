@@ -72,6 +72,7 @@
 #include <aleph/topology/io/EdgeLists.hh>
 
 #include <cassert>
+#include <cmath>
 
 #include <algorithm>
 #include <chrono>
@@ -630,6 +631,19 @@ int main( int argc, char** argv )
 
     D.removeDiagonal();
     D.removeUnpaired();
+
+    if( filtration == "absolute" )
+    {
+      std::transform( D.begin(), D.end(), D.begin(),
+        [] ( const Point& p )
+        {
+          auto x = p.x();
+          auto y = p.y();
+
+          return Point( std::abs(x), std::abs(y) );
+        }
+      );
+    }
 
     if( normalize && normalization.empty() )
     {
