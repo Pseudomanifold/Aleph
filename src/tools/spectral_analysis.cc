@@ -37,7 +37,7 @@
 
 #include <getopt.h>
 
-using DataType           = unsigned;
+using DataType           = double;
 using VertexType         = unsigned;
 using Simplex            = aleph::topology::Simplex<DataType, VertexType>;
 using SimplicialComplex  = aleph::topology::SimplicialComplex<Simplex>;
@@ -130,7 +130,7 @@ int main( int argc, char** argv )
       }
     );
 
-    std::cout << D << "\n";
+    std::cout << std::setprecision(11) << D << "\n";
   }
 
   // Transform the (normalized) spectrum into a plane where the
