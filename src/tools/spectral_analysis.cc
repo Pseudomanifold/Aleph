@@ -27,8 +27,8 @@
 #include <aleph/topology/SimplicialComplex.hh>
 
 #include <algorithm>
+#include <iomanip>
 #include <iostream>
-#include <fstream>  // FIXME: remove or make output configurable...
 #include <string>
 #include <tuple>
 
@@ -140,6 +140,9 @@ int main( int argc, char** argv )
   {
     auto&& map = reader.getIndexToValueMap();
 
+    // TODO: there is surely a better way to report the transformed
+    // function, but the map sorts values automatically, which sure
+    // is nice.
     std::map<double, double> transformedFunction;
 
     for( auto&& pair : pairing )
@@ -155,13 +158,10 @@ int main( int argc, char** argv )
       auto persistence = std::abs( double( sigma.data() ) - double( tau.data() ) );
       auto x           = map.at( sigma[0] );
 
-      transformedFunction[ x ] = persistence;
+      transformedFunction[x] = persistence;
     }
 
-    std::ofstream out( "/tmp/F.txt" );
-
     for( auto&& pair : transformedFunction )
-      out << pair.first << "\t" << pair.second << "\n";
-
+      std::cout << std::setprecision(11) << pair.first << "\t" << pair.second << "\n";
   }
 }
