@@ -265,6 +265,21 @@ SimplicialComplex applyFiltration( const SimplicialComplex& K,
   return L;
 }
 
+DataType getMinimumAbsoluteWeight( const SimplicialComplex& K )
+{
+  DataType result = std::numeric_limits<DataType>::max();
+
+  // Again, only need to consider $1$-dimensional simplices, i.e. edges
+  // here, because their weights are guarantee to be salient.
+  for( auto&& s : K )
+  {
+    if( s.dimension() == 1 )
+      result = std::min( result, std::abs( s.data() ) );
+  }
+
+  return result;
+}
+
 template <class T> T min_abs( T a, T b )
 {
   if( std::abs( a ) < std::abs( b ) )
@@ -633,7 +648,18 @@ int main( int argc, char** argv )
                                      // we get features in the highest dimension.
 
     D.removeDiagonal();
-    D.removeUnpaired();
+
+    auto minAbsoluteWeight = getMinimumAbsoluteWeight( K );
+
+    std::transform( D.begin(), D.end(), D.begin(),
+      [&minAbsoluteWeight] ( const Point& p )
+      {
+        if( p.isUnpaired() )
+          return Point( p.x(), minAbsoluteWeight );
+        else
+          return Point( p );
+      }
+    );
 
     if( filtration == "absolute" )
     {
