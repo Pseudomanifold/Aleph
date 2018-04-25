@@ -28,7 +28,7 @@ template <class DataType> double totalPersistence( const PersistenceDiagram<Data
   if( !weighted )
   {
     for( auto&& point : D )
-      result += std::pow( static_cast<double>( point.persistence() ), k );
+      result += std::pow( static_cast<double>( std::abs( point.persistence() ) ), k );
   }
   else
   {
