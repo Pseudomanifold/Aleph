@@ -129,12 +129,12 @@ IF( PKG_CONFIG_FOUND )
 
     SET( ALEPH_WITH_EIGEN TRUE )
   ENDIF()
-
-  # Not used here, but in subordinate directories, so it is nicer to
-  # look for the package in a *single* location.
-  FIND_PACKAGE(PythonInterp 3)
-  FIND_PACKAGE(PythonLibs   3)
 ENDIF()
+
+# Not used here, but in subordinate directories, so it is nicer to
+# look for the package in a *single* location.
+FIND_PACKAGE(PythonInterp 3)
+FIND_PACKAGE(PythonLibs   3)
 
 FIND_PACKAGE( tinyxml2 )
 
