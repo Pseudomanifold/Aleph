@@ -400,7 +400,9 @@ void normalizeSimplicialComplex( SimplicialComplex& K, const std::string& normal
     auto s = *it;
     auto w = s.data();
 
-    if( normalization == "minmax" )
+    if( normalization == "abs" )
+      w = w / std::max( std::abs( *minmax.first ), std::abs( *minmax.second ) );
+    else if( normalization == "minmax" )
     {
       w = ( w - *minmax.first ) / ( *minmax.second - *minmax.first ); // [ 0, 1]
       w = 2*w;                                                        // [ 0, 2]
@@ -467,6 +469,7 @@ int main( int argc, char** argv )
   // By default, only the output persistence diagram will be normalized,
   // but the user can change this:
   //
+  //   - abs         (scales all weights in the graph by dividing by the absolute value of its weights)
   //   - minmax      (scales all weights in the graph to $[-1,+1]$
   //   - standardize (scales all weights to have a mean of $0$ and standard deviation of $1)
   std::string normalization;
