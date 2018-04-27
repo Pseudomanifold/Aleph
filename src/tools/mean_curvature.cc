@@ -48,5 +48,11 @@ int main( int argc, char** argv )
 
     std::cout << c << "\n";
   }
+
+#else
+  // Silence compiler warnings on systems that do not have Eigen
+  // installed. In this case, this tool becomes useless.
+  (void) argc;
+  (void) argv;
 #endif
 }
