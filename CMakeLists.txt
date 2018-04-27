@@ -167,8 +167,12 @@ CONFIGURE_FILE( ${CMAKE_SOURCE_DIR}/include/aleph/config/TinyXML2.hh.in ${CMAKE_
 # Include directories
 ########################################################################
 
+# Ensure that Boost installations do not emit any warnings.
 INCLUDE_DIRECTORIES(
-  ${Boost_INCLUDE_DIR}
+  SYSTEM ${Boost_INCLUDE_DIR}
+)
+
+INCLUDE_DIRECTORIES(
   ${CMAKE_SOURCE_DIR}
   ${CMAKE_SOURCE_DIR}/include
 )
