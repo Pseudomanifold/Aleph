@@ -25,7 +25,9 @@ IF( BUILD_PYTHON_BINDINGS )
       )
     ENDIF()
 
-    IF( HDF5_FOUND )
+    # We *cannot* rely on HDF5_FOUND here because the module might be
+    # mis-configured for some reason (older version, etc.).
+    IF( ALEPH_WITH_HDF5 )
       TARGET_INCLUDE_DIRECTORIES( aleph SYSTEM
         PUBLIC
           ${HDF5_INCLUDE_DIRS}
