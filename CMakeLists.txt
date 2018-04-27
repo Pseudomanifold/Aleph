@@ -107,6 +107,17 @@ FIND_PACKAGE( HDF5 COMPONENTS CXX )
 
 IF( HDF5_FOUND )
   SET( ALEPH_WITH_HDF5 TRUE )
+
+  # Workaround for older versions of the FindHDF5.cmake module. In some
+  # versions, this module is broken and does not return the proper libs
+  # when being prompted to do so.
+  FOREACH( library ${HDF5_CXX_LIBRARIES} )
+    IF( NOT library )
+      MESSAGE( WARNING "One of the required HDF5 C++ libraries was not found
+but the module returned HDF5_FOUND. This indicates a broken installation." )
+      SET( ALEPH_WITH_HDF5 FALSE )
+    ENDIF()
+  ENDFOREACH()
 ENDIF()
 
 FIND_PACKAGE( PkgConfig )
