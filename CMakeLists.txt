@@ -11,6 +11,7 @@ ELSE()
 ENDIF()
 
 LIST( APPEND CMAKE_MODULE_PATH
+  ${CMAKE_SOURCE_DIR}/cmake
   ${CMAKE_SOURCE_DIR}/cmake/Modules
 )
 
@@ -18,6 +19,9 @@ SET( CMAKE_EXPORT_COMPILE_COMMANDS ON )
 
 MESSAGE( STATUS "CMAKE_ROOT:           ${CMAKE_ROOT}" )
 MESSAGE( STATUS "CMAKE_SYSTEM_VERSION: ${CMAKE_SYSTEM_VERSION}" )
+
+INCLUDE( setup_external_macros )
+INCLUDE( check_compiler_features )
 
 ########################################################################
 # Versioning
