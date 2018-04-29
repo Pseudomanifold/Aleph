@@ -293,7 +293,6 @@ void wrapPersistenceDiagram( py::module& m )
       // Callback that allows buffer to be freed if not used in python anymore
       py::capsule free_when_done(buffer, [](void *f) {
             DataType *buf = reinterpret_cast<DataType *>(f);
-            std::cerr << "freeing memory  allocated by aleph @ " << f << "\n";
             delete[] buf;
         });
 
