@@ -19,6 +19,7 @@ addons:
     packages:
       - g++-4.9
       - libboost-dev
+      - libboost-regex-dev
       - libeigen3-dev
       - libflann-dev
       - libgomp1
