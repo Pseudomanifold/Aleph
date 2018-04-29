@@ -83,7 +83,20 @@ SET( BUILD_TOOLS
 # Additional packages
 ########################################################################
 
-FIND_PACKAGE( Boost REQUIRED )
+# Check whether the compiler is sufficiently new for C++11 support to
+# exist. If that is *still* not the case, some functionality is going
+# to be used from Boost. This requires linking Boost against each and
+# every target.
+IF( NOT ALEPH_COMPILER_HAS_REGEX_TOKEN_ITERATOR )
+  FIND_PACKAGE( Boost REQUIRED COMPONENTS regex )
+
+  # Pre-condition: this variable is supposed to be empty at the
+  # beginning and so far, this is the only place we we use it.
+  SET( CMAKE_CXX_STANDARD_LIBRARIES ${Boost_LIBRARIES} )
+ELSE()
+  FIND_PACKAGE( Boost REQUIRED )
+ENDIF()
+
 FIND_PACKAGE( OpenMP )
 
 # This is somewhat brute-force: I am adding OpenMP flags regardless of

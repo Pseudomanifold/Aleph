@@ -1,6 +1,12 @@
 #ifndef ALEPH_UTILITIES_STRING_HH__
 #define ALEPH_UTILITIES_STRING_HH__
 
+#include <aleph/config/Aleph.hh>
+
+#ifndef ALEPH_COMPILER_HAS_REGEX_TOKEN_ITERATOR
+  #include <boost/regex.hpp>
+#endif
+
 #include <algorithm>
 #include <iterator>
 #include <limits>
@@ -49,9 +55,16 @@ template <class T> T trim( T sequence )
 template <class T> std::vector<T> split( const T& sequence,
                                          const T& regex = "[[:space:]]+" )
 {
+
+#ifndef ALEPH_COMPILER_HAS_REGEX_TOKEN_ITERATOR
+  boost::regex re( regex );
+  boost::sregex_token_iterator begin( sequence.begin(), sequence.end(), re, -1 );
+  boost::sregex_token_iterator end;
+#else
   std::regex re( regex );
   std::sregex_token_iterator begin( sequence.begin(), sequence.end(), re, -1 );
   std::sregex_token_iterator end;
+#endif
 
   return { begin, end };
 }

@@ -25,6 +25,8 @@ IF( BUILD_PYTHON_BINDINGS )
       )
     ENDIF()
 
+    TARGET_LINK_LIBRARIES( aleph ${Boost_LIBRARIES} )
+
     # We *cannot* rely on HDF5_FOUND here because the module might be
     # mis-configured for some reason (older version, etc.).
     IF( ALEPH_WITH_HDF5 )
