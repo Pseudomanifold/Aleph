@@ -36,7 +36,12 @@
 #include <aleph/persistentHomology/ConnectedComponents.hh>
 #include <aleph/persistentHomology/PersistencePairing.hh>
 
+#include <algorithm>
+#include <limits>
 #include <stdexcept>
+#include <tuple>
+
+#include <cmath>
 
 namespace py = pybind11;
 
@@ -448,14 +453,33 @@ void wrapPersistentHomologyCalculation( py::module& m )
   // diagram along with a persistence pairing. This will permit us a
   // simpler assignment of total persistence values to layers.
   m.def( "calculateZeroDimensionalPersistenceDiagramAndPairing",
-    [] ( const SimplicialComplex& K )
+    [] ( const SimplicialComplex& K, DataType unpairedData = std::numeric_limits<DataType>::infinity() )
     {
       // Tells the calculation procedure that a pairing should be
       // calculated alongside the persistence diagram.
       using Traits
         = aleph::traits::PersistencePairingCalculation<PersistencePairing>;
 
-      return aleph::calculateZeroDimensionalPersistenceDiagram<Simplex, Traits>( K );
+      using Point = typename PersistenceDiagram::Point;
+      auto tuple  = aleph::calculateZeroDimensionalPersistenceDiagram<Simplex, Traits>( K );
+      auto&& pd   = std::get<0>( tuple );
+
+      if( std::isfinite( unpairedData ) )
+      {
+        std::transform( pd.begin(), pd.end(), pd.begin(),
+          [&unpairedData] ( const Point& p )
+          {
+            if( p.isUnpaired() )
+            {
+              return Point( p.x(), unpairedData );
+            }
+            else
+              return Point( p );
+          }
+        );
+      }
+
+      return tuple;
     }
   );
 }
