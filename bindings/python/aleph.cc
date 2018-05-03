@@ -33,6 +33,7 @@
 #include <aleph/persistenceDiagrams/io/Raw.hh>
 
 #include <aleph/persistentHomology/Calculation.hh>
+#include <aleph/persistentHomology/PersistencePairing.hh>
 
 #include <stdexcept>
 
@@ -43,6 +44,7 @@ using VertexType = unsigned;
 
 using PointCloud         = aleph::containers::PointCloud<DataType>;
 using PersistenceDiagram = aleph::PersistenceDiagram<DataType>;
+using PersistencePairing = aleph::PersistencePairing<VertexType>;
 using Simplex            = aleph::topology::Simplex<DataType, VertexType>;
 using SimplicialComplex  = aleph::topology::SimplicialComplex<Simplex>;
 using RipsExpander       = aleph::geometry::RipsExpander<SimplicialComplex>;
@@ -322,6 +324,79 @@ void wrapPersistenceDiagram( py::module& m )
     .def_property_readonly( "unpaired"   , &Point::isUnpaired );
 }
 
+void wrapPersistencePairing( py::module& m )
+{
+  py::class_<PersistencePairing>(m, "PersistencePairing")
+    .def( py::init<>() )
+    .def( "__bool__",                                   // implicit conversion into booleans
+      [] ( const PersistencePairing& pairing )
+      {
+        return !pairing.empty();
+      }
+    )
+    .def( "__eq__", &PersistencePairing::operator== )   // equality check
+    .def( "__ne__", &PersistencePairing::operator!= )   // inequality check
+    .def( "__len__", &PersistencePairing::size )        // length
+    .def( "__iter__",                                   // iteration
+      [] ( const PersistencePairing& pairing )
+      {
+        return py::make_iterator( pairing.begin(), pairing.end() );
+      }, py::keep_alive<0,1>()
+    )
+    .def( "__repr__",                                   // string-based representation
+      [] ( const PersistencePairing& pairing )
+      {
+        std::ostringstream stream;
+        stream << pairing;
+
+        return stream.str();
+      }
+    );
+
+    //.def( "__array__",
+    //  [] (PersistenceDiagram &D) {
+    //  auto n_points = D.size();
+    //  DataType *buffer = new DataType[2*n_points];
+
+    //  for (auto it = D.begin(); it != D.end(); it++) {
+    //    auto index = std::distance(D.begin(), it);
+    //    buffer[2*index] = it->x();
+    //    buffer[2*index+1] = it->y();
+    //  }
+    //  // Based on https://stackoverflow.com/questions/44659924/returning-numpy-arrays-via-pybind11
+    //  // Callback that allows buffer to be freed if not used in python anymore
+    //  py::capsule free_when_done(buffer, [](void *f) {
+    //        DataType *buf = reinterpret_cast<DataType *>(f);
+    //        delete[] buf;
+    //    });
+
+    //  return py::array_t<DataType>(
+    //    {static_cast<unsigned long>(n_points), static_cast<unsigned long>(2)}, // shape
+    //    {static_cast<unsigned long>(2*sizeof(DataType)), static_cast<unsigned long>(sizeof(DataType))}, // Stride
+    //    buffer, // the data pointer
+    //    free_when_done); // numpy array references this parent
+    //});
+
+  using Point = typename PersistenceDiagram::Point;
+
+  py::class_<Point>(m, "PersistenceDiagram.Point" )
+    .def( py::init<DataType>() )
+    .def( py::init<DataType, DataType>() )
+    .def( "__eq__", &Point::operator== )
+    .def( "__ne__", &Point::operator!= )
+    .def( "__repr__",
+      [] ( const Point& p )
+      {
+        return "<" + std::to_string( p.x() ) + "," + std::to_string( p.y() ) + ">";
+      }
+    )
+    .def_property_readonly( "x", &Point::x )
+    .def_property_readonly( "y", &Point::y )
+    .def_property_readonly( "persistence", &Point::persistence )
+    .def_property_readonly( "unpaired"   , &Point::isUnpaired );
+}
+
+
 void wrapPersistentHomologyCalculation( py::module& m )
 {
   using namespace pybind11::literals;
@@ -576,6 +651,7 @@ PYBIND11_MODULE(aleph, m)
   wrapSimplicialComplex(m);
   wrapNorms(m);
   wrapPersistenceDiagram(m);
+  wrapPersistencePairing(m);
   wrapPersistentHomologyCalculation(m);
   wrapRipsExpander(m);
   wrapStepFunction(m);
