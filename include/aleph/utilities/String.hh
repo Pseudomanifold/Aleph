@@ -23,6 +23,11 @@ namespace aleph
 namespace utilities
 {
 
+/**
+  Trims a sting from the left, i.e. removes all whitespace characters
+  that precede any other characters. Returns the modified string.
+*/
+
 template <class T> T ltrim( T sequence )
 {
   sequence.erase( sequence.begin(),
@@ -34,6 +39,11 @@ template <class T> T ltrim( T sequence )
 
   return sequence;
 }
+
+/**
+  Trims a sting from the right, i.e. removes all whitespace characters
+  that follow any other characters. Returns the modified string.
+*/
 
 template <class T> T rtrim( T sequence )
 {
@@ -47,10 +57,25 @@ template <class T> T rtrim( T sequence )
   return sequence;
 }
 
+/**
+  Trims a string from the right and from the left. Returns the modified
+  string.
+*/
+
 template <class T> T trim( T sequence )
 {
   return ltrim( rtrim( sequence ) );
 }
+
+/**
+  Splits a string based on regular expression. By default, all whitespace
+  characters will be used to perform the split. Notice that this function
+  is not necessarily highly efficient as the regex needs to be evaluated,
+  and individual tokens need to be extracted.
+
+  @param sequence String to split
+  @param regex    Regular expression
+*/
 
 template <class T> std::vector<T> split( const T& sequence,
                                          const T& regex = "[[:space:]]+" )
@@ -141,7 +166,7 @@ template <class T, class S> T convert( const S& sequence, bool& success )
     if( string == "+inf" || string == "inf" || string == "+infinity" || string == "infinity" )
       result = std::numeric_limits<T>::infinity();
     else if ( string == "-inf" || string == "-infinity" )
-      result = -std::numeric_limits<T>::infinity();
+      result = static_cast<T>( -std::numeric_limits<T>::infinity() );
     else if( string == "nan" )
       result = std::numeric_limits<T>::quiet_NaN();
 
