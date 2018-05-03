@@ -32,14 +32,36 @@ IF( BUILD_TOOLS )
 
   ENABLE_IF_SUPPORTED( CMAKE_CXX_FLAGS "-O3" )
 
-  # The confidence set calculation requires the availability of generic
-  # lambdas. Ditto for persistent intersection homology and smoothing.
-  SET_SOURCE_FILES_PROPERTIES(
-    persistence_indicator_function_confidence_sets.cc
-    persistent_intersection_homology.cc
-    piecewise_linear_function_smoothing.cc
-    PROPERTIES COMPILE_FLAGS "-std=c++14"
-  )
+  ######################################################################
+  # Check compiler flags
+  ######################################################################
+  #
+  # A few targets require a modern compiler, so we need to make sure
+  # that they are *not* built when an old compiler has been detected
+  # or the flag for C++14 is not supported.
+
+  CHECK_CXX_COMPILER_FLAG( "-std=c++14" ALEPH_HAVE_FLAG_CXX14 )
+
+  IF( ALEPH_HAVE_FLAG_CXX14 )
+    # The confidence set calculation requires the availability of generic
+    # lambdas. Ditto for persistent intersection homology and smoothing.
+    SET_SOURCE_FILES_PROPERTIES(
+      persistence_indicator_function_confidence_sets.cc
+      persistent_intersection_homology.cc
+      piecewise_linear_function_smoothing.cc
+      PROPERTIES COMPILE_FLAGS "-std=c++14"
+    )
+
+  # Old or unsupported compiler; let's exclude the targets from the
+  # build process.
+  ELSE()
+    SET_TARGET_PROPERTIES(
+      persistence_indicator_function_confidence_sets
+      persistent_intersection_homology
+      piecewise_linear_function_smoothing
+      PROPERTIES EXCLUDE_FROM_ALL TRUE
+    )
+  ENDIF()
 
   IF( FLANN_FOUND AND FLANN_VERSION VERSION_GREATER "1.8.4" )
     TARGET_LINK_LIBRARIES( local_dimensionality             lz4 )
