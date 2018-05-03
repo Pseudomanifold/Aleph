@@ -62,18 +62,6 @@ ENABLE_IF_SUPPORTED( CMAKE_CXX_FLAGS "-Wunsafe-loop-optimization" )
 
 ENABLE_IF_SUPPORTED( CMAKE_CXX_FLAGS "-pedantic" )
 
-IF( ALEPH_HAVE_FLAG_CXX14 )
-  SET_SOURCE_FILES_PROPERTIES(
-    test_bootstrap.cc
-    PROPERTIES COMPILE_FLAGS "-std=c++14"
-  )
-ELSE()
-  SET_TARGET_PROPERTIES(
-    test_bootstrap
-    PROPERTIES EXCLUDE_FROM_ALL TRUE
-  )
-ENDIF()
-
 ADD_EXECUTABLE( test_barycentric_subdivision          test_barycentric_subdivision.cc )
 ADD_EXECUTABLE( test_beta_skeleton                    test_beta_skeleton.cc )
 ADD_EXECUTABLE( test_bootstrap                        test_bootstrap.cc )
@@ -120,6 +108,18 @@ ADD_EXECUTABLE( test_tangent_space                    test_tangent_space.cc )
 ADD_EXECUTABLE( test_union_find                       test_union_find.cc )
 ADD_EXECUTABLE( test_step_function                    test_step_function.cc )
 ADD_EXECUTABLE( test_witness_complex                  test_witness_complex.cc )
+
+IF( ALEPH_HAVE_FLAG_CXX14 )
+  SET_SOURCE_FILES_PROPERTIES(
+    test_bootstrap.cc
+    PROPERTIES COMPILE_FLAGS "-std=c++14"
+  )
+ELSE()
+  SET_TARGET_PROPERTIES(
+    test_bootstrap
+    PROPERTIES EXCLUDE_FROM_ALL TRUE
+  )
+ENDIF()
 
 ADD_TEST( barycentric_subdivision          test_barycentric_subdivision )
 ADD_TEST( beta_skeleton                    test_beta_skeleton )
