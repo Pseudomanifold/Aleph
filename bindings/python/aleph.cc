@@ -33,6 +33,7 @@
 #include <aleph/persistenceDiagrams/io/Raw.hh>
 
 #include <aleph/persistentHomology/Calculation.hh>
+#include <aleph/persistentHomology/ConnectedComponents.hh>
 #include <aleph/persistentHomology/PersistencePairing.hh>
 
 #include <stdexcept>
@@ -441,6 +442,21 @@ void wrapPersistentHomologyCalculation( py::module& m )
     "buffer"_a,
     "epsilon"_a   = DataType(),
     "dimension"_a = 0
+  );
+
+  // Wraps a function that calculates a zero-dimensional persistence
+  // diagram along with a persistence pairing. This will permit us a
+  // simpler assignment of total persistence values to layers.
+  m.def( "calculateZeroDimensionalPersistenceDiagramAndPairing",
+    [] ( const SimplicialComplex& K )
+    {
+      // Tells the calculation procedure that a pairing should be
+      // calculated alongside the persistence diagram.
+      using Traits
+        = aleph::traits::PersistencePairingCalculation<PersistencePairing>;
+
+      return aleph::calculateZeroDimensionalPersistenceDiagram<Simplex, Traits>( K );
+    }
   );
 }
 
