@@ -480,7 +480,9 @@ void wrapPersistentHomologyCalculation( py::module& m )
       }
 
       return tuple;
-    }
+    },
+    py::arg("K"),
+    py::arg("unpairedData") = std::numeric_limits<DataType>::infinity()
   );
 }
 
