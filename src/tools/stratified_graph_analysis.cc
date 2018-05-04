@@ -504,7 +504,7 @@ int main( int argc, char** argv )
     };
 
     int option = 0;
-    while( ( option = getopt_long( argc, argv, "bprtvf:w:n::", commandLineOptions, nullptr ) ) != -1 )
+    while( ( option = getopt_long( argc, argv, "bdprtvf:w:n::", commandLineOptions, nullptr ) ) != -1 )
     {
       switch( option )
       {
@@ -544,6 +544,7 @@ int main( int argc, char** argv )
         weights = optarg;
         break;
       default:
+        throw std::runtime_error( "Unknown or incorrect command-line argument encountered" );
         break;
       }
     }
