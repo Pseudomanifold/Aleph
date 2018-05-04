@@ -493,6 +493,7 @@ int main( int argc, char** argv )
     static option commandLineOptions[] =
     {
       { "bipartite"           , no_argument,       nullptr, 'b' },
+      { "default"             , no_argument,       nullptr, 'd' },
       { "persistence-diagrams", no_argument,       nullptr, 'p' },
       { "reverse"             , no_argument,       nullptr, 'r' },
       { "verbose"             , no_argument,       nullptr, 'v' },
@@ -509,6 +510,16 @@ int main( int argc, char** argv )
       {
       case 'b':
         bipartite = true;
+        break;
+      case 'd':
+        std::cerr << "* Applying default arguments\n";
+
+        filtration    = "absolute";
+        normalize     = true;
+        normalization = "abs";
+        reverse       = true;
+        weights       = "global";
+
         break;
       case 'f':
         filtration = optarg;
@@ -565,7 +576,8 @@ int main( int argc, char** argv )
 
   std::cerr << "* Filtration: " << filtration
             << " (" << ( reverse ? "" : "not " ) << "reversed" << ")\n"
-            << "* Vertex weight assignment strategy: " << weights << "\n";
+            << "* Vertex weight assignment strategy: " << weights << "\n"
+            << "* Normalization strategy: " << normalization << "\n";
 
   if( verbose )
     std::cerr << "* Verbose output\n";
