@@ -150,55 +150,55 @@ void wrapSimplicialComplex( py::module& m )
 {
   py::class_<SimplicialComplex>(m, "SimplicialComplex")
     .def( py::init<>() )
-    .def( "__init__",
-      [] ( SimplicialComplex& instance, py::list simplices_ )
-      {
-        std::vector<Simplex> simplices;
-        for( auto simplexHandle : simplices_ )
-        {
-          // Let us first try to obtain a simplex from each handle
-          // in order to rapidly build a complex.
-          try
-          {
-            auto simplex = py::cast<Simplex>( simplexHandle );
-            simplices.push_back( simplex );
-          }
-
-          // Assume that the list contains only lists of vertices
-          // and convert them directly to simplices.
-          catch( py::cast_error& )
-          {
-            std::vector<VertexType> vertices;
-            DataType data = DataType();
-
-            try
+    .def( py::init(
+            [] ( py::list simplices_ )
             {
-              auto&& vertices_ = py::cast<py::list>( simplexHandle );
+              std::vector<Simplex> simplices;
+              for( auto simplexHandle : simplices_ )
+              {
+                // Let us first try to obtain a simplex from each handle
+                // in order to rapidly build a complex.
+                try
+                {
+                  auto simplex = py::cast<Simplex>( simplexHandle );
+                  simplices.push_back( simplex );
+                }
 
-              for( auto vertexHandle : vertices_ )
-                vertices.push_back( py::cast<VertexType>( vertexHandle ) );
+                // Assume that the list contains only lists of vertices
+                // and convert them directly to simplices.
+                catch( py::cast_error& )
+                {
+                  std::vector<VertexType> vertices;
+                  DataType data = DataType();
+
+                  try
+                  {
+                    auto&& vertices_ = py::cast<py::list>( simplexHandle );
+
+                    for( auto vertexHandle : vertices_ )
+                      vertices.push_back( py::cast<VertexType>( vertexHandle ) );
+                  }
+                  catch( py::cast_error& )
+                  {
+                    auto&& tuple_    = py::cast<py::tuple>( simplexHandle );
+
+                    if( tuple_.size() != 2 )
+                      throw std::runtime_error( "Unsupported number of tuple elements" );
+
+                    auto&& vertices_ = py::cast<py::list>( tuple_[0] );
+                    data             = py::cast<DataType>( tuple_[1] );
+
+                    for( auto vertexHandle : vertices_ )
+                      vertices.push_back( py::cast<VertexType>( vertexHandle ) );
+                  }
+
+                  simplices.push_back( Simplex( vertices.begin(), vertices.end(), data ) );
+                }
+              }
+
+              return new SimplicialComplex( simplices.begin(), simplices.end() );
             }
-            catch( py::cast_error& )
-            {
-              auto&& tuple_    = py::cast<py::tuple>( simplexHandle );
-
-              if( tuple_.size() != 2 )
-                throw std::runtime_error( "Unsupported number of tuple elements" );
-
-              auto&& vertices_ = py::cast<py::list>( tuple_[0] );
-              data             = py::cast<DataType>( tuple_[1] );
-
-              for( auto vertexHandle : vertices_ )
-                vertices.push_back( py::cast<VertexType>( vertexHandle ) );
-            }
-
-            simplices.push_back( Simplex( vertices.begin(), vertices.end(), data ) );
-          }
-
-        }
-
-        new (&instance) SimplicialComplex( simplices.begin(), simplices.end() );
-      }
+          )
     )
     .def( "__bool__",
       [] ( const SimplicialComplex& K )
