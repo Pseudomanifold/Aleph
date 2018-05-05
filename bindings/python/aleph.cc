@@ -69,15 +69,16 @@ void wrapSimplex( py::module& m )
     .def( py::init<>() )
     .def( py::init<VertexType, DataType>() )
     .def( py::init<Simplex, DataType>() )
-    .def( "__init__",
-          [] ( Simplex& instance, py::list vertices_ )
+    .def( py::init(
+          [] ( py::list vertices_ )
           {
             std::vector<VertexType> vertices;
             for( auto handle : vertices_ )
               vertices.push_back( py::cast<VertexType>( handle ) );
 
-            new (&instance) Simplex( vertices.begin(), vertices.end() );
+            return new Simplex( vertices.begin(), vertices.end() );
           }
+        )
     )
     .def( "__init__",
           [] ( Simplex& instance, py::list vertices_, DataType dataType )
