@@ -554,11 +554,12 @@ void wrapStepFunction( py::module& m )
 {
   py::class_<StepFunction>(m, "StepFunction")
     .def( py::init<>() )
-    .def( "__init__",
-      [] ( StepFunction& instance, const PersistenceDiagram& D )
-      {
-        new (&instance) StepFunction( aleph::persistenceIndicatorFunction( D ) );
-      }
+    .def( py::init(
+            [] ( const PersistenceDiagram& D )
+            {
+              return new StepFunction( aleph::persistenceIndicatorFunction( D ) );
+            }
+      )
     )
     .def( "__abs__" , &StepFunction::abs )
     .def( "__add__" ,
