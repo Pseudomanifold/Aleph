@@ -15,9 +15,12 @@ IF( BUILD_PYTHON_BINDINGS )
       MESSAGE( WARNING "Unable to detect whether Python libraries and Python includes match. This could indicate a broken installation; please check for Anaconda interference." )
     ENDIF()
 
+    # Suppress warnings caused by either the Python libraries or the
+    # `pybind11` headers.
     INCLUDE_DIRECTORIES(
-      ${PYTHON_INCLUDE_DIRS}
-      ${PYBIND11_INCLUDE_DIRS}
+      SYSTEM
+        ${PYTHON_INCLUDE_DIRS}
+        ${PYBIND11_INCLUDE_DIRS}
     )
 
     ADD_LIBRARY( aleph SHARED aleph.cc )
