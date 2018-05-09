@@ -1,5 +1,10 @@
-#include <pybind11/pybind11.h>
+/**
+  @file  aleph.cc
+  @brief Main file for Aleph's Python bindings
+*/
+
 #include <pybind11/numpy.h>
+#include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 
 #include <aleph/containers/PointCloud.hh>
@@ -18,6 +23,7 @@
 #include <aleph/topology/Simplex.hh>
 #include <aleph/topology/SimplicialComplex.hh>
 
+#include <aleph/topology/filtrations/Data.hh>
 #include <aleph/topology/io/SimplicialComplexReader.hh>
 
 #include <aleph/persistenceDiagrams/Norms.hh>
@@ -485,6 +491,52 @@ void wrapPersistentHomologyCalculation( py::module& m )
     },
     py::arg("K"),
     py::arg("unpairedData") = std::numeric_limits<DataType>::infinity()
+  );
+
+  // Wraps a function that calculates a zero-dimensional persistence
+  // diagram from a `numpy` matrix. The matrix is assumed to contain
+  // edge weights of a bipartite graph. Depending on the parameters,
+  // the graph will be filtered from large weights to small ones, or
+  // vice versa.
+  m.def( "calculateZeroDimensionalPersistenceDiagramOfMatrix",
+    [] ( py::array_t<double> M, bool reverseFiltration = true, DataType vertexWeight = 1.0 )
+    {
+      py::buffer_info bufferInfo = M.request();
+
+      if( bufferInfo.ndim != 2 || bufferInfo.shape.size() != 2 )
+        throw std::runtime_error( "Only two-dimensional buffers are supported" );
+
+      auto n = bufferInfo.shape[0];
+      auto m = bufferInfo.shape[1];
+
+      std::vector<Simplex> simplices;
+      simplices.reserve( static_cast<std::size_t>( (n+m) + (n*m) ) );
+
+      for( VertexType v = 0; v < VertexType(n+m); v++ )
+        simplices.push_back( Simplex( VertexType(v), vertexWeight) );
+
+      // FIXME: not sure whether the buffer info access is correct;
+      // should test this carefully.
+      for( VertexType u = 0; u < VertexType(n); u++ )
+        for( VertexType v = 0; v < VertexType(m); v++ )
+          simplices.push_back( Simplex( {u, VertexType(v+n)}, reinterpret_cast<double*>( bufferInfo.ptr )[u*m+v] ) );
+
+      SimplicialComplex K( simplices.begin(), simplices.end() );
+
+      if( reverseFiltration )
+      {
+        K.sort( aleph::topology::filtrations::Data<Simplex,
+                                                   std::greater<DataType> >()
+        );
+      }
+      else
+        K.sort( aleph::topology::filtrations::Data<Simplex>() );
+
+      return K;
+    },
+    py::arg("M"),
+    py::arg("reverseFiltration") = true,
+    py::arg("vertexWeight")      = DataType(1.0)
   );
 }
 
