@@ -518,15 +518,27 @@ void wrapPersistentHomologyCalculation( py::module& m )
       for( VertexType v = 0; v < VertexType(n+m); v++ )
         simplices.push_back( Simplex( VertexType(v), vertexWeight) );
 
-      // FIXME: not sure whether the buffer info access is correct;
-      // should test this carefully.
+      // Determine the proper stride for accessing the array. While it
+      // is very probable that this just defaults to the C array index
+      // that is so common, i.e. i*m + j, I want to be sure.
+      std::size_t rowStride = std::size_t( bufferInfo.strides[0] ) / sizeof(DataType);
+      std::size_t colStride = std::size_t( bufferInfo.strides[1] ) / sizeof(DataType);
+
       for( VertexType u = 0; u < VertexType(n); u++ )
+      {
         for( VertexType v = 0; v < VertexType(m); v++ )
-          simplices.push_back( Simplex( {u, VertexType(v+n)}, reinterpret_cast<DataType*>( bufferInfo.ptr )[u*m+v] ) );
+        {
+          simplices.push_back(
+            Simplex(
+              {
+                u,
+                VertexType(v+n)
+              },
+              reinterpret_cast<DataType*>( bufferInfo.ptr )[u*rowStride+v*colStride] ) );
+        }
+      }
 
       SimplicialComplex K( simplices.begin(), simplices.end() );
-
-      std::cerr << bufferInfo.strides[0] / sizeof(DataType) << "," << bufferInfo.strides[1] / sizeof(DataType) << "\n";
 
       if( reverseFiltration )
       {
