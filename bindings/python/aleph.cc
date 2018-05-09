@@ -499,7 +499,7 @@ void wrapPersistentHomologyCalculation( py::module& m )
   // the graph will be filtered from large weights to small ones, or
   // vice versa.
   m.def( "calculateZeroDimensionalPersistenceDiagramOfMatrix",
-    [] ( py::array_t<double> M, bool reverseFiltration = true, DataType vertexWeight = 1.0 )
+    [] ( py::array_t<double> M, bool reverseFiltration = true, DataType vertexWeight = 1.0, DataType unpairedData = std::numeric_limits<DataType>::infinity() )
     {
       py::buffer_info bufferInfo = M.request();
 
@@ -549,11 +549,31 @@ void wrapPersistentHomologyCalculation( py::module& m )
       else
         K.sort( aleph::topology::filtrations::Data<Simplex>() );
 
-      return K;
+      using Point = typename PersistenceDiagram::Point;
+      auto tuple  = aleph::calculateZeroDimensionalPersistenceDiagram<Simplex>( K );
+      auto&& pd   = std::get<0>( tuple );
+
+      if( std::isfinite( unpairedData ) )
+      {
+        std::transform( pd.begin(), pd.end(), pd.begin(),
+          [&unpairedData] ( const Point& p )
+          {
+            if( p.isUnpaired() )
+            {
+              return Point( p.x(), unpairedData );
+            }
+            else
+              return Point( p );
+          }
+        );
+      }
+
+      return pd;
     },
     py::arg("M"),
     py::arg("reverseFiltration") = true,
-    py::arg("vertexWeight")      = DataType(1.0)
+    py::arg("vertexWeight")      = DataType(1.0),
+    py::arg("unpairedData")      = std::numeric_limits<DataType>::infinity()
   );
 }
 
