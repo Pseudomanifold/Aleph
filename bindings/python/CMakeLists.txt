@@ -7,12 +7,15 @@ IF( BUILD_PYTHON_BINDINGS )
     GET_FILENAME_COMPONENT( PYTHON_LIBRARIES_PARENT_DIRECTORY ${PYTHON_LIBRARIES} DIRECTORY )
     GET_FILENAME_COMPONENT( PYTHON_LIBRARIES_PARENT_DIRECTORY ${PYTHON_LIBRARIES_PARENT_DIRECTORY} DIRECTORY )
 
-    # Ditto for the include directories.
-    GET_FILENAME_COMPONENT( PYTHON_INCLUDES_PARENT_DIRECTORY ${PYTHON_INCLUDE_DIRS} DIRECTORY )
-    GET_FILENAME_COMPONENT( PYTHON_INCLUDES_PARENT_DIRECTORY ${PYTHON_INCLUDES_PARENT_DIRECTORY} DIRECTORY )
-
-    IF( NOT ${PYTHON_LIBRARIES_PARENT_DIRECTORY} STREQUAL ${PYTHON_INCLUDES_PARENT_DIRECTORY} )
-      MESSAGE( WARNING "Unable to detect whether Python libraries and Python includes match. This could indicate a broken installation; please check for Anaconda interference." )
+    # We may only run this check for rather recent versions of CMake.
+    # Else, the filename components cannot be parsed correctly.
+    IF( ${CMAKE_VERSION} VERSION_GREATER "3.0.0" )
+      # Ditto for the include directories.
+      GET_FILENAME_COMPONENT( PYTHON_INCLUDES_PARENT_DIRECTORY ${PYTHON_INCLUDE_DIRS} DIRECTORY )
+      GET_FILENAME_COMPONENT( PYTHON_INCLUDES_PARENT_DIRECTORY ${PYTHON_INCLUDES_PARENT_DIRECTORY} DIRECTORY )
+      IF( NOT ${PYTHON_LIBRARIES_PARENT_DIRECTORY} STREQUAL ${PYTHON_INCLUDES_PARENT_DIRECTORY} )
+        MESSAGE( WARNING "Unable to detect whether Python libraries and Python includes match. This could indicate a broken installation; please check for Anaconda interference." )
+      ENDIF()
     ENDIF()
 
     # Suppress warnings caused by either the Python libraries or the
