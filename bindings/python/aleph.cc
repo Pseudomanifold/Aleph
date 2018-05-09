@@ -506,6 +506,9 @@ void wrapPersistentHomologyCalculation( py::module& m )
       if( bufferInfo.ndim != 2 || bufferInfo.shape.size() != 2 )
         throw std::runtime_error( "Only two-dimensional buffers are supported" );
 
+      if( bufferInfo.format != py::format_descriptor<DataType>::format() )
+        throw std::runtime_error( "Buffer format is not consistent with data type" );
+
       auto n = bufferInfo.shape[0];
       auto m = bufferInfo.shape[1];
 
@@ -519,9 +522,11 @@ void wrapPersistentHomologyCalculation( py::module& m )
       // should test this carefully.
       for( VertexType u = 0; u < VertexType(n); u++ )
         for( VertexType v = 0; v < VertexType(m); v++ )
-          simplices.push_back( Simplex( {u, VertexType(v+n)}, reinterpret_cast<double*>( bufferInfo.ptr )[u*m+v] ) );
+          simplices.push_back( Simplex( {u, VertexType(v+n)}, reinterpret_cast<DataType*>( bufferInfo.ptr )[u*m+v] ) );
 
       SimplicialComplex K( simplices.begin(), simplices.end() );
+
+      std::cerr << bufferInfo.strides[0] / sizeof(DataType) << "," << bufferInfo.strides[1] / sizeof(DataType) << "\n";
 
       if( reverseFiltration )
       {
