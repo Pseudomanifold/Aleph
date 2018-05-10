@@ -488,7 +488,7 @@ void wrapPersistentHomologyCalculation( py::module& m )
   // diagram along with a persistence pairing. This will permit us a
   // simpler assignment of total persistence values to layers.
   m.def( "calculateZeroDimensionalPersistenceDiagramAndPairing",
-    [] ( const SimplicialComplex& K, DataType unpairedData = std::numeric_limits<DataType>::infinity() )
+    [] ( const SimplicialComplex& K, DataType unpairedData )
     {
       // Tells the calculation procedure that a pairing should be
       // calculated alongside the persistence diagram.
@@ -526,7 +526,7 @@ void wrapPersistentHomologyCalculation( py::module& m )
   // the graph will be filtered from large weights to small ones, or
   // vice versa.
   m.def( "calculateZeroDimensionalPersistenceDiagramOfMatrix",
-    [] ( py::array_t<double> M, bool reverseFiltration = true, DataType vertexWeight = 1.0, DataType unpairedData = std::numeric_limits<DataType>::infinity() )
+    [] ( py::array_t<double> M, bool reverseFiltration, DataType vertexWeight, DataType unpairedData )
     {
       py::buffer_info bufferInfo = M.request();
 
@@ -786,7 +786,7 @@ void wrapNorms( py::module& m )
           return aleph::pNorm(D, k, weighted);
         },
       "D"_a,
-      "k"_a = 2.0,
+      "k"_a        = 2.0,
       "weighted"_a = false
     );
     mNorm.def("infinityNorm",
