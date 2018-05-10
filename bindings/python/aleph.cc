@@ -7,9 +7,16 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 
+// Containers ----------------------------------------------------------
+
 #include <aleph/containers/PointCloud.hh>
 
 #include <aleph/config/FLANN.hh>
+
+// Geometry ------------------------------------------------------------
+//
+// Various classes for nearest-neighbour calculations and the expansion
+// process of a simplicial complex.
 
 #include <aleph/geometry/BruteForce.hh>
 #include <aleph/geometry/FLANN.hh>
@@ -18,13 +25,25 @@
 
 #include <aleph/geometry/distances/Euclidean.hh>
 
+// Step functions ------------------------------------------------------
+
 #include <aleph/math/StepFunction.hh>
+
+// Simplicial complexes ------------------------------------------------
+//
+// Main simplex class, simplicial complexes, filtrations, and the
+// assorted reader classes.
 
 #include <aleph/topology/Simplex.hh>
 #include <aleph/topology/SimplicialComplex.hh>
 
 #include <aleph/topology/filtrations/Data.hh>
 #include <aleph/topology/io/SimplicialComplexReader.hh>
+
+// Persistence diagrams ------------------------------------------------
+//
+// Persistence diagram class, various norms, and conversion functions,
+// as well as the standard distance calculations plus kernels.
 
 #include <aleph/persistenceDiagrams/Norms.hh>
 #include <aleph/persistenceDiagrams/PersistenceDiagram.hh>
@@ -37,6 +56,11 @@
 #include <aleph/persistenceDiagrams/kernels/MultiScaleKernel.hh>
 
 #include <aleph/persistenceDiagrams/io/Raw.hh>
+
+// Persistent homology calculation algorithms --------------------------
+//
+// The "general" calculation is being exposed as well as specific
+// classes for connected components.
 
 #include <aleph/persistentHomology/Calculation.hh>
 #include <aleph/persistentHomology/ConnectedComponents.hh>
@@ -62,11 +86,14 @@ using SimplicialComplex  = aleph::topology::SimplicialComplex<Simplex>;
 using RipsExpander       = aleph::geometry::RipsExpander<SimplicialComplex>;
 using StepFunction       = aleph::math::StepFunction<DataType>;
 
+// Select a default value of calculating nearest neighbours. This is
+// only relevant for those functions that create complexes from data
+// that is unstructured.
+template <class Distance> using NearestNeighbours
 #ifdef ALEPH_WITH_FLANN
-  template <class Distance> using NearestNeighbours = aleph::geometry::FLANN<PointCloud, Distance>;
-
+  = aleph::geometry::FLANN<PointCloud, Distance>;
 #else
-  template <class Distance> using NearestNeighbours = aleph::geometry::BruteForce<PointCloud, Distance>;
+  = aleph::geometry::BruteForce<PointCloud, Distance>;
 #endif
 
 void wrapSimplex( py::module& m )
