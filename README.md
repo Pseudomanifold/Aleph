@@ -148,6 +148,17 @@ If you want to volunteer and submit a package for your favourite Linux
 distribution, please take a look at [issue #27](https://github.com/Submanifold/Aleph/issues/27)
 and add your comments.
 
+# Installing the Python bindings
+
+If your build instructions are configured to build the Python bindings,
+i.e. `BUILD_PYTHON_BINDINGS` follow these instructions to install them:
+
+    $ cd build/bindings/python/aleph
+    $ pthon3 setup.py install
+
+Note that this uses the old `setuptools` approach for installing the
+package. A simpler installation based on `pip` is forthcoming.
+
 # Contact
 
 For general discussion, questions, and comments, please contact the
