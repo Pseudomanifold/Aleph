@@ -258,6 +258,10 @@ template<class T> PointCloud<T> load( const std::string& filename )
   {
     auto tokens = utilities::split( line, std::string( "[:;,[:space:]]+" ) );
 
+    // Skip comment lines
+    if( line.front() == '#' )
+      continue;
+
     if( d == 0 )
     {
       d          = tokens.size();
