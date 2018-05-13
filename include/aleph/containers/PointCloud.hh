@@ -258,8 +258,11 @@ template<class T> PointCloud<T> load( const std::string& filename )
   {
     auto tokens = utilities::split( line, std::string( "[:;,[:space:]]+" ) );
 
-    // Skip comment lines
-    if( line.front() == '#' )
+    // Skip comment lines or empty lines; while this is somewhat
+    // superfluous in most files (at least it is unlikely that a
+    // line in the middle of the file will be empty), the loader
+    // should handle empty lines at the end of the file.
+    if( line.front() == '#' || tokens.empty() )
       continue;
 
     if( d == 0 )
