@@ -15,3 +15,5 @@ The following people have contributed code to Aleph:
 
 * [Submanifold](https://github.com/Submanifold) (Bastian Rieck): main
   contributor
+* [maexlich](https://github.com/maexlich) (Max Horn): fixes and
+  improvements to the Python bindings
