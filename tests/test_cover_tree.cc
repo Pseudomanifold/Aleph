@@ -82,11 +82,19 @@ template <class T> struct Point
 {
   T x;
   T y;
+
+  bool operator<( const Point& other ) const noexcept
+  {
+    if( x == other.x )
+      return y < other.y;
+    else
+      return x < other.x;
+  }
 };
 
 template <class T> std::ostream& operator<<( std::ostream& o, const Point<T>& p )
 {
-  o << p.x << "," << p.y << "\n";
+  o << p.x << "," << p.y;
   return o;
 }
 
@@ -97,6 +105,12 @@ template <class T> struct EuclideanMetric
     return std::sqrt( std::pow( a.x - b.x, T(2) ) + std::pow( a.y - b.y, T(2) ) );
   }
 };
+
+template <class T> bool contains( const Point<T>& centre, const Point<T>& p, T r )
+{
+  EuclideanMetric<T> metric;
+  return metric( centre, p ) <= r;
+}
 
 template <class T> void test2D()
 {
@@ -134,9 +148,34 @@ template <class T> void test2D()
   for( auto&& p : points )
     ct.insert( p );
 
-  ct.print( std::cerr );
-
   ALEPH_ASSERT_THROW( ct.isValid() );
+
+  auto&& nodesByLevel = ct.getNodesByLevel();
+
+  // Determine radii, i.e. *level* of the original data set. Afterwards,
+  // using the corresponding point as the centre, we can check how often
+  // certain points are being covered.
+
+  std::map<Point, unsigned> covered;
+
+  for( auto&& pair : nodesByLevel )
+  {
+    auto&& level  = pair.first;
+    auto&& centre = pair.second;
+
+    for( auto&& p : points )
+    {
+      // TODO: fix radius/level calculation; is this an implementation
+      // detail of the tree?
+      if( contains( centre, p, T( std::pow( T(2), level ) ) ) )
+        covered[p] += 1;
+    }
+  }
+
+  for( auto&& pair : covered )
+    std::cerr << pair.first << ": " << pair.second << "\n";
+
+  ALEPH_ASSERT_EQUAL( nodesByLevel.size(), points.size() );
   ALEPH_TEST_END();
 }
 
