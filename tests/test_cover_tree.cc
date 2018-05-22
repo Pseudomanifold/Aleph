@@ -215,6 +215,23 @@ template <class T> void test2D()
     std::cerr << "\n";
   }
 
+  std::cerr << "# Basic cover distance density\n";
+
+  for( auto&& p : points )
+  {
+    std::cerr << p << ": ";
+
+    auto range      = distances.equal_range( p );
+    double distance = 0.0;
+
+    for( auto it = range.first; it != range.second; ++it )
+      distance += it->second;
+
+    distance /= std::distance( range.first, range.second );
+
+    std::cerr << distance << "\n";
+  }
+
   ALEPH_ASSERT_EQUAL( nodesByLevel.size(), points.size() );
   ALEPH_TEST_END();
 }
