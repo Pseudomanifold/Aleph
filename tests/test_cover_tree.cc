@@ -157,6 +157,7 @@ template <class T> void test2D()
   // certain points are being covered.
 
   std::map<Point, unsigned> covered;
+  std::multimap<Point, long> levels;
 
   for( auto&& pair : nodesByLevel )
   {
@@ -168,12 +169,30 @@ template <class T> void test2D()
       // TODO: fix radius/level calculation; is this an implementation
       // detail of the tree?
       if( contains( centre, p, T( std::pow( T(2), level ) ) ) )
+      {
         covered[p] += 1;
+        levels.insert( std::make_pair( p, level ) );
+      }
     }
   }
 
+  std::cerr << "# Cover counter\n";
+
   for( auto&& pair : covered )
     std::cerr << pair.first << ": " << pair.second << "\n";
+
+  std::cerr << "# Levels counter\n";
+
+  for( auto&& p : points )
+  {
+    std::cerr << p << ": ";
+
+    auto range = levels.equal_range( p );
+    for( auto it = range.first; it != range.second; ++it )
+     std::cerr << it->second << " ";
+
+    std::cerr << "\n";
+  }
 
   ALEPH_ASSERT_EQUAL( nodesByLevel.size(), points.size() );
   ALEPH_TEST_END();
