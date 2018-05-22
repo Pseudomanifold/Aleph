@@ -112,6 +112,12 @@ template <class T> bool contains( const Point<T>& centre, const Point<T>& p, T r
   return metric( centre, p ) <= r;
 }
 
+template <class T> T distance( const Point<T>& centre, const Point<T>& p )
+{
+  EuclideanMetric<T> metric;
+  return metric( centre, p );
+}
+
 template <class T> void test2D()
 {
   ALEPH_TEST_BEGIN( "2D" );
@@ -156,8 +162,9 @@ template <class T> void test2D()
   // using the corresponding point as the centre, we can check how often
   // certain points are being covered.
 
-  std::map<Point, unsigned> covered;
+  std::map<Point, unsigned > covered;
   std::multimap<Point, long> levels;
+  std::multimap<Point, T   > distances;
 
   for( auto&& pair : nodesByLevel )
   {
@@ -172,6 +179,7 @@ template <class T> void test2D()
       {
         covered[p] += 1;
         levels.insert( std::make_pair( p, level ) );
+        distances.insert( std::make_pair( p, distance( centre, p ) ) );
       }
     }
   }
@@ -188,6 +196,19 @@ template <class T> void test2D()
     std::cerr << p << ": ";
 
     auto range = levels.equal_range( p );
+    for( auto it = range.first; it != range.second; ++it )
+     std::cerr << it->second << " ";
+
+    std::cerr << "\n";
+  }
+
+  std::cerr << "# Distances counter\n";
+
+  for( auto&& p : points )
+  {
+    std::cerr << p << ": ";
+
+    auto range = distances.equal_range( p );
     for( auto it = range.first; it != range.second; ++it )
      std::cerr << it->second << " ";
 
