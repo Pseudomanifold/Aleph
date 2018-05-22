@@ -250,7 +250,7 @@ public:
   void insert( const Point& p )
   {
     if( !_root )
-      _root = std::unique_ptr<Node>( new Node(p,1) );
+      _root = std::unique_ptr<Node>( new Node(p,0) );
     else
       _root->insert( p );
   }
