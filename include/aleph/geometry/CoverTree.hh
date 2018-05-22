@@ -317,6 +317,48 @@ public:
     return true;
   }
 
+  /**
+    Checks the covering invariant in the cover tree. The covering
+    invariant states that the distance between a child and parent
+    node is bounded by the covering distance.
+  */
+
+  bool checkCoveringInvariant() const noexcept
+  {
+    std::queue<const Node*> nodes;
+    nodes.push( _root.get() );
+
+    while( !nodes.empty() )
+    {
+      auto n = nodes.size();
+      for( decltype(n) i = 0; i < n; i++ )
+      {
+        auto&& parent = nodes.front();
+
+        for( auto&& child : parent->_children )
+        {
+          auto d = Metric()( parent->_point, child->_point );
+          if( d > parent->coveringDistance() )
+          {
+            std::cerr << __FUNCTION__ << ": Covering invariant is violated by ("
+                      << parent->_point << "," << child->_point << "): "
+                      << d << " > " << parent->coveringDistance() << "\n";
+
+            return false;
+          }
+
+          nodes.push( child.get() );
+        }
+
+        // All children of the current parent node have been processed,
+        // so we can remove it.
+        nodes.pop();
+      }
+    }
+
+    return true;
+  }
+
 private:
 
   /** Root pointer of the tree */

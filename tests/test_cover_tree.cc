@@ -35,6 +35,7 @@ template <class T> void testSimple()
   ct.print( std::cerr );
 
   ALEPH_ASSERT_THROW( ct.checkLevelInvariant() );
+  ALEPH_ASSERT_THROW( ct.checkCoveringInvariant() );
 
   ALEPH_TEST_END();
 }
