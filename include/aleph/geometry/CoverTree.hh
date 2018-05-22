@@ -77,6 +77,7 @@ public:
     {
       auto d = Metric()( _point, p );
 
+      std::cerr << __FUNCTION__ << ": Inserting " << p << "\n";
       std::cerr << __FUNCTION__ << ": Covering distance           = " << this->coveringDistance() << "\n";
       std::cerr << __FUNCTION__ << ": Distance from point to root = " << d << "\n";
 
@@ -89,7 +90,8 @@ public:
           // -----------------------------------------------------------
           //
           // Find a leaf node that can become the new root node with
-          // a raised level.
+          // a raised level. If the tree only contains the root node
+          // its level can be adjusted multiple times.
 
           std::stack<Node*> nodes;
           nodes.push( this );
@@ -97,9 +99,19 @@ public:
           Node* leaf   = nullptr;
           Node* parent = nullptr;
 
+          // Special case: the root itself is a leaf node; this happens
+          // at the beginning of the insertion process and means that a
+          // level adjustment has to be performed.
+          if( this->isLeaf() )
+          {
+            this->_level += 1;
+            continue;
+          }
+
           while( !nodes.empty() )
           {
             auto&& node = nodes.top();
+
             for( auto&& child : parent->_children )
             {
               if( child->isLeaf() )
