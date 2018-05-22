@@ -274,6 +274,49 @@ public:
     }
   }
 
+  // Validity checks ---------------------------------------------------
+  //
+  // These are called by debug code and tests to ensure that the cover
+  // tree is correct.
+
+  /**
+    Checks the level invariant in the cover tree. The level invariant
+    states that the level \f$l$ of the *direct* child of a node \f$p$
+    is the level \f$l'-1$, where \f$l'$ is the level of \f$p$.
+  */
+
+  bool checkLevelInvariant() const noexcept
+  {
+    std::queue<const Node*> nodes;
+    nodes.push( _root.get() );
+
+    // Initialize the level artificially in order to simplify the code
+    // below.
+    long level = _root->_level + 1;
+
+    while( !nodes.empty() )
+    {
+      auto n = nodes.size();
+
+      for( decltype(n) i = 0; i < n; i++ )
+      {
+        auto&& node = nodes.front();
+
+        if( node->_level != level - 1 )
+          return false;
+
+        for( auto&& child : node->_children )
+          nodes.push( child.get() );
+
+        nodes.pop();
+      }
+
+      level -= 1;
+    }
+
+    return true;
+  }
+
 private:
 
   /** Root pointer of the tree */
