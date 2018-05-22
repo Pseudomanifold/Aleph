@@ -65,7 +65,7 @@ public:
     /** Calculates current covering distance of the node */
     double coveringDistance() const noexcept
     {
-      return std::pow( coveringConstant, static_cast<double>( _level ) );
+      return std::pow( 1.0 / coveringConstant, static_cast<double>( _level ) );
     }
 
     /** @returns true if the node is a leaf node */
