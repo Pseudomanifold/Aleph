@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <iterator>
 #include <limits>
+#include <map>
 #include <memory>
 #include <ostream>
 #include <queue>
@@ -302,6 +303,41 @@ public:
         o << "\n";
       }
     }
+  }
+
+  // Tree access -------------------------------------------------------
+
+  /**
+    Gets all nodes according to their corresponding level. The order in
+    which they are stored per level is essentially random and shouldn't
+    be relied on.
+  */
+
+  std::multimap<long, Point> getNodesByLevel() const noexcept
+  {
+    std::multimap<long, Point> levelMap;
+
+    std::queue<const Node*> nodes;
+    nodes.push( _root.get() );
+
+    while( !nodes.empty() )
+    {
+      auto n = nodes.size();
+
+      for( decltype(n) i = 0; i < n; i++ )
+      {
+        auto&& node = nodes.front();
+
+        levelMap.insert( std::make_pair( node->_level, node->_point ) );
+
+        for( auto&& child : node->_children )
+            nodes.push( child.get() );
+
+        nodes.pop();
+      }
+    }
+
+    return levelMap;
   }
 
   // Validity checks ---------------------------------------------------
