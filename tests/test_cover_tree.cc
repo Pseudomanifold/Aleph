@@ -18,9 +18,6 @@ template <class T> void testSimple()
 {
   ALEPH_TEST_BEGIN( "Simple" );
 
-  // FIXME
-  //std::vector<T> data = {7,8,9,10,11,12,13};
-
   CoverTree<T,
             SimpleMetric<T> > ct;
 

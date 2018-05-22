@@ -116,9 +116,10 @@ public:
 
           while( !nodes.empty() )
           {
-            auto&& node = nodes.top();
+            auto node = nodes.top();
+            nodes.pop();
 
-            for( auto&& child : parent->_children )
+            for( auto&& child : node->_children )
             {
               if( child->isLeaf() )
               {
@@ -126,16 +127,21 @@ public:
                 parent = node;
                 break;
               }
+              else
+                nodes.push( child.get() );
             }
-
-            nodes.pop();
           }
+
+          std::cerr << __FUNCTION__ << ": Found leaf node " << leaf->_point << "\n";
 
           // There is no leaf, so there is nothing to do and we just
           // skip to the bottom where we add the current node as the
           // new root of the tree.
           if( !leaf )
+          {
+            std::cerr << __FUNCTION__ << ": Unable to identify leaf node\n";
             break;
+          }
 
           assert( leaf );
           assert( parent );
@@ -184,6 +190,8 @@ public:
           // Since the root of the tree changed, we also have to update
           // the distance calculation.
           d = Metric()( _point, p );
+
+          std::cerr << __FUNCTION__ << ": " << leaf->_point << " is the new root\n";
         }
 
         // Make current point the new root -----------------------------
