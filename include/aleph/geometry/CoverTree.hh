@@ -233,8 +233,6 @@ public:
       _root = std::unique_ptr<Node>( new Node(p,1) );
     else
       _root->insert( p );
-
-    this->updateLevels();
   }
 
   // Pretty-printing function for the tree; this is only meant for
@@ -273,69 +271,6 @@ public:
   }
 
 private:
-
-  /**
-    Updates the levels of a cover tree. This function ensures that all
-    information is being represented correctly. It is not mentioned in
-    the original paper but appears to be necessary.
-  */
-
-  void updateLevels()
-  {
-    // Forward pass ----------------------------------------------------
-    //
-    // Determine depth of the tree. This is required in order to assign
-    // levels correctly later on.
-
-    unsigned depth = 0;
-
-    std::queue<const Node*> nodes;
-    nodes.push( _root.get() );
-
-    while( !nodes.empty() )
-    {
-      auto n = nodes.size();
-
-      for( decltype(n) i = 0; i < n; i++ )
-      {
-        auto node = nodes.front();
-        nodes.pop();
-
-        for( auto&& child : node->_children )
-          nodes.push( child.get() );
-      }
-
-      ++depth;
-    }
-
-    assert( nodes.empty() );
-
-    // Backward pass ---------------------------------------------------
-    //
-    // Set the level of the root node and update child levels. Note that
-    // all nodes will be traversed because this function is dumb.
-
-    _root->_level = depth;
-
-    nodes.push( _root.get() );
-
-    while( !nodes.empty() )
-    {
-      {
-        auto&& parent = nodes.front();
-
-        for( auto&& child : parent->_children )
-        {
-          assert( parent->_level >= 1 );
-
-          child->_level = parent->_level - 1;
-          nodes.push( child.get() );
-        }
-      }
-
-      nodes.pop();
-    }
-  }
 
   /** Root pointer of the tree */
   std::unique_ptr<Node> _root;
