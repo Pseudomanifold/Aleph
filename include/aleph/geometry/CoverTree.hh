@@ -55,17 +55,16 @@ public:
   public:
 
     /** Creates a new node that stores a point */
-    Node( const Point& point, unsigned level )
+    Node( const Point& point, long level )
       : _point( point )
       , _level( level )
     {
-      assert( _level >= 1 );
     }
 
     /** Calculates current covering distance of the node */
     double coveringDistance() const noexcept
     {
-      return std::pow( 1.0 / coveringConstant, static_cast<double>( _level ) );
+      return std::pow( coveringConstant, static_cast<double>( _level ) );
     }
 
     /** @returns true if the node is a leaf node */
@@ -86,6 +85,11 @@ public:
         while( d > 2 * this->coveringDistance() )
         {
           std::cerr << __PRETTY_FUNCTION__ << ": Distance is bigger than covering distance; need to raise level of tree\n";
+
+          // -----------------------------------------------------------
+          //
+          // Find a leaf node that can become the new root node with
+          // a raised level.
 
           std::stack<Node*> nodes;
           nodes.push( this );
@@ -119,6 +123,9 @@ public:
           assert( parent );
 
           // Remove leaf from subtree ----------------------------------
+          //
+          // The previous tree does not contain the leaf node any more,
+          // and it can be added as the new root node.
 
           std::unique_ptr<Node> leaf_ptr( nullptr );
 
@@ -198,17 +205,13 @@ public:
         }
       }
 
-      // Add the new point as a child of the current root node. This
-      // might require updating levels.
-
-      if( _children.empty() )
-        _level += 1;
-
+      // Add the new point as a child of the current root node. Note the
+      // level adjustment.
       _children.push_back( std::unique_ptr<Node>( new Node( p, _level - 1 ) ) );
     }
 
-    Point    _point; //< The point stored in the node
-    unsigned _level; //< The level of the node (>= 1)
+    Point _point; //< The point stored in the node
+    long  _level; //< The level of the node
 
     /**
       All children of the node. Their order depends on the insertion
