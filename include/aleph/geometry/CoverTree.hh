@@ -443,6 +443,19 @@ public:
     return true;
   }
 
+  /**
+    Generic validity check of the tree. Combines *all* validity
+    criteria, i.e. the level invariant, the covering invariant,
+    and the separating invariant.
+  */
+
+  bool isValid() const noexcept
+  {
+    return    this->checkLevelInvariant()
+           && this->checkCoveringInvariant()
+           && this->checkSeparatingInvariant();
+  }
+
 private:
 
   /** Root pointer of the tree */
