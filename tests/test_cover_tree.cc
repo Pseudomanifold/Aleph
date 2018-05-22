@@ -227,7 +227,7 @@ template <class T> void test2D()
     for( auto it = range.first; it != range.second; ++it )
       distance += it->second;
 
-    distance /= std::distance( range.first, range.second );
+    distance /= static_cast<T>( std::distance( range.first, range.second ) );
 
     std::cerr << distance << "\n";
   }
