@@ -165,6 +165,10 @@ public:
         }
 
         // Make current point the new root -----------------------------
+        //
+        // So far, the new point has not yet been inserted into the
+        // tree. This needs to be done now while the cover is valid
+        // again.
 
         auto oldRoot
           = std::unique_ptr<Node>( new Node( this->_point, this->_level ) );
