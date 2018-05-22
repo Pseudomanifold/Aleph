@@ -36,6 +36,7 @@ template <class T> void testSimple()
 
   ALEPH_ASSERT_THROW( ct.checkLevelInvariant() );
   ALEPH_ASSERT_THROW( ct.checkCoveringInvariant() );
+  ALEPH_ASSERT_THROW( ct.checkSeparatingInvariant() );
 
   ALEPH_TEST_END();
 }

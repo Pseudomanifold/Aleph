@@ -67,6 +67,12 @@ public:
       return std::pow( coveringConstant, static_cast<double>( _level ) );
     }
 
+    /** Calculates current separating distance of the node */
+    double separatingDistance() const noexcept
+    {
+      return std::pow( coveringConstant, static_cast<double>( _level - 1 ) );
+    }
+
     /** @returns true if the node is a leaf node */
     bool isLeaf() const noexcept
     {
@@ -364,6 +370,60 @@ public:
           }
 
           nodes.push( child.get() );
+        }
+
+        // All children of the current parent node have been processed,
+        // so we can remove it.
+        nodes.pop();
+      }
+    }
+
+    return true;
+  }
+
+  /**
+    Checks the separating invariant in the cover tree. The separating
+    invariant states that the distance between a child and its parent
+    is larger than the separating distance.
+  */
+
+  bool checkSeparatingInvariant() const noexcept
+  {
+    std::queue<const Node*> nodes;
+    nodes.push( _root.get() );
+
+    while( !nodes.empty() )
+    {
+      auto n = nodes.size();
+      for( decltype(n) i = 0; i < n; i++ )
+      {
+        auto&& parent = nodes.front();
+
+        for( auto it1 = parent->_children.begin(); it1 != parent->_children.end(); ++it1 )
+        {
+          for( auto it2 = std::next(it1); it2 != parent->_children.end(); ++it2 )
+          {
+            // The distance between the two points must by necessity be
+            // larger than the separating distance of their parent node
+            // in order to satisfy the separating property.
+
+            auto&& p = (*it1)->_point;
+            auto&& q = (*it2)->_point;
+            auto d   = Metric()(p, q);
+
+            if( d <= parent->separatingDistance() )
+            {
+              std::cerr << __FUNCTION__ << ": Separating invariant is violated by ("
+                        << p << "," << q << "): "
+                        << d << " > " << parent->separatingDistance() << "\n";
+
+              return false;
+            }
+          }
+
+          // Add the child such that the next level of the tree can be
+          // visited.
+          nodes.push( it1->get() );
         }
 
         // All children of the current parent node have been processed,
