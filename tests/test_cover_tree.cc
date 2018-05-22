@@ -41,8 +41,45 @@ template <class T> void testSimple()
   ALEPH_TEST_END();
 }
 
+template <class T> void testSimplePermutations()
+{
+  ALEPH_TEST_BEGIN( "Simple (using permutations)" );
+
+  std::vector<T> data = {7,8,9,10,11,12,13};
+
+  do
+  {
+    CoverTree<T,
+              SimpleMetric<T> > ct;
+
+    // Debug output ----------------------------------------------------
+
+    std::cerr << "Permutation: ";
+
+    for( auto&& x : data )
+      std::cerr << x << " ";
+
+    std::cerr << "\n";
+
+    // Check validity of tree ------------------------------------------
+
+    for( auto&& x : data )
+      ct.insert( x );
+
+    ALEPH_ASSERT_THROW( ct.checkLevelInvariant() );
+    ALEPH_ASSERT_THROW( ct.checkCoveringInvariant() );
+    ALEPH_ASSERT_THROW( ct.checkSeparatingInvariant() );
+  }
+  while( std::next_permutation( data.begin(), data.end() ) );
+
+  ALEPH_TEST_END();
+}
+
 int main( int, char** )
 {
   testSimple<double>();
   testSimple<float> ();
+
+  testSimplePermutations<double>();
+  testSimplePermutations<float> ();
 }
