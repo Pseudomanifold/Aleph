@@ -77,14 +77,14 @@ public:
     {
       auto d = Metric()( _point, p );
 
-      std::cerr << __PRETTY_FUNCTION__ << ": Covering distance           = " << this->coveringDistance() << "\n";
-      std::cerr << __PRETTY_FUNCTION__ << ": Distance from point to root = " << d << "\n";
+      std::cerr << __FUNCTION__ << ": Covering distance           = " << this->coveringDistance() << "\n";
+      std::cerr << __FUNCTION__ << ": Distance from point to root = " << d << "\n";
 
       if( d > this->coveringDistance() )
       {
         while( d > 2 * this->coveringDistance() )
         {
-          std::cerr << __PRETTY_FUNCTION__ << ": Distance is bigger than covering distance; need to raise level of tree\n";
+          std::cerr << __FUNCTION__ << ": Distance is bigger than covering distance; need to raise level of tree\n";
 
           // -----------------------------------------------------------
           //
@@ -162,6 +162,10 @@ public:
 
           _children.clear();
           _children.push_back( std::move( oldRoot ) );
+
+          // Since the root of the tree changed, we also have to update
+          // the distance calculation.
+          d = Metric()( _point, p );
         }
 
         // Make current point the new root -----------------------------
