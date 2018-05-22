@@ -1,5 +1,11 @@
 #include <tests/Base.hh>
 
+#include <fstream>
+#include <iostream>
+#include <sstream>
+#include <string>
+#include <vector>
+
 #include <cmath>
 
 #include <aleph/geometry/CoverTree.hh>
@@ -72,6 +78,68 @@ template <class T> void testSimplePermutations()
   ALEPH_TEST_END();
 }
 
+template <class T> struct Point
+{
+  T x;
+  T y;
+};
+
+template <class T> std::ostream& operator<<( std::ostream& o, const Point<T>& p )
+{
+  o << p.x << "," << p.y << "\n";
+  return o;
+}
+
+template <class T> struct EuclideanMetric
+{
+  T operator()( Point<T> a, Point<T> b )
+  {
+    return std::sqrt( std::pow( a.x - b.x, T(2) ) + std::pow( a.y - b.y, T(2) ) );
+  }
+};
+
+template <class T> void test2D()
+{
+  ALEPH_TEST_BEGIN( "2D" );
+
+  using Point     = Point<T>;
+  using Metric    = EuclideanMetric<T>;
+  using CoverTree = CoverTree<Point, Metric>;
+
+  CoverTree ct;
+
+  std::ifstream in( CMAKE_SOURCE_DIR + std::string( "/tests/input/Cover_tree_simple.txt" ) );
+  ALEPH_ASSERT_THROW( in );
+
+  std::vector<Point> points;
+
+  std::string line;
+  while( std::getline( in, line ) )
+  {
+    std::stringstream converter( line );
+
+    T x = T();
+    T y = T();
+
+    converter >> x
+              >> y;
+
+    ALEPH_ASSERT_THROW( not converter.fail() );
+
+    points.push_back( {x,y} );
+  }
+
+  ALEPH_ASSERT_EQUAL( points.size(), 15 );
+
+  for( auto&& p : points )
+    ct.insert( p );
+
+  ct.print( std::cerr );
+
+  ALEPH_ASSERT_THROW( ct.isValid() );
+  ALEPH_TEST_END();
+}
+
 int main( int, char** )
 {
   testSimple<double>();
@@ -79,4 +147,7 @@ int main( int, char** )
 
   testSimplePermutations<double>();
   testSimplePermutations<float> ();
+
+  test2D<double>();
+  test2D<float> ();
 }
