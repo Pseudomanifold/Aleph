@@ -340,6 +340,42 @@ public:
     return levelMap;
   }
 
+  /**
+    Gets all nodes (which are supposed to be unique) and assigns them
+    their level.
+
+    TODO: This is essentially the *same* implementation as the function
+    above, albeit with switched nodes and labels in the map. This needs
+    to be consolidated somehow.
+  */
+
+  std::map<Point, long> nodesToLevel() const noexcept
+  {
+    std::map<Point, long> levelMap;
+
+    std::queue<const Node*> nodes;
+    nodes.push( _root.get() );
+
+    while( !nodes.empty() )
+    {
+      auto n = nodes.size();
+
+      for( decltype(n) i = 0; i < n; i++ )
+      {
+        auto&& node = nodes.front();
+
+        levelMap.insert( std::make_pair( node->_point, node->_level ) );
+
+        for( auto&& child : node->_children )
+            nodes.push( child.get() );
+
+        nodes.pop();
+      }
+    }
+
+    return levelMap;
+  }
+
   // Validity checks ---------------------------------------------------
   //
   // These are called by debug code and tests to ensure that the cover
