@@ -94,7 +94,7 @@ template <class T> struct Point
 
 template <class T> std::ostream& operator<<( std::ostream& o, const Point<T>& p )
 {
-  o << p.x << "," << p.y;
+  o << p.x << " " << p.y;
   return o;
 }
 
