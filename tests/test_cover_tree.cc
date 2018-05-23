@@ -232,6 +232,21 @@ template <class T> void test2D()
     std::cerr << distance << "\n";
   }
 
+  // DEBUG: output of cover radii --------------------------------------
+
+  {
+    std::ofstream out( "/tmp/C.txt" );
+
+    for( auto&& pair : nodesByLevel )
+    {
+      auto&& level  = pair.first;
+      auto&& centre = pair.second;
+      auto r        = std::pow( T(2), level );
+
+      out << centre << " " << r << "\n";
+    }
+  }
+
   ALEPH_ASSERT_EQUAL( nodesByLevel.size(), points.size() );
   ALEPH_TEST_END();
 }
