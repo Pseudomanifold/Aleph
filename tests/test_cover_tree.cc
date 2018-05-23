@@ -281,6 +281,49 @@ template <class T> void test2D()
       out << edge.first  << "\n"
           << edge.second << "\n\n";
     }
+
+    std::cerr << "# Cover tree\n";
+
+    ct.print( std::cerr );
+
+    std::set< std::pair<Point, Point> > filteredEdges;
+
+    auto&& nodesToLevel = ct.nodesToLevel();
+    for( auto&& edge : edges )
+    {
+      auto&& source = edge.first;                 // source node
+      auto&& upper  = nodesToLevel.at( source );  // source level
+      auto&& target = edge.second;                // target node
+      auto&& lower  = nodesToLevel.at( target );  // target level
+
+      auto d       = distance( source, target );
+      auto d_lower = std::pow( T(2), lower );
+      auto d_upper = std::pow( T(2), upper );
+
+      std::cerr << edge.first << " -- " << edge.second << ":\n";
+
+      if( d <= d_lower && d <= d_upper )
+        filteredEdges.insert( edge );
+      else if( d <= d_lower && d > d_upper )
+      {
+        // Only one criterion holds
+      }
+      else if( d <= d_upper && d > d_lower )
+      {
+        // Ditto.
+      }
+      else
+        throw std::runtime_error( "This should never happen" );
+    }
+
+    out.close();
+    out.open( "/tmp/F.txt" );
+
+    for( auto&& edge : filteredEdges )
+    {
+      out << edge.first  << "\n"
+          << edge.second << "\n\n";
+    }
   }
 
   ALEPH_ASSERT_EQUAL( nodesByLevel.size(), points.size() );
