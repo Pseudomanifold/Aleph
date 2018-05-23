@@ -147,7 +147,7 @@ template <class T> void test2D()
 
   CoverTree ct;
 
-  std::ifstream in( CMAKE_SOURCE_DIR + std::string( "/tests/input/Cover_tree_simple.txt" ) );
+  std::ifstream in( CMAKE_SOURCE_DIR + std::string( "/tests/input/Cover_tree_sorted.txt" ) );
   ALEPH_ASSERT_THROW( in );
 
   std::vector<Point> points;
