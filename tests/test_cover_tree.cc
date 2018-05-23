@@ -119,6 +119,24 @@ template <class T> T distance( const Point<T>& centre, const Point<T>& p )
   return metric( centre, p );
 }
 
+template <class T> std::vector<T> eccentricity( const std::vector< Point<T> >& points )
+{
+  std::vector<T> E;
+
+  for( auto&& p : points )
+  {
+    T e = T();
+
+    for( auto&& q : points )
+      e += distance( p, q );
+
+    e /= static_cast<T>( points.size() );
+    E.push_back( e );
+  }
+
+  return E;
+}
+
 template <class T> void test2D()
 {
   ALEPH_TEST_BEGIN( "2D" );
@@ -151,6 +169,22 @@ template <class T> void test2D()
   }
 
   ALEPH_ASSERT_EQUAL( points.size(), 15 );
+
+#if 0
+  // Check eccentricity-based sorting in order to obtain cover trees
+  // with improved balance properties.
+  {
+    auto e = eccentricity( points );
+
+    std::multimap<T, Point> sortedPoints;
+
+    for( std::size_t i = 0; i < points.size(); i++ )
+      sortedPoints.insert( std::make_pair( e.at(i), points.at(i) ) );
+
+    for( auto it = sortedPoints.rbegin(); it != sortedPoints.rend(); ++it )
+      ct.insert( it->second );
+  }
+#endif
 
   for( auto&& p : points )
     ct.insert( p );
