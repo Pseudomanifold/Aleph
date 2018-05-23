@@ -300,10 +300,32 @@ template <class T> void test2D()
       auto d_lower = std::pow( T(2), lower );
       auto d_upper = std::pow( T(2), upper );
 
-      std::cerr << edge.first << " -- " << edge.second << ":\n";
+      std::cerr << edge.first << " -- " << edge.second << ":\n"
+                << "  " << upper << "," << lower << "," << std::abs( upper - lower ) << "\n";
 
       if( d <= d_lower && d <= d_upper )
         filteredEdges.insert( edge );
+      else
+      {
+        auto l     = std::min( lower, upper );
+        auto L     = std::max( lower, upper );
+        unsigned c = 0;
+
+        for( long level = l; level <= L; level++ )
+        {
+          auto D = std::pow( T(2), level );
+          if( d > D )
+            c++;
+        }
+
+        // TODO: make configurable
+        if( c == 1 )
+          filteredEdges.insert( edge );
+      }
+
+      // TODO: old criterion; this can probably be removed at some point
+      // in the future
+      #if 0
       else if( d <= d_lower && d > d_upper )
       {
         // Only one criterion holds
@@ -314,6 +336,7 @@ template <class T> void test2D()
       }
       else
         throw std::runtime_error( "This should never happen" );
+      #endif
     }
 
     out.close();
