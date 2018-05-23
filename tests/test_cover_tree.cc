@@ -2,6 +2,7 @@
 
 #include <fstream>
 #include <iostream>
+#include <set>
 #include <sstream>
 #include <string>
 #include <vector>
@@ -244,6 +245,41 @@ template <class T> void test2D()
       auto r        = std::pow( T(2), level );
 
       out << centre << " " << r << "\n";
+    }
+  }
+
+  // DEBUG: output of edges --------------------------------------------
+
+  {
+    std::set< std::pair<Point, Point> > edges;
+
+    for( auto&& pair : nodesByLevel )
+    {
+      auto&& level  = pair.first;
+      auto&& centre = pair.second;
+
+      for( auto&& p : points )
+      {
+        // TODO: fix radius/level calculation; is this an implementation
+        // detail of the tree?
+        if( contains( centre, p, T( std::pow( T(2), level ) ) ) )
+        {
+          // Induce basic ordering of edges in order to make it easier
+          // to print them later on.
+          if( centre < p )
+            edges.insert( std::make_pair( centre, p ) );
+          else
+            edges.insert( std::make_pair( p, centre ) );
+        }
+      }
+    }
+
+    std::ofstream out( "/tmp/E.txt" );
+
+    for( auto&& edge : edges )
+    {
+      out << edge.first  << "\n"
+          << edge.second << "\n\n";
     }
   }
 
