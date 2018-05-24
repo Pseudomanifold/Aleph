@@ -25,9 +25,9 @@ template <class T> void testFormats()
 
   for( auto&& pc : pointClouds )
   {
-    ALEPH_ASSERT_THROW( pc.size()      == 150 );
-    ALEPH_ASSERT_THROW( pc.dimension() == 4 );
-    ALEPH_ASSERT_THROW( pc.empty()     == false );
+    ALEPH_ASSERT_EQUAL( pc.size(),      150 );
+    ALEPH_ASSERT_EQUAL( pc.dimension(),   4 );
+    ALEPH_ASSERT_THROW( pc.empty() == false );
   }
 
   for( auto&& pc1 : pointClouds )
