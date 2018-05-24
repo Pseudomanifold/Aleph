@@ -306,7 +306,7 @@ template <class T> void test2D()
       {
         // TODO: fix radius/level calculation; is this an implementation
         // detail of the tree?
-        if( contains( centre, p, T( std::pow( T(2), level ) ) ) )
+        if( centre != p && contains( centre, p, T( std::pow( T(2), level ) ) ) )
         {
           // Induce basic ordering of edges in order to make it easier
           // to print them later on.
