@@ -91,6 +91,16 @@ template <class T> struct Point
     else
       return x < other.x;
   }
+
+  bool operator==( const Point& other ) const noexcept
+  {
+    return x == other.x && y == other.y;
+  }
+
+  bool operator!=( const Point& other ) const noexcept
+  {
+    return !this->operator==( other );
+  }
 };
 
 template <class T> std::ostream& operator<<( std::ostream& o, const Point<T>& p )
