@@ -246,6 +246,22 @@ template<class T> PointCloud<T> load( const std::string& filename )
   if( lines <= 0 )
     return PointCloud<T>();
 
+  // Recount all lines in the file, removing comments and empty lines
+  // from the calculation. Else, the code below allocates many points
+  // that will remain empty.
+  {
+    std::string line;
+    while( std::getline( in, line ) )
+    {
+      line = utilities::trim( line );
+      if( line.empty() || line.front() == '#' )
+        lines -= 1;
+    }
+  }
+
+  in.clear();
+  in.seekg( 0 );
+
   std::size_t i = 0;
   std::size_t d = 0;
   std::size_t n = static_cast<std::size_t>( lines );
@@ -256,13 +272,14 @@ template<class T> PointCloud<T> load( const std::string& filename )
 
   while( std::getline( in, line ) )
   {
+    line        = utilities::trim( line );
     auto tokens = utilities::split( line, std::string( "[:;,[:space:]]+" ) );
 
     // Skip comment lines or empty lines; while this is somewhat
     // superfluous in most files (at least it is unlikely that a
     // line in the middle of the file will be empty), the loader
     // should handle empty lines at the end of the file.
-    if( line.front() == '#' || tokens.empty() )
+    if( line.empty() || line.front() == '#' || tokens.empty() )
       continue;
 
     if( d == 0 )
