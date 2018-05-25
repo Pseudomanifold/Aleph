@@ -2,6 +2,7 @@
 
 #include <fstream>
 #include <iostream>
+#include <numeric>
 #include <set>
 #include <sstream>
 #include <string>
@@ -10,6 +11,8 @@
 #include <cmath>
 
 #include <aleph/geometry/CoverTree.hh>
+
+#include <aleph/topology/UnionFind.hh>
 
 using namespace aleph::geometry;
 
@@ -393,17 +396,64 @@ template <class T> void test2D()
     }
   }
 
+  // DEBUG: hierarchy creation -----------------------------------------
+  //
+  // The idea is to create edges hierarchically, while always
+  // maintaining that new edges will be created using *short*
+  // distances into connected components.
+
+  {
+    std::map<Point, std::size_t> point_to_index;
+    for( std::size_t i = 0; i < points.size(); i++ )
+      point_to_index[ points[i] ] = i;
+
+    std::vector<std::size_t> indices( points.size() );
+    std::iota( indices.begin(), indices.end(), 0 );
+
+    aleph::topology::UnionFind<std::size_t> uf( indices.begin(), indices.end() );
+
+    for( auto&& pair : nodesByLevel )
+    {
+      auto&& level  = pair.first;
+      auto&& centre = pair.second;
+
+      std::cerr << "Parent: " << centre << "\n";
+
+      for( auto&& p : points )
+      {
+        // TODO: fix radius/level calculation; is this an implementation
+        // detail of the tree?
+        if( centre != p && contains( centre, p, T( std::pow( T(2), level ) ) ) )
+        {
+          std::cerr << " -> " << p << "\n";
+          std::cerr << point_to_index[centre] << " -- " << point_to_index[p] << "\n";
+
+          // Get connected component that corresponds to the child;
+          // check for *shortest* distance
+
+          std::vector<std::size_t> component;
+
+          uf.get( point_to_index[p], std::back_inserter( component ) );
+
+          std::cerr << " -> [" << component.size() << "]\n";
+
+          uf.merge( point_to_index[p], point_to_index[centre] );
+        }
+      }
+    }
+  }
+
   ALEPH_ASSERT_EQUAL( nodesByLevel.size(), points.size() );
   ALEPH_TEST_END();
 }
 
 int main( int, char** )
 {
-  testSimple<double>();
-  testSimple<float> ();
+  //testSimple<double>();
+  //testSimple<float> ();
 
-  testSimplePermutations<double>();
-  testSimplePermutations<float> ();
+  //testSimplePermutations<double>();
+  //testSimplePermutations<float> ();
 
   test2D<double>();
   test2D<float> ();
