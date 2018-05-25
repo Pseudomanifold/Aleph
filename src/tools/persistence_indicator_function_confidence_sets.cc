@@ -8,6 +8,7 @@
 #include <algorithm>
 #include <fstream>
 #include <iostream>
+#include <stdexcept>
 #include <string>
 #include <vector>
 
@@ -64,9 +65,8 @@ int main( int argc, char** argv )
         numBootstrapSamples = static_cast<unsigned>( std::stoul( optarg ) );
         break;
 
-      // TODO: throw exception
       default:
-        break;
+        throw std::runtime_error( "Unknown command-line parameter" );
       }
     }
 
