@@ -5,6 +5,8 @@
 
 #include <aleph/persistenceDiagrams/io/Raw.hh>
 
+#include <aleph/utilities/Values.hh>
+
 #include <algorithm>
 #include <fstream>
 #include <iostream>
@@ -70,8 +72,8 @@ int main( int argc, char** argv )
       }
     }
 
-    // TODO: check alpha
-    // TODO: check bootstrap samples
+    aleph::utilities::ensureRange( alpha, 0.0, 1.0 );
+    aleph::utilities::ensureLarger( numBootstrapSamples, unsigned(0) );
   }
 
   std::vector<PersistenceIndicatorFunction> persistenceIndicatorFunctions;
