@@ -150,6 +150,27 @@ template <class T> std::vector<T> eccentricity( const std::vector< Point<T> >& p
   return E;
 }
 
+// Selects a particular point from a set of points. The point is chosen
+// with respect to a linkage criterion to a parent point $p$. Currently
+// this is the *single linkage* criterion.
+template <class T> Point<T> linkage( const Point<T>& parent, const std::vector< Point<T> >& points )
+{
+  T minDistance = std::numeric_limits<T>::max();
+  Point<T> result;
+
+  for( auto&& p : points )
+  {
+    auto d = distance( parent, p );
+    if( d < minDistance )
+    {
+      minDistance = d;
+      result      = p;
+    }
+  }
+
+  return result;
+}
+
 template <class T> void test2D()
 {
   ALEPH_TEST_BEGIN( "2D" );
