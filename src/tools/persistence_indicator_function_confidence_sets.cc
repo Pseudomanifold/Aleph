@@ -77,7 +77,7 @@ int main( int argc, char** argv )
   std::vector<PersistenceIndicatorFunction> persistenceIndicatorFunctions;
   persistenceIndicatorFunctions.reserve( static_cast<std::size_t>( argc - 1 ) );
 
-  for( int i = 1; i < argc; i++ )
+  for( int i = optind; i < argc; i++ )
   {
     std::cerr << "* Processing '" << argv[i] << "'...";
 
