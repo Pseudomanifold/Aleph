@@ -433,6 +433,8 @@ template <class T> void test2D()
 
     aleph::topology::UnionFind<std::size_t> uf( indices.begin(), indices.end() );
 
+    std::set< std::pair<Point, Point> > edges;
+
     for( auto&& pair : nodesByLevel )
     {
       auto&& level  = pair.first;
@@ -446,6 +448,13 @@ template <class T> void test2D()
         // detail of the tree?
         if( centre != p && contains( centre, p, T( std::pow( T(2), level ) ) ) )
         {
+          // TODO: this should be configurable
+          //
+          // Skip edge creation if the two points are already in the
+          // same connected component
+          if( uf.find( point_to_index[centre] ) == uf.find( point_to_index[p] ) )
+            continue;
+
           std::cerr << " -> " << p << "\n";
           std::cerr << point_to_index[centre] << " -- " << point_to_index[p] << "\n";
 
@@ -453,14 +462,37 @@ template <class T> void test2D()
           // check for *shortest* distance
 
           std::vector<std::size_t> component;
+          std::vector<Point> component_;
 
           uf.get( point_to_index[p], std::back_inserter( component ) );
 
+          for( auto&& i : component )
+            component_.push_back( points.at(i) );
+
           std::cerr << " -> [" << component.size() << "]\n";
 
+          auto q = linkage( centre, component_ );
+          if( p != q )
+            std::cerr << " -> This is different!\n";
+
           uf.merge( point_to_index[p], point_to_index[centre] );
+
+          std::cerr << point_to_index[centre] << " -- " << point_to_index[q] << "\n";
+
+          if( centre < q )
+            edges.insert( std::make_pair( centre, q ) );
+          else
+            edges.insert( std::make_pair( q, centre ) );
         }
       }
+    }
+
+    std::ofstream out( "/tmp/H.txt" );
+
+    for( auto&& edge : edges )
+    {
+      out << edge.first  << "\n"
+          << edge.second << "\n\n";
     }
   }
 
