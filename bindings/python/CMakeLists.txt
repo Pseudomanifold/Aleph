@@ -28,14 +28,31 @@ IF( BUILD_PYTHON_BINDINGS )
 
     ADD_LIBRARY( aleph SHARED aleph.cc )
 
+    ####################################################################
     # The library must not have any prefix and should be located in
     # a subfolder that includes the package name. The setup will be
     # more complicated otherwise.
+    ####################################################################
+
     SET_TARGET_PROPERTIES( aleph
       PROPERTIES
         PREFIX ""
-        LIBRARY_OUTPUT_DIRECTORY "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/aleph"
     )
+
+    # If a specific output directory has been set, for example if this
+    # module is built using `setuptools`, use it. Else, default to the
+    # binary directory.
+    IF( CMAKE_LIBRARY_OUTPUT_DIRECTORY )
+      SET_TARGET_PROPERTIES( aleph
+        PROPERTIES
+          LIBRARY_OUTPUT_DIRECTORY "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/aleph"
+      )
+    ELSE()
+      SET_TARGET_PROPERTIES( aleph
+        PROPERTIES
+          LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/aleph"
+      )
+    ENDIF()
 
     IF( APPLE )
       SET_TARGET_PROPERTIES( aleph
