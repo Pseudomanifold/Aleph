@@ -123,9 +123,12 @@ ENDIF()
 FIND_PACKAGE( HDF5 COMPONENTS CXX )
 
 IF( HDF5_FOUND )
-  # Workaround for HDF5 issues: just pretend that HDF5 does not exist
-  # for the current installation.
-  SET( ALEPH_WITH_HDF5 FALSE )
+  SET( ALEPH_WITH_HDF5 TRUE
+    CACHE BOOL
+    "Toggle using the HDF5 library (optional)"
+  )
+
+  MESSAGE( STATUS "HDF5 has been found; use ALEPH_WITH_HDF5 to toggle its usage" )
 
   # Workaround for older versions of the FindHDF5.cmake module. In some
   # versions, this module is broken and does not return the proper libs
