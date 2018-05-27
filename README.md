@@ -159,7 +159,13 @@ i.e. `BUILD_PYTHON_BINDINGS` follow these instructions to install them:
 Note that this uses the old `setuptools` approach for installing the
 package. A simpler installation based on `pip` is forthcoming.
 
-# Contact
+# Contact & contributors
 
 For general discussion, questions, and comments, please contact the
 principal developer and maintainer Bastian Rieck (bastian.rieck@iwr.uni-heidelberg.de).
+
+The following people have contributed code to Aleph:
+
+* [Submanifold](https://github.com/Submanifold) (Bastian Rieck): principal developer
+* [maexlich](https://github.com/maexlich) (Max Horn): fixes and
+  improvements to the Python bindings
