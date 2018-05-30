@@ -10,6 +10,9 @@
 #include <aleph/geometry/CoverTree.hh>
 #include <aleph/geometry/Point.hh>
 
+#include <aleph/geometry/distances/Euclidean.hh>
+#include <aleph/geometry/distances/Wrapper.hh>
+
 #include <aleph/utilities/String.hh>
 
 #include <algorithm>
@@ -21,8 +24,11 @@
 
 #include <getopt.h>
 
-using DataType = double;
-using Point    = aleph::geometry::Point<DataType>;
+using DataType  = double;
+using Point     = aleph::geometry::Point<DataType>;
+using Distance  = aleph::geometry::distances::Euclidean<DataType>;
+using Wrapper   = aleph::geometry::distances::Wrapper<Distance, Point>;
+using CoverTree = aleph::geometry::CoverTree<Point, Wrapper>;
 
 std::vector<Point> load( std::istream& in )
 {
@@ -65,8 +71,30 @@ std::vector<Point> load( const std::string& filename )
   return load( in );
 }
 
-
-
-int main( int, char** )
+int main( int argc, char** argv )
 {
+  // Linkage criterion to use for constructing a hierarchical graph from
+  // the cover tree. Currently, this is *not* used.
+  std::string linkage = "single";
+
+  {
+    static option commandLineOptions[] =
+    {
+      { "linkage", required_argument, nullptr, 'l' },
+      { nullptr  ,                 0, nullptr,  0  }
+    };
+
+    int option = 0;
+    while( ( option = getopt_long( argc, argv, "l:", commandLineOptions, nullptr ) ) != -1 )
+    {
+      switch( option )
+      {
+      case 'l':
+        linkage = optarg;
+        break;
+      default:
+        throw std::runtime_error( "Unknown command-line option" );
+      }
+    }
+  }
 }
