@@ -270,6 +270,18 @@ public:
       _root->insert( p );
   }
 
+  /**
+    Inserts a sequence of points into the cover tree. This is just
+    a convenience function; no parallelization---or other advanced
+    techniques---will be used.
+  */
+
+  template <class InputIterator> void insert( InputIterator begin, InputIterator end )
+  {
+    for( auto it = begin; it != end; ++it )
+      this->insert( *it );
+  }
+
   // Pretty-printing function for the tree; this is only meant for
   // debugging purposes and could conceivably be implemented using
   // `std::ostream`.
