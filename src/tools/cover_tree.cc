@@ -122,8 +122,12 @@ int main( int argc, char** argv )
     return 0;
 
   std::cerr << "* Read "
-            << filename.size()
+            << points.size()
             << " points of dimension "
             << points.front().dimension()
             << "\n";
+
+  CoverTree ct;
+  ct.insert( points.begin(), points.end() );
+  ct.print( std::cerr );
 }
