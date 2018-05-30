@@ -49,6 +49,14 @@ public:
   {
   }
 
+  // Iterators ---------------------------------------------------------
+
+  const_iterator begin() const noexcept { return _points.begin(); }
+  iterator       begin()       noexcept { return _points.begin(); }
+
+  const_iterator end()   const noexcept { return _points.end();   }
+  iterator       end()         noexcept { return _points.end();   }
+
   // Attributes --------------------------------------------------------
 
   /** @returns Dimension of the point */
