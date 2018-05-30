@@ -231,7 +231,7 @@ public:
         auto d = Metric()( child->_point, p );
         if( d <= child->coveringDistance() )
         {
-          std::cerr << __PRETTY_FUNCTION__ << ": Recursive enumeration of the tree\n";
+          std::cerr << __FUNCTION__ << ": Recursive enumeration of the tree\n";
 
           // We found a node in which the new point can be inserted
           // *without* violating the covering invariant.
