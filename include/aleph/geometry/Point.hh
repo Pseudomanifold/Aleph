@@ -102,4 +102,17 @@ private:
 
 } // namespace aleph
 
+template <class T> std::ostream& operator<<( std::ostream& o, const aleph::geometry::Point<T>& p )
+{
+  for( auto it = p.begin(); it != p.end(); ++it )
+  {
+    if( it != p.begin() )
+      o << " ";
+
+    o << *it;
+  }
+
+  return o;
+}
+
 #endif
