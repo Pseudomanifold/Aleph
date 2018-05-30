@@ -2,7 +2,7 @@
 #define ALEPH_GEOMETRY_POINT_HH__
 
 #include <algorithm>
-#include <initalizer_list>
+#include <initializer_list>
 #include <ostream>
 #include <vector>
 
@@ -44,18 +44,18 @@ public:
   {
   }
 
-  template <class T> Point( std::initalizer_list<T> data )
-    _data( data.begin(), data.end() )
+  Point( std::initializer_list<T> data )
+    : _data( data.begin(), data.end() )
   {
   }
 
   // Iterators ---------------------------------------------------------
 
-  const_iterator begin() const noexcept { return _points.begin(); }
-  iterator       begin()       noexcept { return _points.begin(); }
+  const_iterator begin() const noexcept { return _data.begin(); }
+  iterator       begin()       noexcept { return _data.begin(); }
 
-  const_iterator end()   const noexcept { return _points.end();   }
-  iterator       end()         noexcept { return _points.end();   }
+  const_iterator end()   const noexcept { return _data.end();   }
+  iterator       end()         noexcept { return _data.end();   }
 
   // Attributes --------------------------------------------------------
 
