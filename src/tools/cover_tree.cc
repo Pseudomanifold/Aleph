@@ -17,6 +17,7 @@
 
 #include <algorithm>
 #include <fstream>
+#include <iostream>
 #include <istream>
 #include <stdexcept>
 #include <string>
@@ -59,6 +60,14 @@ std::vector<Point> load( std::istream& in )
     points.emplace_back( Point( values.begin(), values.end() ) );
   }
 
+  if( !points.empty() )
+  {
+    auto d = points.front().dimension();
+    for( auto&& p : points )
+      if( p.dimension() != d )
+        throw std::runtime_error( "Dimension of points must not vary" );
+  }
+
   return points;
 }
 
@@ -97,4 +106,24 @@ int main( int argc, char** argv )
       }
     }
   }
+
+  // The remaining command-line arguments are considered to be file
+  // names. The name '-' deserves special handling.
+  std::string filename = argv[ optind++ ];
+
+  std::vector<Point> points;
+  if( filename == "-" )
+    points = load( std::cin );
+  else
+    points = load( filename );
+
+  // Nothing to do here
+  if( points.empty() )
+    return 0;
+
+  std::cerr << "* Read "
+            << filename.size()
+            << " points of dimension "
+            << points.front().dimension()
+            << "\n";
 }
