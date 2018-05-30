@@ -29,6 +29,14 @@ public:
 
   // Typedefs ----------------------------------------------------------
 
+  using Container = std::vector<T>;
+
+  // STL-like definitions because they make it easier to use the class
+  // with standard algorithms.
+  using const_iterator = typename Container::const_iterator;
+  using iterator       = typename Container::iterator;
+  using value_type     = T;
+
   // Constructors ------------------------------------------------------
 
   template <class InputIterator> Point( InputIterator begin, InputIterator end )
@@ -79,7 +87,7 @@ public:
 private:
 
   /** Stores the individual coordinates of the point */
-  std::vector<T> _data;
+  Container _data;
 };
 
 } // namespace geometry
