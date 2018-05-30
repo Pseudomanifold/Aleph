@@ -108,11 +108,7 @@ private:
   Container _data;
 };
 
-} // namespace geometry
-
-} // namespace aleph
-
-template <class T> std::ostream& operator<<( std::ostream& o, const aleph::geometry::Point<T>& p )
+template <class T> std::ostream& operator<<( std::ostream& o, const Point<T>& p )
 {
   for( auto it = p.begin(); it != p.end(); ++it )
   {
@@ -124,5 +120,9 @@ template <class T> std::ostream& operator<<( std::ostream& o, const aleph::geome
 
   return o;
 }
+
+} // namespace geometry
+
+} // namespace aleph
 
 #endif
