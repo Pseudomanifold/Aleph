@@ -65,6 +65,16 @@ public:
     return _data.size();
   }
 
+  /**
+    @returns Dimension of the point; provided to be compatible with STL
+    methods that are unaware of the `dimension` attribute.
+  */
+
+  std::size_t size() const noexcept
+  {
+    return _data.size();
+  }
+
   // Operators ---------------------------------------------------------
 
   /** Checks all coordinates of two points for equality */
