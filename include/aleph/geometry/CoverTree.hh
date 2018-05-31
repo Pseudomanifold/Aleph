@@ -602,10 +602,42 @@ public:
         previous = current;
     }
 
-    return std::is_sorted( distances.rbegin(), distances.rend(), std::less_equal<double>() );
+    auto harmonic =
+      std::is_sorted( distances.rbegin(), distances.rend(),
+        std::less_equal<double>()
+      );
+
+    // FIXME: this is not the proper place for this check, but it is
+    // easier at the moment
+    if( !harmonic && !distances.empty() )
+    {
+      auto maxDistance = *std::max_element( distances.begin(), distances.end() );
+      auto l           = this->level();
+
+      while( maxDistance <= this->coveringDistance( l ) )
+        --l;
+
+      ++l;
+
+      if( l < this->level() )
+        std::cerr << "Point " << p << " is a more harmonic root with level = " << l << "\n";
+    }
+
+    return harmonic;
   }
 
 private:
+
+  /**
+    Calculates covering distance of a given level. This is
+    a convenience function that ensures that this check is
+    always in sync with the covering constant.
+  */
+
+  double coveringDistance( long level ) const noexcept
+  {
+    return std::pow( coveringConstant, static_cast<double>( level ) );
+  }
 
   /** Root pointer of the tree */
   std::unique_ptr<Node> _root;
