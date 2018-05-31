@@ -637,7 +637,7 @@ public:
 
     // FIXME: this is not the proper place for this check, but it is
     // easier at the moment
-    if( !harmonic && !distances.empty() )
+    if( distances.size() >= 2 )
     {
       auto maxDistance = *std::max_element( distances.begin(), distances.end() );
       auto l           = this->level();
@@ -654,6 +654,8 @@ public:
       // new root.
       if( l < this->level() )
       {
+        std::cerr << "Replacing root node with " << current->_point << "\n";
+
         auto allPoints = this->points();
 
         allPoints.erase(
