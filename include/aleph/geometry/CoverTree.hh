@@ -392,6 +392,21 @@ public:
     return levelMap;
   }
 
+  // Tree attributes ---------------------------------------------------
+
+  /**
+    @returns Level of the tree, i.e. the level of the root node. If no root
+    node exists, a level of zero is returned. This is *not* the depth.
+  */
+
+  long level() const noexcept
+  {
+    if( _root )
+      return _root->_level;
+    else
+      return 0;
+  }
+
   // Validity checks ---------------------------------------------------
   //
   // These are called by debug code and tests to ensure that the cover
