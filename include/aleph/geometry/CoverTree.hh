@@ -596,7 +596,7 @@ public:
     of the tree.
   */
 
-  bool isHarmonic( const Point& p ) const noexcept
+  bool isHarmonic( const Point& p ) /* FIXME const */ noexcept
   {
     std::vector<double> distances;
 
@@ -647,8 +647,36 @@ public:
 
       ++l;
 
+      // The cover condition can be improved by making the current point
+      // the new root node and inserting points into this tree. We shall
+      // use the *dumbest* way of doing this (for now) and simply insert
+      // all nodes into the new tree, depending on their distance to the
+      // new root.
       if( l < this->level() )
-        std::cerr << "Point " << p << " is a more harmonic root with level = " << l << "\n";
+      {
+        auto allPoints = this->points();
+
+        allPoints.erase(
+          std::remove( allPoints.begin(), allPoints.end(), current->_point ),
+          allPoints.end()
+        );
+
+        // Sort points in *descending* distance from the new root node
+        std::sort( allPoints.begin(), allPoints.end(),
+          [&current] ( const Point& p, const Point& q )
+          {
+            auto dp = Metric()( current->_point, p );
+            auto dq = Metric()( current->_point, q );
+
+            return dp > dq;
+          }
+        );
+
+        _root =
+          std::unique_ptr<Node>( new Node( current->_point, l ) );
+
+        this->insert( allPoints.begin(), allPoints.end() );
+      }
     }
 
     return harmonic;
