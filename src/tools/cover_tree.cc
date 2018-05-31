@@ -134,8 +134,30 @@ int main( int argc, char** argv )
   // check harmonic property; actually we should do this after each
   // insertion...
 
-  for( auto&& p : points )
-    std::cerr << "Harmonic for point " << p << "? " << ct.isHarmonic( p ) << "\n";
+  {
+    bool isHarmonic = true;
+    do
+    {
+      for( auto&& p : points )
+      {
+        isHarmonic = isHarmonic && ct.isHarmonic( p );
+        if( !isHarmonic )
+        {
+          std::cerr << "Point " << p << " breaks harmony\n";
+          break;
+        }
+      }
+
+      std::cerr << "LEVEL: " << ct.level() << "\n";
+
+      if( !isHarmonic )
+      {
+        isHarmonic = true;
+        continue;
+      }
+    }
+    while( !isHarmonic );
+  }
 
   std::cerr << "# Final tree\n";
   ct.print( std::cerr );
