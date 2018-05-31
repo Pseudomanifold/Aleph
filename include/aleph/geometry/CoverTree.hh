@@ -240,6 +240,10 @@ public:
         }
       }
 
+      // If we reach this point, we are sufficiently deep in to the tree
+      // to make the new point a child of the current node. This code is
+      // only reached when the recursive enumeration has finished!
+      //
       // Add the new point as a child of the current root node. Note the
       // level adjustment.
       _children.push_back( std::unique_ptr<Node>( new Node( p, _level - 1 ) ) );
