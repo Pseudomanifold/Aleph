@@ -128,37 +128,14 @@ int main( int argc, char** argv )
             << "\n";
 
   CoverTree ct;
-  ct.insert( points.begin(), points.end() );
-  ct.print( std::cerr );
 
-  // check harmonic property; actually we should do this after each
-  // insertion...
-
+  for( auto&& p : points )
   {
-    bool isHarmonic = true;
-    do
-    {
-      for( auto&& p : points )
-      {
-        isHarmonic = isHarmonic && ct.isHarmonic( p );
-        if( !isHarmonic )
-        {
-          std::cerr << "Point " << p << " breaks harmony\n";
-          break;
-        }
-      }
+    ct.insert( p );
 
-      std::cerr << "LEVEL: " << ct.level() << "\n";
-
-      if( !isHarmonic )
-      {
-        isHarmonic = true;
-        continue;
-      }
-    }
-    while( !isHarmonic );
+    if( !ct.isHarmonic( p ) )
+      std::cerr << "Attempting to restore harmony\n";
   }
 
-  std::cerr << "# Final tree\n";
   ct.print( std::cerr );
 }
