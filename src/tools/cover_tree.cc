@@ -130,4 +130,13 @@ int main( int argc, char** argv )
   CoverTree ct;
   ct.insert( points.begin(), points.end() );
   ct.print( std::cerr );
+
+  // check harmonic property; actually we should do this after each
+  // insertion...
+
+  for( auto&& p : points )
+    std::cerr << "Harmonic for point " << p << "? " << ct.isHarmonic( p ) << "\n";
+
+  std::cerr << "# Final tree\n";
+  ct.print( std::cerr );
 }
