@@ -129,13 +129,20 @@ int main( int argc, char** argv )
 
   CoverTree ct;
 
-  for( auto&& p : points )
-  {
-    ct.insert( p );
-
-    if( !ct.isHarmonic( p ) )
-      std::cerr << "Attempting to restore harmony\n";
-  }
+  ct.insert( points.begin(), points.end() );
 
   ct.print( std::cerr );
+
+  for( auto&& p : points )
+    ct.checkDistance( p );
+
+  //for( auto&& p : points )
+  //{
+  //  ct.insert( p );
+
+  //  if( !ct.isHarmonic( p ) )
+  //    std::cerr << "Attempting to restore harmony\n";
+  //}
+
+  //ct.print( std::cerr );
 }

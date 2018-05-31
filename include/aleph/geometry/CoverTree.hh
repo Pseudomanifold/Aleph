@@ -731,12 +731,14 @@ public:
         previous = current;
     }
 
-    std::cerr << "root distances:\n";
+    std::cerr << "Point = " << p << "\n";
+
+    std::cerr << "  root distances:\n";
     for( auto&& d : rootDistances )
       std::cerr << d << " ";
     std::cerr << "\n";
 
-    std::cerr << "edge distances:\n";
+    std::cerr << "  edge distances:\n";
     for( auto&& d : edgeDistances )
       std::cerr << d << " ";
     std::cerr << "\n";
