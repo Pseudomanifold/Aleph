@@ -392,6 +392,34 @@ public:
     return levelMap;
   }
 
+  /** Gets all points in BFS order */
+  std::vector<Point> points() const noexcept
+  {
+    std::vector<Point> result;
+
+    std::queue<const Node*> nodes;
+    nodes.push( _root.get() );
+
+    while( !nodes.empty() )
+    {
+      auto n = nodes.size();
+
+      for( decltype(n) i = 0; i < n; i++ )
+      {
+        auto&& node = nodes.front();
+
+        result.push_back( node->_point );
+
+        for( auto&& child : node->_children )
+          nodes.push( child.get() );
+
+        nodes.pop();
+      }
+    }
+
+    return result;
+  }
+
   // Tree attributes ---------------------------------------------------
 
   /**
