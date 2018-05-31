@@ -599,6 +599,7 @@ public:
   bool isHarmonic( const Point& p ) /* FIXME const */ noexcept
   {
     std::vector<double> distances;
+    std::vector<double> ancestorDistances;
 
     auto current  = _root.get();
     auto previous = _root.get();
@@ -617,6 +618,10 @@ public:
         auto d = Metric()( p, child->_point );
         if( d <= child->coveringDistance() )
         {
+          ancestorDistances.push_back(
+            Metric()( _root->_point, child->_point )
+          );
+
           // Continue the recursion in the next level, using the current
           // node as a new root.
           current = child.get();
@@ -634,6 +639,12 @@ public:
       std::is_sorted( distances.rbegin(), distances.rend(),
         std::less_equal<double>()
       );
+
+    for( auto&& d : ancestorDistances )
+      std::cerr << "AD = " << d << "\n";
+
+    if( !harmonic )
+      std::cerr << __FUNCTION__ << ": " << current->_point << " is not harmonic\n";
 
     // FIXME: this is not the proper place for this check, but it is
     // easier at the moment
@@ -682,6 +693,55 @@ public:
     }
 
     return harmonic;
+  }
+
+  bool checkDistance( const Point& p ) const noexcept
+  {
+    std::vector<double> edgeDistances;
+    std::vector<double> rootDistances;
+
+    auto current  = _root.get();
+    auto previous = _root.get();
+
+    while( current )
+    {
+      auto d = Metric()( p, current->_point );
+      if( d <= current->coveringDistance() )
+        edgeDistances.push_back( static_cast<double>( d ) );
+
+      for( auto&& child : current->_children )
+      {
+        auto d = Metric()( p, child->_point );
+        if( d <= child->coveringDistance() )
+        {
+          rootDistances.push_back(
+            Metric()( _root->_point, child->_point )
+          );
+
+          // Continue the recursion in the next level, using the current
+          // node as a new root.
+          current = child.get();
+          break;
+        }
+      }
+
+      if( current == previous )
+        break;
+      else
+        previous = current;
+    }
+
+    std::cerr << "root distances:\n";
+    for( auto&& d : rootDistances )
+      std::cerr << d << " ";
+    std::cerr << "\n";
+
+    std::cerr << "edge distances:\n";
+    for( auto&& d : edgeDistances )
+      std::cerr << d << " ";
+    std::cerr << "\n";
+
+    return true;
   }
 
 private:
