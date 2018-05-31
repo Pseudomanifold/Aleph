@@ -544,6 +544,52 @@ public:
            && this->checkSeparatingInvariant();
   }
 
+  /**
+    Checks whether the tree nodes are building a *harmonic cover*.
+    A cover is harmonic if its level is smallest among all covers,
+    and the distance of nodes to their parents is decreasing.
+
+    The check requires one point for testing the harmonic property
+    of the tree.
+  */
+
+  bool isHarmonic( const Point& p ) const noexcept
+  {
+    std::vector<double> distances;
+
+    auto current  = _root.get();
+    auto previous = _root.get();
+
+    while( current )
+    {
+      // Need to evaluate the distance to the current node *once* at
+      // this point. Since we select another `current` node later on
+      // it is ensured that we only store the distance *once*.
+      auto d = Metric()( p, current->_point );
+      if( d <= current->coveringDistance() )
+        distances.push_back( static_cast<double>( d ) );
+
+      for( auto&& child : current->_children )
+      {
+        auto d = Metric()( p, child->_point );
+        if( d <= child->coveringDistance() )
+        {
+          // Continue the recursion in the next level, using the current
+          // node as a new root.
+          current = child.get();
+          break;
+        }
+      }
+
+      if( current == previous )
+        break;
+      else
+        previous = current;
+    }
+
+    return std::is_sorted( distances.rbegin(), distances.rend(), std::less_equal<double>() );
+  }
+
 private:
 
   /** Root pointer of the tree */
