@@ -36,6 +36,7 @@
 #include <fstream>
 #include <iostream>
 #include <limits>
+#include <stdexcept>
 #include <string>
 #include <vector>
 
@@ -97,6 +98,7 @@ int main( int argc, char** argv )
   {
     { "dimension"           , required_argument, nullptr, 'd' },
     { "infinity"            , required_argument, nullptr, 'f' },
+    { "output"              , required_argument, nullptr, 'o' },
     { "closeness-centrality", no_argument      , nullptr, 'c' },
     { "sum"                 , no_argument      , nullptr, 's' },
     { nullptr               , 0                , nullptr,  0  }
@@ -106,10 +108,11 @@ int main( int argc, char** argv )
   bool calculateClosenessCentrality = false;
   bool useSumOfDegrees              = false;
   DataType infinity                 = DataType(2);
+  std::string output                = "/tmp";
 
   {
     int option = 0;
-    while( ( option = getopt_long( argc, argv, "d:f:cs", commandLineOptions, nullptr ) ) != -1 )
+    while( ( option = getopt_long( argc, argv, "d:f:o:cs", commandLineOptions, nullptr ) ) != -1 )
     {
       switch( option )
       {
@@ -119,18 +122,30 @@ int main( int argc, char** argv )
       case 'f':
         infinity = aleph::utilities::convert<DataType>( optarg );
         break;
+      case 'o':
+        output = optarg;
+        break;
       case 'c':
         calculateClosenessCentrality = true;
         break;
       case 's':
         useSumOfDegrees = true;
         break;
+      default:
+        throw std::runtime_error( "Unknown command-line arugment" );
       }
     }
   }
 
   if( ( argc - optind ) < 1 )
+  {
+    usage();
     return -1;
+  }
+
+  // Check that the output parameter at least *looks* like a directory
+  if( output.back() != '/' )
+    output.push_back( '/' );
 
   std::string filename = argv[optind++];
 
@@ -156,12 +171,14 @@ int main( int argc, char** argv )
     for( auto&& K : simplicialComplexes )
     {
       K.sort();
-      auto cc     = closenessCentrality( K );
-      auto output = "/tmp/"
-                    + aleph::utilities::format( index, simplicialComplexes.size() )
-                    + "_closeness_centrality.txt";
+      auto cc         = closenessCentrality( K );
+      auto outputPath = output
+                      + aleph::utilities::format( index, simplicialComplexes.size() )
+                      + "_closeness_centrality.txt";
 
-      std::ofstream out( output );
+      std::cerr << "* Storing closeness centrality values in '" << outputPath << "'\n";
+
+      std::ofstream out( outputPath );
       for( auto&& value : cc )
         out << value << "\n";
 
@@ -221,7 +238,7 @@ int main( int argc, char** argv )
 
     for( std::size_t i = 0; i < simplicialComplexes.size(); i++ )
     {
-      auto filename = "/tmp/"
+      auto filename = output
                       + aleph::utilities::format( i, simplicialComplexes.size() )
                       + ".gml";
 
@@ -252,13 +269,13 @@ int main( int argc, char** argv )
       {
         diagram.removeDiagonal();
 
-        auto output = "/tmp/"
-                      + aleph::utilities::format( index, simplicialComplexes.size() )
-                      + "_d"
-                      + std::to_string( diagram.dimension() )
-                      + ".txt";
+        auto outputPath = output
+                        + aleph::utilities::format( index, simplicialComplexes.size() )
+                        + "_d"
+                        + std::to_string( diagram.dimension() )
+                        + ".txt";
 
-        std::ofstream out( output );
+        std::ofstream out( outputPath );
 
         for( auto&& point : diagram )
         {
@@ -279,10 +296,13 @@ int main( int argc, char** argv )
     std::vector<std::string> labels;
     reader.graphLabels( std::back_inserter( labels ) );
 
-    std::ofstream out( "/tmp/"
-                      + aleph::utilities::basename( filename )
-                      + ".txt" );
+    auto outputPath = output
+                    + aleph::utilities::basename( filename )
+                    + ".txt";
 
+    std::cerr << "* Storing labels in '" << outputPath << "'\n";
+
+    std::ofstream out( outputPath );
     for( auto&& label : labels )
       out << label << "\n";
   }
