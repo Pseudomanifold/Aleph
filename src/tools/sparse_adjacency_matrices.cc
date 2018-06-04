@@ -26,7 +26,6 @@
 #include <aleph/topology/io/GML.hh>
 #include <aleph/topology/io/SparseAdjacencyMatrix.hh>
 
-#include <aleph/utilities/Filesystem.hh>
 #include <aleph/utilities/Format.hh>
 #include <aleph/utilities/String.hh>
 
@@ -303,8 +302,7 @@ int main( int argc, char** argv )
     reader.graphLabels( std::back_inserter( labels ) );
 
     auto outputPath = output
-                    + aleph::utilities::basename( filename )
-                    + ".txt";
+                    + "Labels.txt";
 
     std::cerr << "* Storing labels in '" << outputPath << "'\n";
 
