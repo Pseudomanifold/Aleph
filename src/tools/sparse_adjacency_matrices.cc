@@ -87,6 +87,7 @@ void usage()
             << "Flags:\n"
             << "\n"
             << " --closeness-centrality: Calculates closeness centrality filtration\n"
+            << " --graphs:               Stores converted graphs in GML format\n"
             << " --sum:                  Calculates degree sum filtration\n"
             << "\n"
             << "\n";
@@ -106,13 +107,14 @@ int main( int argc, char** argv )
 
   unsigned dimension                = 0;
   bool calculateClosenessCentrality = false;
+  bool storeGraphs                  = false;
   bool useSumOfDegrees              = false;
   DataType infinity                 = DataType(2);
   std::string output                = "/tmp";
 
   {
     int option = 0;
-    while( ( option = getopt_long( argc, argv, "d:f:o:cs", commandLineOptions, nullptr ) ) != -1 )
+    while( ( option = getopt_long( argc, argv, "d:f:o:cgs", commandLineOptions, nullptr ) ) != -1 )
     {
       switch( option )
       {
@@ -127,6 +129,9 @@ int main( int argc, char** argv )
         break;
       case 'c':
         calculateClosenessCentrality = true;
+        break;
+      case 'g':
+        storeGraphs = true;
         break;
       case 's':
         useSumOfDegrees = true;
@@ -233,6 +238,7 @@ int main( int argc, char** argv )
 
   // Store graphs ------------------------------------------------------
 
+  if( storeGraphs )
   {
     aleph::topology::io::GMLWriter writer;
 
