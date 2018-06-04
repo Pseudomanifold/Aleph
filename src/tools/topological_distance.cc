@@ -117,6 +117,7 @@ void usage()
             << "  -h: calculate Hausdorff distances\n"
             << "  -i: calculate persistence indicator function distances\n"
             << "  -k: calculate kernel values instead of distances\n"
+            << "  -l: read filenames from first command-line argument\n"
             << "  -n: normalize the persistence indicator function\n"
             << "  -r: remove duplicate points in each diagram\n"
             << "  -s: use sigma as a scale parameter for the kernel\n"
@@ -394,6 +395,7 @@ int main( int argc, char** argv )
     { "exp"        , no_argument      , nullptr, 'e' },
     { "hausdorff"  , no_argument      , nullptr, 'h' },
     { "indicator"  , no_argument      , nullptr, 'i' },
+    { "list"       , no_argument      , nullptr, 'l' },
     { "normalize"  , no_argument      , nullptr, 'n' },
     { "kernel"     , no_argument      , nullptr, 'k' },
     { "wasserstein", no_argument      , nullptr, 'w' },
@@ -410,11 +412,12 @@ int main( int argc, char** argv )
   bool normalize                    = false;
   bool calculateKernel              = false;
   bool useWassersteinDistance       = false;
+  bool list                         = false;
   bool removeDuplicates             = false;
   bool verbose                      = false;
 
   int option = 0;
-  while( ( option = getopt_long( argc, argv, "f:p:s:ceEhinkrvw", commandLineOptions, nullptr ) ) != -1 )
+  while( ( option = getopt_long( argc, argv, "f:p:s:ceEhinklrvw", commandLineOptions, nullptr ) ) != -1 )
   {
     switch( option )
     {
@@ -450,6 +453,9 @@ int main( int argc, char** argv )
       break;
     case 'k':
       calculateKernel = true;
+      break;
+    case 'l':
+      list = true;
       break;
     case 'n':
       normalize = true;
@@ -493,6 +499,19 @@ int main( int argc, char** argv )
     // This should never happen...
     if( filenames.empty() )
       return -1;
+
+    if( list )
+    {
+      std::cerr << "* Reading filenames from input file\n";
+
+      auto filename = filenames.front();
+      filenames.clear();
+      std::ifstream in( filename );
+
+      std::string line;
+      while( std::getline( in, line ) )
+        filenames.push_back( line );
+    }
 
     // If the first filename is a text file, I am assuming that the rest
     // of them also are. The program will then read all diagrams, try to
