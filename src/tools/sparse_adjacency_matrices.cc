@@ -68,6 +68,29 @@ std::vector<DataType> closenessCentrality( const SimplicialComplex& K )
   return result;
 }
 
+void usage()
+{
+  std::cerr << "Usage: sparse_adjacency_matrices FILE\n"
+            << "\n"
+            << "Loads a set of sparse adjacency matrices from FILE and performs\n"
+            << "several operations with them. By default, the tool will extract\n"
+            << "all graphs from the file, use a degree-based filtration, and do\n"
+            << "a conversion to GML. Furthermore, persistence diagrams of every\n"
+            << "graph will be calculated.\n"
+            << "\n"
+            << "Optional arguments:\n"
+            << "\n"
+            << " --dimension D: Expand simplicial complexes up to dimension D\n"
+            << " --infinity I:  Use factor I for unpaired points in a diagram\n"
+            << "\n"
+            << "Flags:\n"
+            << "\n"
+            << " --closeness-centrality: Calculates closeness centrality filtration\n"
+            << " --sum:                  Calculates degree sum filtration\n"
+            << "\n"
+            << "\n";
+}
+
 int main( int argc, char** argv )
 {
   static option commandLineOptions[] =
