@@ -101,6 +101,9 @@ public:
 
       for( auto&& s : simplices )
         s.setData( s.data() / totalIntensity );
+
+      for( auto&& pair : _index_to_intensity )
+        pair.second = pair.second / totalIntensity;
     }
 
     K = SimplicialComplex( simplices.begin(), simplices.end() );
