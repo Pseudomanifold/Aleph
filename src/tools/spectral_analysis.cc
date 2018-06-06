@@ -94,11 +94,15 @@ int main( int argc, char** argv )
 
   std::cerr << "* Calculating persistent homology...";
 
-  using PersistencePairing = aleph::PersistencePairing<VertexType>;
-  using Traits             = aleph::traits::PersistencePairingCalculation<PersistencePairing>;
+  using PersistencePairing       = aleph::PersistencePairing<VertexType>;
+  using PairingCalculationTraits = aleph::traits::PersistencePairingCalculation<PersistencePairing>;
+  using ElementCalculationTraits = aleph::traits::DiagonalElementCalculation;
 
   auto&& tuple
-    = aleph::calculateZeroDimensionalPersistenceDiagram<Simplex, Traits>( K );
+    = aleph::calculateZeroDimensionalPersistenceDiagram<
+        Simplex,
+        PairingCalculationTraits,
+        ElementCalculationTraits>( K );
 
   std::cerr << "finished\n";
 
