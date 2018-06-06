@@ -105,7 +105,6 @@ int main( int argc, char** argv )
   auto&& D       = std::get<0>( tuple );
   auto&& pairing = std::get<1>( tuple );
 
-
   // Output ------------------------------------------------------------
 
   if( mode == "diagram" )
@@ -163,5 +162,23 @@ int main( int argc, char** argv )
 
     for( auto&& pair : transformedFunction )
       std::cout << std::setprecision(11) << pair.first << "\t" << pair.second << "\n";
+  }
+
+  // Perform *no* transformation at all, thereby essentially making the
+  // program into a simple converter. The normalization flag is will be
+  // honoured, though.
+  else if( mode == "identity" )
+  {
+    auto&& map_x = reader.getIndexToValueMap();
+    auto&& map_y = reader.getIndexToIntensityMap();
+
+    for( auto&& pair : map_x )
+    {
+      auto& i = pair.first;
+      auto& x = pair.second;
+      auto& y = map_y.at(i);
+
+      std::cout << std::setprecision(11) << x << "\t" << y << "\n";
+    }
   }
 }
