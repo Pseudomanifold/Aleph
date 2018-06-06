@@ -63,7 +63,8 @@ public:
       converter >> x
                 >> y;
 
-      _index_to_value[index] = x;
+      _index_to_value[index]     = x;
+      _index_to_intensity[index] = y;
 
       simplices.emplace_back( Simplex( VertexType( index ), y ) );
       intensities.emplace_back( y );
@@ -124,6 +125,11 @@ public:
     return _index_to_value;
   }
 
+  std::map<std::size_t, double> getIndexToIntensityMap() const noexcept
+  {
+    return _index_to_intensity;
+  }
+
 private:
 
   /**
@@ -140,6 +146,14 @@ private:
   */
 
   std::map<std::size_t, double> _index_to_value;
+
+  /**
+    Contains the raw \f$y\f-values that have been read from the file
+    during the last parsing process. This permits the reconstruction
+    of the original data.
+  */
+
+  std::map<std::size_t, double> _index_to_intensity;
 };
 
 } // namespace io
