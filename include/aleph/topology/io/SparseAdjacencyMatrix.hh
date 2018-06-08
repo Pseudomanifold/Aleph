@@ -135,6 +135,12 @@ public:
     complexes.clear();
     complexes.resize( graphIDs.size() );
 
+    // Contains the *actual* labels of all graphs. It is possible that
+    // some of the input data files do not contain a contiguous series
+    // of labels, making it necessary to store the ones that have been
+    // encountered.
+    std::vector<std::string> labels( graphIDs.size() );
+
     using DataType = typename Simplex::DataType;
 
     for( auto&& vertex : vertices )
@@ -143,6 +149,11 @@ public:
       auto&& index = graph_id_to_index[id];
       auto&& K     = complexes[index];
       auto s       = Simplex( vertex );
+
+      // Most of the time, this just degenerates into an identity
+      // lookup, but in case labels are not contiguous, they will
+      // be assigned correctly here.
+      labels[index] = _graphLabels.at( index );
 
       if( _readNodeAttributes && isValidIndex( _nodeAttributeIndex ) )
       {
@@ -176,6 +187,9 @@ public:
 
     for( auto&& K : complexes )
       K.sort( aleph::topology::filtrations::Data<Simplex>() );
+
+    if( labels.size() < _graphLabels.size() )
+      _graphLabels = labels;
   }
 
   // Output ------------------------------------------------------------
