@@ -1,6 +1,10 @@
 IF( BUILD_TOOLS )
   MESSAGE( STATUS "Building tools" )
 
+  # Set the output directory to 'tools' instead of 'src/tools' in order
+  # to flatten the output folder hierarchy somewhat.
+  SET( CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/tools )
+
   ADD_EXECUTABLE( betti_numbers                                  betti_numbers.cc )
   ADD_EXECUTABLE( clique_communities_to_json                     clique_communities_to_json.cc )
   ADD_EXECUTABLE( clique_persistence_diagram                     clique_persistence_diagram.cc )
