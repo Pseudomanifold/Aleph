@@ -42,7 +42,6 @@ unsigned index( unsigned int samples, double alpha )
 
 int main( int argc, char** argv )
 {
-
   auto alpha                   = 0.05;
   unsigned numBootstrapSamples = 50;
 
@@ -76,8 +75,12 @@ int main( int argc, char** argv )
     aleph::utilities::ensureLarger( numBootstrapSamples, unsigned(0) );
   }
 
+  // No input files are present, so let's do nothing at all
+  if( argc - optind <= 0 )
+    return 0;
+
   std::vector<PersistenceIndicatorFunction> persistenceIndicatorFunctions;
-  persistenceIndicatorFunctions.reserve( static_cast<std::size_t>( argc - 1 ) );
+  persistenceIndicatorFunctions.reserve( static_cast<std::size_t>( argc - optind ) );
 
   for( int i = optind; i < argc; i++ )
   {
