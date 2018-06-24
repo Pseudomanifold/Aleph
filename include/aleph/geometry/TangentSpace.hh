@@ -276,7 +276,7 @@ private:
           auto w               = phi( ( lts.position - neighbour ).norm() / lts.localFeatureSize );
           W( i*(d+1),i*(d+1) ) = w;
 
-          for( Index(j) = 0; j < d; j++ )
+          for( Index j = 0; j < d; j++ )
           {
             assert( W( i*(d+1)+j+1, i*(d+1)+j+1 ) == 0 );
             W( i*(d+1)+j+1, i*(d+1)+j+1 ) = beta * w;
@@ -294,12 +294,12 @@ private:
           auto neighbour       = getPosition( container, index );
           D( i*(d+1), 0 )      = 1.0;
 
-          for( Index(j) = 0; j < d; j++ )
+          for( Index j = 0; j < d; j++ )
             D( i*(d+1), j+1 ) = neighbour(j);
 
           D( i*(d+1), d+1) = neighbour * neighbour.transpose();
 
-          for( Index(j) = 0; j < d; j++ )
+          for( Index j = 0; j < d; j++ )
           {
             D( i*(d+1)+j+1, j+1 ) = 1;
             D( i*(d+1)+j+1, d+1 ) = 2 * neighbour(j);
@@ -320,7 +320,7 @@ private:
         A( d+1,   0) += w * squaredNeigbourNorm;
         A( d+1, d+1) += w * squaredNeigbourNorm * squaredNeigbourNorm;
 
-        for( Index(i) = 1; i < d+1; i++ )
+        for( Index i = 1; i < d+1; i++ )
         {
           A(  i,   i) += w * ( neighbour(i-1)*neighbour(i-1) + 1 ) * beta;
           A(  i,   0) += w * ( neighbour(i-1) );
@@ -334,7 +334,7 @@ private:
           b(i  ) +=       beta * w * localTangentSpaces.at(index).normal(i-1);
           b(d+1) += 2.0 * beta * w * localTangentSpaces.at(index).normal(i-1) * neighbour(i-1);
 
-          for( Index(j) = i+1; j < d+1; j++ )
+          for( Index j = i+1; j < d+1; j++ )
           {
             A(j, i) += w * neighbour(i-1) * neighbour(j-1);
             A(i, j)  = A(j,i);
