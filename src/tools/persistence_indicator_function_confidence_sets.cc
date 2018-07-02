@@ -10,6 +10,7 @@
 #include <algorithm>
 #include <fstream>
 #include <iostream>
+#include <limits>
 #include <stdexcept>
 #include <string>
 #include <vector>
@@ -27,6 +28,9 @@ auto meanCalculation = [] ( auto begin, auto end )
 {
   using T  = typename std::iterator_traits<decltype(begin)>::value_type;
   auto sum = std::accumulate( begin, end, T() );
+
+  if( begin == end )
+    return std::numeric_limits<T>::quiet_NaN();
 
   return sum / static_cast<double>( std::distance(begin, end) );
 };
@@ -101,8 +105,6 @@ int main( int argc, char** argv )
         throw std::runtime_error( "Unable to load input file" );
 
       in >> PIF;
-
-      std::cerr << "READ A PIF: " << PIF << "\n";
     }
     else
     {
