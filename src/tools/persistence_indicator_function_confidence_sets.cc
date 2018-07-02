@@ -105,6 +105,8 @@ int main( int argc, char** argv )
         throw std::runtime_error( "Unable to load input file" );
 
       in >> PIF;
+
+      persistenceIndicatorFunctions.emplace_back( PIF );
     }
     else
     {
