@@ -56,6 +56,12 @@ public:
 
     std::vector<SampleValueType> samples( begin, end );
 
+    // We cannot continue anyway, so let's just be nice and stop. This
+    // does *not* constitute an error condition, though, because users
+    // might just be weird when calling this function with empty data.
+    if( samples.empty() )
+      return;
+
     std::random_device rd;
     std::mt19937 rng( rd() );
 
