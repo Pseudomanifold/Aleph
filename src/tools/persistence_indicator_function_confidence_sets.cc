@@ -44,17 +44,19 @@ int main( int argc, char** argv )
 {
   auto alpha                   = 0.05;
   unsigned numBootstrapSamples = 50;
+  bool readStepFunctions       = false;
 
   {
     static option commandLineOptions[] =
     {
-      { "alpha"    , required_argument, nullptr, 'a' },
-      { "bootstrap", required_argument, nullptr, 'b' },
-      { nullptr    , 0                , nullptr,  0  }
+      { "alpha"              , required_argument, nullptr, 'a' },
+      { "bootstrap"          , required_argument, nullptr, 'b' },
+      { "read-step-functions", no_argument      , nullptr, 's' },
+      { nullptr              , 0                , nullptr,  0  }
     };
 
     int c = 0;
-    while( ( c = getopt_long( argc, argv, "a:b:", commandLineOptions, nullptr ) ) != -1 )
+    while( ( c = getopt_long( argc, argv, "a:b:s", commandLineOptions, nullptr ) ) != -1 )
     {
       switch( c )
       {
@@ -64,6 +66,10 @@ int main( int argc, char** argv )
 
       case 'b':
         numBootstrapSamples = static_cast<unsigned>( std::stoul( optarg ) );
+        break;
+
+      case 's':
+        readStepFunctions = true;
         break;
 
       default:
@@ -86,12 +92,27 @@ int main( int argc, char** argv )
   {
     std::cerr << "* Processing '" << argv[i] << "'...";
 
-    auto D = aleph::io::load<DataType>( argv[i] );
+    if( readStepFunctions )
+    {
+      PersistenceIndicatorFunction PIF;
 
-    D.removeDiagonal();
-    D.removeUnpaired();
+      std::ifstream in( argv[i] );
+      if( !in )
+        throw std::runtime_error( "Unable to load input file" );
 
-    persistenceIndicatorFunctions.emplace_back( aleph::persistenceIndicatorFunction( D ) );
+      in >> PIF;
+
+      std::cerr << "READ A PIF: " << PIF << "\n";
+    }
+    else
+    {
+      auto D = aleph::io::load<DataType>( argv[i] );
+
+      D.removeDiagonal();
+      D.removeUnpaired();
+
+      persistenceIndicatorFunctions.emplace_back( aleph::persistenceIndicatorFunction( D ) );
+    }
 
     std::cerr << "finished\n";
   }
