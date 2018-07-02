@@ -3,9 +3,12 @@
 
 #include <algorithm>
 #include <iterator>
+#include <istream>
 #include <limits>
 #include <ostream>
 #include <set>
+#include <sstream>
+#include <string>
 #include <stdexcept>
 #include <vector>
 
@@ -507,6 +510,36 @@ template <class D, class I> std::ostream& operator<<( std::ostream& o, const Ste
   }
 
   return o;
+}
+
+template <class D, class I> std::istream& operator>>( std::istream& i, StepFunction<D, I>& f )
+{
+  std::string line;
+  while( std::getline(i, line) )
+  {
+    D a  = D();
+    D b  = D();
+    I ya = I();
+    I yb = I();
+
+    std::stringstream converter( line );
+    converter >> a >> ya;
+
+    if( !converter.fail() && std::getline(i, line) )
+    {
+      converter.clear();
+      converter.str( line );
+
+      converter >> b >> yb;
+
+      // Only modify the function if all required values could be read
+      // to our satisfaction.
+      if( !converter.fail() && ya == yb )
+        f.add( a, b, ya );
+    }
+  }
+
+  return i;
 }
 
 /**
