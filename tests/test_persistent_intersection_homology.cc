@@ -226,21 +226,25 @@ template <class T> void testCircleWithWhisker()
   auto D2 = aleph::calculateIntersectionHomology( K, {X0,X1}, aleph::Perversity( { 0} ) );
   auto D3 = aleph::calculateIntersectionHomology( L, {Y0,Y1}, aleph::Perversity( {-1} ), true );
   auto D4 = aleph::calculateIntersectionHomology( L, {Y0,Y1}, aleph::Perversity( { 0} ) );
+  auto D5 = aleph::calculateIntersectionHomology( L, {Y0,Y1}, aleph::Perversity( {-1} ), false );
 
   ALEPH_ASSERT_THROW( D1.empty() == false );
   ALEPH_ASSERT_THROW( D2.empty() == false );
   ALEPH_ASSERT_THROW( D3.empty() == false );
   ALEPH_ASSERT_THROW( D4.empty() == false );
+  ALEPH_ASSERT_THROW( D5.empty() == false );
 
   ALEPH_ASSERT_EQUAL( D1.front().dimension(), 0 );
   ALEPH_ASSERT_EQUAL( D2.front().dimension(), 0 );
   ALEPH_ASSERT_EQUAL( D3.front().dimension(), 0 );
   ALEPH_ASSERT_EQUAL( D4.front().dimension(), 0 );
+  ALEPH_ASSERT_EQUAL( D5.front().dimension(), 0 );
 
   ALEPH_ASSERT_EQUAL( D1.front().betti(), 1 );
   ALEPH_ASSERT_EQUAL( D2.front().betti(), 1 );
   ALEPH_ASSERT_EQUAL( D3.front().betti(), 2 );
   ALEPH_ASSERT_EQUAL( D4.front().betti(), 1 );
+  ALEPH_ASSERT_EQUAL( D5.front().betti(), 2 );
 
   ALEPH_TEST_END();
 }
