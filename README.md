@@ -167,5 +167,5 @@ principal developer and maintainer Bastian Rieck (bastian.rieck@iwr.uni-heidelbe
 The following people have contributed code to Aleph:
 
 * [Submanifold](https://github.com/Submanifold) (Bastian Rieck): principal developer
-* [maexlich](https://github.com/maexlich) (Max Horn): fixes and
+* [ExpectationMax](https://github.com/ExpectationMax) (Max Horn): fixes and
   improvements to the Python bindings
