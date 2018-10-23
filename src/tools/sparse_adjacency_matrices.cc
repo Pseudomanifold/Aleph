@@ -173,9 +173,6 @@ int main( int argc, char** argv )
     std::back_inserter( nodeLabels )
   );
 
-  for( auto&& label : nodeLabels )
-    std::cerr << label << "\n";
-
   std::cerr << "finished\n"
             << "* Read " << simplicialComplexes.size() << " simplicial complexes\n";
 
@@ -253,6 +250,7 @@ int main( int argc, char** argv )
   if( storeGraphs )
   {
     aleph::topology::io::GMLWriter writer;
+    writer.setNodeLabels( nodeLabels.begin(), nodeLabels.end() );
 
     for( std::size_t i = 0; i < simplicialComplexes.size(); i++ )
     {

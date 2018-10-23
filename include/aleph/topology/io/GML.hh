@@ -522,9 +522,15 @@ public:
     {
       if( simplex.dimension() == 0 )
       {
+        auto id = *simplex.begin();
+
         streamNodes << "  node [\n"
-                    << "    id " << *simplex.begin() << "\n"
-                    << "  ]\n";
+                    << "    id " << id << "\n";
+
+        if( !_nodeLabels.empty() )
+          streamNodes << "    label \"" << _nodeLabels.at( id - _indexOffset ) << "\"\n";
+
+        streamNodes << "  ]\n";
       }
       else if( simplex.dimension() == 1 )
       {
@@ -545,6 +551,24 @@ public:
         << streamEdges.str() << "\n"
         << "]\n";
   }
+
+  template <class InputIterator> void setNodeLabels( InputIterator begin, InputIterator end )
+  {
+    _nodeLabels.assign( begin, end );
+  }
+
+  private:
+
+    /**
+      Optional vector of nodel labels. Must be set *before* writing
+      a simplicial complex. Will use the index of a simplex to grab
+      a label from the vector, subject to an index-based offset.
+    */
+
+    std::vector<std::string> _nodeLabels;
+
+    /** Offset to use when accessing the vector of node labels. */
+    std::size_t _indexOffset = 1;
 };
 
 } // namespace io
