@@ -159,10 +159,22 @@ int main( int argc, char** argv )
 
   aleph::topology::io::SparseAdjacencyMatrixReader reader;
   reader.setReadGraphLabels();
+  reader.setReadNodeLabels();
+
+  std::vector<std::string> nodeLabels;
 
   std::cerr << "* Reading '" << filename << "'...";
 
   reader( filename, simplicialComplexes );
+
+  // Get node labels for further processing because we must not drop
+  // this valuable information.
+  reader.nodeLabels(
+    std::back_inserter( nodeLabels )
+  );
+
+  for( auto&& label : nodeLabels )
+    std::cerr << label << "\n";
 
   std::cerr << "finished\n"
             << "* Read " << simplicialComplexes.size() << " simplicial complexes\n";
