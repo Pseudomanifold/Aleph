@@ -211,7 +211,7 @@ public:
 
   template <class OutputIterator> void nodeLabels( OutputIterator result )
   {
-    std::copy( _graphLabels.begin(), _graphLabels.end(), result );
+    std::copy( _nodeLabels.begin(), _nodeLabels.end(), result );
   }
 
   // Configuration options ---------------------------------------------
