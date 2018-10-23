@@ -100,6 +100,7 @@ int main( int argc, char** argv )
     { "infinity"            , required_argument, nullptr, 'f' },
     { "output"              , required_argument, nullptr, 'o' },
     { "closeness-centrality", no_argument      , nullptr, 'c' },
+    { "graphs"              , no_argument      , nullptr, 'g' },
     { "sum"                 , no_argument      , nullptr, 's' },
     { nullptr               , 0                , nullptr,  0  }
   };
