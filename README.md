@@ -154,7 +154,7 @@ If your build instructions are configured to build the Python bindings,
 i.e. `BUILD_PYTHON_BINDINGS` follow these instructions to install them:
 
     $ cd build/bindings/python/aleph
-    $ pthon3 setup.py install
+    $ python3 setup.py install
 
 Note that this uses the old `setuptools` approach for installing the
 package. A simpler installation based on `pip` is forthcoming.
