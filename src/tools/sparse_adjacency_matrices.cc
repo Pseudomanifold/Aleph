@@ -103,6 +103,7 @@ int main( int argc, char** argv )
     { "closeness-centrality", no_argument      , nullptr, 'c' },
     { "graphs"              , no_argument      , nullptr, 'g' },
     { "sum"                 , no_argument      , nullptr, 's' },
+    { "superlevel"          , no_argument      , nullptr, 'S' },
     { "node-labels"         , no_argument      , nullptr, 'n' },
     { nullptr               , 0                , nullptr,  0  }
   };
@@ -113,12 +114,13 @@ int main( int argc, char** argv )
   bool useSumOfDegrees              = false;
   bool readNodeAttributes           = false;
   bool readNodeLabels               = false;
+  bool useSuperlevelSets            = false;
   DataType infinity                 = DataType(2);
   std::string output                = "/tmp";
 
   {
     int option = 0;
-    while( ( option = getopt_long( argc, argv, "d:f:o:acgns", commandLineOptions, nullptr ) ) != -1 )
+    while( ( option = getopt_long( argc, argv, "d:f:o:acgnsS", commandLineOptions, nullptr ) ) != -1 )
     {
       switch( option )
       {
@@ -145,6 +147,9 @@ int main( int argc, char** argv )
         break;
       case 's':
         useSumOfDegrees = true;
+        break;
+      case 'S':
+        useSuperlevelSets = true;
         break;
       default:
         throw std::runtime_error( "Unknown command-line arugment" );
@@ -258,7 +263,20 @@ int main( int argc, char** argv )
     if( useSumOfDegrees )
       K = expander.assignData( K, degrees.begin(), degrees.end(), DataType(0), [] ( DataType a, DataType b ) { return a+b; } );
     else
-      K = expander.assignMaximumData( K, degrees.begin(), degrees.end() );
+    {
+      if( useSuperlevelSets )
+      {
+        auto init    = std::numeric_limits<DataType>::max();
+        auto functor = [] ( const DataType& a, const DataType& b )
+        {
+          return std::min( a, b );
+        };
+
+        K = expander.assignData( K, degrees.begin(), degrees.end(), init, functor );
+      }
+      else
+        K = expander.assignMaximumData( K, degrees.begin(), degrees.end() );
+    }
 
     K.sort( aleph::topology::filtrations::Data<Simplex>() );
   }
