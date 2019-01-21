@@ -530,6 +530,9 @@ public:
         if( !_nodeLabels.empty() )
           streamNodes << "    label \"" << _nodeLabels.at( id - _indexOffset ) << "\"\n";
 
+        if( _writeSimplexDataForVertices )
+          streamNodes << "    data " << simplex.data() << "\n";
+
         streamNodes << "  ]\n";
       }
       else if( simplex.dimension() == 1 )
@@ -557,6 +560,11 @@ public:
     _nodeLabels.assign( begin, end );
   }
 
+  void writeSimplexDataForVertices( bool value = true )
+  {
+    _writeSimplexDataForVertices = value;
+  }
+
   private:
 
     /**
@@ -569,6 +577,12 @@ public:
 
     /** Offset to use when accessing the vector of node labels. */
     std::size_t _indexOffset = 1;
+
+    /**
+      If set, writes simplex weights for zero-dimensional simplices,
+      i.e. vertices.
+    */
+    bool _writeSimplexDataForVertices = false;
 };
 
 } // namespace io
