@@ -474,6 +474,10 @@ int main( int argc, char** argv )
       useScaleSpaceKernel          = true;
       useIndicatorFunctionDistance = false;
       useWassersteinDistance       = false;
+
+      // This function is a kernel, so this flag _cannot_ be disabled by
+      // the client.
+      calculateKernel = true;
       break;
     case 'w':
       useEnvelopeFunctionDistance  = false;
@@ -686,6 +690,14 @@ int main( int argc, char** argv )
                     return 0.0;
                   };
 
+  if( useScaleSpaceKernel )
+  {
+    functor = [&sigma]( const PersistenceDiagram& D1, const PersistenceDiagram& D2, double /* p */ )
+              {
+                return aleph::multiScaleKernel( D1, D2, sigma );
+              };
+  }
+
   // Calculate all distances -------------------------------------------
 
   {
@@ -695,6 +707,9 @@ int main( int argc, char** argv )
                                               : useWassersteinDistance
                                                 ? "Wasserstein"
                                                 : "Hausdorff";
+
+    if( useScaleSpaceKernel )
+      name = "scale-space";
 
     auto type = calculateKernel ? "kernel values" : "distances";
 
