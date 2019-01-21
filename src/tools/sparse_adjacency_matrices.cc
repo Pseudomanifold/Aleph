@@ -102,6 +102,7 @@ int main( int argc, char** argv )
     { "closeness-centrality", no_argument      , nullptr, 'c' },
     { "graphs"              , no_argument      , nullptr, 'g' },
     { "sum"                 , no_argument      , nullptr, 's' },
+    { "node-labels"         , no_argument      , nullptr, 'n' },
     { nullptr               , 0                , nullptr,  0  }
   };
 
@@ -109,6 +110,7 @@ int main( int argc, char** argv )
   bool calculateClosenessCentrality = false;
   bool storeGraphs                  = false;
   bool useSumOfDegrees              = false;
+  bool readNodeLabels               = false;
   DataType infinity                 = DataType(2);
   std::string output                = "/tmp";
 
@@ -132,6 +134,9 @@ int main( int argc, char** argv )
         break;
       case 'g':
         storeGraphs = true;
+        break;
+      case 'n':
+        readNodeLabels = true;
         break;
       case 's':
         useSumOfDegrees = true;
@@ -159,7 +164,9 @@ int main( int argc, char** argv )
 
   aleph::topology::io::SparseAdjacencyMatrixReader reader;
   reader.setReadGraphLabels();
-  reader.setReadNodeLabels();
+
+  if( readNodeLabels )
+    reader.setReadNodeLabels();
 
   std::vector<std::string> nodeLabels;
 
@@ -167,11 +174,14 @@ int main( int argc, char** argv )
 
   reader( filename, simplicialComplexes );
 
-  // Get node labels for further processing because we must not drop
-  // this valuable information.
-  reader.nodeLabels(
-    std::back_inserter( nodeLabels )
-  );
+  if( readNodeLabels )
+  {
+    // Get node labels for further processing because we must not drop
+    // this valuable information.
+    reader.nodeLabels(
+      std::back_inserter( nodeLabels )
+    );
+  }
 
   std::cerr << "finished\n"
             << "* Read " << simplicialComplexes.size() << " simplicial complexes\n";
