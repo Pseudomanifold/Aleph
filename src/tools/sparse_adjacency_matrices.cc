@@ -99,6 +99,7 @@ int main( int argc, char** argv )
     { "dimension"           , required_argument, nullptr, 'd' },
     { "infinity"            , required_argument, nullptr, 'f' },
     { "output"              , required_argument, nullptr, 'o' },
+    { "attributes"          , no_argument      , nullptr, 'a' },
     { "closeness-centrality", no_argument      , nullptr, 'c' },
     { "graphs"              , no_argument      , nullptr, 'g' },
     { "sum"                 , no_argument      , nullptr, 's' },
@@ -110,13 +111,14 @@ int main( int argc, char** argv )
   bool calculateClosenessCentrality = false;
   bool storeGraphs                  = false;
   bool useSumOfDegrees              = false;
+  bool readNodeAttributes           = false;
   bool readNodeLabels               = false;
   DataType infinity                 = DataType(2);
   std::string output                = "/tmp";
 
   {
     int option = 0;
-    while( ( option = getopt_long( argc, argv, "d:f:o:cgs", commandLineOptions, nullptr ) ) != -1 )
+    while( ( option = getopt_long( argc, argv, "d:f:o:acgs", commandLineOptions, nullptr ) ) != -1 )
     {
       switch( option )
       {
@@ -131,6 +133,9 @@ int main( int argc, char** argv )
         break;
       case 'c':
         calculateClosenessCentrality = true;
+        break;
+      case 'a':
+        readNodeAttributes = true;
         break;
       case 'g':
         storeGraphs = true;
@@ -164,6 +169,9 @@ int main( int argc, char** argv )
 
   aleph::topology::io::SparseAdjacencyMatrixReader reader;
   reader.setReadGraphLabels();
+
+  if( readNodeAttributes )
+    reader.setReadNodeAttributes();
 
   if( readNodeLabels )
     reader.setReadNodeLabels();
@@ -261,6 +269,9 @@ int main( int argc, char** argv )
   {
     aleph::topology::io::GMLWriter writer;
     writer.setNodeLabels( nodeLabels.begin(), nodeLabels.end() );
+
+    if( readNodeAttributes )
+      writer.writeSimplexDataForVertices();
 
     for( std::size_t i = 0; i < simplicialComplexes.size(); i++ )
     {
