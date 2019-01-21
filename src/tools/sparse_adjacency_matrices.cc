@@ -118,7 +118,7 @@ int main( int argc, char** argv )
 
   {
     int option = 0;
-    while( ( option = getopt_long( argc, argv, "d:f:o:acgs", commandLineOptions, nullptr ) ) != -1 )
+    while( ( option = getopt_long( argc, argv, "d:f:o:acgns", commandLineOptions, nullptr ) ) != -1 )
     {
       switch( option )
       {
@@ -171,7 +171,10 @@ int main( int argc, char** argv )
   reader.setReadGraphLabels();
 
   if( readNodeAttributes )
+  {
     reader.setReadNodeAttributes();
+    reader.setNodeAttributeIndex( 0 );
+  }
 
   if( readNodeLabels )
     reader.setReadNodeLabels();
