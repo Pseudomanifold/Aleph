@@ -376,7 +376,13 @@ private:
   void readNodeLabels( const std::string& filename )
   {
     auto nodeLabelsFilename = getFilenameNodeLabels( filename );
-    _nodeLabels             = readLabels( nodeLabelsFilename );
+
+    // Node labels are optional so we should not throw an error if they
+    // cannot found.
+    if( !aleph::utilities::exists( nodeLabelsFilename ) )
+      return;
+
+    _nodeLabels = readLabels( nodeLabelsFilename );
   }
 
   std::vector< std::vector<double> > readAttributes( const std::string& filename )
