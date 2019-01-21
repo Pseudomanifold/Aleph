@@ -56,6 +56,8 @@
 #include <aleph/persistenceDiagrams/distances/Hausdorff.hh>
 #include <aleph/persistenceDiagrams/distances/Wasserstein.hh>
 
+#include <aleph/persistenceDiagrams/kernels/MultiScaleKernel.hh>
+
 #include <aleph/persistenceDiagrams/io/JSON.hh>
 #include <aleph/persistenceDiagrams/io/Raw.hh>
 
@@ -86,7 +88,7 @@ struct DataSet
 void usage()
 {
   std::cerr << "Usage: topological_distance [--power=POWER] [--kernel] [--exp] [--sigma]\n"
-            << "                            [--hausdorff|envelope|indicator|wasserstein]\n"
+            << "                            [--hausdorff|envelope|indicator|scale-space|wasserstein]\n"
             << "                            [--clean] [--factor=FACTOR] FILES\n"
             << "\n"
             << "Calculates distances between a set of persistence diagrams, stored\n"
@@ -398,6 +400,7 @@ int main( int argc, char** argv )
     { "list"       , no_argument      , nullptr, 'l' },
     { "normalize"  , no_argument      , nullptr, 'n' },
     { "kernel"     , no_argument      , nullptr, 'k' },
+    { "scale-space", no_argument      , nullptr, 'S' },
     { "wasserstein", no_argument      , nullptr, 'w' },
     { nullptr      , 0                , nullptr,  0  }
   };
@@ -412,12 +415,13 @@ int main( int argc, char** argv )
   bool normalize                    = false;
   bool calculateKernel              = false;
   bool useWassersteinDistance       = false;
+  bool useScaleSpaceKernel           =false;
   bool list                         = false;
   bool removeDuplicates             = false;
   bool verbose                      = false;
 
   int option = 0;
-  while( ( option = getopt_long( argc, argv, "f:p:s:ceEhinklrvw", commandLineOptions, nullptr ) ) != -1 )
+  while( ( option = getopt_long( argc, argv, "f:p:s:ceEhinklrvSw", commandLineOptions, nullptr ) ) != -1 )
   {
     switch( option )
     {
@@ -444,11 +448,13 @@ int main( int argc, char** argv )
     case 'h':
       useWassersteinDistance       = false;
       useIndicatorFunctionDistance = false;
+      useScaleSpaceKernel          = false;
       useEnvelopeFunctionDistance  = false;
       break;
     case 'i':
       useIndicatorFunctionDistance = true;
       useEnvelopeFunctionDistance  = false;
+      useScaleSpaceKernel          = false;
       useWassersteinDistance       = false;
       break;
     case 'k':
@@ -463,9 +469,16 @@ int main( int argc, char** argv )
     case 'r':
       removeDuplicates = true;
       break;
+    case 'S':
+      useEnvelopeFunctionDistance  = false;
+      useScaleSpaceKernel          = true;
+      useIndicatorFunctionDistance = false;
+      useWassersteinDistance       = false;
+      break;
     case 'w':
       useEnvelopeFunctionDistance  = false;
       useIndicatorFunctionDistance = false;
+      useScaleSpaceKernel          = false;
       useWassersteinDistance       = true;
       break;
     case 'v':
