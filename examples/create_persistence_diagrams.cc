@@ -142,7 +142,7 @@ PersistenceDiagram createRandomTorusPersistenceDiagram( DataType R, DataType r, 
   aleph::geometry::BruteForce<PointCloud, Distance> bruteForceWrapper( pointCloud );
 
   auto K
-    = aleph::geometry::buildVietorisRipsComplex( bruteForceWrapper, r, 2 );
+    = aleph::geometry::buildVietorisRipsComplex( bruteForceWrapper, 0.5 * R, 2 );
 
   auto diagrams
     = aleph::calculatePersistenceDiagrams( K );
