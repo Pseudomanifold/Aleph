@@ -90,7 +90,7 @@ PersistenceDiagram createRandomPersistenceDiagram( unsigned n )
   expansion.
 */
 
-std::vector<PersistenceDiagram> createRandomBoxPersistenceDiagrams( DataType r, unsigned n )
+std::vector<PersistenceDiagram> createRandomBoxPersistenceDiagrams( DataType r, unsigned n, unsigned d = 3 )
 {
   std::random_device rd;
   std::default_random_engine rng( rd() );
@@ -105,13 +105,13 @@ std::vector<PersistenceDiagram> createRandomBoxPersistenceDiagrams( DataType r, 
     auto z = distribution( rng );
 
     std::vector<DataType> p = {x,y,z};
-    pointCloud.set(i, p.begin(), p.end() );
+    pointCloud.set( i, p.begin(), p.end() );
   }
 
   aleph::geometry::BruteForce<PointCloud, Distance> bruteForceWrapper( pointCloud );
 
   auto K
-    = aleph::geometry::buildVietorisRipsComplex( bruteForceWrapper, 0.7 * r, 3 );
+    = aleph::geometry::buildVietorisRipsComplex( bruteForceWrapper, 0.7 * r, d );
 
   auto diagrams
     = aleph::calculatePersistenceDiagrams( K );
@@ -191,6 +191,7 @@ int main( int argc, char** argv )
       { "n"     , required_argument, nullptr, 'n' },
       { "R"     , required_argument, nullptr, 'R' },
       { "r"     , required_argument, nullptr, 'r' },
+      { "d"     , required_argument, nullptr, 'd' },
       { "box"   , no_argument      , nullptr, 'b' },
       { "sphere", no_argument      , nullptr, 's' },
       { "torus" , no_argument      , nullptr, 't' },
@@ -198,6 +199,8 @@ int main( int argc, char** argv )
       { nullptr , 0                , nullptr,  0  }
   };
 
+
+  unsigned d            = 3; // default dimension to use for expansion
   unsigned m            = 50;
   unsigned n            = 50;
   DataType R            = DataType(0.50);
@@ -210,10 +213,13 @@ int main( int argc, char** argv )
   bool output           = false;
 
   int option = 0;
-  while( ( option = getopt_long( argc, argv, "m:n:R:r:bsto", commandLineOptions, nullptr ) ) != -1 )
+  while( ( option = getopt_long( argc, argv, "d:m:n:R:r:bsto", commandLineOptions, nullptr ) ) != -1 )
   {
     switch( option )
     {
+    case 'd':
+      d = static_cast<unsigned>( std::stoul(optarg) );
+      break;
     case 'm':
       m = static_cast<unsigned>( std::stoul(optarg) );
       break;
@@ -265,7 +271,7 @@ int main( int argc, char** argv )
     PersistenceDiagram pd;
 
     if( sampleFromBox )
-      pds = createRandomBoxPersistenceDiagrams(r,m);
+      pds = createRandomBoxPersistenceDiagrams(r, m, d);
     else if( sampleFromSphere )
       pd = createRandomSpherePersistenceDiagram(r, m);
     else if( sampleFromTorus )
