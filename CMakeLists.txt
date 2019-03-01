@@ -79,6 +79,23 @@ SET( BUILD_TOOLS
   "Build with tools"
 )
 
+SET( USE_CONAN
+  "ON"
+  CACHE
+  BOOL
+  "Use conan for downloading and installing dependencies"
+)
+
+IF( USE_CONAN )
+  # Bring conan generated dependencies
+  IF( EXISTS ${CMAKE_CURRENT_BINARY_DIR}/conanbuildinfo.cmake )
+    INCLUDE( ${CMAKE_CURRENT_BINARY_DIR}/conanbuildinfo.cmake )
+  ELSE()
+    MESSAGE( WARNING "The file conanbuildinfo.cmake does not exist, you have to run conan install first." )
+  ENDIF()
+  CONAN_BASIC_SETUP()
+ENDIF()
+
 ########################################################################
 # Additional packages
 ########################################################################
@@ -144,7 +161,13 @@ ENDIF()
 
 FIND_PACKAGE( PkgConfig )
 
-IF( PKG_CONFIG_FOUND )
+IF( USE_CONAN AND DEFINED CONAN_INCLUDE_DIRS_RAPIDJSON )
+  # RapidJSON is now available in the normal include path, under the
+  # prefix of RapidJSON.
+  INCLUDE_DIRECTORIES( SYSTEM ${CONAN_INCLUDE_DIRS_RAPIDJSON} )
+
+  SET( ALEPH_WITH_RAPID_JSON TRUE )
+ELSEIF( PKG_CONFIG_FOUND )
   PKG_SEARCH_MODULE( JSON RapidJSON )
 
   IF( JSON_FOUND )
@@ -154,10 +177,44 @@ IF( PKG_CONFIG_FOUND )
 
     SET( ALEPH_WITH_RAPID_JSON TRUE )
   ENDIF()
+ENDIF()
 
+IF( USE_CONAN AND DEFINED CONAN_INCLUDE_DIRS_RAPIDJSON )
+  MESSAGE( STATUS "RapidJSON has been found through Conan; use ALEPH_WITH_RAPID_JSON to toggle its usage" )
+
+  # RapidJSON is now available in the normal include path, under the
+  # prefix of RapidJSON.
+  INCLUDE_DIRECTORIES( SYSTEM ${CONAN_INCLUDE_DIRS_RAPIDJSON} )
+
+  SET( ALEPH_WITH_RAPID_JSON TRUE )
+ELSEIF( PKG_CONFIG_FOUND )
+  PKG_SEARCH_MODULE( JSON RapidJSON )
+
+  IF( JSON_FOUND )
+    MESSAGE( STATUS "RapidJSON has been found through PkgConifg; use ALEPH_WITH_RAPID_JSON to toggle its usage" )
+
+    # RapidJSON is now available in the normal include path, under the
+    # prefix of RapidJSON.
+    INCLUDE_DIRECTORIES( SYSTEM ${JSON_INCLUDE_DIRS} )
+
+    SET( ALEPH_WITH_RAPID_JSON TRUE )
+  ENDIF()
+ENDIF()
+
+IF( USE_CONAN AND DEFINED CONAN_INCLUDE_DIRS_EIGEN )
+  MESSAGE( STATUS "EIGEN has been found through Conan; use ALEPH_WITH_EIGEN to toggle its usage" )
+
+  # RapidJSON is now available in the normal include path, under the
+  # prefix of RapidJSON.
+  INCLUDE_DIRECTORIES( SYSTEM ${CONAN_INCLUDE_DIRS_EIGEN} )
+
+  SET( ALEPH_WITH_EIGEN TRUE )
+ELSEIF( PKG_CONFIG_FOUND )
   PKG_SEARCH_MODULE( EIGEN eigen3 )
 
   IF( EIGEN_FOUND )
+    MESSAGE( STATUS "EIGEN has been found through PkgConfig; use ALEPH_WITH_EIGEN to toggle its usage" )
+
     INCLUDE_DIRECTORIES( SYSTEM ${EIGEN_INCLUDE_DIRS} )
 
     SET( ALEPH_WITH_EIGEN TRUE )
@@ -166,8 +223,8 @@ ENDIF()
 
 # Not used here, but in subordinate directories, so it is nicer to
 # look for the package in a *single* location.
-FIND_PACKAGE(PythonInterp 3)
-FIND_PACKAGE(PythonLibs   3)
+FIND_PACKAGE( PythonInterp 3 )
+FIND_PACKAGE( PythonLibs 3 )
 
 FIND_PACKAGE( tinyxml2 )
 
