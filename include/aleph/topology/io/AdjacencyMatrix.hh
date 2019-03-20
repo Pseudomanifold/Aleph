@@ -129,7 +129,11 @@ public:
 
     for( std::size_t y = 0; y < _dimension; y++ )
     {
-      for( std::size_t x = 0; x < _dimension; x++ )
+      // The way this loop is set up avoids the calculation of
+      // self-edges. Also, it looks at weights from a *single*
+      // direction only. Essentially, half of the data set may
+      // not be considered here.
+      for( std::size_t x = y + 1; x < _dimension; x++ )
       {
         auto i = static_cast<VertexType>( _dimension * y + x   );
         auto w = values[i];
