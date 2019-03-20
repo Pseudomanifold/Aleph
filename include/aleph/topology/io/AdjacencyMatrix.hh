@@ -110,83 +110,54 @@ public:
     if( values.empty() )
       return;
 
-    _height = height;
-    _width  = values.size() / height;
+    _dimension = n;
 
-    if( values.size() % height != 0 )
+    if( values.size() != _dimension * _dimension )
       throw std::runtime_error( "Format error: number of columns must not vary" );
 
-    // This is required in order to assign the weight of nodes
-    // correctly; we cannot trust the weights to be positive.
-    auto minData = *std::min_element( values.begin(), values.end() );
-
     std::vector<Simplex> simplices;
-    simplices.reserve( _width * _height + ( _width + _height ) );
+
+    // First part of that equation reserves $n$ nodes, where $n$ is the
+    // dimension of the matrix, followed by at most $n^2$ edges. Notice
+    // that this assumes that *all* edges are defined.
+    simplices.reserve( _dimension + ( _dimension * _dimension ) );
 
     // Edges -----------------------------------------------------------
     //
     // Create the edges first and update information about their weights
     // along with them.
 
-    // For determining the minimum weight, we first loop over all
-    // possible edges, create a lookup table for the weights, and
-    // finally create all the vertices using this lookup table. A
-    // vertex will only information stored here if the right flag
-    // has been set by the client.
-    std::unordered_map<VertexType, DataType> minWeight;
-
-    auto updateOrSetWeight
-      = [&minWeight, this] ( const VertexType& v, const DataType& w )
-        {
-          if( minWeight.find( v ) == minWeight.end() )
-            minWeight[v] = w;
-          else
-          {
-            if( _assignMinimumAbsoluteVertexWeight )
-            {
-              if( std::abs( w ) < std::abs( minWeight[v] ) )
-                minWeight[v] = w;
-            }
-            else
-              minWeight[v] = std::min( minWeight[v], w );
-          }
-        };
-
-    for( std::size_t y = 0; y < _height; y++ )
+    for( std::size_t y = 0; y < _dimension; y++ )
     {
-      for( std::size_t x = 0; x < _width; x++ )
+      for( std::size_t x = 0; x < _dimension; x++ )
       {
-        auto i = static_cast<VertexType>( _width * y + x   );
+        auto i = static_cast<VertexType>( _dimension * y + x   );
         auto w = values[i];
 
         // Map matrix indices to the corresponding vertex indices as
-        // outline above.
+        // outlined above.
         auto u = VertexType(y);
-        auto v = VertexType(x + _height);
+        auto v = VertexType(x + _dimension);
 
-        updateOrSetWeight( u, w );
-        updateOrSetWeight( v, w );
+        // TODO: skip edge if its weight is going to be ignored anyway
+        // according to the client input.
 
+        // We have no choice here but to store the corresponding simplex
+        // with *exactly* the weight as it was specified in the file.
         simplices.push_back( Simplex( {u,v}, w ) );
       }
     }
 
     // Vertices --------------------------------------------------------
     //
-    // Create a vertex for every node in the input data. An (n,m)-matrix
-    // thus gives rise to n+m nodes.
+    // Create a vertex for every node in the input data. This will use
+    // the minimum weight detected in the file.
+    auto minWeight = *std::min_element( values.begin(), values.end() );
 
-    for( std::size_t i = 0; i < _height + _width; i++ )
+    for( std::size_t i = 0; i < _dimension; i++ )
     {
-      // Notice that that `minWeight` map is guaranteed to contain the
-      // weight (potentially signed) that corresponds to the vertex. A
-      // different way of setting up the map depends on the flags that
-      // are set by the client.
       simplices.push_back(
-        Simplex( VertexType( i ),
-          _assignMinimumVertexWeight || _assignMinimumAbsoluteVertexWeight
-            ?  minWeight[ VertexType(i) ]
-            :  minData )
+        Simplex( VertexType( i ), minWeight )
       );
     }
 
