@@ -52,6 +52,12 @@ class AdjacencyMatrixReader
 {
 public:
 
+  enum class VertexWeightAssignmentStrategy
+  {
+    AssignGlobalMinimum, // assigns the global minimum weight
+    AssignZero           // assigns zero
+  };
+
   /**
     Reads a simplicial complex from a file.
 
@@ -163,8 +169,17 @@ public:
 
     for( std::size_t i = 0; i < _dimension; i++ )
     {
+      DataType weight = DataType();
+
+      if( _vertexWeightAssignmentStrategy == VertexWeightAssignmentStrategy::AssignGlobalMinimum )
+        weight = minWeight;
+      else if( _vertexWeightAssignmentStrategy == VertexWeightAssignmentStrategy::AssignZero )
+        weight = DataType();
+      else
+        throw std::runtime_error( "Unknown vertex weight assignment strategy" );
+
       simplices.push_back(
-        Simplex( VertexType( i ), minWeight )
+        Simplex( VertexType( i ), weight )
       );
     }
 
@@ -191,6 +206,11 @@ public:
     _ignoreZeroWeights = value;
   }
 
+  void setVertexWeightAssignmentStrategy( VertexWeightAssignmentStrategy strategy ) noexcept
+  {
+    _vertexWeightAssignmentStrategy = strategy;
+  }
+
 private:
 
   // Dimension of the matrix that was read last by this reader; this
@@ -205,6 +225,12 @@ private:
   // a missing edge of the graph.
   // a missing edge.
   bool _ignoreZeroWeights = false;
+
+  // Strategy/policy for assigning vertex weights. Can be either one of
+  // the options outlined in the enumeration class above. By default, a
+  // global minimum weight is identified and assigned.
+  VertexWeightAssignmentStrategy _vertexWeightAssignmentStrategy =
+    VertexWeightAssignmentStrategy::AssignGlobalMinimum;
 };
 
 } // namespace io
