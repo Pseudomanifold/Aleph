@@ -214,9 +214,9 @@ IF( ALEPH_WITH_TINYXML2 )
 ENDIF()
 
 IF( FLANN_FOUND AND FLANN_VERSION VERSION_GREATER "1.8.4" )
-  TARGET_LINK_LIBRARIES( test_nearest_neighbours lz4 )
-  TARGET_LINK_LIBRARIES( test_rips_skeleton      lz4 )
-  TARGET_LINK_LIBRARIES( test_tangent_space      lz4 )
+  TARGET_LINK_LIBRARIES( test_nearest_neighbours ${LZ4_LIBRARIES} )
+  TARGET_LINK_LIBRARIES( test_rips_skeleton      ${LZ4_LIBRARIES} )
+  TARGET_LINK_LIBRARIES( test_tangent_space      ${LZ4_LIBRARIES} )
 ENDIF()
 
 ########################################################################

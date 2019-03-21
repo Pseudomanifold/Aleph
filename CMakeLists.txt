@@ -118,6 +118,10 @@ FIND_PACKAGE( FLANN )
 
 IF( FLANN_FOUND )
   SET( ALEPH_WITH_FLANN TRUE )
+
+  # More recent version of FLANN require this. Maybe this should rather
+  # be handled in the `FindFLANN.cmake` file.
+  FIND_PACKAGE( lz4 )
 ENDIF()
 
 FIND_PACKAGE( HDF5 COMPONENTS CXX )

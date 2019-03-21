@@ -78,7 +78,7 @@ IF( BUILD_PYTHON_BINDINGS )
     ENDIF()
 
     IF( FLANN_FOUND AND FLANN_VERSION VERSION_GREATER "1.8.4" )
-      TARGET_LINK_LIBRARIES( aleph lz4 )
+      TARGET_LINK_LIBRARIES( aleph ${LZ4_LIBRARIES} )
     ENDIF()
   ELSE()
     MESSAGE( STATUS "Cannot build Python bindings because no suitable version of Python was found" )
