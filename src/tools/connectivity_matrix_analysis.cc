@@ -22,7 +22,11 @@
 
 #include <aleph/utilities/Filesystem.hh>
 
+#include <cmath>
+
+#include <algorithm>
 #include <iostream>
+#include <limits>
 #include <map>
 #include <string>
 #include <vector>
@@ -31,14 +35,18 @@
 
 void usage()
 {
-  std::cerr << "Usage: connectivity_matrix_analysis [--dimension DIMENSION] FILENAMES\n"
+  std::cerr << "Usage: connectivity_matrix_analysis [--dimension DIMENSION] [--infinity INF] FILENAMES\n"
             << "\n"
             << "Analyses a set of connectivity matrices. The matrices are optionally\n"
             << "expanded to a pre-defined dimension. By default, only information of\n"
             << "the zeroth persistent homology group will be shown.\n"
             << "\n"
+            << "The value INF will be used to replace infinite values in the diagram\n"
+            << "in order to facilitate the subsequent analysis.\n"
+            << "\n"
             << "Flags:\n"
             << "  -k: keep & report unpaired simplices (infinite values)\n"
+            << "  -v: verbose output\n"
             << "\n";
 }
 
@@ -47,22 +55,30 @@ int main( int argc, char** argv )
   static option commandLineOptions[] =
   {
     { "dimension"     , required_argument, nullptr, 'd' },
+    { "infinity"      , required_argument, nullptr, 'i' },
     { "keep-unpaired" , no_argument      , nullptr, 'k' },
+    { "verbose"       , no_argument      , nullptr, 'v' },
     { nullptr         , 0                , nullptr,  0  }
   };
 
   unsigned dimension = 0;
+  double infinity    = std::numeric_limits<double>::infinity();
   bool keepUnpaired  = false;
+  bool verbose       = false;
+
 
   {
     int option = 0;
 
-    while( ( option = getopt_long( argc, argv, "d:k", commandLineOptions, nullptr ) ) != -1 )
+    while( ( option = getopt_long( argc, argv, "d:i:kv", commandLineOptions, nullptr ) ) != -1 )
     {
       switch( option )
       {
       case 'd':
         dimension = static_cast<unsigned>( std::stoul(optarg) );
+        break;
+      case 'i':
+        infinity = static_cast<double>( std::stod(optarg) );
         break;
       case 'k':
         keepUnpaired = false;
@@ -77,12 +93,12 @@ int main( int argc, char** argv )
     return -1;
   }
 
-  bool verbose            = false;
-
-  using DataType          = double;
-  using VertexType        = unsigned short;
-  using Simplex           = aleph::topology::Simplex<DataType, VertexType>;
-  using SimplicialComplex = aleph::topology::SimplicialComplex<Simplex>;
+  using DataType           = double;
+  using VertexType         = unsigned short;
+  using Simplex            = aleph::topology::Simplex<DataType, VertexType>;
+  using SimplicialComplex  = aleph::topology::SimplicialComplex<Simplex>;
+  using PersistenceDiagram = aleph::PersistenceDiagram<DataType>;
+  using Point              = typename PersistenceDiagram::Point;
 
   std::vector<std::string> filenames;
 
@@ -128,6 +144,19 @@ int main( int argc, char** argv )
 
     for( auto&& diagram : diagrams )
     {
+      if( std::isfinite( infinity ) )
+      {
+        std::transform( diagram.begin(), diagram.end(), diagram.begin(),
+            [&infinity] ( const Point& p )
+            {
+              if( p.isUnpaired() )
+                return Point( p.x(), infinity );
+              else
+                return Point( p.x(), p.y() );
+            }
+        );
+      }
+
       // Stores additional data about each persistence diagram in order
       // to make it easier to keep track of information.
       std::map<std::string, std::string> kvs;
