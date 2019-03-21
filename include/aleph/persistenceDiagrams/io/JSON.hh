@@ -12,6 +12,8 @@
 #include <ostream>
 #include <string>
 
+#include <map>
+
 #ifdef ALEPH_WITH_RAPID_JSON
   #include <rapidjson/document.h>
   #include <rapidjson/istreamwrapper.h>
@@ -30,9 +32,16 @@ namespace io
   that infinite values will be encoded as strings. Additional data
   about the diagram, e.g. its dimension, are stored in name--value
   pairs.
+
+  An optional map can be supplied in order to store arbitrary data
+  about each diagram.
 */
 
-template <class Diagram> void writeJSON( std::ostream& o, const Diagram& D, const std::string& name = std::string() )
+template <class Diagram> void writeJSON(
+  std::ostream& o,
+  const Diagram& D,
+  const std::string& name = std::string(),
+  const std::map<std::string, std::string>& kvs = std::map<std::string, std::string>() )
 {
   std::string level = "  ";
 
@@ -40,6 +49,14 @@ template <class Diagram> void writeJSON( std::ostream& o, const Diagram& D, cons
 
   o << level << "\"betti\": "     << D.betti()     << ",\n"
     << level << "\"dimension\": " << D.dimension() << ",\n";
+
+  // Store additional key--value pairs belonging to the current diagram,
+  // if they have been supplied by the client.
+  if( !kvs.empty() )
+  {
+    for( auto&& pair : kvs )
+      o << level << "\"" << pair.first << "\": " << "\"" << pair.second << "\",\n";
+  }
 
   if( !name.empty() )
     o << level << "\"name\": " << "\"" << name << "\",\n";
