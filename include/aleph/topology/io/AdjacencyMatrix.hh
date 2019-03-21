@@ -96,6 +96,21 @@ public:
   }
 
   /** @overload operator()( const std::string&, SimplicialComplex& ) */
+  template <class SimplicialComplex> void operator()( std::istream& in, SimplicialComplex& K )
+  {
+    using Simplex    = typename SimplicialComplex::ValueType;
+    using DataType   = typename Simplex::DataType;
+
+    this->operator()(
+      in,
+      K,
+      // Use the identity functor so that weights are not changed at all
+      // and just stored as-is.
+      [] ( DataType /* a */, DataType /* b */, DataType x ) { return x; }
+    );
+  }
+
+  /** @overload operator()( const std::string&, SimplicialComplex& ) */
   template <class SimplicialComplex, class Functor> void operator()( std::istream& in, SimplicialComplex& K, Functor f )
   {
     using Simplex    = typename SimplicialComplex::ValueType;
