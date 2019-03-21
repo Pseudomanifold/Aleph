@@ -8,6 +8,9 @@
   interpretable correlation measure.
 */
 
+#include <aleph/persistenceDiagrams/Entropy.hh>
+#include <aleph/persistenceDiagrams/Norms.hh>
+
 #include <aleph/persistenceDiagrams/io/JSON.hh>
 
 #include <aleph/persistentHomology/Calculation.hh>
@@ -20,6 +23,7 @@
 #include <aleph/utilities/Filesystem.hh>
 
 #include <iostream>
+#include <map>
 #include <string>
 #include <vector>
 
@@ -123,7 +127,18 @@ int main( int argc, char** argv )
       = aleph::utilities::basename( filename );
 
     for( auto&& diagram : diagrams )
-      aleph::io::writeJSON( std::cout, diagram, basename );
+    {
+      // Stores additional data about each persistence diagram in order
+      // to make it easier to keep track of information.
+      std::map<std::string, std::string> kvs;
+
+      kvs["total_persistence_1"] = std::to_string( aleph::totalPersistence( diagram, 1.0 ) );
+      kvs["total_persistence_2"] = std::to_string( aleph::totalPersistence( diagram, 2.0 ) );
+
+      kvs["persistent_entropy"]  = std::to_string( aleph::persistentEntropy( diagram ) );
+
+      aleph::io::writeJSON( std::cout, diagram, basename, kvs );
+    }
   }
 
   std::cout << "\n"
