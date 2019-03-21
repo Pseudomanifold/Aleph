@@ -143,8 +143,11 @@ public:
         auto u = VertexType(y);
         auto v = VertexType(x + _dimension);
 
-        // TODO: skip edge if its weight is going to be ignored anyway
-        // according to the client input.
+        if( _ignoreNaNs && std::isnan( w ) )
+          continue;
+
+        if( _ignoreZeroWeights && w == DataType() )
+          continue;
 
         // We have no choice here but to store the corresponding simplex
         // with *exactly* the weight as it was specified in the file.
@@ -178,11 +181,30 @@ public:
   /** @returns Dimension of matrix that was read last */
   std::size_t dimension() const noexcept { return _dimension; }
 
+  void setIgnoreNaNs( bool value = true ) noexcept
+  {
+    _ignoreNaNs = value;
+  }
+
+  void setIgnoreZeroWeights( bool value = true ) noexcept
+  {
+    _ignoreZeroWeights = value;
+  }
+
 private:
 
   // Dimension of the matrix that was read last by this reader; this
   // will only be set if the matrix is actually square.
   std::size_t _dimension = 0;
+
+  // If set, NaNs are ignored by the reader and treated as a missing
+  // edge of the graph.
+  bool _ignoreNaNs = false;
+
+  // If set, zero weights are ignored by the reader and treated as
+  // a missing edge of the graph.
+  // a missing edge.
+  bool _ignoreZeroWeights = false;
 };
 
 } // namespace io
