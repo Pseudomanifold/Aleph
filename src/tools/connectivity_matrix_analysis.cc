@@ -123,7 +123,14 @@ int main( int argc, char** argv )
       std::cerr << "* Processing " << filename << "...";
 
     SimplicialComplex K;
-    reader( filename, K );
+    reader( filename, K,
+      [] ( DataType maxWeight, DataType /* minWeight */, DataType weight )
+      {
+        // Transform the weight into a *distance* by negating it; this
+        // ignores all other scaling mechanisms applied to the data.
+        return maxWeight - weight;
+      }
+    );
 
     K.sort();
 
