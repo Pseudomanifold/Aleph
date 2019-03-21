@@ -208,8 +208,9 @@ IF( ALEPH_WITH_HDF5 )
   ENDFOREACH()
 ENDIF()
 
+# FIXME: inclusion does not work anymore; test case will not compile
 IF( ALEPH_WITH_TINYXML2 )
-  INCLUDE( ${tinyxml2_CONFIG} )
+  INCLUDE( ${tinyxml2_DIR}/tinyxml2Config.cmake )
   TARGET_LINK_LIBRARIES( test_io_graphml tinyxml2 )
 ENDIF()
 
