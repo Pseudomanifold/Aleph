@@ -66,7 +66,6 @@ int main( int argc, char** argv )
   bool keepUnpaired  = false;
   bool verbose       = false;
 
-
   {
     int option = 0;
 
@@ -81,7 +80,7 @@ int main( int argc, char** argv )
         infinity = static_cast<double>( std::stod(optarg) );
         break;
       case 'k':
-        keepUnpaired = false;
+        keepUnpaired = true;
         break;
       }
     }
