@@ -45,7 +45,10 @@ namespace io
   \endcode
 
   All simplicial complexes created by this class will be reported
-  in filtration order, following the detected weights.
+  in filtration order, following the detected weights. This class
+  offers the option to supply an *optional* functor for modifying
+  the weights of the matrix. This can be useful when edge weights
+  are supposed to be negated, for example.
 */
 
 class AdjacencyMatrixReader
@@ -67,15 +70,33 @@ public:
 
   template <class SimplicialComplex> void operator()( const std::string& filename, SimplicialComplex& K )
   {
+    using Simplex    = typename SimplicialComplex::ValueType;
+    using DataType   = typename Simplex::DataType;
+
+    this->operator()(
+      filename,
+      K,
+      // Use the identity functor so that weights are not changed at all
+      // and just stored as-is.
+      [] ( DataType /* a */, DataType /* b */, DataType x ) { return x; }
+    );
+  }
+
+  template <class SimplicialComplex, class Functor> void operator()( const std::string& filename, SimplicialComplex& K, Functor f )
+  {
     std::ifstream in( filename );
     if( !in )
       throw std::runtime_error( "Unable to read input file" );
 
-    this->operator()( in, K );
+    this->operator()(
+      in,
+      K,
+      f
+    );
   }
 
   /** @overload operator()( const std::string&, SimplicialComplex& ) */
-  template <class SimplicialComplex> void operator()( std::istream& in, SimplicialComplex& K )
+  template <class SimplicialComplex, class Functor> void operator()( std::istream& in, SimplicialComplex& K, Functor f )
   {
     using Simplex    = typename SimplicialComplex::ValueType;
     using DataType   = typename Simplex::DataType;
@@ -128,6 +149,15 @@ public:
     // that this assumes that *all* edges are defined.
     simplices.reserve( _dimension + ( _dimension * _dimension ) );
 
+    DataType minWeight = DataType();
+    DataType maxWeight = DataType();
+
+    {
+      auto minmax = std::minmax_element( values.begin(), values.end() );
+      minWeight   = *minmax.first;
+      maxWeight   = *minmax.second;
+    }
+
     // Edges -----------------------------------------------------------
     //
     // Create the edges first and update information about their weights
@@ -155,9 +185,9 @@ public:
         if( _ignoreZeroWeights && w == DataType() )
           continue;
 
-        // We have no choice here but to store the corresponding simplex
-        // with *exactly* the weight as it was specified in the file.
-        simplices.push_back( Simplex( {u,v}, w ) );
+        // Apply the client-specified functor here and store the
+        // resulting simplex in the complex.
+        simplices.push_back( Simplex( {u,v}, f( maxWeight, minWeight, w ) ) );
       }
     }
 
@@ -165,14 +195,18 @@ public:
     //
     // Create a vertex for every node in the input data. This will use
     // the minimum weight detected in the file.
-    auto minWeight = *std::min_element( values.begin(), values.end() );
 
     for( std::size_t i = 0; i < _dimension; i++ )
     {
       DataType weight = DataType();
 
       if( _vertexWeightAssignmentStrategy == VertexWeightAssignmentStrategy::AssignGlobalMinimum )
-        weight = minWeight;
+      {
+        // This weight selection strategy requires applying the functor
+        // because the weight might be anything, whereas the zero-based
+        // initialization uses a *fixed* weight.
+        weight = f( maxWeight, minWeight, minWeight );
+      }
       else if( _vertexWeightAssignmentStrategy == VertexWeightAssignmentStrategy::AssignZero )
         weight = DataType();
       else
