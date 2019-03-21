@@ -8,6 +8,8 @@
   interpretable correlation measure.
 */
 
+#include <aleph/persistenceDiagrams/io/JSON.hh>
+
 #include <aleph/persistentHomology/Calculation.hh>
 
 #include <aleph/topology/io/AdjacencyMatrix.hh>
@@ -59,7 +61,7 @@ int main( int argc, char** argv )
         dimension = static_cast<unsigned>( std::stoul(optarg) );
         break;
       case 'k':
-        bool keepUnpaired = false;
+        keepUnpaired = false;
         break;
       }
     }
@@ -80,10 +82,21 @@ int main( int argc, char** argv )
 
   std::vector<std::string> filenames;
 
-  for( int i = 1; i < argc; i++ )
+  for( int i = optind; i < argc; i++ )
     filenames.push_back( argv[i] );
 
   aleph::topology::io::AdjacencyMatrixReader reader;
+  reader.setIgnoreNaNs();
+  reader.setIgnoreZeroWeights();
+
+  // Whew, is there *really* no better way of specifying this strategy
+  // here as a qualified name?
+  reader.setVertexWeightAssignmentStrategy(
+      aleph::topology::io::AdjacencyMatrixReader::VertexWeightAssignmentStrategy::AssignZero
+  );
+
+  std::cout << "{\n"
+            << "\"diagrams\": [\n";
 
   for( auto&& filename : filenames )
   {
@@ -96,7 +109,7 @@ int main( int argc, char** argv )
     K.sort();
 
     bool dualize                    = true;
-    bool includeAllUnpairedCreators = true;
+    bool includeAllUnpairedCreators = keepUnpaired;
 
     auto diagrams
       = aleph::calculatePersistenceDiagrams( K,
@@ -109,7 +122,11 @@ int main( int argc, char** argv )
     auto basename
       = aleph::utilities::basename( filename );
 
-    // TODO: output of generated persistence diagrams, subject to
-    // additional transformations
+    for( auto&& diagram : diagrams )
+      aleph::io::writeJSON( std::cout, diagram, basename );
   }
+
+  std::cout << "\n"
+            << "]\n"
+            << "}\n";
 }
