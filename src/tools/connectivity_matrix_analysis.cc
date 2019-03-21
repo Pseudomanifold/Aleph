@@ -18,18 +18,54 @@
 #include <aleph/utilities/Filesystem.hh>
 
 #include <iostream>
-#include <map>
-#include <regex>
 #include <string>
 #include <vector>
 
+#include <getopt.h>
+
 void usage()
 {
+  std::cerr << "Usage: connectivity_matrix_analysis [--dimension DIMENSION] FILENAMES\n"
+            << "\n"
+            << "Analyses a set of connectivity matrices. The matrices are optionally\n"
+            << "expanded to a pre-defined dimension. By default, only information of\n"
+            << "the zeroth persistent homology group will be shown.\n"
+            << "\n"
+            << "Flags:\n"
+            << "  -k: keep & report unpaired simplices (infinite values)\n"
+            << "\n";
 }
 
 int main( int argc, char** argv )
 {
-  if( argc <= 1 )
+  static option commandLineOptions[] =
+  {
+    { "dimension"     , required_argument, nullptr, 'd' },
+    { "keep-unpaired" , no_argument      , nullptr, 'k' },
+    { nullptr         , 0                , nullptr,  0  }
+  };
+
+  unsigned dimension = 0;
+  bool keepUnpaired  = false;
+
+  {
+    int option = 0;
+
+    while( ( option = getopt_long( argc, argv, "d:k", commandLineOptions, nullptr ) ) != -1 )
+    {
+      switch( option )
+      {
+      case 'd':
+        dimension = static_cast<unsigned>( std::stoul(optarg) );
+        break;
+      case 'k':
+        bool keepUnpaired = false;
+        break;
+      }
+    }
+  }
+
+  if( (argc - optind) < 1 )
   {
     usage();
     return -1;
