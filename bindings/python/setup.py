@@ -66,7 +66,9 @@ setup(
     package_dir = {
       '': '${CMAKE_CURRENT_BINARY_DIR}'
     },
-    ext_modules = [SourceExtension('aleph')],
+    # FIXME: this does not actually build the package from source now
+    # because the process clashes with `pipenv`
+    ext_modules = [],
     cmdclass    = dict(build_ext=Build),
     zip_safe    = False
 )
