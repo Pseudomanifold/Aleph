@@ -121,9 +121,9 @@ correctly.
 The next parameter denotes the filename. Note that the tool is presently
 able to read GML files, NET&nbsp;(Pajek) files, and simple edge lists.
 This should cover many important network formats. If *yours* is missing,
-please [open an issue](https://github.com/Submanifold/Aleph/issues) or
+please [open an issue](https://github.com/Pseudomanifold/Aleph/issues) or
 think about [contributing it
-yourself](https://github.com/Submanifold/Aleph/blob/master/CONTRIBUTING.md).
+yourself](https://github.com/Pseudomanifold/Aleph/blob/master/CONTRIBUTING.md).
 I would be more than happy to integrate your code!
 
 The last parameter gives the maximum dimension of a simplex for
@@ -163,8 +163,8 @@ Stay tuned for more details and other applications!
 The following tools have been used to calculate and analyse networks in
 the paper:
 
-* [`clique_communities_to_json`](https://github.com/Submanifold/Aleph/blob/master/src/tools/clique_communities_to_json.cc)
-* [`clique_persistence_diagram`](https://github.com/Submanifold/Aleph/blob/master/src/tools/clique_persistence_diagram.cc)
-* [`persistence_indicator_function`](https://github.com/Submanifold/Aleph/blob/master/src/tools/persistence_indicator_function.cc)
-* [`persistence_indicator_function_glyph`](https://github.com/Submanifold/Aleph/blob/master/src/tools/persistence_indicator_function_glyph.cc)
-* [`topological_distance`](https://github.com/Submanifold/Aleph/blob/master/src/tools/topological_distance.cc)
+* [`clique_communities_to_json`](https://github.com/Pseudomanifold/Aleph/blob/master/src/tools/clique_communities_to_json.cc)
+* [`clique_persistence_diagram`](https://github.com/Pseudomanifold/Aleph/blob/master/src/tools/clique_persistence_diagram.cc)
+* [`persistence_indicator_function`](https://github.com/Pseudomanifold/Aleph/blob/master/src/tools/persistence_indicator_function.cc)
+* [`persistence_indicator_function_glyph`](https://github.com/Pseudomanifold/Aleph/blob/master/src/tools/persistence_indicator_function_glyph.cc)
+* [`topological_distance`](https://github.com/Pseudomanifold/Aleph/blob/master/src/tools/topological_distance.cc)

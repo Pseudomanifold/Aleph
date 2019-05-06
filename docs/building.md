@@ -12,7 +12,7 @@ your package manager to install the following dependencies:
   Aleph is being continuously built by `g++`, the C++ compiler of the
   GNU project, and `clang++`, the C++ compiler of the LLVM project.
   Other compiler may or may not work. Please open an
-  [issue](https://github.com/Submanifold/Aleph/issues) if you require
+  [issue](https://github.com/Pseudomanifold/Aleph/issues) if you require
   another compiler.
 * `CMake`, preferably a recent version >= 3.2
 * Several `Boost` dependencies for some of the data structures:
@@ -92,7 +92,7 @@ A typical output of this command should look like this:
     Total Test time (real) =   6.87 sec
 
 Please submit any issues you may encounter. If you want to help, please
-take a look at the [contribution guidelines](https://github.com/Submanifold/Aleph/blob/master/CONTRIBUTING.md).
+take a look at the [contribution guidelines](https://github.com/Pseudomanifold/Aleph/blob/master/CONTRIBUTING.md).
 
 # Additional options
 
@@ -123,5 +123,5 @@ building Aleph, you may use the following command:
     $ make install
 
 Package files (for certain Linux distributions) are forthcoming. Please
-refer to [this issue](https://github.com/Submanifold/Aleph/issues/27)
+refer to [this issue](https://github.com/Pseudomanifold/Aleph/issues/27)
 for more details.

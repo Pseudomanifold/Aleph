@@ -75,7 +75,7 @@ for( auto&& diagram : persistenceDiagrams )
 ```
 
 This should result in the same persistence diagram. The test suite of
-Aleph, in particular [`test_persistent_homology_complete.cc`](https://github.com/Submanifold/Aleph/blob/master/tests/test_persistent_homology_complete.cc) defines numerous tests to ensure that neither the representation nor the reduction algorithm influence the results&nbsp;(with the possible exception of runtime and memory usage, of course).
+Aleph, in particular [`test_persistent_homology_complete.cc`](https://github.com/Pseudomanifold/Aleph/blob/master/tests/test_persistent_homology_complete.cc) defines numerous tests to ensure that neither the representation nor the reduction algorithm influence the results&nbsp;(with the possible exception of runtime and memory usage, of course).
 
 ## Filtrations & expansion
 
@@ -184,9 +184,9 @@ Please take a look at the test suite of Aleph for more information.
 Persistent homology calculation is well-tested for different scenarios.
 The following tests may prove useful:
 
-- [`test_connected_components.cc`](https://github.com/Submanifold/Aleph/blob/master/tests/test_connected_components.cc)
-- [`test_persistent_homology_complex.cc`](https://github.com/Submanifold/Aleph/blob/master/tests/test_persistent_homology_complete.cc)
-- [`test_rips_expansion.cc`](https://github.com/Submanifold/Aleph/blob/master/tests/test_rips_expansion.cc)
+- [`test_connected_components.cc`](https://github.com/Pseudomanifold/Aleph/blob/master/tests/test_connected_components.cc)
+- [`test_persistent_homology_complex.cc`](https://github.com/Pseudomanifold/Aleph/blob/master/tests/test_persistent_homology_complete.cc)
+- [`test_rips_expansion.cc`](https://github.com/Pseudomanifold/Aleph/blob/master/tests/test_rips_expansion.cc)
 
 In the [next tutorial](tutorial_vietoris_rips_complex_point_cloud.md), we will put everything together and cover the
 complete Vietoris&ndash;Rips complex expansion process of a point cloud.

@@ -67,7 +67,7 @@ them:
 
 The output of this script is unfortunately still somewhat rough&nbsp;(if
 you want to help improve the script, please consider [contributing to
-Aleph](https://github.com/Submanifold/Aleph/blob/master/CONTRIBUTING.md)).
+Aleph](https://github.com/Pseudomanifold/Aleph/blob/master/CONTRIBUTING.md)).
 The file `/tmp/M.txt` should now contain the following output:
 
     0.000000000000000000e+00 2.000000000000000000e+03
@@ -79,7 +79,7 @@ The off-diagonal values indicate that the two hierarchies are different.
 
 The tool is also capable of reading VTK files&mdash;as long as they
 describe structured grids. To reproduce the 2D examples from the paper,
-we first need to download the [two files stored in this gist](https://gist.github.com/Submanifold/4e247750c342101223cd123bae69dfe7).
+we first need to download the [two files stored in this gist](https://gist.github.com/Pseudomanifold/4e247750c342101223cd123bae69dfe7).
 
 To calculate the interlevel set persistence hierarchy for the
 *superlevel* sets of these data, we have to use the following command:

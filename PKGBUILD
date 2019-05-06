@@ -18,7 +18,7 @@ replaces=()
 backup=()
 options=()
 install=
-source=('aleph::git+https://github.com/Submanifold/Aleph.git')
+source=('aleph::git+https://github.com/Pseudomanifold/Aleph.git')
 noextract=()
 md5sums=('SKIP')
 

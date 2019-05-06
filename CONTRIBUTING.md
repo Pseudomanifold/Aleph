@@ -1,7 +1,7 @@
 # How to contribute?
 
 If you have an idea, encountered strange behaviour, or a just missing
-some functionality, please open an [issue](https://github.com/Submanifold/Aleph/issues)
+some functionality, please open an [issue](https://github.com/Pseudomanifold/Aleph/issues)
 n the project's issue tracker.
 
 Since this project is not really large, there are no coding conventions.

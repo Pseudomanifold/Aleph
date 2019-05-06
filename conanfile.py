@@ -6,7 +6,7 @@ class AlephConan(ConanFile):
     version = "0.1.0"
     license = "MIT"
     author = "Bastian Rieck <bastian@rieck.ru>"
-    url = "https://github.com/Submanifold/Aleph"
+    url = "https://github.com/Pseudomanifold/Aleph"
     description = "A library for exploring persistent homology"
     topics = ("persistent-homology", "topological-data-analysis", "tda")
     settings = "os", "compiler", "build_type", "arch"
@@ -45,7 +45,7 @@ class AlephConan(ConanFile):
             self.requires("tinyxml2/7.0.1@nicolastagliani/stable")
 
     def source(self):
-        self.run("git clone https://github.com/Submanifold/Aleph.git")
+        self.run("git clone https://github.com/Pseudomanifold/Aleph.git")
         self.run("cd Aleph")
 
     def build(self):

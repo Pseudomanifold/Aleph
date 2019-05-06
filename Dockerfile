@@ -18,7 +18,7 @@ WORKDIR /tmp
 
 # Somewhat superfluous because the client most likely downloaded this
 # file already by cloning the repo.
-RUN git clone https://github.com/Submanifold/Aleph.git \
+RUN git clone https://github.com/Pseudomanifold/Aleph.git \
   && cd Aleph                                          \
   && mkdir build                                       \
   && cd build                                          \

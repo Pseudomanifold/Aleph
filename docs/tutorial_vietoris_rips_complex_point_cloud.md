@@ -38,7 +38,7 @@ character. Valid separator characters are:
 Hence, Aleph is capable of reading well-formatted numerical CSV files,
 for example. Other example point clouds, such as the famous [Iris data
   set](https://en.wikipedia.org/wiki/Iris_flower_data_set) in several
-  variants, are provided in the [`tests` directory](https://github.com/Submanifold/Aleph/tree/master/tests/input).
+  variants, are provided in the [`tests` directory](https://github.com/Pseudomanifold/Aleph/tree/master/tests/input).
 
 To load a point cloud, use `aleph::containers::load()`:
 
@@ -117,7 +117,7 @@ a *distance*&nbsp;(in this case, the Euclidean distance). The choice of
 distance measure is very important with respect to the structures that
 can be detected. Aleph provides some distances measures that permit
 calculating distances between two ranges of iterators. Please refer to
-the [source code](https://github.com/Submanifold/Aleph/tree/master/include/aleph/geometry/distances) for a list of valid distance measures.
+the [source code](https://github.com/Pseudomanifold/Aleph/tree/master/include/aleph/geometry/distances) for a list of valid distance measures.
 
 Another useful wrapper is the wrapper based on
 [FLANN](https://github.com/mariusmuja/flann), the *Fast Library for
@@ -265,7 +265,7 @@ K.sort( std::ref( upperStarFiltration ) );
 ```
 
 See the [eccentricity-based Vietoris&ndash;Rips complex calculation
-example](https://github.com/Submanifold/Aleph/blob/master/examples/vietoris_rips_eccentricity.cc)
+example](https://github.com/Pseudomanifold/Aleph/blob/master/examples/vietoris_rips_eccentricity.cc)
 for more information.
 
 ## Calculating persistent homology
@@ -315,5 +315,5 @@ same!
 For more information, the following&nbsp;(fully-documented) examples may
 prove useful:
 
-- [Vietoris&ndash;Rips expansion with distances](https://github.com/Submanifold/Aleph/blob/master/examples/vietoris_rips.cc)
-- [Vietoris&ndash;Rips expansion with eccentricity data descriptor](https://github.com/Submanifold/Aleph/blob/master/examples/vietoris_rips_eccentricity.cc)
+- [Vietoris&ndash;Rips expansion with distances](https://github.com/Pseudomanifold/Aleph/blob/master/examples/vietoris_rips.cc)
+- [Vietoris&ndash;Rips expansion with eccentricity data descriptor](https://github.com/Pseudomanifold/Aleph/blob/master/examples/vietoris_rips_eccentricity.cc)

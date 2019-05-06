@@ -84,7 +84,7 @@ void f( const Simplex& s )
 ```
 
 Please refer to the [source
-code](https://github.com/Submanifold/Aleph/blob/master/include/aleph/topology/Simplex.hh)
+code](https://github.com/Pseudomanifold/Aleph/blob/master/include/aleph/topology/Simplex.hh)
 or the API documentation for more information.
 
 ## Building a simplicial complex
@@ -194,6 +194,6 @@ We cover them in [another tutorial](tutorial_simplicial_complexes_io.md).
 
 More information about the `SimplicialComplex` class is available in the
 [source
-code](https://github.com/Submanifold/Aleph/blob/master/include/aleph/topology/SimplicialComplex.hh)
+code](https://github.com/Pseudomanifold/Aleph/blob/master/include/aleph/topology/SimplicialComplex.hh)
 or the API documentation of Aleph. We will also use simplicial
 complexes when [calculating persistent homology](tutorial_persistent_homology_simplicial_complex.md).

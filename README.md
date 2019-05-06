@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/Submanifold/Aleph.svg?branch=master)](https://travis-ci.org/Submanifold/Aleph) [![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/972/badge)](https://bestpractices.coreinfrastructure.org/projects/972)
+[![Build Status](https://travis-ci.org/Pseudomanifold/Aleph.svg?branch=master)](https://travis-ci.org/Pseudomanifold/Aleph) [![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/972/badge)](https://bestpractices.coreinfrastructure.org/projects/972)
 
 ![Aleph logo](Aleph.png "The logo of Aleph in all its glory")
 
@@ -145,7 +145,7 @@ installing Aleph:
     $ yaourt -S aleph-git # yaourt
 
 If you want to volunteer and submit a package for your favourite Linux
-distribution, please take a look at [issue #27](https://github.com/Submanifold/Aleph/issues/27)
+distribution, please take a look at [issue #27](https://github.com/Pseudomanifold/Aleph/issues/27)
 and add your comments.
 
 # Installing the Python bindings
@@ -166,6 +166,6 @@ principal developer and maintainer Bastian Rieck (bastian.rieck@iwr.uni-heidelbe
 
 The following people have contributed code to Aleph:
 
-* [Submanifold](https://github.com/Submanifold) (Bastian Rieck): principal developer
+* [Pseudomanifold](https://github.com/Pseudomanifold) (Bastian Rieck): principal developer
 * [ExpectationMax](https://github.com/ExpectationMax) (Max Horn): fixes and
   improvements to the Python bindings

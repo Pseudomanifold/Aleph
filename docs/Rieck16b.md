@@ -84,7 +84,7 @@ The output format of the previous program is sufficiently generic to
 support using a variety of other scripts. Use the following gist, for
 example, to embed a matrix into 2D using multidimensional scaling:
 
-<script src="https://gist.github.com/Submanifold/2b1490f9447c1435d890f9960782a7fe.js"></script>
+<script src="https://gist.github.com/Pseudomanifold/2b1490f9447c1435d890f9960782a7fe.js"></script>
 
 The resulting 2D point cloud could look like this:
 

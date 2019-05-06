@@ -45,7 +45,7 @@ Currently, the following formats are supported:
 
 In case a reader does not support your needs, please open an issue in
 the project's [issue
-tracker](https://github.com/Submanifold/Aleph/issues)&mdash;I am always
+tracker](https://github.com/Pseudomanifold/Aleph/issues)&mdash;I am always
 interested in extending Aleph's capabilities.
 
 # The easy way
@@ -132,8 +132,8 @@ Please refer to the documentation for more details.
 
 The `SimplicialComplexReader` class is used in various tests:
 
-* [`test_io_gml.cc`](https://github.com/Submanifold/Aleph/blob/master/tests/test_io_gml.cc)
-* [`test_io_pajek.cc`](https://github.com/Submanifold/Aleph/blob/master/tests/test_io_pajek.cc)
-* [`test_io_vtk.cc`](https://github.com/Submanifold/Aleph/blob/master/tests/test_io_vtk.cc)
+* [`test_io_gml.cc`](https://github.com/Pseudomanifold/Aleph/blob/master/tests/test_io_gml.cc)
+* [`test_io_pajek.cc`](https://github.com/Pseudomanifold/Aleph/blob/master/tests/test_io_pajek.cc)
+* [`test_io_vtk.cc`](https://github.com/Pseudomanifold/Aleph/blob/master/tests/test_io_vtk.cc)
 
-A short demonstration is also available in the [`relevant_edges.cc`](https://github.com/Submanifold/Aleph/blob/master/src/tools/relevant_edges.cc) tool.
+A short demonstration is also available in the [`relevant_edges.cc`](https://github.com/Pseudomanifold/Aleph/blob/master/src/tools/relevant_edges.cc) tool.

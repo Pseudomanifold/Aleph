@@ -18,7 +18,7 @@ This analysis relied on several statistics of persistence diagrams:
 The tool `persistence_diagram_statistics` was developed for the purpose
 of calculating these statistics and reporting them. We require a set of
 persistence diagrams for demonstrating its use. Luckily, Aleph contains
-[several persistence diagrams as a part of its test suite](https://github.com/Submanifold/Aleph/tree/master/tests/input),
+[several persistence diagrams as a part of its test suite](https://github.com/Pseudomanifold/Aleph/tree/master/tests/input),
 which we may use. Having obtained them, we call the tool like this:
 
     $ ./persistence_diagram_statistics --invalid inf  Iris_dimension_*.txt 
@@ -40,4 +40,4 @@ each diagram easily.
 
 Please refer to the forthcoming paper for more information. For more
 details about the underlying theory and data, please visit the paper
-[code repository on GitHub](https://github.com/Submanifold/Skeleton_Persistence).
+[code repository on GitHub](https://github.com/Pseudomanifold/Skeleton_Persistence).

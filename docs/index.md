@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/Submanifold/Aleph.svg?branch=master)](https://travis-ci.org/Submanifold/Aleph) [![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/972/badge)](https://bestpractices.coreinfrastructure.org/projects/972)
+[![Build Status](https://travis-ci.org/Pseudomanifold/Aleph.svg?branch=master)](https://travis-ci.org/Pseudomanifold/Aleph) [![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/972/badge)](https://bestpractices.coreinfrastructure.org/projects/972)
 
 # Aleph &mdash; *A* *L*ibrary for *E*xploring *P*ersistent *H*omology
 
