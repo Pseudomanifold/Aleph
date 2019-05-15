@@ -812,8 +812,8 @@ void wrapVietorisRipsComplexCalculation( py::module& m )
   // Wraps a function that calculates a Vietoris--Rips complex up to
   // a pre-defined dimension, returning a persistence diagram, and a
   // corresponding pairing.
-  m.def( "calculateVietorisRipsComplexMatrix",
-    [] ( py::array_t<double> M, unsigned max_dimension = 0 )
+  m.def( "vietoris_rips_from_matrix",
+    [] ( py::array_t<double> M, unsigned max_dimension )
     {
       py::buffer_info bufferInfo = M.request();
 
@@ -924,8 +924,8 @@ void wrapVietorisRipsComplexCalculation( py::module& m )
 
       return tuple;
     },
-    py::arg("K"),
-    py::arg("unpairedData") = std::numeric_limits<DataType>::infinity()
+    py::arg("M"),
+    py::arg("max_dimension") = 0
   );
 
   // Wraps a function that calculates a zero-dimensional persistence
