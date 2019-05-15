@@ -813,7 +813,7 @@ void wrapVietorisRipsComplexCalculation( py::module& m )
   // a pre-defined dimension, returning a persistence diagram, and a
   // corresponding pairing.
   m.def( "calculateVietorisRipsComplexMatrix",
-    [] ( py::array_t<double> M )
+    [] ( py::array_t<double> M, unsigned max_dimension = 0 )
     {
       py::buffer_info bufferInfo = M.request();
 
@@ -831,7 +831,7 @@ void wrapVietorisRipsComplexCalculation( py::module& m )
         throw std::runtime_error( "Unable to handle rectangular matrices" );
 
       std::vector<Simplex> simplices;
-      simplices.reserve( static_cast<std::size_t>( (n+m) + (n*m) ) );
+      simplices.reserve( static_cast<std::size_t>( n + (n * (n - 1) / 2 ) );
 
       // Create vertices following the idea of a Vietoris--Rips complex
       // that handles a distance function. This is the only sane thing,
@@ -867,6 +867,15 @@ void wrapVietorisRipsComplexCalculation( py::module& m )
       // idea of a distance filtration.
       SimplicialComplex K( simplices.begin(), simplices.end() );
       K.sort( aleph::topology::filtrations::Data<Simplex>() );
+
+      // Perform the desired expansion in case it has been requested by
+      // the client.
+      if( max_dimension != 0 )
+      {
+        RipsExpander ripsExpander;
+        K = ripsExpander( K, max_dimension );
+        K = ripsExpander.assignMaximumWeight( K );
+      }
 
       using Point = typename PersistenceDiagram::Point;
       auto tuple  = aleph::calculateZeroDimensionalPersistenceDiagram<Simplex>( K );
