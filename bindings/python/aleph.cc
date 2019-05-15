@@ -798,6 +798,209 @@ void wrapNorms( py::module& m )
     );
 }
 
+/**
+  Provides wrapper functions for different ways of calculating
+  a Vietoris--Rips complex of a data set. These functions have
+  been written for the purpose of being applied to batches. No
+  speedups to be expected.
+*/
+
+void wrapVietorisRipsComplexCalculation( py::module& m )
+{
+  using namespace pybind11::literals;
+
+  // Wraps a function that calculates a Vietoris--Rips complex up to
+  // a pre-defined dimension, returning a persistence diagram, and a
+  // corresponding pairing.
+  m.def( "calculateVietorisRipsComplexMatrix",
+    [] ( py::array_t<double> M )
+    {
+      py::buffer_info bufferInfo = M.request();
+
+      if( bufferInfo.ndim != 2 || bufferInfo.shape.size() != 2 )
+        throw std::runtime_error( "Only two-dimensional buffers are supported" );
+
+      if( bufferInfo.format != py::format_descriptor<DataType>::format() )
+        throw std::runtime_error( "Buffer format is not consistent with data type" );
+
+      auto n = bufferInfo.shape[0];
+      auto m = bufferInfo.shape[1];
+
+      // We require this to be a distance matrix, even though we do not
+      if( n != m )
+        throw std::runtime_error( "Unable to handle rectangular matrices" );
+
+      std::vector<Simplex> simplices;
+      simplices.reserve( static_cast<std::size_t>( (n+m) + (n*m) ) );
+
+      for( VertexType v = 0; v < VertexType(n+m); v++ )
+        simplices.push_back( Simplex( VertexType(v), vertexWeight) );
+
+      // Determine the proper stride for accessing the array. While it
+      // is very probable that this just defaults to the C array index
+      // that is so common, i.e. i*m + j, I want to be sure.
+      std::size_t rowStride = std::size_t( bufferInfo.strides[0] ) / sizeof(DataType);
+      std::size_t colStride = std::size_t( bufferInfo.strides[1] ) / sizeof(DataType);
+
+      for( VertexType u = 0; u < VertexType(n); u++ )
+      {
+        for( VertexType v = 0; v < VertexType(m); v++ )
+        {
+          simplices.push_back(
+            Simplex(
+              {
+                u,
+                VertexType(v+n)
+              },
+              reinterpret_cast<DataType*>( bufferInfo.ptr )[u*rowStride+v*colStride] ) );
+        }
+      }
+
+      SimplicialComplex K( simplices.begin(), simplices.end() );
+
+      if( reverseFiltration )
+      {
+        K.sort( aleph::topology::filtrations::Data<Simplex,
+                                                   std::greater<DataType> >()
+        );
+      }
+      else
+        K.sort( aleph::topology::filtrations::Data<Simplex>() );
+
+      using Point = typename PersistenceDiagram::Point;
+      auto tuple  = aleph::calculateZeroDimensionalPersistenceDiagram<Simplex>( K );
+      auto&& pd   = std::get<0>( tuple );
+
+      if( std::isfinite( unpairedData ) )
+      {
+        std::transform( pd.begin(), pd.end(), pd.begin(),
+          [&unpairedData] ( const Point& p )
+          {
+            if( p.isUnpaired() )
+            {
+              return Point( p.x(), unpairedData );
+            }
+            else
+              return Point( p );
+          }
+        );
+      }
+
+      return pd;
+
+      // Tells the calculation procedure that a pairing should be
+      // calculated alongside the persistence diagram.
+      using Traits
+        = aleph::traits::PersistencePairingCalculation<PersistencePairing>;
+
+      using Point = typename PersistenceDiagram::Point;
+      auto tuple  = aleph::calculateZeroDimensionalPersistenceDiagram<Simplex, Traits>( K );
+      auto&& pd   = std::get<0>( tuple );
+
+      if( std::isfinite( unpairedData ) )
+      {
+        std::transform( pd.begin(), pd.end(), pd.begin(),
+          [&unpairedData] ( const Point& p )
+          {
+            if( p.isUnpaired() )
+            {
+              return Point( p.x(), unpairedData );
+            }
+            else
+              return Point( p );
+          }
+        );
+      }
+
+      return tuple;
+    },
+    py::arg("K"),
+    py::arg("unpairedData") = std::numeric_limits<DataType>::infinity()
+  );
+
+  // Wraps a function that calculates a zero-dimensional persistence
+  // diagram from a `numpy` matrix. The matrix is assumed to contain
+  // edge weights of a bipartite graph. Depending on the parameters,
+  // the graph will be filtered from large weights to small ones, or
+  // vice versa.
+  m.def( "calculateZeroDimensionalPersistenceDiagramOfMatrix",
+    [] ( py::array_t<double> M, bool reverseFiltration, DataType vertexWeight, DataType unpairedData )
+    {
+      py::buffer_info bufferInfo = M.request();
+
+      if( bufferInfo.ndim != 2 || bufferInfo.shape.size() != 2 )
+        throw std::runtime_error( "Only two-dimensional buffers are supported" );
+
+      if( bufferInfo.format != py::format_descriptor<DataType>::format() )
+        throw std::runtime_error( "Buffer format is not consistent with data type" );
+
+      auto n = bufferInfo.shape[0];
+      auto m = bufferInfo.shape[1];
+
+      std::vector<Simplex> simplices;
+      simplices.reserve( static_cast<std::size_t>( (n+m) + (n*m) ) );
+
+      for( VertexType v = 0; v < VertexType(n+m); v++ )
+        simplices.push_back( Simplex( VertexType(v), vertexWeight) );
+
+      // Determine the proper stride for accessing the array. While it
+      // is very probable that this just defaults to the C array index
+      // that is so common, i.e. i*m + j, I want to be sure.
+      std::size_t rowStride = std::size_t( bufferInfo.strides[0] ) / sizeof(DataType);
+      std::size_t colStride = std::size_t( bufferInfo.strides[1] ) / sizeof(DataType);
+
+      for( VertexType u = 0; u < VertexType(n); u++ )
+      {
+        for( VertexType v = 0; v < VertexType(m); v++ )
+        {
+          simplices.push_back(
+            Simplex(
+              {
+                u,
+                VertexType(v+n)
+              },
+              reinterpret_cast<DataType*>( bufferInfo.ptr )[u*rowStride+v*colStride] ) );
+        }
+      }
+
+      SimplicialComplex K( simplices.begin(), simplices.end() );
+
+      if( reverseFiltration )
+      {
+        K.sort( aleph::topology::filtrations::Data<Simplex,
+                                                   std::greater<DataType> >()
+        );
+      }
+      else
+        K.sort( aleph::topology::filtrations::Data<Simplex>() );
+
+      using Point = typename PersistenceDiagram::Point;
+      auto tuple  = aleph::calculateZeroDimensionalPersistenceDiagram<Simplex>( K );
+      auto&& pd   = std::get<0>( tuple );
+
+      if( std::isfinite( unpairedData ) )
+      {
+        std::transform( pd.begin(), pd.end(), pd.begin(),
+          [&unpairedData] ( const Point& p )
+          {
+            if( p.isUnpaired() )
+            {
+              return Point( p.x(), unpairedData );
+            }
+            else
+              return Point( p );
+          }
+        );
+      }
+
+      return pd;
+    },
+    py::arg("M"),
+    py::arg("reverseFiltration") = true,
+    py::arg("vertexWeight")      = DataType(1.0),
+    py::arg("unpairedData")      = std::numeric_limits<DataType>::infinity()
+  );
+}
 
 PYBIND11_MODULE(aleph, m)
 {
