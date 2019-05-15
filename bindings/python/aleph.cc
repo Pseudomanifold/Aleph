@@ -833,8 +833,11 @@ void wrapVietorisRipsComplexCalculation( py::module& m )
       std::vector<Simplex> simplices;
       simplices.reserve( static_cast<std::size_t>( (n+m) + (n*m) ) );
 
-      for( VertexType v = 0; v < VertexType(n+m); v++ )
-        simplices.push_back( Simplex( VertexType(v), vertexWeight) );
+      // Create vertices following the idea of a Vietoris--Rips complex
+      // that handles a distance function. This is the only sane thing,
+      // for we are getting a distance matrix as an input.
+      for( VertexType v = 0; v < VertexType(n); v++ )
+        simplices.push_back( Simplex( VertexType(v), DataType() ) );
 
       // Determine the proper stride for accessing the array. While it
       // is very probable that this just defaults to the C array index
@@ -842,30 +845,28 @@ void wrapVietorisRipsComplexCalculation( py::module& m )
       std::size_t rowStride = std::size_t( bufferInfo.strides[0] ) / sizeof(DataType);
       std::size_t colStride = std::size_t( bufferInfo.strides[1] ) / sizeof(DataType);
 
+      // This loop assumes that the diagonal values of the distance
+      // matrix are zero. In theory, they could even contain random
+      // values because we ignore them outright.
       for( VertexType u = 0; u < VertexType(n); u++ )
       {
-        for( VertexType v = 0; v < VertexType(m); v++ )
+        for( VertexType v = u + 1; v < VertexType(n); v++ )
         {
+          // Add the corresponding edge, with the weight being
+          // calculated from the distance matrix.
           simplices.push_back(
             Simplex(
               {
-                u,
-                VertexType(v+n)
+                u, v
               },
               reinterpret_cast<DataType*>( bufferInfo.ptr )[u*rowStride+v*colStride] ) );
         }
       }
 
+      // Bring the complex into proper filtration order, following the
+      // idea of a distance filtration.
       SimplicialComplex K( simplices.begin(), simplices.end() );
-
-      if( reverseFiltration )
-      {
-        K.sort( aleph::topology::filtrations::Data<Simplex,
-                                                   std::greater<DataType> >()
-        );
-      }
-      else
-        K.sort( aleph::topology::filtrations::Data<Simplex>() );
+      K.sort( aleph::topology::filtrations::Data<Simplex>() );
 
       using Point = typename PersistenceDiagram::Point;
       auto tuple  = aleph::calculateZeroDimensionalPersistenceDiagram<Simplex>( K );
