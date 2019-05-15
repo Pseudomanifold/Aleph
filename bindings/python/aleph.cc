@@ -7,11 +7,14 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 
+// Configuration -------------------------------------------------------
+
+#include <aleph/config/Defaults.hh>
+#include <aleph/config/FLANN.hh>
+
 // Containers ----------------------------------------------------------
 
 #include <aleph/containers/PointCloud.hh>
-
-#include <aleph/config/FLANN.hh>
 
 // Geometry ------------------------------------------------------------
 //
@@ -45,6 +48,7 @@
 // Persistence diagram class, various norms, and conversion functions,
 // as well as the standard distance calculations plus kernels.
 
+#include <aleph/persistenceDiagrams/Calculation.hh>
 #include <aleph/persistenceDiagrams/Norms.hh>
 #include <aleph/persistenceDiagrams/PersistenceDiagram.hh>
 #include <aleph/persistenceDiagrams/PersistenceIndicatorFunction.hh>
@@ -85,6 +89,8 @@ using Simplex            = aleph::topology::Simplex<DataType, VertexType>;
 using SimplicialComplex  = aleph::topology::SimplicialComplex<Simplex>;
 using RipsExpander       = aleph::geometry::RipsExpander<SimplicialComplex>;
 using StepFunction       = aleph::math::StepFunction<DataType>;
+using Representation     = aleph::defaults::Representation;
+using ReductionAlgorithm = aleph::defaults::ReductionAlgorithm;
 
 // Select a default value of calculating nearest neighbours. This is
 // only relevant for those functions that create complexes from data
@@ -831,7 +837,7 @@ void wrapVietorisRipsComplexCalculation( py::module& m )
         throw std::runtime_error( "Unable to handle rectangular matrices" );
 
       std::vector<Simplex> simplices;
-      simplices.reserve( static_cast<std::size_t>( n + (n * (n - 1) / 2 ) );
+      simplices.reserve( static_cast<std::size_t>( n + (n * (n - 1) / 2 ) ) );
 
       // Create vertices following the idea of a Vietoris--Rips complex
       // that handles a distance function. This is the only sane thing,
@@ -863,10 +869,7 @@ void wrapVietorisRipsComplexCalculation( py::module& m )
         }
       }
 
-      // Bring the complex into proper filtration order, following the
-      // idea of a distance filtration.
       SimplicialComplex K( simplices.begin(), simplices.end() );
-      K.sort( aleph::topology::filtrations::Data<Simplex>() );
 
       // Perform the desired expansion in case it has been requested by
       // the client.
@@ -877,52 +880,15 @@ void wrapVietorisRipsComplexCalculation( py::module& m )
         K = ripsExpander.assignMaximumWeight( K );
       }
 
-      using Point = typename PersistenceDiagram::Point;
-      auto tuple  = aleph::calculateZeroDimensionalPersistenceDiagram<Simplex>( K );
-      auto&& pd   = std::get<0>( tuple );
+      // Bring the complex into proper filtration order, following the
+      // idea of a distance filtration.
+      K.sort( aleph::topology::filtrations::Data<Simplex>() );
 
-      if( std::isfinite( unpairedData ) )
-      {
-        std::transform( pd.begin(), pd.end(), pd.begin(),
-          [&unpairedData] ( const Point& p )
-          {
-            if( p.isUnpaired() )
-            {
-              return Point( p.x(), unpairedData );
-            }
-            else
-              return Point( p );
-          }
-        );
-      }
+      auto boundaryMatrix = aleph::topology::makeBoundaryMatrix<Representation>( K );
+      auto pairing        = aleph::calculatePersistencePairing<ReductionAlgorithm>( boundaryMatrix.dualize() );
+      auto diagrams       = aleph::makePersistenceDiagrams( pairing, K );
 
-      return pd;
-
-      // Tells the calculation procedure that a pairing should be
-      // calculated alongside the persistence diagram.
-      using Traits
-        = aleph::traits::PersistencePairingCalculation<PersistencePairing>;
-
-      using Point = typename PersistenceDiagram::Point;
-      auto tuple  = aleph::calculateZeroDimensionalPersistenceDiagram<Simplex, Traits>( K );
-      auto&& pd   = std::get<0>( tuple );
-
-      if( std::isfinite( unpairedData ) )
-      {
-        std::transform( pd.begin(), pd.end(), pd.begin(),
-          [&unpairedData] ( const Point& p )
-          {
-            if( p.isUnpaired() )
-            {
-              return Point( p.x(), unpairedData );
-            }
-            else
-              return Point( p );
-          }
-        );
-      }
-
-      return tuple;
+      return diagrams;
     },
     py::arg("M"),
     py::arg("max_dimension") = 0
