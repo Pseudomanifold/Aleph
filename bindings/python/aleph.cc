@@ -908,4 +908,5 @@ PYBIND11_MODULE(aleph, m)
   wrapRipsExpander(m);
   wrapStepFunction(m);
   wrapInputFunctions(m);
+  wrapVietorisRipsComplexCalculation(m);
 }
