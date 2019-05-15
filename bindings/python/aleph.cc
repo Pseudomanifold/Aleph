@@ -957,9 +957,35 @@ void wrapVietorisRipsComplexCalculation( py::module& m )
       auto boundaryMatrix = aleph::topology::makeBoundaryMatrix<Representation>( K );
       auto pairing        = aleph::calculatePersistencePairing<ReductionAlgorithm>( boundaryMatrix.dualize() );
 
-      return diagrams;
+      using Pair = decltype( pairing )::ValueType;
+
+      // This follows the terminology of a down-stream task, in which we
+      // think of this as a (very convoluted!) process of selecting edge
+      // subsets, i.e. those that belong to the MST.
+      std::vector<Pair> selected_edges;
+      selected_edges.reserve( static_cast<std::size_t>( n ) );
+
+      for( auto&& pair : pairing )
+      {
+        if( pair.second > K.size() )
+          selected_edges.push_back( std::make_pair( pair.first, pair.first ) );
+
+        // Extract the proper vertex indices of the edge in order to
+        // make this a proper selection of edges.
+        else
+        {
+          // The 'destroyer' of the connected component. Note that the
+          // order is changed to ensure that $u < v$ for the edge. The
+          // other order would also work so this is more of a cosmetic
+          // change (upper triangular matrix instead of lower one).
+          auto edge = K[ pair.second ];
+          selected_edges.push_back( std::make_pair( edge[1], edge[0] ) );
+        }
+      }
+
+      return selected_edges;
     },
-    py::arg("M"),
+    py::arg("M")
   );
 }
 
