@@ -1104,6 +1104,40 @@ void wrapVietorisRipsComplexCalculation( py::module& m )
             selected_edges.push_back( std::make_pair( edge[1], edge[0] ) );
           }
         }
+
+        // Handle 1-dimensional features by searching for the maximum
+        // edge in the destroying triangle.
+        else if( creator.dimension() == 1 )
+        {
+          auto&& destroyer = K[ pair.second ];
+
+          std::cerr << "CREATOR  : " << creator   << "\n";
+          std::cerr << "DESTROYER: " << destroyer << "\n";
+
+          // Triangle (u, v, w) gives rise to the following edges:
+          // - [u, v] (d1)
+          // - [u, w] (d2)
+          // - [v, w] (d3)
+          auto u  = destroyer[0];
+          auto v  = destroyer[1];
+          auto w  = destroyer[2];
+
+          auto d1 = reinterpret_cast<DataType*>( bufferInfo.ptr )[u*rowStride+v*colStride];
+          auto d2 = reinterpret_cast<DataType*>( bufferInfo.ptr )[u*rowStride+w*colStride];
+          auto d3 = reinterpret_cast<DataType*>( bufferInfo.ptr )[v*rowStride+w*colStride];
+
+          // Prepare creator; there's not much we can do here except for
+          // returning the edges in the right order.
+
+          auto i = creator[0];
+          auto j = creator[1];
+
+          if( i > j )
+            std::swap( i, j );
+
+          // For the destroyer, we have to pick the edge with the
+          // largest weight, according to {d1, d2, d3}.
+        }
       }
 
       return selected_edges;
