@@ -987,6 +987,115 @@ void wrapVietorisRipsComplexCalculation( py::module& m )
     },
     py::arg("M")
   );
+
+  // Wraps a function that calculates a Vietoris--Rips complex up to
+  // dimension 2 (including cycles), returning the persistence pairs
+  // in a special format:
+  //
+  // A tuple of two lists will be returned. The first contains every
+  // selected edge as in the 1D case. The second one contains a list
+  // of 4 indices [i, j, k, l]. The first two indices describe edges
+  // that *create* a cycle, while the last two indices contain *the*
+  // unique (!) edge of the triangle that destroys the cycle.
+  m.def( "vietoris_rips_from_matrix_2d",
+    [] ( py::array_t<double> M )
+    {
+      py::buffer_info bufferInfo = M.request();
+
+      if( bufferInfo.ndim != 2 || bufferInfo.shape.size() != 2 )
+        throw std::runtime_error( "Only two-dimensional buffers are supported" );
+
+      if( bufferInfo.format != py::format_descriptor<DataType>::format() )
+        throw std::runtime_error( "Buffer format is not consistent with data type" );
+
+      auto n = bufferInfo.shape[0];
+      auto m = bufferInfo.shape[1];
+
+      // We require this to be a distance matrix, even though we do not
+      if( n != m )
+        throw std::runtime_error( "Unable to handle rectangular matrices" );
+
+      std::vector<Simplex> simplices;
+      simplices.reserve( static_cast<std::size_t>( n + (n * (n - 1) / 2 ) ) );
+
+      // Create vertices following the idea of a Vietoris--Rips complex
+      // that handles a distance function. This is the only sane thing,
+      // for we are getting a distance matrix as an input.
+      for( VertexType v = 0; v < VertexType(n); v++ )
+        simplices.push_back( Simplex( VertexType(v), DataType() ) );
+
+      // Determine the proper stride for accessing the array. While it
+      // is very probable that this just defaults to the C array index
+      // that is so common, i.e. i*m + j, I want to be sure.
+      std::size_t rowStride = std::size_t( bufferInfo.strides[0] ) / sizeof(DataType);
+      std::size_t colStride = std::size_t( bufferInfo.strides[1] ) / sizeof(DataType);
+
+      // This loop assumes that the diagonal values of the distance
+      // matrix are zero. In theory, they could even contain random
+      // values because we ignore them outright.
+      for( VertexType u = 0; u < VertexType(n); u++ )
+      {
+        for( VertexType v = u + 1; v < VertexType(n); v++ )
+        {
+          // Add the corresponding edge, with the weight being
+          // calculated from the distance matrix.
+          simplices.push_back(
+            Simplex(
+              {
+                u, v
+              },
+              reinterpret_cast<DataType*>( bufferInfo.ptr )[u*rowStride+v*colStride] ) );
+        }
+      }
+
+      SimplicialComplex K( simplices.begin(), simplices.end() );
+
+      // Perform the Vietoris--Rips expansion to be able to handle
+      // cycles in addition to 1D topology.
+      {
+        RipsExpander ripsExpander;
+        K = ripsExpander( K, max_dimension );
+        K = ripsExpander.assignMaximumWeight( K );
+      }
+
+      // Bring the complex into proper filtration order, following the
+      // idea of a distance filtration.
+      K.sort( aleph::topology::filtrations::Data<Simplex>() );
+
+      auto boundaryMatrix = aleph::topology::makeBoundaryMatrix<Representation>( K );
+      auto pairing        = aleph::calculatePersistencePairing<ReductionAlgorithm>( boundaryMatrix.dualize() );
+
+      using Pair = decltype( pairing )::ValueType;
+
+      // This follows the terminology of a down-stream task, in which we
+      // think of this as a (very convoluted!) process of selecting edge
+      // subsets, i.e. those that belong to the MST.
+      std::vector<Pair> selected_edges;
+      selected_edges.reserve( static_cast<std::size_t>( n ) );
+
+      for( auto&& pair : pairing )
+      {
+        if( pair.second > K.size() )
+          selected_edges.push_back( std::make_pair( pair.first, pair.first ) );
+
+        // Extract the proper vertex indices of the edge in order to
+        // make this a proper selection of edges.
+        else
+        {
+          // The 'destroyer' of the connected component. Note that the
+          // order is changed to ensure that $u < v$ for the edge. The
+          // other order would also work so this is more of a cosmetic
+          // change (upper triangular matrix instead of lower one).
+          auto edge = K[ pair.second ];
+          selected_edges.push_back( std::make_pair( edge[1], edge[0] ) );
+        }
+      }
+
+      return selected_edges;
+    },
+    py::arg("M")
+  );
+
 }
 
 PYBIND11_MODULE(aleph, m)
