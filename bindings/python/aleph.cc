@@ -1111,36 +1111,62 @@ void wrapVietorisRipsComplexCalculation( py::module& m )
         {
           auto&& destroyer = K[ pair.second ];
 
-          std::cerr << "CREATOR  : " << creator   << "\n";
-          std::cerr << "DESTROYER: " << destroyer << "\n";
-
           // Triangle (u, v, w) gives rise to the following edges:
           // - [u, v] (d1)
           // - [u, w] (d2)
           // - [v, w] (d3)
-          auto u  = destroyer[0];
+          //
+          // The way we access them ensures some lexicographical
+          // ordering already, so we do not have to sort them in
+          // a later stage.
+          auto u  = destroyer[2];
           auto v  = destroyer[1];
-          auto w  = destroyer[2];
+          auto w  = destroyer[0];
 
           auto d1 = reinterpret_cast<DataType*>( bufferInfo.ptr )[u*rowStride+v*colStride];
           auto d2 = reinterpret_cast<DataType*>( bufferInfo.ptr )[u*rowStride+w*colStride];
           auto d3 = reinterpret_cast<DataType*>( bufferInfo.ptr )[v*rowStride+w*colStride];
 
           // Prepare creator; there's not much we can do here except for
-          // returning the edges in the right order.
+          // returning the edges in the right order (hence swapped index
+          // access).
 
-          auto i = creator[0];
-          auto j = creator[1];
-
-          if( i > j )
-            std::swap( i, j );
+          auto i = creator[1];
+          auto j = creator[0];
 
           // For the destroyer, we have to pick the edge with the
-          // largest weight, according to {d1, d2, d3}.
+          // largest weight, according to {d1, d2, d3}. We do not
+          // know which edge is going to be the largest, so we do
+          // a check for all of them.
+          //
+          // Notice that the ordering of the if clauses implies a
+          // sane ordering in case all of the edges have the same
+          // weight.
+
+          auto k = i;
+          auto l = j;
+
+          if( d1 >= creator.data() )
+          {
+            k = u; 
+            l = v;
+          }
+          else if( d2 >= creator.data() )
+          {
+            k = u;
+            l = w;
+          }
+          else if( d3 >= creator.data() )
+          {
+            k = v;
+            l = w;
+          }
+
+          selected_pairs.push_back( std::make_tuple(i, j, k, l) );
         }
       }
 
-      return selected_edges;
+      return std::make_pair( selected_edges, selected_pairs );
     },
     py::arg("M")
   );
