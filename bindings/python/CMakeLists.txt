@@ -26,6 +26,8 @@ IF( BUILD_PYTHON_BINDINGS )
         ${PYBIND11_INCLUDE_DIRS}
     )
 
+    ENABLE_IF_SUPPORTED( CMAKE_CXX_FLAGS "-O3" )
+
     ADD_LIBRARY( aleph SHARED aleph.cc )
 
     ####################################################################
