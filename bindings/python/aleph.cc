@@ -1054,7 +1054,7 @@ void wrapVietorisRipsComplexCalculation( py::module& m )
       // cycles in addition to 1D topology.
       {
         RipsExpander ripsExpander;
-        K = ripsExpander( K, max_dimension );
+        K = ripsExpander( K, 2 );
         K = ripsExpander.assignMaximumWeight( K );
       }
 
@@ -1065,7 +1065,8 @@ void wrapVietorisRipsComplexCalculation( py::module& m )
       auto boundaryMatrix = aleph::topology::makeBoundaryMatrix<Representation>( K );
       auto pairing        = aleph::calculatePersistencePairing<ReductionAlgorithm>( boundaryMatrix.dualize() );
 
-      using Pair = decltype( pairing )::ValueType;
+      using Index = decltype( pairing )::IndexType;
+      using Pair  = decltype( pairing )::ValueType;
 
       // This follows the terminology of a down-stream task, in which we
       // think of this as a (very convoluted!) process of selecting edge
@@ -1073,21 +1074,35 @@ void wrapVietorisRipsComplexCalculation( py::module& m )
       std::vector<Pair> selected_edges;
       selected_edges.reserve( static_cast<std::size_t>( n ) );
 
+      // Describes a pair of edges: the first two indices describe the
+      // indices of the creator edge, while the last two correspond to
+      // the indices of the destroyer edge.
+      using EdgePair = std::tuple<Index, Index, Index, Index>;
+
+      std::vector<EdgePair> selected_pairs;
+      selected_pairs.reserve( static_cast<std::size_t>( n * (n - 1) / 2 ) );
+
       for( auto&& pair : pairing )
       {
-        if( pair.second > K.size() )
-          selected_edges.push_back( std::make_pair( pair.first, pair.first ) );
+        auto&& creator = K[ pair.first ];
 
-        // Extract the proper vertex indices of the edge in order to
-        // make this a proper selection of edges.
-        else
+        // Handle 0-dimensional features as before
+        if( creator.dimension() == 0 )
         {
-          // The 'destroyer' of the connected component. Note that the
-          // order is changed to ensure that $u < v$ for the edge. The
-          // other order would also work so this is more of a cosmetic
-          // change (upper triangular matrix instead of lower one).
-          auto edge = K[ pair.second ];
-          selected_edges.push_back( std::make_pair( edge[1], edge[0] ) );
+          if( pair.second > K.size() )
+            selected_edges.push_back( std::make_pair( pair.first, pair.first ) );
+
+          // Extract the proper vertex indices of the edge in order to
+          // make this a proper selection of edges.
+          else
+          {
+            // The 'destroyer' of the connected component. Note that the
+            // order is changed to ensure that $u < v$ for the edge. The
+            // other order would also work so this is more of a cosmetic
+            // change (upper triangular matrix instead of lower one).
+            auto edge = K[ pair.second ];
+            selected_edges.push_back( std::make_pair( edge[1], edge[0] ) );
+          }
         }
       }
 
