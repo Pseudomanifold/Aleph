@@ -1093,19 +1093,23 @@ void wrapVietorisRipsComplexCalculation( py::module& m )
         // Handle 0-dimensional features as before
         if( creator.dimension() == 0 )
         {
+          // Do not add a pair for the unpaired vertex, as it will result
+          // in a cycle edge.
           if( pair.second > K.size() )
-            selected_edges.push_back( std::make_pair( pair.first, pair.first ) );
+            continue;
 
           // Extract the proper vertex indices of the edge in order to
           // make this a proper selection of edges.
           else
           {
-            // The 'destroyer' of the connected component. Note that the
-            // order is changed to ensure that $u < v$ for the edge. The
-            // other order would also work so this is more of a cosmetic
-            // change (upper triangular matrix instead of lower one).
-            auto edge = K[ pair.second ];
-            selected_edges.push_back( std::make_pair( edge[1], edge[0] ) );
+            auto u = K[ pair.first ][0]; // creator is always a vertex
+            auto e = K[ pair.second ];   // destroyer is always an edge
+
+            // Select the proper vertex index for the destroyer; this is
+            // just the *other* vertex of the edge.
+            auto v = e[0] != u ? e[0] : e[1];
+
+            selected_edges.push_back( std::make_pair( u, v ) );
           }
         }
 
