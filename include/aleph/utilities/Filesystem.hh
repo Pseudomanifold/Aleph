@@ -38,6 +38,7 @@
 #endif
 
 #include <fstream>
+#include <utility>
 
 namespace aleph
 {
@@ -173,7 +174,7 @@ std::string stem( const std::string& path )
   auto&& filename = basename( path );
 
   if( filename.find( '.' ) == std::string::npos || filename == "." || filename == ".." )
-    return filename;
+    return std::move( filename );
 
   auto pos = filename.find_last_of( '.' );
   return filename.substr( 0, pos );
