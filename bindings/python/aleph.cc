@@ -976,14 +976,8 @@ void wrapVietorisRipsComplexCalculation( py::module& m )
         // make this a proper selection of edges.
         else
         {
-          auto u = K[ pair.first ][0]; // creator is always a vertex
-          auto e = K[ pair.second ];   // destroyer is always an edge
-
-          // Select the proper vertex index for the destroyer; this is
-          // just the *other* vertex of the edge.
-          auto v = e[0] != u ? e[0] : e[1];
-
-          selected_edges.push_back( std::make_pair( u, v ) );
+          auto edge = K[ pair.second ];
+          selected_edges.push_back( std::make_pair( edge[1], edge[0] ) );
         }
       }
 
