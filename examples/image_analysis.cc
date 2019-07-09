@@ -7,6 +7,7 @@
 
 #include <aleph/topology/io/Matrix.hh>
 
+#include <functional>
 #include <iostream>
 #include <string>
 
@@ -56,7 +57,15 @@ int main( int argc, char** argv )
   aleph::topology::io::MatrixReader reader;
   reader( filename, K );
 
-  K.sort( Filtration() );
+  if( useSuperlevelSets )
+  {
+    using Filtration = 
+      aleph::topology::filtrations::Data<Simplex, std::greater<DataType> >;
+  
+    K.sort( Filtration() );
+  }
+  else
+    K.sort( Filtration() );
 
   auto diagrams = aleph::calculatePersistenceDiagrams( K );
 
