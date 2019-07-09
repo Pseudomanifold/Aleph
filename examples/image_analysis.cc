@@ -10,6 +10,8 @@
 #include <iostream>
 #include <string>
 
+#include <getopt.h>
+
 using DataType          = float;
 using VertexType        = unsigned;
 using Simplex           = aleph::topology::Simplex<DataType, VertexType>;
@@ -18,7 +20,33 @@ using Filtration        = aleph::topology::filtrations::Data<Simplex>;
 
 int main( int argc, char** argv )
 {
-  if( argc <= 1 )
+  bool useSuperlevelSets = false;
+
+  {
+    static option commandLineOptions[] = {
+      { "sublevel"   , no_argument, nullptr, 's' },
+      { "superlevel" , no_argument, nullptr, 'S' },
+      { nullptr      , 0          , nullptr,  0  }
+    };
+
+    int option = -1;
+    while( ( option = getopt_long( argc, argv, "sS", commandLineOptions, nullptr ) ) != - 1)
+    {
+      switch( option )
+      {
+      case 's':
+        useSuperlevelSets = false;
+        break;
+      case 'S':
+        useSuperlevelSets = true;
+        break;
+      default:
+        break;
+      }
+    }
+  }
+
+  if( ( argc - optind ) < 1 )
     return -1;
 
   std::string filename = argv[1];
