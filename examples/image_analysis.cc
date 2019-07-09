@@ -54,8 +54,21 @@ int main( int argc, char** argv )
 
   SimplicialComplex K;
 
-  aleph::topology::io::MatrixReader reader;
-  reader( filename, K );
+  if( useSuperlevelSets )
+  {
+    aleph::topology::io::MatrixReader reader;
+    reader( filename, K,
+        [] ( DataType a, DataType b )
+        {
+          return std::min( a, b );
+        }
+    );
+  }
+  else
+  {
+    aleph::topology::io::MatrixReader reader;
+    reader( filename, K );
+  }
 
   if( useSuperlevelSets )
   {
