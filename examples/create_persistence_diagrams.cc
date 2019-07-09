@@ -199,7 +199,6 @@ int main( int argc, char** argv )
       { nullptr , 0                , nullptr,  0  }
   };
 
-
   unsigned d            = 3; // default dimension to use for expansion
   unsigned m            = 50;
   unsigned n            = 50;
