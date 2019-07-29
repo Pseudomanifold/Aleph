@@ -77,7 +77,7 @@ int main( int argc, char** argv )
 
   std::cerr << "* Generating a random graph with n=" << n << " and p=" << p << "...";
 
-  if( weighted )
+  if( not weighted )
   {
     auto K = aleph::topology::generateErdosRenyiGraph( n, p );
     storeGraph(K, std::cout);
