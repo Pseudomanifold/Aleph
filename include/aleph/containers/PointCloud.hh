@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <fstream>
 #include <initializer_list>
+#include <istream>
 #include <iterator>
 #include <ostream>
 #include <stdexcept>
@@ -223,16 +224,12 @@ private:
 };
 
 /**
-  Loads a new point cloud from a file. The file is supposed to be in
-  ASCII format. Each row must specify one item of the data set.  The
-  different attributes of each item are assumed to be separated by a
-  comma or white-space characters.
+  Loads a new point cloud from an input stream. This makes it possible
+  to perform simple input redirection.
 */
 
-template<class T> PointCloud<T> load( const std::string& filename )
+template<class T> PointCloud<T> load( std::istream& in )
 {
-  std::ifstream in( filename );
-
   if( !in )
     return PointCloud<T>();
 
@@ -304,6 +301,19 @@ template<class T> PointCloud<T> load( const std::string& filename )
   }
 
   return pointCloud;
+}
+
+/**
+  Loads a new point cloud from a file. The file is supposed to be in
+  ASCII format. Each row must specify one item of the data set.  The
+  different attributes of each item are assumed to be separated by a
+  comma or white-space characters.
+*/
+
+template<class T> PointCloud<T> load( const std::string& filename )
+{
+  std::ifstream in( filename );
+  return load<T>( in );
 }
 
 } // namespace containers
