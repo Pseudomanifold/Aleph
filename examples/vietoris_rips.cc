@@ -42,6 +42,8 @@
 #include <string>
 #include <vector>
 
+#include <getopt.h>
+
 void usage()
 {
   std::cerr << "Usage: vietoris_rips FILE EPSILON [DIMENSION]\n"
@@ -62,6 +64,30 @@ int main( int argc, char** argv )
     return -1;
   }
 
+  bool normalize = false;
+
+  {
+    static option commandLineOptions[] =
+    {
+      { "normalize", no_argument, nullptr, 'n' },
+      { nullptr    , 0          , nullptr,  0  }
+    };
+
+    int option = 0;
+    while( ( option = getopt_long( argc, argv, "n", commandLineOptions, nullptr ) ) != -1 )
+    {
+      switch( option )
+      {
+      case 'n':
+        normalize = true;
+        break;
+
+      default:
+        break;
+      }
+    }
+  }
+
   // We first have to specify the data type to use for the subsequent
   // expansion of the Vietoris--Rips complex. This also results in
   // a different choice of point clouds.
@@ -74,7 +100,7 @@ int main( int argc, char** argv )
   using PointCloud = aleph::containers::PointCloud<DataType>;
   using Distance   = aleph::geometry::distances::Euclidean<DataType>;
 
-  std::string input = argv[1];
+  std::string input = argv[optind++];
 
   PointCloud pointCloud;
 
@@ -95,10 +121,10 @@ int main( int argc, char** argv )
   // builtin types such as 'double' or 'float'. If you want to use this
   // for your own data types, you need to overload `operator>>` because
   // the converter internally uses `std::stringstream` for tokens.
-  auto epsilon = aleph::utilities::convert<DataType>( argv[2] );
+  auto epsilon = aleph::utilities::convert<DataType>( argv[optind++] );
 
-  if( argc >= 4 )
-    dimension = std::stoul( argv[3] );
+  if( (argc - optind) > 0 )
+    dimension = std::stoul( argv[optind++] );
 
   std::cerr << "* Calculating Vietoris--Rips complex with eps=" << epsilon << " and d=" << dimension << "...";
 
