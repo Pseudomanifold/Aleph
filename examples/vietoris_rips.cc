@@ -184,11 +184,44 @@ int main( int argc, char** argv )
   std::cerr << "finished\n"
             << "* Obtained " << diagrams.size() << " persistence diagrams\n";
 
+  DataType maxDistance = DataType();
+
+  // Calculate maximum pairwise distance in the data set in order to
+  // perform a proper normalisation.
+  if( normalize )
+  {
+    for( std::size_t i = 0; i < pointCloud.size(); i++ )
+    {
+      auto&& p = pointCloud[i];
+
+      for( std::size_t j = i + 1; j < pointCloud.size(); j++ )
+      {
+        auto&& q    = pointCloud[j];
+        maxDistance = std::max( maxDistance, Distance()( p.begin(), q.begin(), pointCloud.dimension() ) );
+      }
+    }
+  }
+
+  using PersistenceDiagram = aleph::PersistenceDiagram<DataType>;
+
   for( auto&& D : diagrams )
   {
     // Removes all features of zero persistence. They only clutter up
     // the diagonal.
     D.removeDiagonal();
+
+    if( normalize )
+    {
+      std::transform( D.begin(), D.end(), D.begin(),
+          [&maxDistance] ( const PersistenceDiagram::Point& p )
+          {
+            if( !std::isfinite( p.y() ) )
+              return PersistenceDiagram::Point( p.x() / maxDistance, DataType(1) );
+            else
+              return PersistenceDiagram::Point( p.x() / maxDistance, p.y() / maxDistance );
+          }
+      );
+    }
 
     // This output contains a sort of header (in gnuplot style) so that
     // it is possible to store multiple persistence diagrams in the same
