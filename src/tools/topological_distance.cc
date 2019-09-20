@@ -53,6 +53,7 @@
 #include <aleph/persistenceDiagrams/PersistenceDiagram.hh>
 #include <aleph/persistenceDiagrams/PersistenceIndicatorFunction.hh>
 
+#include <aleph/persistenceDiagrams/distances/Bottleneck.hh>
 #include <aleph/persistenceDiagrams/distances/Hausdorff.hh>
 #include <aleph/persistenceDiagrams/distances/Wasserstein.hh>
 
@@ -88,7 +89,7 @@ struct DataSet
 void usage()
 {
   std::cerr << "Usage: topological_distance [--power=POWER] [--kernel] [--exp] [--sigma]\n"
-            << "                            [--hausdorff|envelope|indicator|scale-space|wasserstein]\n"
+            << "                            [--bottleneck|envelope|hausdorff|indicator|scale-space|wasserstein]\n"
             << "                            [--clean] [--factor=FACTOR] FILES\n"
             << "\n"
             << "Calculates distances between a set of persistence diagrams, stored\n"
@@ -113,6 +114,7 @@ void usage()
             << "a 'd' (for dimension) or a 'k' (for clique dimension).\n"
             << "\n"
             << "Flags:\n"
+            << "  -b: calculate bottleneck distance\n"
             << "  -c: clean persistence diagrams (remove unpaired points)\n"
             << "  -e: use exponential weighting for kernel calculation\n"
             << "  -E: calculate envelope function distances\n"
@@ -392,6 +394,7 @@ int main( int argc, char** argv )
     { "factor"     , required_argument, nullptr, 'f' },
     { "power"      , required_argument, nullptr, 'p' },
     { "sigma"      , required_argument, nullptr, 's' },
+    { "bottleneck" , no_argument      , nullptr, 'b' },
     { "clean"      , no_argument      , nullptr, 'c' },
     { "envelope"   , no_argument      , nullptr, 'E' },
     { "exp"        , no_argument      , nullptr, 'e' },
@@ -409,19 +412,20 @@ int main( int argc, char** argv )
   double power                      = 2.0;
   double sigma                      = 1.0;
   bool cleanPersistenceDiagrams     = false;
+  bool useBottleneckDistance        = false;
   bool useExponentialFunction       = false;
   bool useEnvelopeFunctionDistance  = false;
   bool useIndicatorFunctionDistance = false;
   bool normalize                    = false;
   bool calculateKernel              = false;
   bool useWassersteinDistance       = false;
-  bool useScaleSpaceKernel           =false;
+  bool useScaleSpaceKernel          = false;
   bool list                         = false;
   bool removeDuplicates             = false;
   bool verbose                      = false;
 
   int option = 0;
-  while( ( option = getopt_long( argc, argv, "f:p:s:ceEhinklrvSw", commandLineOptions, nullptr ) ) != -1 )
+  while( ( option = getopt_long( argc, argv, "f:p:s:bceEhinklrvSw", commandLineOptions, nullptr ) ) != -1 )
   {
     switch( option )
     {
@@ -434,11 +438,19 @@ int main( int argc, char** argv )
     case 's':
       sigma = std::stod( optarg );
       break;
+    case 'b':
+      useBottleneckDistance        = true;
+      useEnvelopeFunctionDistance  = false;
+      useIndicatorFunctionDistance = false;
+      useScaleSpaceKernel          = false;
+      useWassersteinDistance       = false;
+      break;
     case 'c':
       cleanPersistenceDiagrams = true;
       break;
     case 'E':
       useEnvelopeFunctionDistance  = true;
+      useBottleneckDistance        = false;
       useWassersteinDistance       = false;
       useIndicatorFunctionDistance = false;
       break;
@@ -676,19 +688,24 @@ int main( int argc, char** argv )
 
   std::function< double( const PersistenceDiagram&, const PersistenceDiagram&, double ) > functor
     = !useIndicatorFunctionDistance && !useEnvelopeFunctionDistance ?
-        useWassersteinDistance ?
-          [] ( const PersistenceDiagram& D1, const PersistenceDiagram& D2, double p )
+        useWassersteinDistance
+        ? [] ( const PersistenceDiagram& D1, const PersistenceDiagram& D2, double p )
+             {
+               return aleph::distances::wassersteinDistance( D1, D2, p );
+             }
+        : useBottleneckDistance
+          ? [] ( const PersistenceDiagram& D1, const PersistenceDiagram& D2, double )
                {
-                 return aleph::distances::wassersteinDistance( D1, D2, p );
+                 return aleph::distances::bottleneckDistance( D1, D2 );
                }
-         : [] ( const PersistenceDiagram& D1, const PersistenceDiagram& D2, double p )
-              {
-                return std::pow( aleph::distances::hausdorffDistance( D1, D2 ), p );
-              }
-           : [] ( const PersistenceDiagram&, const PersistenceDiagram&, double )
-                  {
-                    return 0.0;
-                  };
+          : [] ( const PersistenceDiagram& D1, const PersistenceDiagram& D2, double p )
+               {
+                  return std::pow( aleph::distances::hausdorffDistance( D1, D2 ), p );
+               }
+      : [] ( const PersistenceDiagram&, const PersistenceDiagram&, double )
+           {
+             return 0.0;
+           };
 
   if( useScaleSpaceKernel )
   {
@@ -706,6 +723,8 @@ int main( int argc, char** argv )
                                               ? "persistence indicator function"
                                               : useWassersteinDistance
                                                 ? "Wasserstein"
+                                                : useBottleneckDistance
+                                                ? "Bottleneck"
                                                 : "Hausdorff";
 
     if( useScaleSpaceKernel )
