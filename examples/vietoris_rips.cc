@@ -76,11 +76,19 @@ int main( int argc, char** argv )
 
   std::string input = argv[1];
 
-  // This loads the point cloud from an unstructured file. The point
-  // cloud loader is smart enough to handle things such as different
-  // separators in a file.
-  auto pointCloud   = aleph::containers::load<DataType>( input );
-  auto dimension    = pointCloud.dimension() + 1;
+  PointCloud pointCloud;
+
+  if( input == "-" )
+    pointCloud = aleph::containers::load<DataType>( std::cin );
+  else
+  {
+    // This loads the point cloud from an unstructured file. The point
+    // cloud loader is smart enough to handle things such as different
+    // separators in a file.
+    pointCloud = aleph::containers::load<DataType>( input );
+  }
+
+  auto dimension = pointCloud.dimension() + 1;
 
   // This converts the string supplied by the user to the corresponding
   // data type. Note that the `convert()` function only makes sense for
