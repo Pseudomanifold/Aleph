@@ -246,6 +246,13 @@ int main( int argc, char** argv )
     std::cerr << "finished\n";
   }
 
+  std::size_t maxDimension = 0;
+
+  // Determine maximum dimension; this will be required later on to
+  // ensure that we store persistence diagrams for each complex.
+  for( auto&& K : simplicialComplexes )
+    maxDimension = std::max( K.dimension(), maxDimension );
+
   // Calculate degrees -------------------------------------------------
 
   DataType maxDegree = 0;
@@ -356,6 +363,10 @@ int main( int argc, char** argv )
         = aleph::calculatePersistenceDiagrams( K,
                                                dualize,
                                                includeAllUnpairedCreators );
+
+      // Ensures that the same number of diagrams is available for each
+      // of the simplicial complexes---even if the diagram is empty.
+      diagrams.resize( std::max( diagrams.size(), maxDimension ) );
 
       for( auto&& diagram : diagrams )
       {
