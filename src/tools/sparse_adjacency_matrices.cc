@@ -280,6 +280,11 @@ int main( int argc, char** argv )
       K = expander.assignData( K, degrees.begin(), degrees.end(), DataType(0), [] ( DataType a, DataType b ) { return a+b; } );
     else
     {
+      // Degrees are either use in a sublevel set fashion, or in
+      // a superlevel set one. For both filtrations, each vertex
+      // of the complex gets assigned its *original* degree. The
+      // edges of the complex are then handled using the functor
+      // specified below.
       if( useSuperlevelSets )
       {
         auto init    = std::numeric_limits<DataType>::max();
@@ -294,7 +299,16 @@ int main( int argc, char** argv )
         K = expander.assignMaximumData( K, degrees.begin(), degrees.end() );
     }
 
-    K.sort( aleph::topology::filtrations::Data<Simplex>() );
+      // The normal sorting order is inverted when using a superlevel
+      // set filtration.
+      if( useSuperlevelSets )
+      {
+        K.sort(
+           aleph::topology::filtrations::Data< Simplex, std::less<DataType> >()
+         );
+      }
+      else
+        K.sort( aleph::topology::filtrations::Data<Simplex>() );
   }
 
   std::cerr << "finished\n"
