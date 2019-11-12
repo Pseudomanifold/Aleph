@@ -364,9 +364,19 @@ int main( int argc, char** argv )
                                                dualize,
                                                includeAllUnpairedCreators );
 
-      // Ensures that the same number of diagrams is available for each
-      // of the simplicial complexes---even if the diagram is empty.
-      diagrams.resize( std::max( diagrams.size(), maxDimension ) );
+      // Creates all potential diagrams for each simplicial complex; if
+      // some of them are empty, it is a feature of the data. This will
+      // ensure that the cardinality of all diagrams is the same.
+      for( std::size_t d = 0; d <= maxDimension; d++ )
+      {
+        auto outputPath = output
+                        + aleph::utilities::format( index, simplicialComplexes.size() )
+                        + "_d"
+                        + std::to_string( d )
+                        + ".txt";
+
+        std::ofstream out( outputPath );
+      }
 
       for( auto&& diagram : diagrams )
       {
