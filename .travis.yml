@@ -8,16 +8,12 @@ env:
   global:
     - MAKEFLAGS="-j 2"
 
-osx_image: xcode8.3
+osx_image: xcode11
 
-dist: trusty
 sudo: false
 addons:
   apt:
-    sources:
-      - ubuntu-toolchain-r-test
     packages:
-      - g++-4.9
       - libboost-dev
       - libboost-regex-dev
       - libeigen3-dev
@@ -37,9 +33,6 @@ before_install:
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install pybind11  ; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install rapidjson ; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install tinyxml2  ; fi
-
-install:
-  - if [[ "$TRAVIS_OS_NAME" != "osx" && "$CXX" == "g++" ]]; then export CXX="g++-4.9" CC="gcc-4.9"; fi
 
 script:
   - mkdir build
