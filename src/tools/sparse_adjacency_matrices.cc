@@ -274,6 +274,10 @@ int main( int argc, char** argv )
                         return degree / maxDegree;
                       }
       );
+
+      // The output will make more sense in case normalisation has been
+      // requested by the user.
+      maxDegree = 1.0;
     }
 
     if( useSumOfDegrees )
