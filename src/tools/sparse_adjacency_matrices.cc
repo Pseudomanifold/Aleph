@@ -87,6 +87,7 @@ void usage()
             << "\n"
             << " --closeness-centrality: Calculates closeness centrality filtration\n"
             << " --graphs:               Stores converted graphs in GML format\n"
+            << " --normalise:            Normalises weights between [0, 1]\n"
             << " --sum:                  Calculates degree sum filtration\n"
             << "\n"
             << "\n";
@@ -105,6 +106,7 @@ int main( int argc, char** argv )
     { "sum"                 , no_argument      , nullptr, 's' },
     { "superlevel"          , no_argument      , nullptr, 'S' },
     { "node-labels"         , no_argument      , nullptr, 'n' },
+    { "normalise"           , no_argument      , nullptr, 'N' },
     { nullptr               , 0                , nullptr,  0  }
   };
 
@@ -115,12 +117,13 @@ int main( int argc, char** argv )
   bool readNodeAttributes           = false;
   bool readNodeLabels               = false;
   bool useSuperlevelSets            = false;
+  bool normalise                    = false;
   DataType infinity                 = DataType(2);
   std::string output                = "/tmp";
 
   {
     int option = 0;
-    while( ( option = getopt_long( argc, argv, "d:f:o:acgnsS", commandLineOptions, nullptr ) ) != -1 )
+    while( ( option = getopt_long( argc, argv, "d:f:o:acgnNsS", commandLineOptions, nullptr ) ) != -1 )
     {
       switch( option )
       {
@@ -144,6 +147,9 @@ int main( int argc, char** argv )
         break;
       case 'n':
         readNodeLabels = true;
+        break;
+      case 'N':
+        normalise = true;
         break;
       case 's':
         useSumOfDegrees = true;
@@ -258,6 +264,16 @@ int main( int argc, char** argv )
       maxDegree
         = std::max( maxDegree,
                     *std::max_element( degrees.begin(), degrees.end() ) );
+    }
+
+    if( normalise )
+    {
+      std::transform( degrees.begin(), degrees.end(), degrees.begin(),
+                      [&maxDegree] ( DataType degree )
+                      {
+                        return degree / maxDegree;
+                      }
+      );
     }
 
     if( useSumOfDegrees )
