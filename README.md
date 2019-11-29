@@ -20,14 +20,14 @@ For more information, please read the [original paper describing
 Since its inception in late 2016, Aleph has been used to support the
 following papers:
 
-- [Clique Community Persistence: A Topological Visual Analysis Approach for Complex Networks](https://submanifold.github.io/Aleph/Rieck17d.html)
-- [Persistence Concepts for 2D Skeleton Evolution Analysis](https://submanifold.github.io/Aleph/Rieck17b.html)
-- [Hierarchies and Ranks for Persistence Pairs](https://submanifold.github.io/Aleph/Rieck17a.html)
+- [Clique Community Persistence: A Topological Visual Analysis Approach for Complex Networks](https://pseudomanifold.github.io/Aleph/Rieck17d.html)
+- [Persistence Concepts for 2D Skeleton Evolution Analysis](https://pseudomanifold.github.io/Aleph/Rieck17b.html)
+- [Hierarchies and Ranks for Persistence Pairs](https://pseudomanifold.github.io/Aleph/Rieck17a.html)
 - [*Shall I compare thee to a network?*&mdash;Visualizing the Topological
-  Structure of Shakespeare&rsquo;s plays](https://submanifold.github.io/Aleph/Rieck16b.html)
+  Structure of Shakespeare&rsquo;s plays](https://pseudomanifold.github.io/Aleph/Rieck16b.html)
 
 Please refer to [the list of
-publications](https://submanifold.github.io/Aleph/publications) in the
+publications](https://pseudomanifold.github.io/Aleph/publications) in the
 documentation of Aleph for more details. The documentation covers how to
 reproduce a subset of the results reported in the papers above.
 
@@ -68,7 +68,7 @@ important ones:
 
 # Documentation
 
-[Documentation](https://submanifold.github.io/Aleph) of the main
+[Documentation](https://pseudomanifold.github.io/Aleph) of the main
 features, including some tutorials, is available on GitHub. If you want
 to delve into the code, the `examples` subdirectory is a good starting
 point.
@@ -123,7 +123,7 @@ Please submit any issues you may encounter.
 
 For more information, including how to run tests, please refer to the
 [detailed build
-instructions](https://submanifold.github.io/Aleph/building) in the
+instructions](https://pseudomanifold.github.io/Aleph/building) in the
 documentation.
 
 # Installing Aleph
