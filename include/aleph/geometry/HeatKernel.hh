@@ -119,7 +119,10 @@ template <class SimplicialComplex> auto weightedLaplacianMatrix( const Simplicia
 
   Matrix L = Matrix::Zero( W.rows(), W.cols() );
 
-  auto V = W.rowwise().sum();
+  using DataType = typename SimplicialComplex::ValueType::DataType;
+  using Vector = Eigen::Matrix<DataType, 1, Eigen::Dynamic>;
+
+  Vector V = W.rowwise().sum();
 
   for( IndexType i = 0; i < V.size(); i++ )
     L(i,i) = V(i);
