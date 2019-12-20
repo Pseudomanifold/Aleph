@@ -28,11 +28,17 @@ compiler:
 # Let us install a set of Homebrew packages for Mac OS X. This appears
 # to be rather clunky, but the official documentation contains similar
 # examples.
+#
+# Moreover, we need to fix the library paths for `clang` because `OMP`
+# will not be found otherwise. This appears to be an issue with Travis
+# CI; see https://github.com/travis-ci/travis-ci/issues/8613.
 before_install:
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install eigen     ; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install pybind11  ; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install rapidjson ; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install tinyxml2  ; fi
+  # Workaround documented in: https://github.com/travis-ci/travis-ci/issues/8613
+  - export LD_LIBRARY_PATH=/usr/local/clang/lib:$LD_LIBRARY_PATH
 
 script:
   - mkdir build
