@@ -446,7 +446,7 @@ for_each_combination(BidirIter first, BidirIter mid,
     detail::combine_discontinuous(first, mid, std::distance(first, mid),
                                   mid, last, std::distance(mid, last),
                                   wfunc);
-    return std::move(f);
+    return f;
 }
 
 template <class UInt>
