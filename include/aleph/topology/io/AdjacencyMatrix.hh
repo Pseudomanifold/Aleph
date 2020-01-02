@@ -57,6 +57,7 @@ public:
 
   enum class VertexWeightAssignmentStrategy
   {
+    AssignGlobalMaximum, // assigns the global maximum weight
     AssignGlobalMinimum, // assigns the global minimum weight
     AssignZero           // assigns zero
   };
@@ -215,7 +216,14 @@ public:
     {
       DataType weight = DataType();
 
-      if( _vertexWeightAssignmentStrategy == VertexWeightAssignmentStrategy::AssignGlobalMinimum )
+      if( _vertexWeightAssignmentStrategy == VertexWeightAssignmentStrategy::AssignGlobalMaximum )
+      {
+        // This weight selection strategy requires applying the functor
+        // because the weight might be anything, whereas the zero-based
+        // initialization uses a *fixed* weight.
+        weight = f( maxWeight, minWeight, maxWeight );
+      }
+      else if( _vertexWeightAssignmentStrategy == VertexWeightAssignmentStrategy::AssignGlobalMinimum )
       {
         // This weight selection strategy requires applying the functor
         // because the weight might be anything, whereas the zero-based
