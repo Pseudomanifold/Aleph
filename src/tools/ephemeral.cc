@@ -33,6 +33,15 @@
 
 #include <getopt.h>
 
+// Let's make those aliases global because they will be used throughout
+// this program.
+using DataType           = double;
+using VertexType         = unsigned short;
+using Simplex            = aleph::topology::Simplex<DataType, VertexType>;
+using SimplicialComplex  = aleph::topology::SimplicialComplex<Simplex>;
+using PersistenceDiagram = aleph::PersistenceDiagram<DataType>;
+using Point              = typename PersistenceDiagram::Point;
+
 void usage()
 {
   std::cerr << "Usage: ephemeral [--dimension DIMENSION] [--infinity INF] FILENAMES\n"
@@ -48,6 +57,60 @@ void usage()
             << "  -k: keep & report unpaired simplices (infinite values)\n"
             << "  -v: verbose output\n"
             << "\n";
+}
+
+void processFilename( const std::string& filename,
+                      double infinity,
+                      bool keepUnpaired,
+                      bool verbose,
+                      aleph::topology::io::AdjacencyMatrixReader reader )
+{
+  if( verbose )
+    std::cerr << "* Processing " << filename << "...";
+
+  SimplicialComplex K;
+  reader( filename, K );
+
+  K.sort();
+
+  bool dualize                    = true;
+  bool includeAllUnpairedCreators = keepUnpaired;
+
+  auto diagrams
+    = aleph::calculatePersistenceDiagrams( K,
+                                           dualize,
+                                           includeAllUnpairedCreators );
+
+  if( verbose )
+    std::cerr << "finished\n";
+
+  auto basename
+    = aleph::utilities::basename( filename );
+
+  for( auto&& diagram : diagrams )
+  {
+    if( std::isfinite( infinity ) )
+    {
+      std::transform( diagram.begin(), diagram.end(), diagram.begin(),
+          [&infinity] ( const Point& p )
+          {
+            if( p.isUnpaired() )
+              return Point( p.x(), infinity );
+            else
+              return Point( p.x(), p.y() );
+          }
+      );
+    }
+
+    // Stores additional data about each persistence diagram in order
+    // to make it easier to keep track of information.
+    std::map<std::string, std::string> kvs;
+
+    kvs["total_persistence_1"] = std::to_string( aleph::totalPersistence( diagram, 1.0 ) );
+    kvs["total_persistence_2"] = std::to_string( aleph::totalPersistence( diagram, 2.0 ) );
+
+    aleph::io::writeJSON( std::cout, diagram, basename, kvs );
+  }
 }
 
 int main( int argc, char** argv )
@@ -92,13 +155,6 @@ int main( int argc, char** argv )
     return -1;
   }
 
-  using DataType           = double;
-  using VertexType         = unsigned short;
-  using Simplex            = aleph::topology::Simplex<DataType, VertexType>;
-  using SimplicialComplex  = aleph::topology::SimplicialComplex<Simplex>;
-  using PersistenceDiagram = aleph::PersistenceDiagram<DataType>;
-  using Point              = typename PersistenceDiagram::Point;
-
   std::vector<std::string> filenames;
 
   for( int i = optind; i < argc; i++ )
@@ -119,52 +175,12 @@ int main( int argc, char** argv )
 
   for( auto&& filename : filenames )
   {
-    if( verbose )
-      std::cerr << "* Processing " << filename << "...";
-
-    SimplicialComplex K;
-    reader( filename, K );
-
-    K.sort();
-
-    bool dualize                    = true;
-    bool includeAllUnpairedCreators = keepUnpaired;
-
-    auto diagrams
-      = aleph::calculatePersistenceDiagrams( K,
-                                             dualize,
-                                             includeAllUnpairedCreators );
-
-    if( verbose )
-      std::cerr << "finished\n";
-
-    auto basename
-      = aleph::utilities::basename( filename );
-
-    for( auto&& diagram : diagrams )
-    {
-      if( std::isfinite( infinity ) )
-      {
-        std::transform( diagram.begin(), diagram.end(), diagram.begin(),
-            [&infinity] ( const Point& p )
-            {
-              if( p.isUnpaired() )
-                return Point( p.x(), infinity );
-              else
-                return Point( p.x(), p.y() );
-            }
-        );
-      }
-
-      // Stores additional data about each persistence diagram in order
-      // to make it easier to keep track of information.
-      std::map<std::string, std::string> kvs;
-
-      kvs["total_persistence_1"] = std::to_string( aleph::totalPersistence( diagram, 1.0 ) );
-      kvs["total_persistence_2"] = std::to_string( aleph::totalPersistence( diagram, 2.0 ) );
-
-      aleph::io::writeJSON( std::cout, diagram, basename, kvs );
-    }
+    processFilename( filename,
+                     infinity,
+                     keepUnpaired,
+                     verbose,
+                     reader
+    );
   }
 
   std::cout << "\n"
