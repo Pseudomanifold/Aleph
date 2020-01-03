@@ -80,6 +80,11 @@ public:
       diagrams.at( index++ ).merge( *it );
   }
 
+  Diagrams& operator[]( const Key& key )
+  {
+    return _diagrams[ key ];
+  }
+
 private:
 
   Map _diagrams;
@@ -241,6 +246,19 @@ int main( int argc, char** argv )
                                      numDiagrams,
                                      reader
     );
+
+    diagramCollection.update( filename, diagrams.begin(), diagrams.end() );
+  }
+
+  // Output ------------------------------------------------------------
+  //
+  // After merging diagrams of corresponding dimensions, output all of
+  // them in text format. Again, this is not the most efficient format
+  // but it simplifies the remainder of the pipeline.
+
+  for( auto&& filename : filenames )
+  {
+    auto&& diagrams = diagramCollection[ filename ];
 
     for( auto&& D : diagrams )
       std::cout << D << "\n";
