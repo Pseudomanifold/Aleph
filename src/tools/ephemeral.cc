@@ -22,6 +22,7 @@
 
 #include <aleph/utilities/Filesystem.hh>
 
+#include <cassert>
 #include <cmath>
 
 #include <algorithm>
@@ -101,11 +102,12 @@ void usage()
             << "\n";
 }
 
-void processFilename( const std::string& filename,
-                      double infinity,
-                      bool keepUnpaired,
-                      bool verbose,
-                      aleph::topology::io::AdjacencyMatrixReader reader )
+std::vector<PersistenceDiagram> processFilename( const std::string& filename,
+                                                 double infinity,
+                                                 bool keepUnpaired,
+                                                 bool verbose,
+                                                 unsigned numDiagrams,
+                                                 aleph::topology::io::AdjacencyMatrixReader reader )
 {
   if( verbose )
     std::cerr << "* Processing " << filename << "...";
@@ -122,6 +124,20 @@ void processFilename( const std::string& filename,
     = aleph::calculatePersistenceDiagrams( K,
                                            dualize,
                                            includeAllUnpairedCreators );
+
+  diagrams.resize( numDiagrams );
+
+  // Ensures that non-empty diagrams follow the indexing of the vector.
+  // For example, if we have data for dimensions 0 and 1, the diagrams
+  // should be stored at index 0 and 1, respectively. This is a sanity
+  // check that will fail if the data behaves weirdly.
+  for( std::size_t i = 0; i < diagrams.size(); i++ )
+  {
+    auto&& D = diagrams[i];
+
+    if( !D.empty() )
+      assert( D.dimension() == i );
+  }
 
   if( verbose )
     std::cerr << "finished\n";
@@ -143,16 +159,9 @@ void processFilename( const std::string& filename,
           }
       );
     }
-
-    // Stores additional data about each persistence diagram in order
-    // to make it easier to keep track of information.
-    std::map<std::string, std::string> kvs;
-
-    kvs["total_persistence_1"] = std::to_string( aleph::totalPersistence( diagram, 1.0 ) );
-    kvs["total_persistence_2"] = std::to_string( aleph::totalPersistence( diagram, 2.0 ) );
-
-    aleph::io::writeJSON( std::cout, diagram, basename, kvs );
   }
+
+  return diagrams;
 }
 
 int main( int argc, char** argv )
@@ -223,20 +232,17 @@ int main( int argc, char** argv )
       aleph::topology::io::AdjacencyMatrixReader::VertexWeightAssignmentStrategy::AssignGlobalMinimum
   );
 
-  std::cout << "{\n"
-            << "\"diagrams\": [\n";
-
   for( auto&& filename : filenames )
   {
-    processFilename( filename,
-                     infinity,
-                     keepUnpaired,
-                     verbose,
-                     reader
+    auto diagrams = processFilename( filename,
+                                     infinity,
+                                     keepUnpaired,
+                                     verbose,
+                                     numDiagrams,
+                                     reader
     );
-  }
 
-  std::cout << "\n"
-            << "]\n"
-            << "}\n";
+    for( auto&& D : diagrams )
+      std::cout << D << "\n";
+  }
 }
