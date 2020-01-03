@@ -173,6 +173,20 @@ public:
                     points.end() );
   }
 
+  /**
+    Merges two persistence diagrams. The points stored in the other
+    persistence diagram will simply be added to the current diagram
+    without accounting for duplicates.
+
+    @param other Persistence diagram to merge into the current one
+  */
+
+  void merge( const PersistenceDiagram<DataType>& other )
+  {
+    _points.insert( _points.end(),
+                    other._points.begin(), other._points.end() );
+  }
+
   // Attributes --------------------------------------------------------
 
   void setDimension( std::size_t dimension )
