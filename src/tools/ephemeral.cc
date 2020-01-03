@@ -307,6 +307,7 @@ int main( int argc, char** argv )
   {
     auto&& diagrams = diagramCollection[ filename ];
     auto basename   = aleph::utilities::basename( filename );
+    basename        = aleph::utilities::stem( basename );
     unsigned index  = 0;
 
     for( auto&& D : diagrams )
