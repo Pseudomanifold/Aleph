@@ -9,11 +9,9 @@
   will be merged into a single persistence diagram.
 */
 
-#include <aleph/persistenceDiagrams/Norms.hh>
-
-#include <aleph/persistenceDiagrams/io/JSON.hh>
-
 #include <aleph/persistentHomology/Calculation.hh>
+
+#include <aleph/topology/filtrations/Data.hh>
 
 #include <aleph/topology/io/AdjacencyMatrix.hh>
 
@@ -111,6 +109,7 @@ std::vector<PersistenceDiagram> processFilename( const std::string& filename,
                                                  double infinity,
                                                  bool keepUnpaired,
                                                  bool verbose,
+                                                 bool reverse,
                                                  unsigned numDiagrams,
                                                  aleph::topology::io::AdjacencyMatrixReader reader )
 {
@@ -120,7 +119,14 @@ std::vector<PersistenceDiagram> processFilename( const std::string& filename,
   SimplicialComplex K;
   reader( filename, K );
 
-  K.sort();
+  if( reverse )
+  {
+    K.sort(
+       aleph::topology::filtrations::Data< Simplex, std::less<DataType> >()
+     );
+  }
+  else
+    K.sort( aleph::topology::filtrations::Data<Simplex>() );
 
   bool dualize                    = true;
   bool includeAllUnpairedCreators = keepUnpaired;
@@ -149,6 +155,11 @@ std::vector<PersistenceDiagram> processFilename( const std::string& filename,
 
   auto basename
     = aleph::utilities::basename( filename );
+
+  // Negate any finite values supplied by the user to ensure symmetry of
+  // the reverse filtration.
+  if( reverse && std::isfinite( infinity ) )
+    infinity = -infinity;
 
   for( auto&& diagram : diagrams )
   {
@@ -231,6 +242,13 @@ int main( int argc, char** argv )
   reader.setIgnoreNaNs();
   reader.setIgnoreZeroWeights();
 
+  // Ascending filtration ----------------------------------------------
+  //
+  // This filtration goes from *negatively* correlated features of the
+  // graphs to positively correlated ones.
+
+  bool reverse = false;
+
   // Whew, is there *really* no better way of specifying this strategy
   // here as a qualified name?
   reader.setVertexWeightAssignmentStrategy(
@@ -243,6 +261,34 @@ int main( int argc, char** argv )
                                      infinity,
                                      keepUnpaired,
                                      verbose,
+                                     reverse,
+                                     numDiagrams,
+                                     reader
+    );
+
+    diagramCollection.update( filename, diagrams.begin(), diagrams.end() );
+  }
+
+  // Descending filtration ---------------------------------------------
+  //
+  // This filtration goes from *positively* correlated features of the
+  // graphs to negatively correlated ones.
+
+  reverse = true;
+
+  // Whew, is there *really* no better way of specifying this strategy
+  // here as a qualified name?
+  reader.setVertexWeightAssignmentStrategy(
+      aleph::topology::io::AdjacencyMatrixReader::VertexWeightAssignmentStrategy::AssignGlobalMaximum
+  );
+
+  for( auto&& filename : filenames )
+  {
+    auto diagrams = processFilename( filename,
+                                     infinity,
+                                     keepUnpaired,
+                                     verbose,
+                                     reverse,
                                      numDiagrams,
                                      reader
     );
