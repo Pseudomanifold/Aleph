@@ -42,6 +42,34 @@ using SimplicialComplex  = aleph::topology::SimplicialComplex<Simplex>;
 using PersistenceDiagram = aleph::PersistenceDiagram<DataType>;
 using Point              = typename PersistenceDiagram::Point;
 
+/*
+  Class for collecting persistence diagrams for a set of input
+  filenames. The class is capable of merging the diagrams that
+  correspond to the same filename automatically. Diagrams will
+  be merged by taking a union of their points.
+*/
+
+class DiagramCollection
+{
+public:
+  template <class InputIterator> DiagramCollection( unsigned numDiagrams, InputIterator begin, InputIterator end )
+  {
+    // Fill collection with empty diagrams
+    for( auto it = begin; it != end; ++it )
+      _diagrams[ *it ] = Diagrams( numDiagrams );
+  }
+
+private:
+
+  // Slightly verbose, but makes for readable code later on
+  using Diagrams = std::vector<PersistenceDiagram>;
+  using Value    = Diagrams;
+  using Key      = std::string;
+  using Map      = std::map<Key, Value>;
+
+  Map _diagrams;
+};
+
 void usage()
 {
   std::cerr << "Usage: ephemeral [--dimension DIMENSION] [--infinity INF] FILENAMES\n"
@@ -159,6 +187,17 @@ int main( int argc, char** argv )
 
   for( int i = optind; i < argc; i++ )
     filenames.push_back( argv[i] );
+
+  // The maximum number of diagrams per simplicial complex depends on
+  // the maximum expansion dimension and whether we want to keep some
+  // unpaired features. This is required for bookkeeping.
+  unsigned numDiagrams = keepUnpaired + dimension + 1;
+
+  DiagramCollection diagramCollection(
+      numDiagrams,
+      filenames.begin(),
+      filenames.end()
+  );
 
   aleph::topology::io::AdjacencyMatrixReader reader;
   reader.setIgnoreNaNs();
