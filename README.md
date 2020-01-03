@@ -169,3 +169,5 @@ The following people have contributed code to Aleph:
 * [Pseudomanifold](https://github.com/Pseudomanifold) (Bastian Rieck): principal developer
 * [ExpectationMax](https://github.com/ExpectationMax) (Max Horn): fixes and
   improvements to the Python bindings
+* [macjohnny](https://github.com/macjohnny) (Esteban Gehring): documentation
+  updates
