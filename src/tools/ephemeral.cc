@@ -111,6 +111,7 @@ std::vector<PersistenceDiagram> processFilename( const std::string& filename,
                                                  bool keepUnpaired,
                                                  bool verbose,
                                                  bool reverse,
+                                                 bool distance,
                                                  unsigned numDiagrams,
                                                  aleph::topology::io::AdjacencyMatrixReader reader )
 {
@@ -118,7 +119,23 @@ std::vector<PersistenceDiagram> processFilename( const std::string& filename,
     std::cerr << "* Processing " << filename << "...";
 
   SimplicialComplex K;
-  reader( filename, K );
+
+  if( distance )
+  {
+    reader( filename, K,
+      [] ( DataType /* maxWeight */, DataType /* minWeight */, DataType weight )
+      {
+        // Transform the weight into a *distance* by negating it; this
+        // ignores all other scaling mechanisms applied to the data.
+        return 1.0 - weight;
+      }
+    );
+  }
+  else
+    reader( filename, K );
+
+  // Setting both of them would be invalid
+  assert( !(distance && reverse) );
 
   if( reverse )
   {
@@ -189,6 +206,7 @@ int main( int argc, char** argv )
     { "infinity"      , required_argument, nullptr, 'i' },
     { "keep-unpaired" , no_argument      , nullptr, 'k' },
     { "verbose"       , no_argument      , nullptr, 'v' },
+    { "distance"      , no_argument      , nullptr, 'D' },
     { nullptr         , 0                , nullptr,  0  }
   };
 
@@ -196,11 +214,12 @@ int main( int argc, char** argv )
   double infinity    = std::numeric_limits<double>::infinity();
   bool keepUnpaired  = false;
   bool verbose       = false;
+  bool distance      = false;
 
   {
     int option = 0;
 
-    while( ( option = getopt_long( argc, argv, "d:i:kv", commandLineOptions, nullptr ) ) != -1 )
+    while( ( option = getopt_long( argc, argv, "d:i:kvD", commandLineOptions, nullptr ) ) != -1 )
     {
       switch( option )
       {
@@ -212,6 +231,9 @@ int main( int argc, char** argv )
         break;
       case 'k':
         keepUnpaired = true;
+        break;
+      case 'D':
+        distance = true;
         break;
       }
     }
@@ -243,58 +265,97 @@ int main( int argc, char** argv )
   reader.setIgnoreNaNs();
   reader.setIgnoreZeroWeights();
 
-  // Ascending filtration ----------------------------------------------
-  //
-  // This filtration goes from *negatively* correlated features of the
-  // graphs to positively correlated ones.
-
-  bool reverse = false;
-
-  // Whew, is there *really* no better way of specifying this strategy
-  // here as a qualified name?
-  reader.setVertexWeightAssignmentStrategy(
-      aleph::topology::io::AdjacencyMatrixReader::VertexWeightAssignmentStrategy::AssignGlobalMinimum
-  );
-
-  for( auto&& filename : filenames )
+  // No distance calculations are desired; calculate dual filtration and
+  // store them.
+  if( !distance )
   {
-    auto diagrams = processFilename( filename,
-                                     infinity,
-                                     keepUnpaired,
-                                     verbose,
-                                     reverse,
-                                     numDiagrams,
-                                     reader
+    // Ascending filtration ----------------------------------------------
+    //
+    // This filtration goes from *negatively* correlated features of the
+    // graphs to positively correlated ones.
+
+    bool reverse = false;
+
+    // Whew, is there *really* no better way of specifying this strategy
+    // here as a qualified name?
+    reader.setVertexWeightAssignmentStrategy(
+        aleph::topology::io::AdjacencyMatrixReader::VertexWeightAssignmentStrategy::AssignGlobalMinimum
     );
 
-    diagramCollection.update( filename, diagrams.begin(), diagrams.end() );
+    for( auto&& filename : filenames )
+    {
+      auto diagrams = processFilename( filename,
+                                       infinity,
+                                       keepUnpaired,
+                                       verbose,
+                                       reverse,
+                                       distance,
+                                       numDiagrams,
+                                       reader
+      );
+
+      diagramCollection.update( filename, diagrams.begin(), diagrams.end() );
+    }
+
+    // Descending filtration ---------------------------------------------
+    //
+    // This filtration goes from *positively* correlated features of the
+    // graphs to negatively correlated ones.
+
+    reverse = true;
+
+    // Whew, is there *really* no better way of specifying this strategy
+    // here as a qualified name?
+    reader.setVertexWeightAssignmentStrategy(
+        aleph::topology::io::AdjacencyMatrixReader::VertexWeightAssignmentStrategy::AssignGlobalMaximum
+    );
+
+    for( auto&& filename : filenames )
+    {
+      auto diagrams = processFilename( filename,
+                                       infinity,
+                                       keepUnpaired,
+                                       verbose,
+                                       reverse,
+                                       distance,
+                                       numDiagrams,
+                                       reader
+      );
+
+      diagramCollection.update( filename, diagrams.begin(), diagrams.end() );
+    }
   }
 
-  // Descending filtration ---------------------------------------------
-  //
-  // This filtration goes from *positively* correlated features of the
-  // graphs to negatively correlated ones.
-
-  reverse = true;
-
-  // Whew, is there *really* no better way of specifying this strategy
-  // here as a qualified name?
-  reader.setVertexWeightAssignmentStrategy(
-      aleph::topology::io::AdjacencyMatrixReader::VertexWeightAssignmentStrategy::AssignGlobalMaximum
-  );
-
-  for( auto&& filename : filenames )
+  // Distance calculations are desired, rephrase the expansion and
+  // creation of simplicial complexes accordingly.
+  else
   {
-    auto diagrams = processFilename( filename,
-                                     infinity,
-                                     keepUnpaired,
-                                     verbose,
-                                     reverse,
-                                     numDiagrams,
-                                     reader
+    reader.setVertexWeightAssignmentStrategy(
+        aleph::topology::io::AdjacencyMatrixReader::VertexWeightAssignmentStrategy::AssignZero
     );
 
-    diagramCollection.update( filename, diagrams.begin(), diagrams.end() );
+    for( auto&& filename : filenames )
+    {
+      auto diagrams = processFilename( filename,
+                                       infinity,
+                                       keepUnpaired,
+                                       verbose,
+                                       false, // no reverse filtration
+                                       true,  // distance
+                                       numDiagrams,
+                                       reader
+      );
+
+      diagramCollection.update( filename, diagrams.begin(), diagrams.end() );
+    }
+
+    for( auto&& filename : filenames )
+    {
+      if( verbose )
+        std::cerr << "* Processing " << filename << "...";
+
+      SimplicialComplex K;
+    }
   }
 
   // Output ------------------------------------------------------------
