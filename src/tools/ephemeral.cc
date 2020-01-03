@@ -52,6 +52,13 @@ using Point              = typename PersistenceDiagram::Point;
 class DiagramCollection
 {
 public:
+
+  // Slightly verbose, but makes for readable code later on
+  using Diagrams = std::vector<PersistenceDiagram>;
+  using Value    = Diagrams;
+  using Key      = std::string;
+  using Map      = std::map<Key, Value>;
+
   template <class InputIterator> DiagramCollection( unsigned numDiagrams, InputIterator begin, InputIterator end )
   {
     // Fill collection with empty diagrams
@@ -59,13 +66,20 @@ public:
       _diagrams[ *it ] = Diagrams( numDiagrams );
   }
 
-private:
+  template <class InputIterator> void update( const Key& key,
+                                              InputIterator begin,
+                                              InputIterator end )
+  {
+    // Let's not check for existence here but gamble a little bit ;-)
+    auto&& diagrams = _diagrams.at( key );
+    unsigned index  = 0;
 
-  // Slightly verbose, but makes for readable code later on
-  using Diagrams = std::vector<PersistenceDiagram>;
-  using Value    = Diagrams;
-  using Key      = std::string;
-  using Map      = std::map<Key, Value>;
+    // Again, no checking bounds because I am a little bit lazy.
+    for( auto it = begin; it != end; ++it )
+      diagrams.at( index++ ).merge( *it );
+  }
+
+private:
 
   Map _diagrams;
 };
