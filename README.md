@@ -162,7 +162,7 @@ package. A simpler installation based on `pip` is forthcoming.
 # Contact & contributors
 
 For general discussion, questions, and comments, please contact the
-principal developer and maintainer Bastian Rieck (bastian.rieck@iwr.uni-heidelberg.de).
+principal developer and maintainer Bastian Rieck (bastian.rieck@bsse.ethz.ch).
 
 The following people have contributed code to Aleph:
 
