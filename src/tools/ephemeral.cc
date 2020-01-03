@@ -314,7 +314,7 @@ int main( int argc, char** argv )
     {
       auto output = "/tmp/"
                   + basename
-                  + "_d" + std::to_string( index )
+                  + "_d" + std::to_string( index++ )
                   + ".txt";
 
       std::ofstream out( output );
