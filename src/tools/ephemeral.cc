@@ -25,6 +25,7 @@
 
 #include <algorithm>
 #include <iostream>
+#include <fstream>
 #include <limits>
 #include <map>
 #include <string>
@@ -305,8 +306,18 @@ int main( int argc, char** argv )
   for( auto&& filename : filenames )
   {
     auto&& diagrams = diagramCollection[ filename ];
+    auto basename   = aleph::utilities::basename( filename );
+    unsigned index  = 0;
 
     for( auto&& D : diagrams )
-      std::cout << D << "\n";
+    {
+      auto output = "/tmp/"
+                  + basename
+                  + "_d" + std::to_string( index )
+                  + ".txt";
+
+      std::ofstream out( output );
+      out << D;
+    }
   }
 }
