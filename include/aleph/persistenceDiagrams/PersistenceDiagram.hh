@@ -106,6 +106,22 @@ public:
     _points.push_back( Point( x, y ) );
   }
 
+  /**
+    Inserts a sequence of points at the specified position of the
+    persistence diagram.
+
+    @param position Position at which to insert the points
+    @param first    Iterator to beginning of range
+    @param end      Iterator to end of range
+  */
+
+  template <class InputIterator> void insert( Iterator position,
+                                              InputIterator first,
+                                              InputIterator last )
+  {
+    _points.insert( position, first, last );
+  }
+
   Iterator erase( Iterator position )
   {
     return _points.erase( position );
