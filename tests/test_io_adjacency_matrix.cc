@@ -38,6 +38,12 @@ template <class T> void testSimple()
   ALEPH_ASSERT_THROW( K.empty() == false );
   ALEPH_ASSERT_EQUAL( K.size(), 3 + 3 );    // 3 nodes, 3 edges
 
+  // Ensures that the indices of the simplicial complex are consistent
+  // with the dimension of the matrix.
+  for( auto&& s : K )
+    for( auto&& v : s )
+      ALEPH_ASSERT_THROW( v <= 2 );
+
   std::vector<DataType> weights;
 
   std::transform( K.begin(), K.end(), std::back_inserter( weights ),
