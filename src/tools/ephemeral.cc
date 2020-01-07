@@ -6,8 +6,12 @@
   matrices, specifically those arising from fMRI data sets. To this
   end, *two* graph filtrations are calculated: one for the positive
   correlations, the other for the negative ones. The resulting data
-  will be merged into a single persistence diagram.
+  will be merged into a single persistence diagram. An *additional*
+  mode permits calculating a filtration based on *pseudo-distances*
+  calculated from the correlation values of edges.
 */
+
+#include <aleph/geometry/RipsExpander.hh>
 
 #include <aleph/persistentHomology/Calculation.hh>
 
@@ -41,6 +45,7 @@ using Simplex            = aleph::topology::Simplex<DataType, VertexType>;
 using SimplicialComplex  = aleph::topology::SimplicialComplex<Simplex>;
 using PersistenceDiagram = aleph::PersistenceDiagram<DataType>;
 using Point              = typename PersistenceDiagram::Point;
+using RipsExpander       = aleph::geometry::RipsExpander<SimplicialComplex>;
 
 /*
   Class for collecting persistence diagrams for a set of input
@@ -108,6 +113,7 @@ void usage()
 
 std::vector<PersistenceDiagram> processFilename( const std::string& filename,
                                                  double infinity,
+                                                 unsigned dimension,
                                                  bool keepUnpaired,
                                                  bool verbose,
                                                  bool reverse,
@@ -133,6 +139,18 @@ std::vector<PersistenceDiagram> processFilename( const std::string& filename,
   }
   else
     reader( filename, K );
+
+  // If desired, perform a simple Vietoris--Rips expansion of the given
+  // simplicial complex. This tacitly assumes that edges are *weighted*
+  // and propagates the maximum edge weight to higher-dimensional faces
+  // of the complex.
+  if( dimension != 0 )
+  {
+    RipsExpander expander;
+
+    K = expander( K, dimension );
+    K = expander.assignMaximumWeight( K );
+  }
 
   // Setting both of them would be invalid
   assert( !(distance && reverse) );
@@ -286,6 +304,7 @@ int main( int argc, char** argv )
     {
       auto diagrams = processFilename( filename,
                                        infinity,
+                                       dimension,
                                        keepUnpaired,
                                        verbose,
                                        reverse,
@@ -314,6 +333,7 @@ int main( int argc, char** argv )
     {
       auto diagrams = processFilename( filename,
                                        infinity,
+                                       dimension,
                                        keepUnpaired,
                                        verbose,
                                        reverse,
@@ -338,6 +358,7 @@ int main( int argc, char** argv )
     {
       auto diagrams = processFilename( filename,
                                        infinity,
+                                       dimension,
                                        keepUnpaired,
                                        verbose,
                                        false, // no reverse filtration
