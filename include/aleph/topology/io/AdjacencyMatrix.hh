@@ -193,7 +193,7 @@ public:
         // Map matrix indices to the corresponding vertex indices as
         // outlined above.
         auto u = VertexType(y);
-        auto v = VertexType(x + _dimension);
+        auto v = VertexType(x);
 
         if( _ignoreNaNs && std::isnan( w ) )
           continue;
