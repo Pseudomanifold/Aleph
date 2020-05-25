@@ -65,21 +65,27 @@ int main( int argc, char** argv )
   }
 
   bool normalize = false;
+  bool tail = false;
 
   {
     static option commandLineOptions[] =
     {
       { "normalize", no_argument, nullptr, 'n' },
+      { "tail"     , no_argument, nullptr, 't' },
       { nullptr    , 0          , nullptr,  0  }
     };
 
     int option = 0;
-    while( ( option = getopt_long( argc, argv, "n", commandLineOptions, nullptr ) ) != -1 )
+    while( ( option = getopt_long( argc, argv, "nt", commandLineOptions, nullptr ) ) != -1 )
     {
       switch( option )
       {
       case 'n':
         normalize = true;
+        break;
+
+      case 't':
+        tail = true;
         break;
 
       default:
@@ -204,8 +210,10 @@ int main( int argc, char** argv )
 
   using PersistenceDiagram = aleph::PersistenceDiagram<DataType>;
 
-  for( auto&& D : diagrams )
+  for( std::size_t i = 0; i < diagrams.size(); i++ )
   {
+    auto&& D = diagrams[i];
+
     // Removes all features of zero persistence. They only clutter up
     // the diagonal.
     D.removeDiagonal();
@@ -223,16 +231,21 @@ int main( int argc, char** argv )
       );
     }
 
-    // This output contains a sort of header (in gnuplot style) so that
-    // it is possible to store multiple persistence diagrams in the same
-    // file.
-    //
-    // Note that for the output, it would also be possible just to loop
-    // over the individual points of the persistence diagram.
-    std::cout << "# Persistence diagram <" << input << ">\n"
-              << "#\n"
-              << "# Dimension: " << D.dimension() << "\n"
-              << "# Entries  : " << D.size() << "\n"
-              << D << "\n\n";
+    // Only print this if we want to see the tail diagram, i.e. the last
+    // one, or we want to see *all* of them.
+    if( i + 1 == diagrams.size() || !tail )
+    {
+      // This output contains a sort of header (in gnuplot style) so that
+      // it is possible to store multiple persistence diagrams in the same
+      // file.
+      //
+      // Note that for the output, it would also be possible just to loop
+      // over the individual points of the persistence diagram.
+      std::cout << "# Persistence diagram <" << input << ">\n"
+                << "#\n"
+                << "# Dimension: " << D.dimension() << "\n"
+                << "# Entries  : " << D.size() << "\n"
+                << D << "\n\n";
+    }
   }
 }
