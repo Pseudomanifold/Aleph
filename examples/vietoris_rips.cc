@@ -58,12 +58,6 @@ void usage()
 
 int main( int argc, char** argv )
 {
-  if( argc <= 2 )
-  {
-    usage();
-    return -1;
-  }
-
   bool normalize = false;
   bool tail = false;
 
@@ -121,6 +115,14 @@ int main( int argc, char** argv )
   }
 
   auto dimension = pointCloud.dimension() + 1;
+
+  // Insufficient number of parameters available. Just show the help and
+  // stop everything else.
+  if( argc - optind <= 0 )
+  {
+    usage();
+    return -1;
+  }
 
   // This converts the string supplied by the user to the corresponding
   // data type. Note that the `convert()` function only makes sense for
