@@ -60,20 +60,26 @@ int main( int argc, char** argv )
 {
   bool normalize = false;
   bool tail = false;
+  bool keep = false;
 
   {
     static option commandLineOptions[] =
     {
       { "normalize", no_argument, nullptr, 'n' },
+      { "keep",      no_argument, nullptr, 'k' },
       { "tail"     , no_argument, nullptr, 't' },
       { nullptr    , 0          , nullptr,  0  }
     };
 
     int option = 0;
-    while( ( option = getopt_long( argc, argv, "nt", commandLineOptions, nullptr ) ) != -1 )
+    while( ( option = getopt_long( argc, argv, "knt", commandLineOptions, nullptr ) ) != -1 )
     {
       switch( option )
       {
+      case 'k':
+        keep = true;
+        break;
+
       case 'n':
         normalize = true;
         break;
@@ -86,6 +92,14 @@ int main( int argc, char** argv )
         break;
       }
     }
+  }
+
+  // Insufficient number of parameters available. Just show the help and
+  // stop everything else.
+  if( argc - optind <= 0 )
+  {
+    usage();
+    return -1;
   }
 
   // We first have to specify the data type to use for the subsequent
@@ -115,14 +129,6 @@ int main( int argc, char** argv )
   }
 
   auto dimension = pointCloud.dimension() + 1;
-
-  // Insufficient number of parameters available. Just show the help and
-  // stop everything else.
-  if( argc - optind <= 0 )
-  {
-    usage();
-    return -1;
-  }
 
   // This converts the string supplied by the user to the corresponding
   // data type. Note that the `convert()` function only makes sense for
@@ -216,9 +222,12 @@ int main( int argc, char** argv )
   {
     auto&& D = diagrams[i];
 
-    // Removes all features of zero persistence. They only clutter up
-    // the diagonal.
-    D.removeDiagonal();
+    if( !keep )
+    {
+      // Removes all features of zero persistence. They only clutter up
+      // the diagonal.
+      D.removeDiagonal();
+    }
 
     if( normalize )
     {
