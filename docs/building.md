@@ -133,6 +133,50 @@ cmake ..
 make install
 ```
 
+After this, **reinstall** the package once more and ensure it passes all the tests. Then try the import again.
+
+## Use Aleph with python inside Docker
+
+Using this package inside is a bit complicated, but it is possible to make it work using this (relatively unorthodox solution).
+
+1. **DO NOT** include Aleph as a requirement inside a `requirements.txt`. Instead, create a `requirement_docker.txt` where Aleph is not included. 
+2. Inside `build/bindings/python/aleph`, create a file called `setup_docker.py` looking like this:
+
+```python3
+# Set this one up in aleph/build/bindings/python/aleph
+from setuptools import setup
+
+setup(
+    name="Aleph",
+    version="0.0.0",
+    packages=["aleph"],
+    package_dir={"": "./Aleph/build/bindings/python/"},
+    package_data={"": ["aleph.so"]},
+    zip_safe=False,
+)
+```
+
+3. A sample Docker image that should work is the following.
+```Dockerfile
+FROM python:3.7.6-buster
+
+# Install cmake
+RUN apt-get update && apt-get -y install cmake protobuf-compiler
+
+# Install dependencies
+RUN python -m pip install --upgrade pip
+COPY {PATH_TO_ALEPH}/Aleph/build/bindings/python/aleph ./Aleph/build/bindings/python/aleph
+# requirements_docker.txt should include all your requirements EXCEPT Aleph
+COPY requirements_docker.txt requirements_docker.txt
+RUN python3 ./Aleph/build/bindings/python/aleph/setup_docker.py install
+RUN pip3 install -r requirements_docker.txt
+
+COPY test_file.py test_file.py
+
+CMD ["python3", "test_file.py"]
+
+```
+
 # Additional options
 
 Some of the components of Aleph may be disabled if you want to increase
