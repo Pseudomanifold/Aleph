@@ -94,6 +94,45 @@ A typical output of this command should look like this:
 Please submit any issues you may encounter. If you want to help, please
 take a look at the [contribution guidelines](https://github.com/Pseudomanifold/Aleph/blob/master/CONTRIBUTING.md).
 
+## Binding to Python
+
+If you want to install Aleph and bind it to its python function, do make sure you have `PYBIND11` installed. If you don't, you might get something like the following output when trying to use it:
+
+```
+$ python3
+>>> import aleph
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+  File "/.../python3.x/site-packages/aleph/__init__.py", line 1, in <module>
+    from .aleph import *
+ModuleNotFoundError: No module named 'aleph.aleph'
+```
+
+Furthermore, you might get something like the following as part of the output when you run `ccmake .` inside the `build/` directory.
+
+```
+PYBIND11_DIR                                                                                                  
+PYBIND11_INCLUDE_DIR             PYBIND11_INCLUDE_DIR-NOTFOUND  
+```
+
+In this case, install `PYBIND11` both for python3 and for c/c++. For this, do:
+
+```sh
+pip3 install pybind11
+```
+
+and
+
+```sh
+# Clone, build and install
+git clone https://github.com/pybind/pybind11.git
+cd pybind11
+mkdir build
+cd build
+cmake ..
+make install
+```
+
 # Additional options
 
 Some of the components of Aleph may be disabled if you want to increase
