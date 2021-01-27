@@ -15,10 +15,13 @@
 
 #include <aleph/persistenceDiagrams/io/Raw.hh>
 
+#include <aleph/utilities/Filesystem.hh>
+
 #include <iostream>
 #include <limits>
 #include <numeric>
 #include <string>
+#include <regex>
 #include <vector>
 
 #include <getopt.h>
@@ -32,6 +35,9 @@ struct Input
 {
   std::string filename;
   PersistenceDiagram persistenceDiagram;
+
+  std::string name;   // data set name
+  unsigned dimension; // dimension of diagram
 };
 
 void usage()
@@ -56,6 +62,34 @@ void usage()
             << "            calculations. This does not apply to the infinity norm of\n"
             << "            a persistence diagram.\n"
             << "\n\n";
+}
+
+std::pair<std::string, unsigned> parseFilename( std::string filename )
+{
+  if( aleph::utilities::extension( filename ) == ".txt" )
+  {
+    // Ignore anything else before the stem of the filename. Since we
+    // are interested in parsing the dimension anyway, this is okay.
+    filename = aleph::utilities::stem( filename );
+
+    std::regex reDataSetPrefix( "(.*)_[dk]([[:digit:]]+)" );
+    std::smatch matches;
+
+    // Check if a recognizable prefix and suffix exist so that we may
+    // grab information about the data set and its dimension. If not,
+    // use the complete filename to identify the data set.
+    if( std::regex_match( filename, matches, reDataSetPrefix ) )
+    {
+      std::string name   = matches[1];
+      unsigned dimension = unsigned( std::stoul( matches[2] ) );
+
+      return std::make_pair( name, dimension );
+    }
+  }
+
+  // If we cannot parse the filename, just return its basename along
+  // with dimension zero. This is a safe bet.
+  return std::make_pair( aleph::utilities::stem( filename ), 0 );
 }
 
 int main( int argc, char** argv )
@@ -97,7 +131,9 @@ int main( int argc, char** argv )
   inputs.reserve( static_cast<std::size_t>( argc - optind ) );
 
   std::vector<std::string> columns = {
-    "file" ,
+    "file",
+    "name",
+    "dimension",
     "power",
     "total_persistence",
     "total_persistence_normalized",
@@ -111,9 +147,16 @@ int main( int argc, char** argv )
 
     std::cerr << "* Loading '" << filename << "'...";
 
+    std::string name;
+    unsigned dimension;
+
+    std::tie( name, dimension ) = parseFilename( filename );
+
     Input input = {
       filename,
-      aleph::io::load<DataType>( filename )
+      aleph::io::load<DataType>( filename ),
+      name,
+      dimension
     };
 
     inputs.push_back( input );
@@ -167,6 +210,8 @@ int main( int argc, char** argv )
     auto averagePersistence         = std::accumulate( persistence.begin(), persistence.end(), 0.0 ) / static_cast<double>( input.persistenceDiagram.size() );
 
     std::cout << "'" << input.filename      << "'" << ","
+              << input.name                 << ","
+              << input.dimension            << ","
               << p                          << ","
               << totalPersistence           << ","
               << totalPersistenceNormalized << ","
