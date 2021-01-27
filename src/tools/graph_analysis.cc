@@ -94,7 +94,7 @@ int main( int argc, char** argv )
 
   // Calculate degrees -------------------------------------------------
 
-  std::cerr << "* Calculating degree-based filtration...";
+  std::cerr << "* Calculating degree-based filtration...\n";
 
   aleph::geometry::RipsExpander<SimplicialComplex> expander;
 
@@ -109,12 +109,8 @@ int main( int argc, char** argv )
 
     if( ( argc - optind ) >= 1 )
     {
-      auto dimension = static_cast<unsigned>( std::stoul(optarg) );
+      auto dimension = static_cast<unsigned>(  std::stoul( argv[optind++] ) );
       std::cerr << "* Expanding simplicial complex up to a dimension of d = " << dimension << "...\n";
-
-      // Ensures that other arguments can be handled correctly in
-      // subsequent updates of the tool.
-      optind++;
 
       K = expander( K, dimension );
     }
@@ -122,7 +118,7 @@ int main( int argc, char** argv )
     K = expander.assignMaximumData( K, degrees.begin(), degrees.end() );
   }
 
-  std::cerr << "finished\n";
+  std::cerr << "* Finished filtration calculation\n"; 
 
   // Set vertex weights ------------------------------------------------
 
