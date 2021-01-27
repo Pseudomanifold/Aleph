@@ -107,18 +107,19 @@ int main( int argc, char** argv )
     if( not degrees.empty() )
       maxDegree = *std::max_element( degrees.begin(), degrees.end() );
 
-
     if( ( argc - optind ) >= 1 )
     {
       auto dimension = static_cast<unsigned>( std::stoul(optarg) );
-      std::cerr << "* Expanding simplicial complex up to a dimension of d = " << dimension "" <...\n";
+      std::cerr << "* Expanding simplicial complex up to a dimension of d = " << dimension << "...\n";
+
+      // Ensures that other arguments can be handled correctly in
+      // subsequent updates of the tool.
+      optind++;
 
       K = expander( K, dimension );
     }
 
     K = expander.assignMaximumData( K, degrees.begin(), degrees.end() );
-
-    std::cerr << K << "\n";
   }
 
   std::cerr << "finished\n";
