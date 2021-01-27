@@ -424,11 +424,13 @@ private:
     // vertices stored in this iterator: Namely, the filter iterator will
     // return all vertices that are _not_ equal to its current position.
 
+    using std::placeholders::_1;
+
     vertex_container_type vertices(
-          boost::make_filter_iterator( std::bind2nd( std::not_equal_to<vertex_type>(), *( this->base() ) ),
+          boost::make_filter_iterator( std::bind( std::not_equal_to<vertex_type>(), _1, *( this->base() ) ),
                                                      _vertices.begin(),
                                                      _vertices.end() ),
-          boost::make_filter_iterator( std::bind2nd( std::not_equal_to<vertex_type>(), *( this->base() ) ),
+          boost::make_filter_iterator( std::bind( std::not_equal_to<vertex_type>(), _1, *( this->base() ) ),
                                                      _vertices.end(),
                                                      _vertices.end() )
           );
