@@ -134,6 +134,7 @@ int main( int argc, char** argv )
     "file",
     "name",
     "dimension",
+    "n_features",
     "power",
     "total_persistence",
     "total_persistence_normalized",
@@ -209,13 +210,14 @@ int main( int argc, char** argv )
 
     auto averagePersistence         = std::accumulate( persistence.begin(), persistence.end(), 0.0 ) / static_cast<double>( input.persistenceDiagram.size() );
 
-    std::cout << "'" << input.filename      << "'" << ","
-              << input.name                 << ","
-              << input.dimension            << ","
-              << p                          << ","
-              << totalPersistence           << ","
-              << totalPersistenceNormalized << ","
-              << infinityNorm               << ","
-              << averagePersistence         << "\n";
+    std::cout << "'" << input.filename           << "'" << ","
+              << input.name                      << ","
+              << input.dimension                 << ","
+              << input.persistenceDiagram.size() << ","
+              << p                               << ","
+              << totalPersistence                << ","
+              << totalPersistenceNormalized      << ","
+              << infinityNorm                    << ","
+              << averagePersistence              << "\n";
   }
 }
