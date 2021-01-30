@@ -164,7 +164,8 @@ int main( int argc, char** argv )
                                              includeAllUnpairedCreators );
     for( auto&& diagram : diagrams )
     {
-      diagram.removeDiagonal();
+      if( diagram.dimension() == 0 )
+        diagram.removeDiagonal();
 
       auto output = outputDirectory
                     + aleph::utilities::stem( filename )
