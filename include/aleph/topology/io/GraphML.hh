@@ -10,6 +10,7 @@
 #endif
 
 #include <algorithm>
+#include <map>
 #include <string>
 
 namespace aleph

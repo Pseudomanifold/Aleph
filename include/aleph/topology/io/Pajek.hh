@@ -3,6 +3,7 @@
 
 #include <algorithm>
 #include <fstream>
+#include <map>
 #include <regex>
 #include <stdexcept>
 #include <string>
