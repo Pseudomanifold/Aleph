@@ -68,7 +68,7 @@ call:
 ```cpp
 using namespace aleph::persistentHomology::algorithms;
 
-auto persistenceDiagrams = calculatePersistenceDiagram<Standard>( K );
+auto persistenceDiagrams = calculatePersistenceDiagrams<Standard>( K );
 
 for( auto&& diagram : persistenceDiagrams )
   std::cout << diagram << "\n";
@@ -87,6 +87,10 @@ the resulting simplicial complex to a Vietoris&ndash;Rips complex. This
 will automatically create the triangle for us:
 
 ```cpp
+#include <aleph/topology/Simplex.hh>
+
+using namespace aleph::topology;
+
 using Data              = double;
 using Vertex            = unsigned;
 using Simplex           = Simplex<Data, Vertex>;
@@ -149,7 +153,7 @@ established the filtration order, we may proceed to calculate persistent
 homology as usual:
 
 ```cpp
-auto persistenceDiagrams = calculatePersistenceDiagram( L );
+auto persistenceDiagrams = calculatePersistenceDiagrams( L );
 
 for( auto&& diagram : persistenceDiagrams )
   std::cout << diagram << "\n";
